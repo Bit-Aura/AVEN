@@ -100,3 +100,4 @@ To run the backend test suite locally on the host:
 - **Micro-celebration Overlay (Frontend)**: A screen-covering, dopamine-inducing animation that triggers automatically when a user completes a major learning milestone. (See docs/Feature_Micro_Celebration.md)
 - **Time-Travel History / Undo (Frontend)**: A custom snapshot state engine allowing users to instantly undo milestone completions via a sleek toast UI. (See docs/Feature_Time_Travel.md)
 - **Command Palette (Frontend)**: A global keyboard-driven interface (Cmd/Ctrl+K) for quickly accessing power features like the IDE (Cmd+I) or AI Coach (Cmd+H). (See docs/Feature_Command_Palette.md)
+- **Focus Mode Toggle (Frontend)**: A cognitive-load reduction feature that uses CSS dimming and blurring to spotlight only the active learning node, accessible via a header toggle or Cmd+F. (See docs/Feature_Focus_Mode.md)
