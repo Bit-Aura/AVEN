@@ -11,7 +11,7 @@ async def parse_intent(
     neo4j_client: Neo4jClient
 ) -> Dict[str, Any]:
     """
-    Parses user input into a structured intent using the AI provider and queries the Neo4j graph.
+    Parses user input into a structured intent using the AI provider.
     
     Args:
         user_input (str): The natural language input from the user.
@@ -21,5 +21,6 @@ async def parse_intent(
     Returns:
         Dict[str, Any]: The extracted intent schema.
     """
-    # TODO: Use ai_provider to parse goal and query/verify skill nodes in Neo4j using neo4j_client
-    return {}
+    # Call the AI provider to perform intent parsing
+    intent_data = await ai_provider.parse_goal(user_input)
+    return intent_data
