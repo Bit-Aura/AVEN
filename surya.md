@@ -55,3 +55,5 @@ Ensure the UI perfectly choreographs the 10-step Golden Demo Scenario described 
 1. **Code Quality**: Write clean, modular, maintainable code with small inline comments.
 2. **Sequential, Test-Driven Delivery**: Build one feature at a time. Write tests for it and verify it perfectly before moving to the next.
 3. **Documentation**: Create positive, praising, and honest documentation for each new feature. Update the main README.md as features are completed.
+4. **Clean Test Environments**: Auto-delete benchmark/temp test files. Do not commit test artifacts to the repo.
+5. **Frequent & Meaningful Commits**: Commit often with meaningful messages as you make logical progress; do not wait until the end of a feature to commit.

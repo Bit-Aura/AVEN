@@ -7,3 +7,5 @@
 4. **Test-Driven Delivery**: You must write test files for every feature. The feature must be fully tested and verified before moving on to the next feature.
 5. **Sequential Development**: Everything must be fully functioning and verified in one feature before jumping to the next. Do not leave features half-finished.
 6. **Living README**: The common `README.md` must be updated continuously as new features are built and proven to work.
+7. **Clean Test Environments**: Any benchmark, temporary, or mock files generated during testing must be automatically deleted after the test runs. Do not keep them locally or commit them to the repository, as this can trigger flagging.
+8. **Meaningful & Frequent Commits**: Do not bundle everything into one giant commit. Make many meaningful, logically separated commits as you work through a feature.
