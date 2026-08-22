@@ -1,91 +1,159 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from datetime import datetime
-from sqlalchemy import Column, String, ForeignKey, Table, Text, DateTime
+from sqlalchemy import String, ForeignKey, Text, DateTime, Integer, Boolean, Float, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from pgvector.sqlalchemy import Vector
 from .base import Base
 
-# Self-referential many-to-many association table for Skill prerequisites
-skill_prerequisites = Table(
-    "skill_prerequisites",
-    Base.metadata,
-    Column("skill_id", ForeignKey("skills.id"), primary_key=True),
-    Column("prerequisite_id", ForeignKey("skills.id"), primary_key=True),
-)
-
 class User(Base):
     __tablename__ = "users"
     
-    id: Mapped[int] = mapped_column(primary_key=True)
-    clerk_id: Mapped[str] = mapped_column(String, unique=True, index=True)
-    email: Mapped[str] = mapped_column(String, unique=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    clerk_id: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     
-    profile: Mapped["LearnerProfile"] = relationship(back_populates="user", uselist=False)
+    profile: Mapped[Optional["LearnerProfile"]] = relationship(back_populates="user", uselist=False)
 
-class Skill(Base):
-    __tablename__ = "skills"
+class LearnerProfile(Base):
+    __tablename__ = "learner_profiles"
     
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String, unique=True, index=True)
-    description: Mapped[str] = mapped_column(Text)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
+    current_context: Mapped[Optional[str]] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     
-    # 384 dimensions for all-MiniLM-L6-v2
+    user: Mapped["User"] = relationship(back_populates="profile")
+    goals: Mapped[List["Goal"]] = relationship(back_populates="profile")
+    diagnostic_sessions: Mapped[List["DiagnosticSession"]] = relationship(back_populates="profile")
+    assessment_attempts: Mapped[List["AssessmentAttempt"]] = relationship(back_populates="profile")
+    path_versions: Mapped[List["PathVersion"]] = relationship(back_populates="profile")
+    readiness_snapshots: Mapped[List["ReadinessSnapshot"]] = relationship(back_populates="profile")
+
+class Goal(Base):
+    __tablename__ = "goals"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id"))
+    title: Mapped[str] = mapped_column(String(255))
+    description: Mapped[Optional[str]] = mapped_column(Text)
     embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(384))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     
-    prerequisites: Mapped[List["Skill"]] = relationship(
-        "Skill",
-        secondary=skill_prerequisites,
-        primaryjoin=id==skill_prerequisites.c.skill_id,
-        secondaryjoin=id==skill_prerequisites.c.prerequisite_id,
-        backref="required_by"
-    )
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="goals")
+
+class DiagnosticSession(Base):
+    __tablename__ = "diagnostic_sessions"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id"))
+    status: Mapped[str] = mapped_column(String(50), default="active")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="diagnostic_sessions")
+    turns: Mapped[List["DiagnosticTurn"]] = relationship(back_populates="session")
+
+class DiagnosticTurn(Base):
+    __tablename__ = "diagnostic_turns"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    session_id: Mapped[int] = mapped_column(ForeignKey("diagnostic_sessions.id"))
+    prompt: Mapped[str] = mapped_column(Text)
+    response: Mapped[Optional[str]] = mapped_column(Text)
+    turn_number: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    session: Mapped["DiagnosticSession"] = relationship(back_populates="turns")
+
+class AssessmentItem(Base):
+    __tablename__ = "assessment_items"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(255))
+    content: Mapped[str] = mapped_column(Text)
+    difficulty: Mapped[str] = mapped_column(String(50))
+    embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(384))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    attempts: Mapped[List["AssessmentAttempt"]] = relationship(back_populates="assessment_item")
+
+class AssessmentAttempt(Base):
+    __tablename__ = "assessment_attempts"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id"))
+    assessment_item_id: Mapped[int] = mapped_column(ForeignKey("assessment_items.id"))
+    score: Mapped[float] = mapped_column(Float)
+    is_correct: Mapped[bool] = mapped_column(Boolean)
+    response_data: Mapped[Optional[str]] = mapped_column(Text)
+    attempted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="assessment_attempts")
+    assessment_item: Mapped["AssessmentItem"] = relationship(back_populates="attempts")
+
+class PathVersion(Base):
+    __tablename__ = "path_versions"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id"))
+    parent_version_id: Mapped[Optional[int]] = mapped_column(ForeignKey("path_versions.id"), nullable=True)
+    trigger_event: Mapped[str] = mapped_column(String(255))
+    changed_nodes: Mapped[Any] = mapped_column(JSON) # JSON field for changed nodes
+    decision_trace: Mapped[Any] = mapped_column(JSON) # JSON field for decision trace
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="path_versions")
+
+class ReadinessSnapshot(Base):
+    __tablename__ = "readiness_snapshots"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id"))
+    skill_id: Mapped[str] = mapped_column(String(255)) # reference to Neo4j Skill node by name/ID
+    readiness_score: Mapped[float] = mapped_column(Float)
+    last_updated: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="readiness_snapshots")
 
 class Resource(Base):
     __tablename__ = "resources"
     
-    id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(255))
     content: Mapped[str] = mapped_column(Text)
-    url: Mapped[str] = mapped_column(String)
-    
+    url: Mapped[str] = mapped_column(String(512))
     embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(384))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     
-class LearnerProfile(Base):
-    __tablename__ = "learner_profiles"
-    
-    id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    current_context: Mapped[str] = mapped_column(Text, nullable=True)
-    
-    user: Mapped["User"] = relationship(back_populates="profile")
-    paths: Mapped[List["LearningPath"]] = relationship(back_populates="profile")
+    metadata_relations: Mapped[List["ResourceMetadata"]] = relationship(back_populates="resource")
 
-class LearningPath(Base):
-    __tablename__ = "learning_paths"
+class ResourceMetadata(Base):
+    __tablename__ = "resource_metadata"
     
-    id: Mapped[int] = mapped_column(primary_key=True)
-    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id"))
-    goal: Mapped[str] = mapped_column(String)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    resource_id: Mapped[int] = mapped_column(ForeignKey("resources.id"))
+    key: Mapped[str] = mapped_column(String(255))
+    value: Mapped[str] = mapped_column(Text)
     
-    profile: Mapped["LearnerProfile"] = relationship(back_populates="paths")
-    milestones: Mapped[List["PathMilestone"]] = relationship(back_populates="path")
-
-class PathMilestone(Base):
-    __tablename__ = "path_milestones"
-    
-    id: Mapped[int] = mapped_column(primary_key=True)
-    path_id: Mapped[int] = mapped_column(ForeignKey("learning_paths.id"))
-    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.id"))
-    status: Mapped[str] = mapped_column(String, default="pending") # pending, in_progress, completed
-    
-    path: Mapped["LearningPath"] = relationship(back_populates="milestones")
+    resource: Mapped["Resource"] = relationship(back_populates="metadata_relations")
 
 class FeedbackEvent(Base):
     __tablename__ = "feedback_events"
     
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    milestone_id: Mapped[int] = mapped_column(ForeignKey("path_milestones.id"))
-    feedback_type: Mapped[str] = mapped_column(String) # too_easy, too_hard, completed
+    target_type: Mapped[str] = mapped_column(String(50)) # e.g., 'resource', 'path_milestone'
+    target_id: Mapped[int] = mapped_column(Integer)
+    feedback_type: Mapped[str] = mapped_column(String(50)) # e.g., 'too_easy', 'too_hard', 'completed'
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+class DomainEvent(Base):
+    __tablename__ = "domain_events"
+    
+    event_id: Mapped[str] = mapped_column(String(255), primary_key=True) # event_id (UUID or unique string)
+    event_type: Mapped[str] = mapped_column(String(255))
+    aggregate_id: Mapped[str] = mapped_column(String(255))
+    payload: Mapped[Any] = mapped_column(JSON)
+    published_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
