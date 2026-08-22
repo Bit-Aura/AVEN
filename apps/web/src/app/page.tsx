@@ -4,11 +4,14 @@ import SkillGraph from '../components/SkillGraph';
 import MilestoneCard from '../components/MilestoneCard';
 import GoalChat from '../components/GoalChat';
 import DiagnosticChat from '../components/DiagnosticChat';
+import TrustPanel from '../components/TrustPanel';
 import { usePathStore } from '../store/usePathStore';
 
 export default function Home() {
   const userGoal = usePathStore((state) => state.userGoal);
   const diagnosticComplete = usePathStore((state) => state.diagnosticComplete);
+  const isTrustPanelOpen = usePathStore((state) => state.isTrustPanelOpen);
+  const toggleTrustPanel = usePathStore((state) => state.toggleTrustPanel);
 
   // 1. If the user hasn't set a goal yet, show the GoalChat UI fullscreen.
   if (!userGoal) {
@@ -29,13 +32,21 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 p-8 flex flex-col md:flex-row gap-8">
+    <main className="min-h-screen bg-slate-950 text-slate-100 p-8 flex flex-col md:flex-row gap-8 relative overflow-hidden">
       <div className="flex-1 flex flex-col">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Your PathFinder Learning Graph</h1>
-          <p className="text-slate-400 font-medium px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg inline-block">
-            Goal: <span className="text-emerald-400">{userGoal}</span>
-          </p>
+        <div className="mb-6 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Your PathFinder Learning Graph</h1>
+            <p className="text-slate-400 font-medium px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg inline-block">
+              Goal: <span className="text-emerald-400">{userGoal}</span>
+            </p>
+          </div>
+          <button 
+            onClick={toggleTrustPanel}
+            className="px-4 py-2 bg-slate-900 border border-slate-700 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-slate-100 transition-colors flex items-center gap-2 shadow-lg"
+          >
+            <span>⚡</span> Why this path?
+          </button>
         </div>
         <SkillGraph />
       </div>
@@ -43,6 +54,13 @@ export default function Home() {
         <h2 className="text-2xl font-bold mb-2">Active Milestone</h2>
         <MilestoneCard milestone={dummyMilestone} />
       </div>
+
+      {/* Trust Panel Overlay */}
+      {isTrustPanelOpen && (
+        <div className="absolute top-0 right-0 h-full z-50">
+          <TrustPanel />
+        </div>
+      )}
     </main>
   );
 }
