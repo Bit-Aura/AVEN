@@ -14,6 +14,7 @@ interface PathState {
   isSimulatingSkip: boolean;
   simulatedConsequence: string | null;
   isTakingAssessment: boolean;
+  isTrustPanelOpen: boolean;
   nodes: Node[];
   edges: Edge[];
   activeMilestone: Milestone | null;
@@ -26,6 +27,7 @@ interface PathState {
   startAssessment: () => void;
   stopAssessment: () => void;
   bypassMilestone: (nodeId: string) => void;
+  toggleTrustPanel: () => void;
 }
 
 export const usePathStore = create<PathState>((set) => ({
@@ -34,6 +36,7 @@ export const usePathStore = create<PathState>((set) => ({
   isSimulatingSkip: false,
   simulatedConsequence: null,
   isTakingAssessment: false,
+  isTrustPanelOpen: false,
   nodes: [],
   edges: [],
   activeMilestone: null,
@@ -59,4 +62,5 @@ export const usePathStore = create<PathState>((set) => ({
     }
     return { isTakingAssessment: false };
   }),
+  toggleTrustPanel: () => set((state) => ({ isTrustPanelOpen: !state.isTrustPanelOpen })),
 }));
