@@ -31,6 +31,7 @@ interface PathState {
   showCelebration: boolean;
   showUndoToast: boolean;
   isCommandPaletteOpen: boolean;
+  isFocusMode: boolean;
   previousStateSnapshot: Partial<PathState> | null;
   syncQueue: string[];
   collaborators: Collaborator[];
@@ -60,6 +61,7 @@ interface PathState {
   hideUndoToast: () => void;
   toggleCommandPalette: () => void;
   closeCommandPalette: () => void;
+  toggleFocusMode: () => void;
 }
 
 export const usePathStore = create<PathState>((set) => ({
@@ -77,6 +79,7 @@ export const usePathStore = create<PathState>((set) => ({
   showCelebration: false,
   showUndoToast: false,
   isCommandPaletteOpen: false,
+  isFocusMode: false,
   previousStateSnapshot: null,
   syncQueue: [],
   collaborators: [
@@ -164,4 +167,5 @@ export const usePathStore = create<PathState>((set) => ({
   }),
   toggleCommandPalette: () => set((state) => ({ isCommandPaletteOpen: !state.isCommandPaletteOpen })),
   closeCommandPalette: () => set({ isCommandPaletteOpen: false }),
+  toggleFocusMode: () => set((state) => ({ isFocusMode: !state.isFocusMode })),
 }));

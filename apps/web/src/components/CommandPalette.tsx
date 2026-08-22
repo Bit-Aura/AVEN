@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathStore } from '../store/usePathStore';
-import { Terminal, Code, HelpCircle, WifiOff, X, Command } from 'lucide-react';
+import { Terminal, Code, HelpCircle, WifiOff, Focus, X, Command } from 'lucide-react';
 import { useEffect } from 'react';
 
 export default function CommandPalette() {
@@ -13,6 +13,7 @@ export default function CommandPalette() {
   const openIde = usePathStore((state) => state.openIde);
   const openCoach = usePathStore((state) => state.openCoach);
   const toggleOffline = usePathStore((state) => state.toggleOffline);
+  const toggleFocusMode = usePathStore((state) => state.toggleFocusMode);
 
   // Global Keyboard Listener
   useEffect(() => {
@@ -53,6 +54,13 @@ export default function CommandPalette() {
         toggleOffline();
         closeCommandPalette();
       }
+
+      // Action: Cmd+F (Toggle Focus Mode)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+        e.preventDefault();
+        toggleFocusMode();
+        closeCommandPalette();
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -65,6 +73,7 @@ export default function CommandPalette() {
     openIde,
     openCoach,
     toggleOffline,
+    toggleFocusMode,
   ]);
 
   if (!isCommandPaletteOpen) return null;
@@ -129,6 +138,19 @@ export default function CommandPalette() {
             </div>
             <div className="flex items-center gap-1 text-slate-500 text-xs font-mono">
               <Command size={12} /> <span>O</span>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => { toggleFocusMode(); closeCommandPalette(); }}
+            className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-800 text-left transition-colors group"
+          >
+            <div className="flex items-center gap-3 text-slate-300 group-hover:text-white">
+              <Focus size={18} className="text-indigo-400" />
+              <span>Toggle Focus Mode</span>
+            </div>
+            <div className="flex items-center gap-1 text-slate-500 text-xs font-mono">
+              <Command size={12} /> <span>F</span>
             </div>
           </button>
         </div>
