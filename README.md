@@ -84,3 +84,6 @@ To run the backend test suite locally on the host:
    ```bash
    PYTHONPATH=apps/api pytest apps/api
    ```
+
+## Built Features
+- **Dashboard & Skill Graph (Frontend)**: Highly interactive, visually stunning React Flow graph for displaying the learning path, powered by strict Zustand state management and fully testable architecture. (See docs/Feature_Dashboard_Skill_Graph.md)
