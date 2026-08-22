@@ -88,3 +88,4 @@ To run the backend test suite locally on the host:
 ## Built Features
 - **Dashboard & Skill Graph (Frontend)**: Highly interactive, visually stunning React Flow graph for displaying the learning path, powered by strict Zustand state management and fully testable architecture. (See docs/Feature_Dashboard_Skill_Graph.md)
 - **Goal Chat UI (Frontend)**: An immersive, beautifully styled natural-language input interface that seamlessly captures the user's initial goal and conditionally transitions into the dashboard. (See docs/Feature_Goal_Chat.md)
+- **Cold-Start Diagnostic UI (Frontend)**: A sleek, bounded conversational UI that effectively estimates a learner's baseline skills right after onboarding, preventing the "cold-start" problem without relying on boring forms. (See docs/Feature_Diagnostic_Chat.md)

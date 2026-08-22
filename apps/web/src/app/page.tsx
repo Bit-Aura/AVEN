@@ -3,20 +3,28 @@
 import SkillGraph from '../components/SkillGraph';
 import MilestoneCard from '../components/MilestoneCard';
 import GoalChat from '../components/GoalChat';
+import DiagnosticChat from '../components/DiagnosticChat';
 import { usePathStore } from '../store/usePathStore';
 
 export default function Home() {
   const userGoal = usePathStore((state) => state.userGoal);
+  const diagnosticComplete = usePathStore((state) => state.diagnosticComplete);
 
-  // If the user hasn't set a goal yet, show the GoalChat UI fullscreen.
+  // 1. If the user hasn't set a goal yet, show the GoalChat UI fullscreen.
   if (!userGoal) {
     return <GoalChat />;
   }
 
+  // 2. If the user has a goal but hasn't completed the diagnostic, show the diagnostic chat.
+  if (!diagnosticComplete) {
+    return <DiagnosticChat />;
+  }
+
+  // 3. Once both are complete, show the actual dashboard.
   const dummyMilestone = {
     id: '1',
     title: 'Python Basics',
-    explanation: 'This is the most critical starting point for Backend Engineering. Python provides the fundamental syntax and concepts you will use for the rest of your path.',
+    explanation: 'Based on your diagnostic, this is the most critical starting point for Backend Engineering. Python provides the fundamental syntax and concepts you will use for the rest of your path.',
     status: 'active' as const,
   };
 
