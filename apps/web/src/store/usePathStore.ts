@@ -26,6 +26,8 @@ interface PathState {
   activeIdeNodeId: string | null;
   activeCoachNodeId: string | null;
   isOffline: boolean;
+  streak: number;
+  xp: number;
   syncQueue: string[];
   collaborators: Collaborator[];
   nodes: Node[];
@@ -48,6 +50,7 @@ interface PathState {
   closeCoach: () => void;
   toggleOffline: () => void;
   syncOfflineProgress: () => void;
+  awardXp: (amount: number) => void;
 }
 
 export const usePathStore = create<PathState>((set) => ({
@@ -60,6 +63,8 @@ export const usePathStore = create<PathState>((set) => ({
   activeIdeNodeId: null,
   activeCoachNodeId: null,
   isOffline: false,
+  streak: 5,
+  xp: 1250,
   syncQueue: [],
   collaborators: [
     { id: 'u1', name: 'You', color: 'bg-blue-500', isOnline: true },
@@ -88,7 +93,8 @@ export const usePathStore = create<PathState>((set) => ({
       return { 
         activeMilestone: { ...state.activeMilestone, status: 'completed' },
         isTakingAssessment: false,
-        syncQueue: newQueue
+        syncQueue: newQueue,
+        xp: state.xp + 150
       };
     }
     return { isTakingAssessment: false };
@@ -99,7 +105,8 @@ export const usePathStore = create<PathState>((set) => ({
       return { 
         activeMilestone: { ...state.activeMilestone, status: 'completed' },
         activeIdeNodeId: null,
-        syncQueue: newQueue
+        syncQueue: newQueue,
+        xp: state.xp + 150
       };
     }
     return { activeIdeNodeId: null };
@@ -111,4 +118,5 @@ export const usePathStore = create<PathState>((set) => ({
   closeCoach: () => set({ activeCoachNodeId: null }),
   toggleOffline: () => set((state) => ({ isOffline: !state.isOffline })),
   syncOfflineProgress: () => set({ syncQueue: [] }),
+  awardXp: (amount) => set((state) => ({ xp: state.xp + amount })),
 }));

@@ -9,6 +9,7 @@ import PresenceBar from '../components/PresenceBar';
 import IdeSidecar from '../components/IdeSidecar';
 import AiCoachDrawer from '../components/AiCoachDrawer';
 import OfflineSyncBanner from '../components/OfflineSyncBanner';
+import GamificationHud from '../components/GamificationHud';
 import { usePathStore } from '../store/usePathStore';
 import { Wifi, WifiOff } from 'lucide-react';
 
@@ -84,6 +85,9 @@ export default function Home() {
           <TrustPanel />
         </div>
       )}
+
+      {/* Gamification HUD */}
+      <GamificationHud />
 
       {/* IDE Sidecar Overlay */}
       <IdeSidecar />
