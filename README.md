@@ -93,3 +93,4 @@ To run the backend test suite locally on the host:
 - **Prove-It Assessment UI (Frontend)**: A seamlessly integrated quiz interface that allows confident learners to instantly prove their skills and bypass foundational milestones without unnecessary friction. (See docs/Feature_Prove_It_Gates.md)
 - **Trust Panel & Readiness Vector UI (Frontend)**: Eliminates the "black box" by showing the learner exactly why the AI generated their path, visualizing their progress toward their ultimate goal. (See docs/Feature_Trust_Panel.md)
 - **Live Multi-Cursor/Presence UI (Frontend)**: A sleek collaboration bar showing who else is viewing the path right now (e.g., mentors, peers). (See docs/Feature_Presence_UI.md)
+- **Context-Aware IDE Sidecar (Frontend)**: A simulated inline Monaco/VS Code environment that allows learners to write code and solve node challenges directly in the browser without friction. (See docs/Feature_IDE_Sidecar.md)
