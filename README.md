@@ -102,3 +102,4 @@ To run the backend test suite locally on the host:
 - **Command Palette (Frontend)**: A global keyboard-driven interface (Cmd/Ctrl+K) for quickly accessing power features like the IDE (Cmd+I) or AI Coach (Cmd+H). (See docs/Feature_Command_Palette.md)
 - **Focus Mode Toggle (Frontend)**: A cognitive-load reduction feature that uses CSS dimming and blurring to spotlight only the active learning node, accessible via a header toggle or Cmd+F. (See docs/Feature_Focus_Mode.md)
 - **Shareable Proof Cards (Frontend)**: The capstone UI feature displaying a learner's verified confidence score, evidence tags, and an AI narrative in a premium, shareable glassmorphic credential. (See docs/Feature_Proof_Cards.md)
+- **Learner-Steerable Ranking Sliders**: Visual sliders allowing users to dynamically adjust speed vs. depth, free vs. paid, and video vs. project-based constraints. (See docs/Feature_Ranking_Sliders.md)
