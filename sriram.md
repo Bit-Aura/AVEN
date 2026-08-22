@@ -49,3 +49,8 @@ This document contains your half of the work from `PathFinder_Full_Context.md`. 
 Ensure all backend API endpoints and data structures seamlessly support the 10-step Golden Demo Scenario described in the master context.
 
 **Note on Exclusions**: Do NOT build anything listed in Section 9 of the master document (e.g., crypto, multi-agent RL loops, cohort rings).
+
+## 7. Developer Workflow & Quality Rules (See agents.md)
+1. **Code Quality**: Write clean, modular, maintainable code with small inline comments.
+2. **Sequential, Test-Driven Delivery**: Build one feature at a time. Write tests for it and verify it perfectly before moving to the next.
+3. **Documentation**: Create positive, praising, and honest documentation for each new feature. Update the main README.md as features are completed.
