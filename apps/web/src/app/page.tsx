@@ -5,6 +5,7 @@ import MilestoneCard from '../components/MilestoneCard';
 import GoalChat from '../components/GoalChat';
 import DiagnosticChat from '../components/DiagnosticChat';
 import TrustPanel from '../components/TrustPanel';
+import PresenceBar from '../components/PresenceBar';
 import { usePathStore } from '../store/usePathStore';
 
 export default function Home() {
@@ -37,9 +38,12 @@ export default function Home() {
         <div className="mb-6 flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold mb-2">Your PathFinder Learning Graph</h1>
-            <p className="text-slate-400 font-medium px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg inline-block">
-              Goal: <span className="text-emerald-400">{userGoal}</span>
-            </p>
+            <div className="flex items-center gap-4">
+              <p className="text-slate-400 font-medium px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg inline-block">
+                Goal: <span className="text-emerald-400">{userGoal}</span>
+              </p>
+              <PresenceBar />
+            </div>
           </div>
           <button 
             onClick={toggleTrustPanel}
