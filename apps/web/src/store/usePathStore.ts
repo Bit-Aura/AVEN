@@ -8,6 +8,14 @@ export interface Milestone {
   status: 'locked' | 'active' | 'completed';
 }
 
+export interface Collaborator {
+  id: string;
+  name: string;
+  color: string;
+  isOnline: boolean;
+  avatarUrl?: string;
+}
+
 interface PathState {
   userGoal: string | null;
   diagnosticComplete: boolean;
@@ -15,6 +23,7 @@ interface PathState {
   simulatedConsequence: string | null;
   isTakingAssessment: boolean;
   isTrustPanelOpen: boolean;
+  collaborators: Collaborator[];
   nodes: Node[];
   edges: Edge[];
   activeMilestone: Milestone | null;
@@ -37,6 +46,11 @@ export const usePathStore = create<PathState>((set) => ({
   simulatedConsequence: null,
   isTakingAssessment: false,
   isTrustPanelOpen: false,
+  collaborators: [
+    { id: 'u1', name: 'You', color: 'bg-blue-500', isOnline: true },
+    { id: 'u2', name: 'Sriram (Mentor)', color: 'bg-emerald-500', isOnline: true },
+    { id: 'u3', name: 'Alex (Peer)', color: 'bg-purple-500', isOnline: false }
+  ],
   nodes: [],
   edges: [],
   activeMilestone: null,
