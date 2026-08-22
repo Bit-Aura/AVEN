@@ -11,6 +11,7 @@ import AiCoachDrawer from '../components/AiCoachDrawer';
 import OfflineSyncBanner from '../components/OfflineSyncBanner';
 import GamificationHud from '../components/GamificationHud';
 import MicroCelebration from '../components/MicroCelebration';
+import UndoToast from '../components/UndoToast';
 import { usePathStore } from '../store/usePathStore';
 import { Wifi, WifiOff } from 'lucide-react';
 
@@ -101,6 +102,9 @@ export default function Home() {
 
       {/* Micro-celebration Overlay */}
       <MicroCelebration />
+
+      {/* Undo Toast */}
+      <UndoToast />
     </main>
   );
 }

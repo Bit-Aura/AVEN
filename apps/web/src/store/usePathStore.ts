@@ -29,6 +29,8 @@ interface PathState {
   streak: number;
   xp: number;
   showCelebration: boolean;
+  showUndoToast: boolean;
+  previousStateSnapshot: Partial<PathState> | null;
   syncQueue: string[];
   collaborators: Collaborator[];
   nodes: Node[];
@@ -53,6 +55,8 @@ interface PathState {
   syncOfflineProgress: () => void;
   awardXp: (amount: number) => void;
   hideCelebration: () => void;
+  undoLastAction: () => void;
+  hideUndoToast: () => void;
 }
 
 export const usePathStore = create<PathState>((set) => ({
@@ -68,6 +72,8 @@ export const usePathStore = create<PathState>((set) => ({
   streak: 5,
   xp: 1250,
   showCelebration: false,
+  showUndoToast: false,
+  previousStateSnapshot: null,
   syncQueue: [],
   collaborators: [
     { id: 'u1', name: 'You', color: 'bg-blue-500', isOnline: true },
@@ -92,8 +98,15 @@ export const usePathStore = create<PathState>((set) => ({
     // In a real app, this would update the graph edge states. 
     // For MVP frontend UI, we just mark the milestone as completed.
     if (state.activeMilestone?.id === nodeId) {
+      const snapshot = {
+        activeMilestone: state.activeMilestone,
+        xp: state.xp,
+        syncQueue: [...state.syncQueue],
+      };
       const newQueue = state.isOffline ? [...state.syncQueue, nodeId] : state.syncQueue;
       return { 
+        previousStateSnapshot: snapshot,
+        showUndoToast: true,
         activeMilestone: { ...state.activeMilestone, status: 'completed' },
         isTakingAssessment: false,
         syncQueue: newQueue,
@@ -105,8 +118,16 @@ export const usePathStore = create<PathState>((set) => ({
   }),
   completeMilestoneViaIde: (nodeId) => set((state) => {
     if (state.activeMilestone?.id === nodeId) {
+      const snapshot = {
+        activeMilestone: state.activeMilestone,
+        xp: state.xp,
+        syncQueue: [...state.syncQueue],
+        activeIdeNodeId: state.activeIdeNodeId,
+      };
       const newQueue = state.isOffline ? [...state.syncQueue, nodeId] : state.syncQueue;
       return { 
+        previousStateSnapshot: snapshot,
+        showUndoToast: true,
         activeMilestone: { ...state.activeMilestone, status: 'completed' },
         activeIdeNodeId: null,
         syncQueue: newQueue,
@@ -125,4 +146,16 @@ export const usePathStore = create<PathState>((set) => ({
   syncOfflineProgress: () => set({ syncQueue: [] }),
   awardXp: (amount) => set((state) => ({ xp: state.xp + amount })),
   hideCelebration: () => set({ showCelebration: false }),
+  hideUndoToast: () => set({ showUndoToast: false }),
+  undoLastAction: () => set((state) => {
+    if (state.previousStateSnapshot) {
+      return {
+        ...state.previousStateSnapshot,
+        previousStateSnapshot: null,
+        showUndoToast: false,
+        showCelebration: false, // Cancel celebration if they undo instantly
+      };
+    }
+    return {};
+  }),
 }));
