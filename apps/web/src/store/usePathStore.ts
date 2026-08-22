@@ -23,6 +23,7 @@ interface PathState {
   simulatedConsequence: string | null;
   isTakingAssessment: boolean;
   isTrustPanelOpen: boolean;
+  activeIdeNodeId: string | null;
   collaborators: Collaborator[];
   nodes: Node[];
   edges: Edge[];
@@ -36,7 +37,10 @@ interface PathState {
   startAssessment: () => void;
   stopAssessment: () => void;
   bypassMilestone: (nodeId: string) => void;
+  completeMilestoneViaIde: (nodeId: string) => void;
   toggleTrustPanel: () => void;
+  openIde: (nodeId: string) => void;
+  closeIde: () => void;
 }
 
 export const usePathStore = create<PathState>((set) => ({
@@ -46,6 +50,7 @@ export const usePathStore = create<PathState>((set) => ({
   simulatedConsequence: null,
   isTakingAssessment: false,
   isTrustPanelOpen: false,
+  activeIdeNodeId: null,
   collaborators: [
     { id: 'u1', name: 'You', color: 'bg-blue-500', isOnline: true },
     { id: 'u2', name: 'Sriram (Mentor)', color: 'bg-emerald-500', isOnline: true },
@@ -76,5 +81,16 @@ export const usePathStore = create<PathState>((set) => ({
     }
     return { isTakingAssessment: false };
   }),
+  completeMilestoneViaIde: (nodeId) => set((state) => {
+    if (state.activeMilestone?.id === nodeId) {
+      return { 
+        activeMilestone: { ...state.activeMilestone, status: 'completed' },
+        activeIdeNodeId: null
+      };
+    }
+    return { activeIdeNodeId: null };
+  }),
   toggleTrustPanel: () => set((state) => ({ isTrustPanelOpen: !state.isTrustPanelOpen })),
+  openIde: (nodeId) => set({ activeIdeNodeId: nodeId }),
+  closeIde: () => set({ activeIdeNodeId: null }),
 }));

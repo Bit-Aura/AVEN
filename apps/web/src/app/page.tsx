@@ -6,6 +6,7 @@ import GoalChat from '../components/GoalChat';
 import DiagnosticChat from '../components/DiagnosticChat';
 import TrustPanel from '../components/TrustPanel';
 import PresenceBar from '../components/PresenceBar';
+import IdeSidecar from '../components/IdeSidecar';
 import { usePathStore } from '../store/usePathStore';
 
 export default function Home() {
@@ -61,10 +62,13 @@ export default function Home() {
 
       {/* Trust Panel Overlay */}
       {isTrustPanelOpen && (
-        <div className="absolute top-0 right-0 h-full z-50">
+        <div className="absolute top-0 right-0 h-full z-40">
           <TrustPanel />
         </div>
       )}
+
+      {/* IDE Sidecar Overlay */}
+      <IdeSidecar />
     </main>
   );
 }

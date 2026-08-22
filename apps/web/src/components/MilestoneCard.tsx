@@ -12,6 +12,8 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
   const cancelSimulation = usePathStore((state) => state.cancelSimulation);
   const isTakingAssessment = usePathStore((state) => state.isTakingAssessment);
   const startAssessment = usePathStore((state) => state.startAssessment);
+  const openIde = usePathStore((state) => state.openIde);
+  const { id } = milestone;
 
   return (
     <div className="bg-slate-900 border border-slate-700 p-6 rounded-xl shadow-xl max-w-md w-full transition-all">
@@ -30,13 +32,6 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
         {milestone.explanation}
       </p>
       <div className="flex flex-col gap-3">
-        <button 
-          className="w-full bg-slate-100 text-slate-900 font-bold py-3 rounded hover:bg-white transition-colors shadow-lg disabled:opacity-50"
-          disabled={milestone.status === 'completed' || isTakingAssessment}
-        >
-          Start Milestone
-        </button>
-        
         {!isTakingAssessment && milestone.status !== 'completed' && (
           <div className="flex gap-3">
             <button 
@@ -44,6 +39,13 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
               className="flex-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold py-2 rounded hover:bg-emerald-500/20 transition-colors text-sm"
             >
               Prove I know this
+            </button>
+            <button 
+              onClick={() => openIde(id)}
+              className="py-2 px-4 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors font-medium border border-blue-500/30 flex items-center gap-2 text-sm"
+              title="Open Inline IDE"
+            >
+              <span>💻</span> IDE
             </button>
             <button 
               onClick={() => isSimulatingSkip ? cancelSimulation() : simulateSkip(milestone.id)}
