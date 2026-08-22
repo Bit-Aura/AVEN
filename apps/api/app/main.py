@@ -1,6 +1,7 @@
 import logging
 import json
 from typing import Dict, Any, List, Optional
+from datetime import datetime
 from fastapi import FastAPI, Depends, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -127,7 +128,7 @@ async def parse_and_initiate_goal(
         profile_id=profile.id,
         title=intent.get("target_goal", data.goal_text),
         description=data.preferred_modality,
-        embedding=[] # Optional: populate with intent embeddings if needed
+        embedding=None
     )
     db.add(goal)
     await db.flush()
