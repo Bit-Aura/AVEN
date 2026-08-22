@@ -14,11 +14,19 @@ const initialEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2' }];
 export default function SkillGraph() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const isSimulatingSkip = usePathStore((state) => state.isSimulatingSkip);
   
   const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   return (
-    <div className="w-full h-[500px] border-2 border-slate-800 rounded-lg overflow-hidden bg-slate-950">
+    <div className={`w-full h-[500px] border-2 rounded-lg overflow-hidden bg-slate-950 transition-all duration-500 relative ${
+      isSimulatingSkip ? 'border-rose-500/50 shadow-[0_0_30px_rgba(244,63,94,0.15)]' : 'border-slate-800'
+    }`}>
+      {isSimulatingSkip && (
+        <div className="absolute top-4 left-4 z-10 bg-rose-500 text-white text-xs font-bold px-3 py-1 rounded shadow-lg animate-pulse">
+          SIMULATING ALTERNATIVE PATH
+        </div>
+      )}
       <ReactFlow
         nodes={nodes}
         edges={edges}
