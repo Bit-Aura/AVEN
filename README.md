@@ -96,3 +96,4 @@ To run the backend test suite locally on the host:
 - **Context-Aware IDE Sidecar (Frontend)**: A simulated inline Monaco/VS Code environment that allows learners to write code and solve node challenges directly in the browser without friction. (See docs/Feature_IDE_Sidecar.md)
 - **Offline-First Resilience UI (Frontend)**: A smart queueing system and animated banner that captures node completions when offline, syncing them seamlessly when the connection returns. (See docs/Feature_Offline_Resilience_UI.md)
 - **AI Coach "Help Me" Overlay (Frontend)**: A context-aware chat drawer attached to learning nodes, offering socratic tutoring and assistance. (See docs/Feature_AI_Coach.md)
+- **Gamification HUD (Frontend)**: A floating dashboard widget tracking daily streaks and XP with micro-animations that fire when completing milestones. (See docs/Feature_Gamification_HUD.md)
