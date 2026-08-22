@@ -16,6 +16,14 @@ export interface Collaborator {
   avatarUrl?: string;
 }
 
+export interface ProofCardData {
+  skillName: string;
+  confidenceScore: number;
+  evidenceTags: string[];
+  narrative: string;
+  issueDate: string;
+}
+
 interface PathState {
   userGoal: string | null;
   diagnosticComplete: boolean;
@@ -32,6 +40,7 @@ interface PathState {
   showUndoToast: boolean;
   isCommandPaletteOpen: boolean;
   isFocusMode: boolean;
+  activeProofCard: ProofCardData | null;
   previousStateSnapshot: Partial<PathState> | null;
   syncQueue: string[];
   collaborators: Collaborator[];
@@ -62,6 +71,8 @@ interface PathState {
   toggleCommandPalette: () => void;
   closeCommandPalette: () => void;
   toggleFocusMode: () => void;
+  openProofCard: (card: ProofCardData) => void;
+  closeProofCard: () => void;
 }
 
 export const usePathStore = create<PathState>((set) => ({
@@ -80,6 +91,7 @@ export const usePathStore = create<PathState>((set) => ({
   showUndoToast: false,
   isCommandPaletteOpen: false,
   isFocusMode: false,
+  activeProofCard: null,
   previousStateSnapshot: null,
   syncQueue: [],
   collaborators: [
@@ -168,4 +180,6 @@ export const usePathStore = create<PathState>((set) => ({
   toggleCommandPalette: () => set((state) => ({ isCommandPaletteOpen: !state.isCommandPaletteOpen })),
   closeCommandPalette: () => set({ isCommandPaletteOpen: false }),
   toggleFocusMode: () => set((state) => ({ isFocusMode: !state.isFocusMode })),
+  openProofCard: (card) => set({ activeProofCard: card }),
+  closeProofCard: () => set({ activeProofCard: null }),
 }));

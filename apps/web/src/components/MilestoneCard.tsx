@@ -1,3 +1,4 @@
+import { PlayCircle, CheckCircle, Undo2, Award } from 'lucide-react';
 import { Milestone, usePathStore } from '../store/usePathStore';
 import ProveItAssessment from './ProveItAssessment';
 
@@ -14,6 +15,8 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
   const startAssessment = usePathStore((state) => state.startAssessment);
   const openIde = usePathStore((state) => state.openIde);
   const openCoach = usePathStore((state) => state.openCoach);
+  const markComplete = usePathStore((state) => state.markComplete);
+  const openProofCard = usePathStore((state) => state.openProofCard);
   const { id } = milestone;
 
   return (
@@ -25,7 +28,19 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
             {milestone.status === 'completed' ? 'Completed' : 'Active'}
           </span>
           {milestone.status === 'completed' && (
-            <span className="text-xs text-emerald-400 font-semibold">✓ Proven</span>
+            <button 
+              onClick={() => openProofCard({
+                skillName: milestone.title,
+                confidenceScore: 94,
+                evidenceTags: ["Passed 3 Prove-It Gates", "Built 1 Project"],
+                narrative: `Surya has demonstrated exceptional capability in ${milestone.title}. Their solutions pass performance thresholds and exhibit robust error handling.`,
+                issueDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              })}
+              className="text-xs text-emerald-400 font-semibold hover:text-emerald-300 transition-colors flex items-center gap-1"
+            >
+              <Award size={12} />
+              ✓ Proven
+            </button>
           )}
         </div>
       </div>

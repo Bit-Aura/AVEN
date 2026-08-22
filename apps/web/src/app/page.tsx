@@ -13,6 +13,7 @@ import GamificationHud from '../components/GamificationHud';
 import MicroCelebration from '../components/MicroCelebration';
 import UndoToast from '../components/UndoToast';
 import CommandPalette from '../components/CommandPalette';
+import ProofCard from '../components/ProofCard';
 import { usePathStore } from '../store/usePathStore';
 import { Wifi, WifiOff, Focus } from 'lucide-react';
 
@@ -128,6 +129,9 @@ export default function Home() {
 
       {/* Command Palette */}
       <CommandPalette />
+
+      {/* Proof Card Overlay */}
+      <ProofCard />
     </main>
   );
 }
