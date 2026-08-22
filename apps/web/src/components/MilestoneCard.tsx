@@ -15,7 +15,6 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
   const startAssessment = usePathStore((state) => state.startAssessment);
   const openIde = usePathStore((state) => state.openIde);
   const openCoach = usePathStore((state) => state.openCoach);
-  const markComplete = usePathStore((state) => state.markComplete);
   const openProofCard = usePathStore((state) => state.openProofCard);
   const { id } = milestone;
 

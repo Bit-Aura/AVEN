@@ -21,7 +21,7 @@ export default function AiCoachDrawer() {
       setMessages([
         {
           role: 'ai',
-          text: `Hi! I see you're working on "${activeNode.data.label}". What specific part is confusing you? I'm here to help.`
+          text: `Hi! I see you're working on "${(activeNode.data as any)?.label || ''}". What specific part is confusing you? I'm here to help.`
         }
       ]);
     }
@@ -68,7 +68,7 @@ export default function AiCoachDrawer() {
 
       {/* Context Badge */}
       <div className="px-4 py-2 bg-slate-900 border-b border-slate-800 text-xs text-slate-400">
-        Context: <span className="text-slate-300 font-medium">{activeNode?.data.label}</span>
+        Context: <span className="text-slate-300 font-medium">{(activeNode?.data as any)?.label || ''}</span>
       </div>
 
       {/* Chat Area */}
