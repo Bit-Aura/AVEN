@@ -10,6 +10,7 @@ import IdeSidecar from '../components/IdeSidecar';
 import AiCoachDrawer from '../components/AiCoachDrawer';
 import OfflineSyncBanner from '../components/OfflineSyncBanner';
 import GamificationHud from '../components/GamificationHud';
+import MicroCelebration from '../components/MicroCelebration';
 import { usePathStore } from '../store/usePathStore';
 import { Wifi, WifiOff } from 'lucide-react';
 
@@ -97,6 +98,9 @@ export default function Home() {
 
       {/* Offline Sync Banner */}
       <OfflineSyncBanner />
+
+      {/* Micro-celebration Overlay */}
+      <MicroCelebration />
     </main>
   );
 }

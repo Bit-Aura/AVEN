@@ -28,6 +28,7 @@ interface PathState {
   isOffline: boolean;
   streak: number;
   xp: number;
+  showCelebration: boolean;
   syncQueue: string[];
   collaborators: Collaborator[];
   nodes: Node[];
@@ -51,6 +52,7 @@ interface PathState {
   toggleOffline: () => void;
   syncOfflineProgress: () => void;
   awardXp: (amount: number) => void;
+  hideCelebration: () => void;
 }
 
 export const usePathStore = create<PathState>((set) => ({
@@ -65,6 +67,7 @@ export const usePathStore = create<PathState>((set) => ({
   isOffline: false,
   streak: 5,
   xp: 1250,
+  showCelebration: false,
   syncQueue: [],
   collaborators: [
     { id: 'u1', name: 'You', color: 'bg-blue-500', isOnline: true },
@@ -94,7 +97,8 @@ export const usePathStore = create<PathState>((set) => ({
         activeMilestone: { ...state.activeMilestone, status: 'completed' },
         isTakingAssessment: false,
         syncQueue: newQueue,
-        xp: state.xp + 150
+        xp: state.xp + 150,
+        showCelebration: true
       };
     }
     return { isTakingAssessment: false };
@@ -106,7 +110,8 @@ export const usePathStore = create<PathState>((set) => ({
         activeMilestone: { ...state.activeMilestone, status: 'completed' },
         activeIdeNodeId: null,
         syncQueue: newQueue,
-        xp: state.xp + 150
+        xp: state.xp + 150,
+        showCelebration: true
       };
     }
     return { activeIdeNodeId: null };
@@ -119,4 +124,5 @@ export const usePathStore = create<PathState>((set) => ({
   toggleOffline: () => set((state) => ({ isOffline: !state.isOffline })),
   syncOfflineProgress: () => set({ syncQueue: [] }),
   awardXp: (amount) => set((state) => ({ xp: state.xp + amount })),
+  hideCelebration: () => set({ showCelebration: false }),
 }));
