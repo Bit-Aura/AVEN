@@ -30,6 +30,7 @@ interface PathState {
   xp: number;
   showCelebration: boolean;
   showUndoToast: boolean;
+  isCommandPaletteOpen: boolean;
   previousStateSnapshot: Partial<PathState> | null;
   syncQueue: string[];
   collaborators: Collaborator[];
@@ -57,6 +58,8 @@ interface PathState {
   hideCelebration: () => void;
   undoLastAction: () => void;
   hideUndoToast: () => void;
+  toggleCommandPalette: () => void;
+  closeCommandPalette: () => void;
 }
 
 export const usePathStore = create<PathState>((set) => ({
@@ -73,6 +76,7 @@ export const usePathStore = create<PathState>((set) => ({
   xp: 1250,
   showCelebration: false,
   showUndoToast: false,
+  isCommandPaletteOpen: false,
   previousStateSnapshot: null,
   syncQueue: [],
   collaborators: [
@@ -158,4 +162,6 @@ export const usePathStore = create<PathState>((set) => ({
     }
     return {};
   }),
+  toggleCommandPalette: () => set((state) => ({ isCommandPaletteOpen: !state.isCommandPaletteOpen })),
+  closeCommandPalette: () => set({ isCommandPaletteOpen: false }),
 }));
