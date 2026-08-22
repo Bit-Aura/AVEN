@@ -98,3 +98,4 @@ To run the backend test suite locally on the host:
 - **AI Coach "Help Me" Overlay (Frontend)**: A context-aware chat drawer attached to learning nodes, offering socratic tutoring and assistance. (See docs/Feature_AI_Coach.md)
 - **Gamification HUD (Frontend)**: A floating dashboard widget tracking daily streaks and XP with micro-animations that fire when completing milestones. (See docs/Feature_Gamification_HUD.md)
 - **Micro-celebration Overlay (Frontend)**: A screen-covering, dopamine-inducing animation that triggers automatically when a user completes a major learning milestone. (See docs/Feature_Micro_Celebration.md)
+- **Time-Travel History / Undo (Frontend)**: A custom snapshot state engine allowing users to instantly undo milestone completions via a sleek toast UI. (See docs/Feature_Time_Travel.md)
