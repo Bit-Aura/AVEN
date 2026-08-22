@@ -92,3 +92,4 @@ To run the backend test suite locally on the host:
 - **What-If-Skip Simulation UI (Frontend)**: Empowers learners to negotiate their path by previewing the downstream consequences of skipping a milestone, complete with immersive visual graph feedback and inline consequence rendering. (See docs/Feature_What_If_Skip.md)
 - **Prove-It Assessment UI (Frontend)**: A seamlessly integrated quiz interface that allows confident learners to instantly prove their skills and bypass foundational milestones without unnecessary friction. (See docs/Feature_Prove_It_Gates.md)
 - **Trust Panel & Readiness Vector UI (Frontend)**: Eliminates the "black box" by showing the learner exactly why the AI generated their path, visualizing their progress toward their ultimate goal. (See docs/Feature_Trust_Panel.md)
+- **Live Multi-Cursor/Presence UI (Frontend)**: A sleek collaboration bar showing who else is viewing the path right now (e.g., mentors, peers). (See docs/Feature_Presence_UI.md)
