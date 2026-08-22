@@ -24,6 +24,12 @@ export interface ProofCardData {
   issueDate: string;
 }
 
+export interface RankingPreferences {
+  speedVsDepth: number;
+  freeVsPaid: number;
+  videoVsProject: number;
+}
+
 interface PathState {
   userGoal: string | null;
   diagnosticComplete: boolean;
@@ -41,6 +47,7 @@ interface PathState {
   isCommandPaletteOpen: boolean;
   isFocusMode: boolean;
   activeProofCard: ProofCardData | null;
+  rankingPreferences: RankingPreferences;
   previousStateSnapshot: Partial<PathState> | null;
   syncQueue: string[];
   collaborators: Collaborator[];
@@ -73,6 +80,7 @@ interface PathState {
   toggleFocusMode: () => void;
   openProofCard: (card: ProofCardData) => void;
   closeProofCard: () => void;
+  updateRankingPreference: (key: keyof RankingPreferences, value: number) => void;
 }
 
 export const usePathStore = create<PathState>((set) => ({
@@ -92,6 +100,11 @@ export const usePathStore = create<PathState>((set) => ({
   isCommandPaletteOpen: false,
   isFocusMode: false,
   activeProofCard: null,
+  rankingPreferences: {
+    speedVsDepth: 50,
+    freeVsPaid: 50,
+    videoVsProject: 50,
+  },
   previousStateSnapshot: null,
   syncQueue: [],
   collaborators: [
@@ -182,4 +195,10 @@ export const usePathStore = create<PathState>((set) => ({
   toggleFocusMode: () => set((state) => ({ isFocusMode: !state.isFocusMode })),
   openProofCard: (card) => set({ activeProofCard: card }),
   closeProofCard: () => set({ activeProofCard: null }),
+  updateRankingPreference: (key, value) => set((state) => ({
+    rankingPreferences: {
+      ...state.rankingPreferences,
+      [key]: value
+    }
+  })),
 }));

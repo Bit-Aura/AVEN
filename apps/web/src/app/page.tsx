@@ -14,6 +14,7 @@ import MicroCelebration from '../components/MicroCelebration';
 import UndoToast from '../components/UndoToast';
 import CommandPalette from '../components/CommandPalette';
 import ProofCard from '../components/ProofCard';
+import RankingSliders from '../components/RankingSliders';
 import { usePathStore } from '../store/usePathStore';
 import { Wifi, WifiOff, Focus } from 'lucide-react';
 
@@ -100,6 +101,10 @@ export default function Home() {
       <div className={`w-full md:w-96 flex flex-col gap-6 pt-[88px] transition-all duration-700 ${isFocusMode ? 'relative z-20 scale-105' : ''}`}>
         <h2 className={`text-2xl font-bold mb-2 transition-colors ${isFocusMode ? 'text-indigo-300' : ''}`}>Active Milestone</h2>
         <MilestoneCard milestone={dummyMilestone} />
+        
+        <div className={`transition-opacity duration-700 ${isFocusMode ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'}`}>
+          <RankingSliders />
+        </div>
       </div>
 
       {/* Trust Panel Overlay */}
