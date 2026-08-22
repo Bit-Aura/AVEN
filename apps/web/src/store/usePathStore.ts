@@ -24,6 +24,7 @@ interface PathState {
   isTakingAssessment: boolean;
   isTrustPanelOpen: boolean;
   activeIdeNodeId: string | null;
+  activeCoachNodeId: string | null;
   isOffline: boolean;
   syncQueue: string[];
   collaborators: Collaborator[];
@@ -43,6 +44,8 @@ interface PathState {
   toggleTrustPanel: () => void;
   openIde: (nodeId: string) => void;
   closeIde: () => void;
+  openCoach: (nodeId: string) => void;
+  closeCoach: () => void;
   toggleOffline: () => void;
   syncOfflineProgress: () => void;
 }
@@ -55,6 +58,7 @@ export const usePathStore = create<PathState>((set) => ({
   isTakingAssessment: false,
   isTrustPanelOpen: false,
   activeIdeNodeId: null,
+  activeCoachNodeId: null,
   isOffline: false,
   syncQueue: [],
   collaborators: [
@@ -103,6 +107,8 @@ export const usePathStore = create<PathState>((set) => ({
   toggleTrustPanel: () => set((state) => ({ isTrustPanelOpen: !state.isTrustPanelOpen })),
   openIde: (nodeId) => set({ activeIdeNodeId: nodeId }),
   closeIde: () => set({ activeIdeNodeId: null }),
+  openCoach: (nodeId) => set({ activeCoachNodeId: nodeId }),
+  closeCoach: () => set({ activeCoachNodeId: null }),
   toggleOffline: () => set((state) => ({ isOffline: !state.isOffline })),
   syncOfflineProgress: () => set({ syncQueue: [] }),
 }));

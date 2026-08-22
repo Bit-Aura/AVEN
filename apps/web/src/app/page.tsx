@@ -7,6 +7,7 @@ import DiagnosticChat from '../components/DiagnosticChat';
 import TrustPanel from '../components/TrustPanel';
 import PresenceBar from '../components/PresenceBar';
 import IdeSidecar from '../components/IdeSidecar';
+import AiCoachDrawer from '../components/AiCoachDrawer';
 import OfflineSyncBanner from '../components/OfflineSyncBanner';
 import { usePathStore } from '../store/usePathStore';
 import { Wifi, WifiOff } from 'lucide-react';
@@ -86,6 +87,9 @@ export default function Home() {
 
       {/* IDE Sidecar Overlay */}
       <IdeSidecar />
+
+      {/* AI Coach Overlay */}
+      <AiCoachDrawer />
 
       {/* Offline Sync Banner */}
       <OfflineSyncBanner />

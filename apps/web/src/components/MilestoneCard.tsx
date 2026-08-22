@@ -13,6 +13,7 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
   const isTakingAssessment = usePathStore((state) => state.isTakingAssessment);
   const startAssessment = usePathStore((state) => state.startAssessment);
   const openIde = usePathStore((state) => state.openIde);
+  const openCoach = usePathStore((state) => state.openCoach);
   const { id } = milestone;
 
   return (
@@ -33,23 +34,31 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
       </p>
       <div className="flex flex-col gap-3">
         {!isTakingAssessment && milestone.status !== 'completed' && (
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3">
             <button 
               onClick={startAssessment}
-              className="flex-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold py-2 rounded hover:bg-emerald-500/20 transition-colors text-sm"
+              className="w-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold py-2 rounded hover:bg-emerald-500/20 transition-colors text-sm"
             >
               Prove I know this
             </button>
-            <button 
-              onClick={() => openIde(id)}
-              className="py-2 px-4 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors font-medium border border-blue-500/30 flex items-center gap-2 text-sm"
-              title="Open Inline IDE"
-            >
-              <span>💻</span> IDE
-            </button>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => openIde(id)}
+                className="flex-1 py-2 px-4 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors font-medium border border-blue-500/30 flex items-center justify-center gap-2 text-sm"
+                title="Open Inline IDE"
+              >
+                <span>💻</span> IDE
+              </button>
+              <button 
+                onClick={() => openCoach(id)}
+                className="flex-1 py-2 px-4 bg-indigo-900/40 text-indigo-300 rounded-lg hover:bg-indigo-800/60 transition-colors font-medium border border-indigo-700/50 flex items-center justify-center gap-2 text-sm"
+              >
+                🤖 Need Help
+              </button>
+            </div>
             <button 
               onClick={() => isSimulatingSkip ? cancelSimulation() : simulateSkip(milestone.id)}
-              className={`flex-1 font-bold py-2 rounded transition-colors text-sm ${
+              className={`w-full font-bold py-2 rounded transition-colors text-sm ${
                 isSimulatingSkip 
                   ? 'bg-rose-500/20 text-rose-400 border border-rose-500/50 hover:bg-rose-500/30' 
                   : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700 hover:text-slate-300'
