@@ -7,13 +7,17 @@ import DiagnosticChat from '../components/DiagnosticChat';
 import TrustPanel from '../components/TrustPanel';
 import PresenceBar from '../components/PresenceBar';
 import IdeSidecar from '../components/IdeSidecar';
+import OfflineSyncBanner from '../components/OfflineSyncBanner';
 import { usePathStore } from '../store/usePathStore';
+import { Wifi, WifiOff } from 'lucide-react';
 
 export default function Home() {
   const userGoal = usePathStore((state) => state.userGoal);
   const diagnosticComplete = usePathStore((state) => state.diagnosticComplete);
   const isTrustPanelOpen = usePathStore((state) => state.isTrustPanelOpen);
   const toggleTrustPanel = usePathStore((state) => state.toggleTrustPanel);
+  const isOffline = usePathStore((state) => state.isOffline);
+  const toggleOffline = usePathStore((state) => state.toggleOffline);
 
   // 1. If the user hasn't set a goal yet, show the GoalChat UI fullscreen.
   if (!userGoal) {
@@ -46,12 +50,25 @@ export default function Home() {
               <PresenceBar />
             </div>
           </div>
-          <button 
-            onClick={toggleTrustPanel}
-            className="px-4 py-2 bg-slate-900 border border-slate-700 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-slate-100 transition-colors flex items-center gap-2 shadow-lg"
-          >
-            <span>⚡</span> Why this path?
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={toggleOffline}
+              className={`p-2 rounded-lg border transition-colors flex items-center justify-center shadow-lg ${
+                isOffline 
+                  ? 'bg-amber-900/50 border-amber-700 text-amber-500 hover:bg-amber-900/70' 
+                  : 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-emerald-400'
+              }`}
+              title={isOffline ? "Go Online" : "Simulate Offline Mode"}
+            >
+              {isOffline ? <WifiOff size={20} /> : <Wifi size={20} />}
+            </button>
+            <button 
+              onClick={toggleTrustPanel}
+              className="px-4 py-2 bg-slate-900 border border-slate-700 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-slate-100 transition-colors flex items-center gap-2 shadow-lg"
+            >
+              <span>⚡</span> Why this path?
+            </button>
+          </div>
         </div>
         <SkillGraph />
       </div>
@@ -69,6 +86,9 @@ export default function Home() {
 
       {/* IDE Sidecar Overlay */}
       <IdeSidecar />
+
+      {/* Offline Sync Banner */}
+      <OfflineSyncBanner />
     </main>
   );
 }

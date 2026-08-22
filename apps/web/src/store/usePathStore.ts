@@ -24,6 +24,8 @@ interface PathState {
   isTakingAssessment: boolean;
   isTrustPanelOpen: boolean;
   activeIdeNodeId: string | null;
+  isOffline: boolean;
+  syncQueue: string[];
   collaborators: Collaborator[];
   nodes: Node[];
   edges: Edge[];
@@ -41,6 +43,8 @@ interface PathState {
   toggleTrustPanel: () => void;
   openIde: (nodeId: string) => void;
   closeIde: () => void;
+  toggleOffline: () => void;
+  syncOfflineProgress: () => void;
 }
 
 export const usePathStore = create<PathState>((set) => ({
@@ -51,6 +55,8 @@ export const usePathStore = create<PathState>((set) => ({
   isTakingAssessment: false,
   isTrustPanelOpen: false,
   activeIdeNodeId: null,
+  isOffline: false,
+  syncQueue: [],
   collaborators: [
     { id: 'u1', name: 'You', color: 'bg-blue-500', isOnline: true },
     { id: 'u2', name: 'Sriram (Mentor)', color: 'bg-emerald-500', isOnline: true },
@@ -74,18 +80,22 @@ export const usePathStore = create<PathState>((set) => ({
     // In a real app, this would update the graph edge states. 
     // For MVP frontend UI, we just mark the milestone as completed.
     if (state.activeMilestone?.id === nodeId) {
+      const newQueue = state.isOffline ? [...state.syncQueue, nodeId] : state.syncQueue;
       return { 
         activeMilestone: { ...state.activeMilestone, status: 'completed' },
-        isTakingAssessment: false 
+        isTakingAssessment: false,
+        syncQueue: newQueue
       };
     }
     return { isTakingAssessment: false };
   }),
   completeMilestoneViaIde: (nodeId) => set((state) => {
     if (state.activeMilestone?.id === nodeId) {
+      const newQueue = state.isOffline ? [...state.syncQueue, nodeId] : state.syncQueue;
       return { 
         activeMilestone: { ...state.activeMilestone, status: 'completed' },
-        activeIdeNodeId: null
+        activeIdeNodeId: null,
+        syncQueue: newQueue
       };
     }
     return { activeIdeNodeId: null };
@@ -93,4 +103,6 @@ export const usePathStore = create<PathState>((set) => ({
   toggleTrustPanel: () => set((state) => ({ isTrustPanelOpen: !state.isTrustPanelOpen })),
   openIde: (nodeId) => set({ activeIdeNodeId: nodeId }),
   closeIde: () => set({ activeIdeNodeId: null }),
+  toggleOffline: () => set((state) => ({ isOffline: !state.isOffline })),
+  syncOfflineProgress: () => set({ syncQueue: [] }),
 }));
