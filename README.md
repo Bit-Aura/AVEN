@@ -94,3 +94,4 @@ To run the backend test suite locally on the host:
 - **Trust Panel & Readiness Vector UI (Frontend)**: Eliminates the "black box" by showing the learner exactly why the AI generated their path, visualizing their progress toward their ultimate goal. (See docs/Feature_Trust_Panel.md)
 - **Live Multi-Cursor/Presence UI (Frontend)**: A sleek collaboration bar showing who else is viewing the path right now (e.g., mentors, peers). (See docs/Feature_Presence_UI.md)
 - **Context-Aware IDE Sidecar (Frontend)**: A simulated inline Monaco/VS Code environment that allows learners to write code and solve node challenges directly in the browser without friction. (See docs/Feature_IDE_Sidecar.md)
+- **Offline-First Resilience UI (Frontend)**: A smart queueing system and animated banner that captures node completions when offline, syncing them seamlessly when the connection returns. (See docs/Feature_Offline_Resilience_UI.md)
