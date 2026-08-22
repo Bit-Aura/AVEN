@@ -157,3 +157,17 @@ class DomainEvent(Base):
     payload: Mapped[Any] = mapped_column(JSON)
     published_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+class SkillRecord(Base):
+    __tablename__ = "skills"
+    
+    id: Mapped[str] = mapped_column(String(255), primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    bkt_p_l0: Mapped[float] = mapped_column(Float, default=0.15)
+    bkt_p_t: Mapped[float] = mapped_column(Float, default=0.20)
+    bkt_p_s: Mapped[float] = mapped_column(Float, default=0.10)
+    bkt_p_g: Mapped[float] = mapped_column(Float, default=0.20)
+    embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(384))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+

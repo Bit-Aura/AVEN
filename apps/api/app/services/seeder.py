@@ -1,103 +1,118 @@
 import logging
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.domain import Resource, ResourceMetadata, AssessmentItem
+from app.models.domain import Resource, ResourceMetadata, AssessmentItem, SkillRecord
 from app.infrastructure.neo4j.client import Neo4jClient
 from app.services.semantic_mapper import get_embedding_model
 
 logger = logging.getLogger(__name__)
 
-# 15 Curated Skills for Backend Software Engineer
+# 15 Curated Skills for Backend Software Engineer with custom BKT parameters
 SKILLS_SEED = [
     {
         "id": "python_basics",
         "name": "Python Basics",
         "description": "Syntax, variable assignments, loops, control structures, and basic functions in Python.",
-        "prereqs": []
+        "prereqs": [],
+        "bkt": {"p_l0": 0.25, "p_t": 0.30, "p_s": 0.08, "p_g": 0.25}
     },
     {
         "id": "python_advanced",
         "name": "Advanced Python",
         "description": "Decorators, generators, context managers, dunder methods, and OOP principles.",
-        "prereqs": ["python_basics"]
+        "prereqs": ["python_basics"],
+        "bkt": {"p_l0": 0.12, "p_t": 0.20, "p_s": 0.12, "p_g": 0.18}
     },
     {
         "id": "sql_basics",
         "name": "SQL Basics",
         "description": "Basic database queries including SELECT, WHERE, GROUP BY, and simple filtering.",
-        "prereqs": ["python_basics"]
+        "prereqs": ["python_basics"],
+        "bkt": {"p_l0": 0.22, "p_t": 0.28, "p_s": 0.09, "p_g": 0.22}
     },
     {
         "id": "db_design",
         "name": "SQL Database Design & Joins",
         "description": "Database normalization, indexes, primary/foreign keys, and multi-table JOIN operations.",
-        "prereqs": ["sql_basics"]
+        "prereqs": ["sql_basics"],
+        "bkt": {"p_l0": 0.14, "p_t": 0.22, "p_s": 0.11, "p_g": 0.16}
     },
     {
         "id": "http_fundamentals",
         "name": "HTTP Fundamentals",
         "description": "Understanding HTTP methods, status codes, headers, and request/response life cycles.",
-        "prereqs": ["python_basics"]
+        "prereqs": ["python_basics"],
+        "bkt": {"p_l0": 0.20, "p_t": 0.25, "p_s": 0.10, "p_g": 0.20}
     },
     {
         "id": "api_design",
         "name": "REST API Design",
         "description": "Designing clean, resource-oriented endpoint structures, serialization, and versioning.",
-        "prereqs": ["http_fundamentals"]
+        "prereqs": ["http_fundamentals"],
+        "bkt": {"p_l0": 0.15, "p_t": 0.22, "p_s": 0.10, "p_g": 0.18}
     },
     {
         "id": "fastapi_basics",
         "name": "FastAPI Basics",
         "description": "Declaring endpoints, path/query params, using Pydantic, and dependency injection.",
-        "prereqs": ["api_design", "python_advanced"]
+        "prereqs": ["api_design", "python_advanced"],
+        "bkt": {"p_l0": 0.15, "p_t": 0.25, "p_s": 0.10, "p_g": 0.20}
     },
     {
         "id": "orm_sqlalchemy",
         "name": "SQLAlchemy ORM",
         "description": "Connecting Python to relational databases using models, async sessions, and migrations.",
-        "prereqs": ["python_advanced", "db_design"]
+        "prereqs": ["python_advanced", "db_design"],
+        "bkt": {"p_l0": 0.10, "p_t": 0.18, "p_s": 0.14, "p_g": 0.15}
     },
     {
         "id": "auth_jwt",
         "name": "Authentication & JWT",
         "description": "Securing web endpoints using JWT tokens, passwords hashing, and roles validation.",
-        "prereqs": ["fastapi_basics"]
+        "prereqs": ["fastapi_basics"],
+        "bkt": {"p_l0": 0.12, "p_t": 0.20, "p_s": 0.12, "p_g": 0.16}
     },
     {
         "id": "testing_pytest",
         "name": "Testing with Pytest",
         "description": "Writing unit tests, setting up mock fixtures, and testing async endpoints.",
-        "prereqs": ["fastapi_basics"]
+        "prereqs": ["fastapi_basics"],
+        "bkt": {"p_l0": 0.16, "p_t": 0.24, "p_s": 0.10, "p_g": 0.18}
     },
     {
         "id": "docker_basics",
         "name": "Docker Basics",
         "description": "Creating Dockerfiles, understanding images, container isolation, and caching layers.",
-        "prereqs": ["http_fundamentals"]
+        "prereqs": ["http_fundamentals"],
+        "bkt": {"p_l0": 0.18, "p_t": 0.25, "p_s": 0.10, "p_g": 0.20}
     },
     {
         "id": "docker_compose",
         "name": "Docker Compose",
         "description": "Orchestrating multi-container environments, setting up networks, volumes, and links.",
-        "prereqs": ["docker_basics"]
+        "prereqs": ["docker_basics"],
+        "bkt": {"p_l0": 0.14, "p_t": 0.22, "p_s": 0.11, "p_g": 0.18}
     },
     {
         "id": "caching_redis",
         "name": "Caching with Redis",
         "description": "Key-value cache storage, cache eviction policies, and session storage.",
-        "prereqs": ["fastapi_basics"]
+        "prereqs": ["fastapi_basics"],
+        "bkt": {"p_l0": 0.12, "p_t": 0.20, "p_s": 0.12, "p_g": 0.15}
     },
     {
         "id": "message_queues",
         "name": "Asynchronous Queues & Celery",
         "description": "Running long tasks asynchronously using workers, brokers (Redis/RabbitMQ).",
-        "prereqs": ["caching_redis"]
+        "prereqs": ["caching_redis"],
+        "bkt": {"p_l0": 0.10, "p_t": 0.18, "p_s": 0.13, "p_g": 0.14}
     },
     {
         "id": "system_design",
         "name": "System Design & Scale",
         "description": "Load balancers, scale-out strategies, horizontal partition (sharding), and database read replicas.",
-        "prereqs": ["docker_compose", "message_queues"]
+        "prereqs": ["docker_compose", "message_queues"],
+        "bkt": {"p_l0": 0.08, "p_t": 0.15, "p_s": 0.15, "p_g": 0.12}
     }
 ]
 
@@ -301,6 +316,7 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
     Seeds Neo4j and PostgreSQL databases with default skills, resources, and assessments.
     """
     logger.info("Starting Neo4j skill graph seeding...")
+    model = get_embedding_model()
     
     # 1. Seed Neo4j Skills and Prerequisites
     with neo4j_client.driver.session() as session:
@@ -308,14 +324,28 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
         session.run("CREATE CONSTRAINT skill_id_unique IF NOT EXISTS FOR (s:Skill) REQUIRE s.id IS UNIQUE")
         session.run("CREATE CONSTRAINT skill_name_unique IF NOT EXISTS FOR (s:Skill) REQUIRE s.name IS UNIQUE")
         
-        # Merge skill nodes
+        # Merge skill nodes with BKT weights
         for skill in SKILLS_SEED:
+            bkt = skill.get("bkt", {"p_l0": 0.15, "p_t": 0.20, "p_s": 0.10, "p_g": 0.20})
             session.run(
                 """
                 MERGE (s:Skill {id: $id})
-                SET s.name = $name, s.description = $description
+                SET s.name = $name,
+                    s.description = $description,
+                    s.bkt_p_l0 = $p_l0,
+                    s.bkt_p_t = $p_t,
+                    s.bkt_p_s = $p_s,
+                    s.bkt_p_g = $p_g
                 """,
-                {"id": skill["id"], "name": skill["name"], "description": skill["description"]}
+                {
+                    "id": skill["id"],
+                    "name": skill["name"],
+                    "description": skill["description"],
+                    "p_l0": bkt["p_l0"],
+                    "p_t": bkt["p_t"],
+                    "p_s": bkt["p_s"],
+                    "p_g": bkt["p_g"]
+                }
             )
             
         # Merge prerequisite relationships
@@ -331,18 +361,45 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
                 )
     logger.info("Neo4j skill graph seeding completed successfully.")
 
-    # 2. Seed PostgreSQL Resources and Metadata
+    # 2. Seed PostgreSQL Skills Table with Vector Embeddings and BKT Factors
+    logger.info("Starting PostgreSQL skills table seeding...")
+    for skill_data in SKILLS_SEED:
+        stmt = select(SkillRecord).where(SkillRecord.id == skill_data["id"])
+        existing_skill = (await db.execute(stmt)).scalars().first()
+        
+        skill_text = f"{skill_data['name']}: {skill_data['description']}"
+        emb = model.encode(skill_text, convert_to_numpy=True).tolist()
+        bkt = skill_data.get("bkt", {"p_l0": 0.15, "p_t": 0.20, "p_s": 0.10, "p_g": 0.20})
+        
+        if existing_skill:
+            existing_skill.name = skill_data["name"]
+            existing_skill.description = skill_data["description"]
+            existing_skill.bkt_p_l0 = bkt["p_l0"]
+            existing_skill.bkt_p_t = bkt["p_t"]
+            existing_skill.bkt_p_s = bkt["p_s"]
+            existing_skill.bkt_p_g = bkt["p_g"]
+            existing_skill.embedding = emb
+        else:
+            skill_record = SkillRecord(
+                id=skill_data["id"],
+                name=skill_data["name"],
+                description=skill_data["description"],
+                bkt_p_l0=bkt["p_l0"],
+                bkt_p_t=bkt["p_t"],
+                bkt_p_s=bkt["p_s"],
+                bkt_p_g=bkt["p_g"],
+                embedding=emb
+            )
+            db.add(skill_record)
+
+    # 3. Seed PostgreSQL Resources and Metadata
     logger.info("Starting PostgreSQL resources seeding...")
-    model = get_embedding_model()
-    
     for res_data in RESOURCES_SEED:
-        # Check if already exists
         stmt = select(Resource).where(Resource.title == res_data["title"])
         existing = (await db.execute(stmt)).scalars().first()
         if existing:
             continue
             
-        # Calculate embedding
         emb = model.encode(res_data["content"], convert_to_numpy=True).tolist()
         
         resource = Resource(
@@ -352,9 +409,8 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
             embedding=emb
         )
         db.add(resource)
-        await db.flush() # Populate resource.id
+        await db.flush()
         
-        # Add metadata relations
         meta_items = [
             ResourceMetadata(resource_id=resource.id, key="skill_id", value=res_data["skill_id"]),
         ]
@@ -363,10 +419,9 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
             
         db.add_all(meta_items)
         
-    # 3. Seed PostgreSQL Assessment Items
+    # 4. Seed PostgreSQL Assessment Items
     logger.info("Starting PostgreSQL assessment items seeding...")
     for assess_data in ASSESSMENTS_SEED:
-        # Check if already exists
         stmt = select(AssessmentItem).where(AssessmentItem.title == assess_data["title"])
         existing = (await db.execute(stmt)).scalars().first()
         if existing:
@@ -383,3 +438,4 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
         
     await db.commit()
     logger.info("PostgreSQL seeding completed successfully.")
+

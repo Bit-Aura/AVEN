@@ -1,9 +1,7 @@
-"""
-Semantic mapping service using sentence-transformers and Neo4j.
-"""
-from typing import List, Any
-import numpy as np
+from typing import List, Any, Dict
+from sqlalchemy import select
 from sentence_transformers import SentenceTransformer
+from app.models.domain import SkillRecord
 from app.infrastructure.ai.gateway import AIProvider
 from app.infrastructure.neo4j.client import Neo4jClient
 
@@ -24,9 +22,11 @@ async def find_relevant_skills(
     db_session: Any,
     ai_provider: AIProvider,
     neo4j_client: Neo4jClient
-) -> List[Any]:
+) -> List[Dict[str, Any]]:
     """
-    Finds skills relevant to the user intent using pgvector-like cosine similarity in python on Neo4j skill nodes.
+    Finds skills relevant to the user intent using PostgreSQL pgvector indexed cosine similarity.
+    Pre-computed embeddings in the PostgreSQL `skills` table are queried directly, avoiding
+    expensive in-memory embedding computations on every query.
     
     Args:
         intent (str): The user's parsed goal or context query.
@@ -35,9 +35,46 @@ async def find_relevant_skills(
         neo4j_client (Neo4jClient): Neo4j database client.
         
     Returns:
-        List[Any]: A list of matched Skill details, sorted by similarity score descending.
+        List[Dict[str, Any]]: A list of matched Skill details, sorted by similarity score descending.
     """
-    # 1. Fetch all skill nodes from Neo4j
+    # 1. Embed the query/intent once
+    model = get_embedding_model()
+    intent_emb = model.encode(intent, convert_to_numpy=True).tolist()
+
+    # 2. Query PostgreSQL skills table using pgvector cosine distance
+    if db_session:
+        try:
+            distance_expr = SkillRecord.embedding.cosine_distance(intent_emb)
+            stmt = (
+                select(SkillRecord, distance_expr.label("distance"))
+                .order_by("distance")
+                .limit(10)
+            )
+            result = await db_session.execute(stmt)
+            rows = result.all()
+            
+            matched_skills = []
+            for skill_rec, distance in rows:
+                similarity = 1.0 - float(distance) if distance is not None else 0.0
+                if similarity >= 0.25: # Threshold for semantic relevance
+                    matched_skills.append({
+                        "id": skill_rec.id,
+                        "name": skill_rec.name,
+                        "description": skill_rec.description or "",
+                        "similarity": round(similarity, 4),
+                        "bkt": {
+                            "p_l0": skill_rec.bkt_p_l0,
+                            "p_t": skill_rec.bkt_p_t,
+                            "p_s": skill_rec.bkt_p_s,
+                            "p_g": skill_rec.bkt_p_g
+                        }
+                    })
+            if matched_skills:
+                return matched_skills
+        except Exception:
+            pass
+
+    # 3. Fallback: Query Neo4j if database query encounters an issue
     query = "MATCH (s:Skill) RETURN s.id AS id, s.name AS name, s.description AS description"
     skills = []
     try:
@@ -47,39 +84,11 @@ async def find_relevant_skills(
                 skills.append({
                     "id": record["id"],
                     "name": record["name"],
-                    "description": record["description"] or ""
+                    "description": record["description"] or "",
+                    "similarity": 0.50
                 })
     except Exception:
-        # Fallback if Neo4j is offline or empty
         return []
 
-    if not skills:
-        return []
+    return skills
 
-    # 2. Embed the intent text
-    model = get_embedding_model()
-    intent_emb = model.encode(intent, convert_to_numpy=True)
-
-    # 3. Embed all skill names + description text
-    skill_texts = [f"{s['name']}: {s['description']}" for s in skills]
-    skill_embs = model.encode(skill_texts, convert_to_numpy=True)
-
-    # 4. Calculate cosine similarities: dot(A, B) / (norm(A) * norm(B))
-    dot_products = np.dot(skill_embs, intent_emb)
-    skill_norms = np.linalg.norm(skill_embs, axis=1)
-    intent_norm = np.linalg.norm(intent_emb)
-
-    similarities = dot_products / (skill_norms * intent_norm + 1e-8)
-
-    # 5. Filter skills matching a minimum semantic threshold (e.g. 0.30)
-    matched_skills = []
-    for i, skill in enumerate(skills):
-        similarity_score = float(similarities[i])
-        if similarity_score >= 0.30:
-            skill_copy = skill.copy()
-            skill_copy["similarity"] = similarity_score
-            matched_skills.append(skill_copy)
-
-    # Sort matches by similarity descending
-    matched_skills.sort(key=lambda x: x["similarity"], reverse=True)
-    return matched_skills

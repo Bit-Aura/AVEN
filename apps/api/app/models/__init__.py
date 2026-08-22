@@ -13,6 +13,7 @@ from .domain import (
     ResourceMetadata,
     FeedbackEvent,
     DomainEvent,
+    SkillRecord,
 )
 
 __all__ = [
@@ -30,4 +31,5 @@ __all__ = [
     "ResourceMetadata",
     "FeedbackEvent",
     "DomainEvent",
+    "SkillRecord",
 ]

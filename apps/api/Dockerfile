@@ -6,10 +6,12 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy pyproject.toml
-COPY pyproject.toml .
+# Copy pyproject.toml and README.md
+COPY pyproject.toml README.md ./
+RUN mkdir app
 
 # Install dependencies directly using pip
 RUN pip install --no-cache-dir .

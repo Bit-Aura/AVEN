@@ -309,10 +309,12 @@ async def submit_checkpoint_answer(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Submits a Prove-It quiz check. If fails, runs backtrace, decays weak
+    Submits a Prove-It quiz check with flexible grading (regex, case/whitespace normalization,
+    option indexing). If fails, runs root-cause backtrace with parent fallback, decays weak
     prerequisites, replans, and returns results.
     """
     from app.services.path_planner import update_bkt_score, failure_root_cause_backtrace, generate_or_replan_path
+    from app.services.grader import evaluate_answer
     
     # 1. Find the assessment item for the skill
     stmt = select(AssessmentItem)
@@ -331,7 +333,15 @@ async def submit_checkpoint_answer(
         
     content = json.loads(matched_item.content)
     correct_ans = content.get("correct_answer")
-    is_correct = (data.user_answer.strip().lower() == correct_ans.strip().lower())
+    options = content.get("options", [])
+    
+    # Flexible Grading (Feature 4)
+    is_correct = await evaluate_answer(
+        user_answer=data.user_answer,
+        correct_answer=correct_ans,
+        options=options,
+        ai_provider=ai_provider
+    )
     
     # Record attempt
     attempt = AssessmentAttempt(
@@ -344,13 +354,19 @@ async def submit_checkpoint_answer(
     db.add(attempt)
     await db.flush()
     
-    # 2. Update Bayesian Knowledge Tracing score
-    new_mastery_prob = await update_bkt_score(data.profile_id, data.skill_id, is_correct, db)
+    # 2. Update Bayesian Knowledge Tracing score using custom dynamic node parameters (Feature 1)
+    new_mastery_prob = await update_bkt_score(
+        profile_id=data.profile_id,
+        skill_id=data.skill_id,
+        is_correct=is_correct,
+        db=db,
+        neo4j_client=neo4j_client
+    )
     
     root_cause = None
     trigger = f"checkpoint_{'passed' if is_correct else 'failed'}_{data.skill_id}"
     
-    # 3. If fail, trigger backtrace and decay the root cause prerequisite
+    # 3. If fail, trigger backtrace with immediate parent fallback (Feature 2)
     if not is_correct:
         root_cause = await failure_root_cause_backtrace(data.profile_id, data.skill_id, db, neo4j_client)
         if root_cause:
@@ -381,7 +397,8 @@ async def submit_checkpoint_answer(
         "new_mastery_probability": new_mastery_prob,
         "detected_root_cause_prereq": root_cause,
         "updated_path": path_version.changed_nodes,
-        "explanation": path_version.decision_trace.get("explanation")
+        "explanation": path_version.decision_trace.get("explanation"),
+        "estimated_hours": path_version.decision_trace.get("estimated_hours")
     }
 
 @app.post("/api/v1/weights/update")
@@ -395,7 +412,7 @@ async def update_steerable_weights(
     """
     from app.services.path_planner import generate_or_replan_path
     
-    # Fetch profile and mock slider weights update (saved on profile description for demo)
+    # Fetch profile
     stmt = select(LearnerProfile).where(LearnerProfile.id == data.profile_id)
     profile = (await db.execute(stmt)).scalars().first()
     if not profile:
@@ -413,30 +430,115 @@ async def update_steerable_weights(
     return {
         "status": "success",
         "updated_path": path_version.changed_nodes,
-        "explanation": path_version.decision_trace.get("explanation")
+        "explanation": path_version.decision_trace.get("explanation"),
+        "estimated_hours": path_version.decision_trace.get("estimated_hours")
     }
 
 @app.get("/api/v1/readiness/{profile_id}")
 async def get_role_readiness(profile_id: int, db: AsyncSession = Depends(get_db)):
     """
-    Calculates dynamic role readiness bar stats and proof cards.
+    Calculates dynamic role readiness bar stats and cryptographically signed proof cards.
     """
     from app.services.path_planner import calculate_readiness_bar
+    from app.services.proof_card import generate_signed_proof_card
     
     readiness_data = await calculate_readiness_bar(profile_id, db, neo4j_client)
     
-    # Generate proof card info if readiness is substantial
+    # Fetch mastered skills
+    stmt = select(ReadinessSnapshot).where(
+        ReadinessSnapshot.profile_id == profile_id,
+        ReadinessSnapshot.readiness_score >= 0.70
+    )
+    mastered_snapshots = (await db.execute(stmt)).scalars().all()
+    mastered_skill_ids = [s.skill_id for s in mastered_snapshots]
+    
+    # Generate cryptographically signed Proof Card
     proof_card = None
-    if readiness_data["mastered_count"] > 0:
-        proof_card = {
-            "profile_id": profile_id,
-            "role": "Backend Software Engineer",
-            "skills_mastered_count": readiness_data["mastered_count"],
-            "verification_date": datetime.now().strftime("%Y-%m-%d"),
-            "narrative_summary": f"Demonstrated basic competency across {readiness_data['mastered_count']} verified skill checkpoints."
-        }
+    if len(mastered_skill_ids) > 0:
+        proof_card = generate_signed_proof_card(
+            profile_id=profile_id,
+            role="Backend Software Engineer",
+            mastered_skills=mastered_skill_ids,
+            readiness_score=readiness_data["readiness_score"]
+        )
         
     return {
         "readiness": readiness_data,
         "proof_card": proof_card
     }
+
+@app.post("/api/v1/readiness/decay")
+async def trigger_active_decay(db: AsyncSession = Depends(get_db)):
+    """
+    Actively triggers Ebbinghaus forgetting curve decay on all learner profiles (Feature 5).
+    """
+    from app.workers.decay_worker import run_active_decay_for_all
+    report = await run_active_decay_for_all(db)
+    return report
+
+@app.get("/api/v1/proof-card/{profile_id}")
+async def get_proof_card(profile_id: int, db: AsyncSession = Depends(get_db)):
+    """
+    Generates and returns a cryptographically signed Proof Card credential (Feature 6).
+    """
+    from app.services.path_planner import calculate_readiness_bar
+    from app.services.proof_card import generate_signed_proof_card
+    
+    readiness_data = await calculate_readiness_bar(profile_id, db, neo4j_client)
+    
+    stmt = select(ReadinessSnapshot).where(
+        ReadinessSnapshot.profile_id == profile_id,
+        ReadinessSnapshot.readiness_score >= 0.70
+    )
+    mastered_snapshots = (await db.execute(stmt)).scalars().all()
+    mastered_skill_ids = [s.skill_id for s in mastered_snapshots]
+    
+    card = generate_signed_proof_card(
+        profile_id=profile_id,
+        role="Backend Software Engineer",
+        mastered_skills=mastered_skill_ids,
+        readiness_score=readiness_data["readiness_score"]
+    )
+    return card
+
+@app.get("/api/v1/proof-card/{profile_id}/svg")
+async def get_proof_card_svg_endpoint(profile_id: int, db: AsyncSession = Depends(get_db)):
+    """
+    Exports a rendered high-fidelity SVG badge certificate for the Proof Card (Feature 6).
+    """
+    from fastapi.responses import Response
+    from app.services.path_planner import calculate_readiness_bar
+    from app.services.proof_card import generate_signed_proof_card, generate_proof_card_svg
+    
+    readiness_data = await calculate_readiness_bar(profile_id, db, neo4j_client)
+    
+    stmt = select(ReadinessSnapshot).where(
+        ReadinessSnapshot.profile_id == profile_id,
+        ReadinessSnapshot.readiness_score >= 0.70
+    )
+    mastered_snapshots = (await db.execute(stmt)).scalars().all()
+    mastered_skill_ids = [s.skill_id for s in mastered_snapshots]
+    
+    card = generate_signed_proof_card(
+        profile_id=profile_id,
+        role="Backend Software Engineer",
+        mastered_skills=mastered_skill_ids,
+        readiness_score=readiness_data["readiness_score"]
+    )
+    
+    svg_content = generate_proof_card_svg(card)
+    return Response(content=svg_content, media_type="image/svg+xml")
+
+@app.post("/api/v1/proof-card/verify")
+async def verify_proof_card_endpoint(card_data: Dict[str, Any] = Body(...)):
+    """
+    Cryptographically verifies the authenticity of a submitted Proof Card credential (Feature 6).
+    """
+    from app.services.proof_card import verify_proof_card_signature
+    is_valid = verify_proof_card_signature(card_data)
+    return {
+        "is_valid": is_valid,
+        "credential_id": card_data.get("credential_id"),
+        "status": "AUTHENTIC" if is_valid else "INVALID_OR_TAMPERED"
+    }
+
