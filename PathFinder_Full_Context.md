@@ -112,9 +112,10 @@ A skill node is never marked satisfied by a "Mark Complete" click. It requires p
 *(a.k.a. "You're in the Driver's Seat, Not the App")*
 Expose the ranking model's actual trade-off dimensions (speed vs. depth, free vs. paid, video vs. project-based) as visible sliders on the dashboard. Moving a slider re-runs Step 4 live with new weights. No cold-start dependency — build early.
 
-### Feature 7 — Market-Drift Reweighting / Opportunity Shock Alerts
+### Feature 7 — Market-Drift Reweighting / Job Market Ingestion Pipeline
 *(a.k.a. "The App Stays Updated With the Real Job Market," "Opportunity Shock Alerts")*
-A scheduled offline job periodically re-scores each skill node's job-market relevance weight against external demand signal data. When a node's weight shifts meaningfully, proactively notify learners currently on a path through that node. Requires an external job-market data source — do not fabricate this data with the LLM; if no real data source is wired up in time, this feature stays disabled rather than shipping fake numbers.
+An asynchronous job scraping ETL subsystem (`apps/api/app/scraper/`) extracts, cleans, validates, and deduplicates real-world job postings from external ATS platforms (e.g. Greenhouse public API). It normalizes HTML, classifies employment types, standardizes locations/dates, and powers market-demand signal tracking and skill prerequisite grounding. Accessible via CLI (`python -m app.scraper.cli`) and REST API (`POST /api/v1/scraper/scrape`, `GET /api/v1/scraper/sources`). See `docs/Feature_Job_Scraping_Pipeline.md`.
+
 
 ### Feature 8 — Multi-Agent Separation of Concerns
 *(a.k.a. "One Brain for Listening, Another for Planning")*

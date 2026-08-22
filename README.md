@@ -103,3 +103,5 @@ To run the backend test suite locally on the host:
 - **Focus Mode Toggle (Frontend)**: A cognitive-load reduction feature that uses CSS dimming and blurring to spotlight only the active learning node, accessible via a header toggle or Cmd+F. (See docs/Feature_Focus_Mode.md)
 - **Shareable Proof Cards (Frontend)**: The capstone UI feature displaying a learner's verified confidence score, evidence tags, and an AI narrative in a premium, shareable glassmorphic credential. (See docs/Feature_Proof_Cards.md)
 - **Learner-Steerable Ranking Sliders**: Visual sliders allowing users to dynamically adjust speed vs. depth, free vs. paid, and video vs. project-based constraints. (See docs/Feature_Ranking_Sliders.md)
+- **Job Data Collection & Scraping Pipeline (Backend)**: Asynchronous, source-agnostic ETL pipeline extracting live job postings from ATS platforms (e.g., Greenhouse), with HTML normalization, job-type classification, location/date formatting, and deduplication. (See docs/Feature_Job_Scraping_Pipeline.md)
+

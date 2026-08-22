@@ -65,6 +65,13 @@ class SliderWeightsInput(BaseModel):
     depth: float = Field(default=0.5, ge=0.0, le=1.0)
     cost: float = Field(default=0.5, ge=0.0, le=1.0)
 
+class ScrapeJobsInput(BaseModel):
+    source: str = Field(default="greenhouse", description="Source adapter name (e.g. 'greenhouse')")
+    board_token: str = Field(..., description="Job board identifier token (e.g. 'canonical', 'stripe')")
+    company_name: Optional[str] = Field(default=None, description="Optional company display name")
+    limit: Optional[int] = Field(default=None, ge=1, description="Max jobs to return")
+
+
 # Helper function to get or create a demo user profile
 async def get_or_create_profile(email: str, db: AsyncSession) -> LearnerProfile:
     # 1. Check if user exists
@@ -541,4 +548,49 @@ async def verify_proof_card_endpoint(card_data: Dict[str, Any] = Body(...)):
         "credential_id": card_data.get("credential_id"),
         "status": "AUTHENTIC" if is_valid else "INVALID_OR_TAMPERED"
     }
+
+@app.get("/api/v1/scraper/sources")
+async def get_scraper_sources():
+    """
+    Returns available job board source adapters for data collection.
+    """
+    return {
+        "sources": [
+            {
+                "id": "greenhouse",
+                "name": "Greenhouse ATS",
+                "description": "Scrapes public Greenhouse job boards via REST API",
+                "requires_token": True,
+                "example_tokens": ["canonical", "stripe", "github"]
+            }
+        ]
+    }
+
+@app.post("/api/v1/scraper/scrape")
+async def scrape_jobs_endpoint(data: ScrapeJobsInput):
+    """
+    Executes the job scraping pipeline to fetch, clean, normalize, validate,
+    and deduplicate job postings from an external applicant tracking system.
+    """
+    from app.scraper.pipeline import JobScrapingPipeline
+    from app.scraper.sources.greenhouse import GreenhouseSource
+    
+    pipeline = JobScrapingPipeline()
+    if data.source.lower() == "greenhouse":
+        source = GreenhouseSource()
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported source '{data.source}'. Supported: 'greenhouse'")
+        
+    result = await pipeline.run_pipeline(
+        source=source,
+        board_identifier=data.board_token,
+        company_name=data.company_name
+    )
+    
+    if data.limit and data.limit > 0:
+        result.jobs = result.jobs[:data.limit]
+        result.total_deduplicated = len(result.jobs)
+        
+    return result
+
 
