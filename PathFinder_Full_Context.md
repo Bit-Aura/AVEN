@@ -36,13 +36,13 @@ Every AI output is schema-validated (Pydantic), provenance-linked, and passed th
 
 | Layer | Choice |
 |---|---|
-| Frontend | Next.js (App Router) + TypeScript + Tailwind CSS + shadcn/ui + **React Flow** (skill graph rendering) + TanStack Query + Zustand |
+| Frontend | Next.js 15 (App Router) + TypeScript + Tailwind CSS + shadcn/ui + **React Flow** (skill graph rendering) + TanStack Query + Zustand + Drizzle ORM |
 | Backend | FastAPI + Python 3.12 + Pydantic v2 + SQLAlchemy 2.0 async + Alembic + asyncpg |
 | Transactional DB | PostgreSQL 16 + `pgvector` |
 | Graph DB | **Neo4j** (real graph database — not a Postgres adjacency table) |
 | Background/replanning | FastAPI `BackgroundTasks` + scheduled jobs (Temporal explicitly deferred, not used) |
 | AI orchestration | One typed `AIProvider` interface (Protocol class) wrapping direct Anthropic SDK calls — never call the SDK from inside a service file directly |
-| Auth | Clerk |
+| Auth | Clerk (Next.js middleware protection) |
 | Deploy | Docker Compose locally → Railway (API/worker/Postgres) + Neo4j Aura |
 | Observability | Structured JSON logging only (OpenTelemetry explicitly deferred) |
 
@@ -172,19 +172,20 @@ This single scenario is the one thing every component in Sections 4–6 must wor
 
 ---
 
-## 9. Explicitly Out of Scope (do not build these — listed so no agent "helpfully" adds them)
+## 9. Completed Extensions & In-Progress Innovations
+The following features are fully integrated into the codebase:
+- **Cohort Challenge Rings & Peer Presence**: (`CohortRing.tsx`, `PeerPresenceBadge.tsx`)
+- **Staleness Warnings & Ebbinghaus Decay Worker**: (`StalenessWarning.tsx`, `decay_worker.py`)
+- **Opportunity Alerts & ATS Job Ingestion**: (`OpportunityAlert.tsx`, `apps/api/app/scraper/`)
+- **Autonomy Sliders & Readiness Bar**: (`AutonomySliders.tsx`, `ReadinessBar.tsx`)
+- **Micro-Assessment Gate Modals**: (`MicroAssessmentModal.tsx`, `ProveItAssessment.tsx`)
 
-- **Cryptographically-signed portable credentials / digital wallet certificates** — real idea, real complexity (wallet infra, signing infrastructure, verification standards), not buildable in a hackathon timeframe.
-- **Full multilingual agent support** — good future idea, not MVP.
-- **Institution-side features** (Skill Radar, Curriculum Tension Map, Placement Season War Room, Mentor Load Balancer) — real product ideas from the research, but secondary to the learner-facing core loop. Only attempt after Sections 4–6 are fully working.
-- **Opportunity-to-Skill Reverse Planner** (building the graph backward from live job-posting data) — requires a real job-market data pipeline that doesn't exist yet; don't fabricate this with LLM guesses.
-- **Tutor Noise Filter** (parsing external advice snippets like YouTube roadmaps against the graph) — interesting, not core.
-- **Cohort Challenge Rings / peer-presence social features** — nice-to-have, only after the core loop is solid.
-- **Any income-share-agreement or "pay from future salary" financing model** — this is a business-model note from research, not a feature to implement in the product at all.
-- **A second role, a full course marketplace, live uncontrolled web scraping, or any RL-based training loop** — explicitly called out as things not to attempt during the hackathon build.
+For the comprehensive technical specification of in-progress and planned innovations (including **Keystroke & Diff Debugging Diagnostic for SDT Process-Praise**, **Live What-If-Skip Date Simulation**, **Confidence-Competence 2x2 Calibration Matrix**, and **Career Alternatives Panel**), see:
+👉 [**`docs/INNOVATIONS_TO_BE_DONE.md`**](file:///g:/AVEN/docs/INNOVATIONS_TO_BE_DONE.md) and [**`docs/INNOVATIONS_ROADMAP.md`**](file:///g:/AVEN/docs/INNOVATIONS_ROADMAP.md).
 
 ---
 
 ## 10. Rule for Any Agent Building From This Document
 
-If a feature request comes in that isn't listed in Sections 4–6, check Section 9 first — it's probably intentionally excluded. If it's genuinely new and not covered anywhere in this document, flag it explicitly as a new addition rather than silently building it, so this document can be updated to stay the single source of truth.
+If a feature request comes in, check `docs/INNOVATIONS_TO_BE_DONE.md` and this document first to maintain strict architectural alignment with the deterministic neuro-symbolic domain engine.
+
