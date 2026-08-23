@@ -4,6 +4,15 @@ import { useEffect, useCallback } from 'react';
 import { ReactFlow, Background, Controls, MiniMap, Node, Edge, addEdge, Connection, useNodesState, useEdgesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { usePathStore } from '../store/usePathStore';
+import SkillNode from './SkillNode';
+import FailureHeatmapOverlay from './graph/FailureHeatmapOverlay';
+
+const nodeTypes = {
+  custom: SkillNode,
+  default: SkillNode,
+  input: SkillNode,
+  output: SkillNode
+};
 
 export default function SkillGraph() {
   const storeNodes = usePathStore((state) => state.nodes);
@@ -24,6 +33,7 @@ export default function SkillGraph() {
     <div className={`w-full h-[500px] border-2 rounded-lg overflow-hidden bg-slate-950 transition-all duration-500 relative ${
       isSimulatingSkip ? 'border-rose-500/50 shadow-[0_0_30px_rgba(244,63,94,0.15)]' : 'border-slate-800'
     }`}>
+      <FailureHeatmapOverlay />
       {isSimulatingSkip && (
         <div className="absolute top-4 left-4 z-10 bg-rose-500 text-white text-xs font-bold px-3 py-1 rounded shadow-lg animate-pulse">
           SIMULATING ALTERNATIVE PATH
@@ -32,6 +42,7 @@ export default function SkillGraph() {
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
