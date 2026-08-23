@@ -70,8 +70,20 @@ async def run_cli(
             company_name=company,
             filter_policy=policy
         )
+    elif source_lower == "amazon":
+        result = await pipeline.scrape_amazon(
+            category=board_token,
+            company_name=company or "Amazon",
+            filter_policy=policy
+        )
+    elif source_lower == "google":
+        result = await pipeline.scrape_google(
+            query=board_token,
+            company_name=company or "Google",
+            filter_policy=policy
+        )
     else:
-        logger.error(f"Unsupported source '{source_name}'. Currently supported: 'greenhouse', 'lever'")
+        logger.error(f"Unsupported source '{source_name}'. Supported: 'greenhouse', 'lever', 'amazon', 'google'")
         sys.exit(1)
 
     # Optional result truncation for CLI preview
@@ -113,13 +125,13 @@ def main():
         "--source",
         type=str,
         default="greenhouse",
-        help="Job board source adapter: 'greenhouse' or 'lever' (default: 'greenhouse')"
+        help="Job source adapter: 'greenhouse', 'lever', 'amazon', 'google' (default: 'greenhouse')"
     )
     parser.add_argument(
         "--board-token",
         type=str,
         required=True,
-        help="Board identifier token or site slug (e.g. 'canonical', 'palantir')"
+        help="Board identifier, category, or search query (e.g. 'canonical', 'software-development', 'machine learning')"
     )
     parser.add_argument(
         "--company",

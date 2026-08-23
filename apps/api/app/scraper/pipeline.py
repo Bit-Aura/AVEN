@@ -4,6 +4,9 @@ from .models import ScrapedJob, ScrapeResult
 from .sources.base import BaseJobSource, ScraperException
 from .sources.greenhouse import GreenhouseSource
 from .sources.lever import LeverSource
+from .sources.amazon import AmazonJobsSource
+from .sources.google import GoogleCareersSource
+from .sources.generic_html import StaticHTMLCareerSource, HTMLSelectorConfig
 from .deduplicator import deduplicate_jobs
 from .filter import FilterPolicy, FilterResult, filter_jobs
 
@@ -12,29 +15,35 @@ logger = logging.getLogger(__name__)
 class JobScrapingPipeline:
     """
     Main orchestrator for fetching, extracting, normalizing, validating,
-    deduplicating, and optionally filtering job postings from external job boards.
+    deduplicating, and optionally filtering job postings from external job boards
+    and direct company career sources.
     """
     def __init__(
         self,
         greenhouse_source: Optional[GreenhouseSource] = None,
-        lever_source: Optional[LeverSource] = None
+        lever_source: Optional[LeverSource] = None,
+        amazon_source: Optional[AmazonJobsSource] = None,
+        google_source: Optional[GoogleCareersSource] = None
     ):
         self.greenhouse_source = greenhouse_source or GreenhouseSource()
         self.lever_source = lever_source or LeverSource()
+        self.amazon_source = amazon_source or AmazonJobsSource()
+        self.google_source = google_source or GoogleCareersSource()
 
     async def run_pipeline(
         self,
         source: BaseJobSource,
         board_identifier: str,
         company_name: Optional[str] = None,
-        filter_policy: Optional[FilterPolicy] = None
+        filter_policy: Optional[FilterPolicy] = None,
+        **kwargs
     ) -> ScrapeResult:
         """
         Executes the end-to-end data collection pipeline for a given source adapter.
         
         Args:
             source (BaseJobSource): The configured source adapter.
-            board_identifier (str): Board token or account name.
+            board_identifier (str): Board token, category, query, or base URL.
             company_name (Optional[str]): Human-readable company name for tagging.
             filter_policy (Optional[FilterPolicy]): Optional domain/seniority filter policy.
             
@@ -51,7 +60,7 @@ class JobScrapingPipeline:
         # 1. Fetch raw data from external source
         raw_items: List[Dict[str, Any]] = []
         try:
-            raw_items = await source.fetch_raw_jobs(board_identifier)
+            raw_items = await source.fetch_raw_jobs(board_identifier, **kwargs)
             result.total_fetched = len(raw_items)
             logger.info(f"Successfully fetched {len(raw_items)} raw job postings from '{board_identifier}'.")
         except ScraperException as e:
@@ -131,6 +140,66 @@ class JobScrapingPipeline:
             source=self.lever_source,
             board_identifier=site,
             company_name=company_name,
+            filter_policy=filter_policy
+        )
+
+    async def scrape_amazon(
+        self,
+        category: str = "software-development",
+        query: Optional[str] = None,
+        result_limit: int = 10,
+        max_pages: int = 1,
+        company_name: Optional[str] = "Amazon",
+        filter_policy: Optional[FilterPolicy] = None
+    ) -> ScrapeResult:
+        """
+        Convenience wrapper to scrape Amazon Jobs public search API.
+        """
+        return await self.run_pipeline(
+            source=self.amazon_source,
+            board_identifier=category,
+            company_name=company_name,
+            filter_policy=filter_policy,
+            query=query,
+            category=category,
+            result_limit=result_limit,
+            max_pages=max_pages
+        )
+
+    async def scrape_google(
+        self,
+        query: str = "software",
+        max_pages: int = 1,
+        company_name: Optional[str] = "Google",
+        filter_policy: Optional[FilterPolicy] = None
+    ) -> ScrapeResult:
+        """
+        Convenience wrapper to scrape Google Careers public search.
+        """
+        return await self.run_pipeline(
+            source=self.google_source,
+            board_identifier=query,
+            company_name=company_name,
+            filter_policy=filter_policy,
+            query=query,
+            max_pages=max_pages
+        )
+
+    async def scrape_static_html(
+        self,
+        url: str,
+        config: HTMLSelectorConfig,
+        company_name: Optional[str] = None,
+        filter_policy: Optional[FilterPolicy] = None
+    ) -> ScrapeResult:
+        """
+        Convenience wrapper to scrape a generic static HTML career page.
+        """
+        source = StaticHTMLCareerSource(config=config)
+        return await self.run_pipeline(
+            source=source,
+            board_identifier=url,
+            company_name=company_name or config.company_name,
             filter_policy=filter_policy
         )
 

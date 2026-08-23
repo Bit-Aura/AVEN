@@ -10,6 +10,9 @@ from .sources.base import (
 )
 from .sources.greenhouse import GreenhouseSource
 from .sources.lever import LeverSource
+from .sources.amazon import AmazonJobsSource
+from .sources.google import GoogleCareersSource
+from .sources.generic_html import StaticHTMLCareerSource, HTMLSelectorConfig
 from .normalizer import clean_html, detect_job_type, normalize_location, normalize_date
 from .validator import validate_scraped_job, construct_and_validate_job
 from .deduplicator import deduplicate_jobs
@@ -30,6 +33,10 @@ __all__ = [
     "BaseJobSource",
     "GreenhouseSource",
     "LeverSource",
+    "AmazonJobsSource",
+    "GoogleCareersSource",
+    "StaticHTMLCareerSource",
+    "HTMLSelectorConfig",
     "ScraperException",
     "BoardNotFoundError",
     "RateLimitError",

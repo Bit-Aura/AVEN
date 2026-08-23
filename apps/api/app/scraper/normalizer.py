@@ -210,7 +210,16 @@ def normalize_date(date_raw: Any) -> Optional[str]:
                 dt = dt.replace(tzinfo=timezone.utc)
             return dt.astimezone(timezone.utc).isoformat()
         except (ValueError, TypeError):
-            # If standard ISO parse fails, return None to avoid invalid date strings
-            return None
+            pass
+
+        # Try common human-readable date formats (e.g. "August 20, 2026", "Aug 20, 2026", "2026-08-20")
+        for fmt in ("%B %d, %Y", "%b %d, %Y", "%Y-%m-%d", "%m/%d/%Y", "%d/%m/%Y"):
+            try:
+                dt = datetime.strptime(cleaned, fmt)
+                return dt.replace(tzinfo=timezone.utc).isoformat()
+            except (ValueError, TypeError):
+                pass
+
+        return None
 
     return None
