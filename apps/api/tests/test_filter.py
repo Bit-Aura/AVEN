@@ -358,3 +358,88 @@ async def test_pipeline_scrape_greenhouse_and_lever_with_filter_policy():
     assert len(res_lev.jobs) == 1
     assert res_lev.jobs[0].title == "Deep Learning Scientist"
 
+
+def test_filter_non_technical_analyst_associate_specialist_with_boilerplate_rejected():
+    """
+    Regression test: Non-technical roles with words 'analyst', 'associate', 'specialist'
+    must not be accepted merely because company boilerplate contains AI/tech keywords.
+    """
+    boilerplate_desc = (
+        "About our company: We are an AI-first startup building generative AI, "
+        "machine learning models, and deep learning platforms using PyTorch."
+    )
+    jobs = [
+        ScrapedJob(
+            external_id="fp-1",
+            source="ashby",
+            title="Revenue Operations Analyst",
+            description=f"{boilerplate_desc}\n\nRole: Manage CRM data and sales reporting."
+        ),
+        ScrapedJob(
+            external_id="fp-2",
+            source="ashby",
+            title="Customer Experience Associate",
+            description=f"{boilerplate_desc}\n\nRole: Respond to customer support tickets."
+        ),
+        ScrapedJob(
+            external_id="fp-3",
+            source="ashby",
+            title="Credit Risk Associate",
+            description=f"{boilerplate_desc}\n\nRole: Review credit limits and underwriting."
+        ),
+        ScrapedJob(
+            external_id="fp-4",
+            source="ashby",
+            title="Data Annotation Specialist - German Writer/Translator",
+            description=f"{boilerplate_desc}\n\nRole: Translate text prompts into German."
+        ),
+    ]
+
+    result = filter_jobs(jobs, policy=AI_TECH_POLICY)
+    assert result.accepted_count == 0
+    assert result.rejected_count == 4
+    assert len(result.jobs) == 0
+
+
+def test_filter_legitimate_technical_roles_and_billing_platform_accepted():
+    """
+    Regression test: Legitimate technical and engineering management roles must be accepted,
+    and 'Engineering Manager, Billing Platform' must not be rejected due to 'billing'.
+    """
+    jobs = [
+        ScrapedJob(
+            external_id="tech-1",
+            source="ashby",
+            title="Machine Learning Engineer",
+            description="Build PyTorch models."
+        ),
+        ScrapedJob(
+            external_id="tech-2",
+            source="ashby",
+            title="Software Engineering Intern",
+            description="Summer software internship."
+        ),
+        ScrapedJob(
+            external_id="tech-3",
+            source="ashby",
+            title="Engineering Manager, Infrastructure",
+            description="Lead the cloud infrastructure team."
+        ),
+        ScrapedJob(
+            external_id="tech-4",
+            source="ashby",
+            title="Engineering Manager, Billing Platform",
+            description="Lead engineering on our billing and payments platform."
+        ),
+    ]
+
+    result = filter_jobs(jobs, policy=AI_TECH_POLICY)
+    assert result.accepted_count == 4
+    assert result.rejected_count == 0
+    assert len(result.jobs) == 4
+    accepted_titles = [j.title for j in result.jobs]
+    assert "Machine Learning Engineer" in accepted_titles
+    assert "Software Engineering Intern" in accepted_titles
+    assert "Engineering Manager, Infrastructure" in accepted_titles
+    assert "Engineering Manager, Billing Platform" in accepted_titles
+

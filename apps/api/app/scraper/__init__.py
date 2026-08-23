@@ -10,6 +10,7 @@ from .sources.base import (
 )
 from .sources.greenhouse import GreenhouseSource
 from .sources.lever import LeverSource
+from .sources.ashby import AshbySource
 from .sources.amazon import AmazonJobsSource
 from .sources.google import GoogleCareersSource
 from .sources.generic_html import StaticHTMLCareerSource, HTMLSelectorConfig
@@ -33,6 +34,7 @@ __all__ = [
     "BaseJobSource",
     "GreenhouseSource",
     "LeverSource",
+    "AshbySource",
     "AmazonJobsSource",
     "GoogleCareersSource",
     "StaticHTMLCareerSource",

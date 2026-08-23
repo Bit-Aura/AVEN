@@ -94,12 +94,12 @@ def detect_job_type(
     """
     # 1. Check explicit type metadata if already supplied by source
     if explicit_type:
-        exp_clean = explicit_type.strip().lower().replace("-", "_").replace(" ", "_")
-        if "intern" in exp_clean or "co_op" in exp_clean or "apprentice" in exp_clean:
+        exp_clean = explicit_type.strip().lower().replace("-", "").replace("_", "").replace(" ", "")
+        if "intern" in exp_clean or "coop" in exp_clean or "apprentice" in exp_clean:
             return "internship"
-        if "full_time" in exp_clean or "permanent" in exp_clean or "regular" in exp_clean:
+        if "fulltime" in exp_clean or "permanent" in exp_clean or "regular" in exp_clean:
             return "full_time"
-        if "part_time" in exp_clean:
+        if "parttime" in exp_clean:
             return "part_time"
         if "contract" in exp_clean or "freelance" in exp_clean:
             return "contract"

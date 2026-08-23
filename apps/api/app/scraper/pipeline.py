@@ -4,6 +4,7 @@ from .models import ScrapedJob, ScrapeResult
 from .sources.base import BaseJobSource, ScraperException
 from .sources.greenhouse import GreenhouseSource
 from .sources.lever import LeverSource
+from .sources.ashby import AshbySource
 from .sources.amazon import AmazonJobsSource
 from .sources.google import GoogleCareersSource
 from .sources.generic_html import StaticHTMLCareerSource, HTMLSelectorConfig
@@ -22,11 +23,13 @@ class JobScrapingPipeline:
         self,
         greenhouse_source: Optional[GreenhouseSource] = None,
         lever_source: Optional[LeverSource] = None,
+        ashby_source: Optional[AshbySource] = None,
         amazon_source: Optional[AmazonJobsSource] = None,
         google_source: Optional[GoogleCareersSource] = None
     ):
         self.greenhouse_source = greenhouse_source or GreenhouseSource()
         self.lever_source = lever_source or LeverSource()
+        self.ashby_source = ashby_source or AshbySource()
         self.amazon_source = amazon_source or AmazonJobsSource()
         self.google_source = google_source or GoogleCareersSource()
 
@@ -139,6 +142,22 @@ class JobScrapingPipeline:
         return await self.run_pipeline(
             source=self.lever_source,
             board_identifier=site,
+            company_name=company_name,
+            filter_policy=filter_policy
+        )
+
+    async def scrape_ashby(
+        self,
+        job_board_name: str,
+        company_name: Optional[str] = None,
+        filter_policy: Optional[FilterPolicy] = None
+    ) -> ScrapeResult:
+        """
+        Convenience wrapper to scrape an Ashby public job board.
+        """
+        return await self.run_pipeline(
+            source=self.ashby_source,
+            board_identifier=job_board_name,
             company_name=company_name,
             filter_policy=filter_policy
         )

@@ -69,6 +69,7 @@ DEFAULT_TECH_KEYWORDS = [
     "infrastructure engineer",
     "applied scientist",
     "research scientist",
+    "engineering manager",
 ]
 
 DEFAULT_AMBIGUOUS_TECH_INDICATORS = [
@@ -85,14 +86,11 @@ DEFAULT_AMBIGUOUS_TECH_INDICATORS = [
     "scientist",
     "researcher",
     "research",
-    "analyst",
-    "specialist",
     "technologist",
     "consultant",
     "architect",
     "mts",
     "member of technical staff",
-    "associate",
 ]
 
 DEFAULT_EXCLUDE_DOMAIN_KEYWORDS = [
@@ -103,7 +101,10 @@ DEFAULT_EXCLUDE_DOMAIN_KEYWORDS = [
     "bookkeeper",
     "clerk",
     "payroll",
-    "billing",
+    "billing clerk",
+    "billing specialist",
+    "billing coordinator",
+    "billing manager",
     "financial analyst",
     "finance manager",
     "human resources",
