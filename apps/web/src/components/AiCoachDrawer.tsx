@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathStore } from '../store/usePathStore';
-import { X, Send, Bot, User } from 'lucide-react';
+import { X, Send, Bot, User, Award } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function AiCoachDrawer() {
@@ -11,7 +11,9 @@ export default function AiCoachDrawer() {
     nodes,
     coachMessages,
     isCoachTyping,
-    sendCoachMessage
+    sendCoachMessage,
+    coachPraiseCard,
+    openProofCard
   } = usePathStore();
 
   const [inputMessage, setInputMessage] = useState('');
@@ -65,6 +67,29 @@ export default function AiCoachDrawer() {
       <div className="px-4 py-2 bg-slate-900 border-b border-slate-800 text-xs text-slate-400">
         Context: <span className="text-slate-300 font-medium">{(activeNode?.data as any)?.label || ''}</span>
       </div>
+
+      {/* Praise Card */}
+      {coachPraiseCard && (
+        <div className="mx-4 mt-4 bg-emerald-900/30 border border-emerald-500/50 rounded-xl p-4 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-start gap-3">
+            <Award className="text-emerald-400 shrink-0 mt-1" size={20} />
+            <div>
+              <h3 className="text-sm font-bold text-emerald-400 mb-1">Process Praise</h3>
+              <p className="text-sm text-slate-300 leading-relaxed mb-3">
+                {coachPraiseCard.message}
+              </p>
+              {coachPraiseCard.badge && (
+                <button 
+                  onClick={() => openProofCard(coachPraiseCard.badge!)}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-lg shadow-emerald-900/20"
+                >
+                  View Mastery Badge
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
