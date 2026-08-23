@@ -10,6 +10,7 @@ export default function IdeSidecar() {
   const completeMilestoneViaIde = usePathStore((state) => state.completeMilestoneViaIde);
   const setCoachPraiseCard = usePathStore((state) => state.setCoachPraiseCard);
   const openCoach = usePathStore((state) => state.openCoach);
+  const submitIdeTelemetry = usePathStore((state) => state.submitIdeTelemetry);
 
   const [code, setCode] = useState('// Write your solution here\n\nfunction solve() {\n  return true;\n}');
   const [output, setOutput] = useState<string | null>(null);
@@ -45,31 +46,13 @@ export default function IdeSidecar() {
       setOutput('Compiling...\nRunning tests...\nAll 3 tests passed! ✅');
       
       try {
-        const res = await fetch('/api/v1/diagnostics/debug-telemetry', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedSnapshots)
-        });
-        const data = await res.json();
-        
-        if (data.praise) {
-           setCoachPraiseCard({ message: data.praise, badge: data.badge });
-           openCoach(activeIdeNodeId);
-        }
-      } catch (e) {
-        // Mock fallback if backend isn't ready
-        const mockBadge: ProofCardData = {
-          skillName: "Debugging Mastery",
-          confidenceScore: 92,
-          evidenceTags: ["Surgical Debugging", "Efficient Fix", "No Thrashing"],
-          narrative: "Demonstrated systematic debugging by analyzing test failures and applying targeted fixes rather than random thrashing.",
-          issueDate: new Date().toLocaleDateString()
-        };
-        setCoachPraiseCard({ 
-          message: "You isolated the bug in 2 surgical steps rather than random thrashing. Excellent methodical approach!", 
-          badge: mockBadge 
+        await submitIdeTelemetry({
+          session_id: "demo-session",
+          snapshots: updatedSnapshots
         });
         openCoach(activeIdeNodeId);
+      } catch (e) {
+        console.error("Failed to submit telemetry", e);
       }
     } else {
       setOutput('Compiling...\nRunning tests...\nFailed: Expected true but got false ❌\nTip: Try looking at the return statement.');
