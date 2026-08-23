@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathStore } from '../store/usePathStore';
+import { usePathStore, ProofCardData } from '../store/usePathStore';
 import { Play, CheckCircle, TerminalSquare } from 'lucide-react';
 import { useState } from 'react';
 
@@ -8,14 +8,74 @@ export default function IdeSidecar() {
   const activeIdeNodeId = usePathStore((state) => state.activeIdeNodeId);
   const closeIde = usePathStore((state) => state.closeIde);
   const completeMilestoneViaIde = usePathStore((state) => state.completeMilestoneViaIde);
+  const setCoachPraiseCard = usePathStore((state) => state.setCoachPraiseCard);
+  const openCoach = usePathStore((state) => state.openCoach);
 
   const [code, setCode] = useState('// Write your solution here\n\nfunction solve() {\n  return true;\n}');
   const [output, setOutput] = useState<string | null>(null);
+  
+  const [runCount, setRunCount] = useState(0);
+  const [snapshots, setSnapshots] = useState<any[]>([]);
+  const [isRunning, setIsRunning] = useState(false);
 
   if (!activeIdeNodeId) return null;
 
-  const handleRun = () => {
-    setOutput('Compiling...\nRunning tests...\nAll 3 tests passed! ✅');
+  const handleRun = async () => {
+    setIsRunning(true);
+    setRunCount(prev => prev + 1);
+    const isPassing = runCount >= 1; // Fails first run, passes second run
+    
+    setOutput('Compiling...\nRunning tests...');
+    
+    // Simulate delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    const newSnapshot = {
+      timestamp: new Date().toISOString(),
+      codeDiff: '+ function solve() { return true; }',
+      linesChanged: 3,
+      testRan: true,
+      testPassed: isPassing,
+    };
+    
+    const updatedSnapshots = [...snapshots, newSnapshot];
+    setSnapshots(updatedSnapshots);
+    
+    if (isPassing) {
+      setOutput('Compiling...\nRunning tests...\nAll 3 tests passed! ✅');
+      
+      try {
+        const res = await fetch('/api/v1/diagnostics/debug-telemetry', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedSnapshots)
+        });
+        const data = await res.json();
+        
+        if (data.praise) {
+           setCoachPraiseCard({ message: data.praise, badge: data.badge });
+           openCoach(activeIdeNodeId);
+        }
+      } catch (e) {
+        // Mock fallback if backend isn't ready
+        const mockBadge: ProofCardData = {
+          skillName: "Debugging Mastery",
+          confidenceScore: 92,
+          evidenceTags: ["Surgical Debugging", "Efficient Fix", "No Thrashing"],
+          narrative: "Demonstrated systematic debugging by analyzing test failures and applying targeted fixes rather than random thrashing.",
+          issueDate: new Date().toLocaleDateString()
+        };
+        setCoachPraiseCard({ 
+          message: "You isolated the bug in 2 surgical steps rather than random thrashing. Excellent methodical approach!", 
+          badge: mockBadge 
+        });
+        openCoach(activeIdeNodeId);
+      }
+    } else {
+      setOutput('Compiling...\nRunning tests...\nFailed: Expected true but got false ❌\nTip: Try looking at the return statement.');
+    }
+    
+    setIsRunning(false);
   };
 
   const handleSubmit = () => {
@@ -59,9 +119,10 @@ export default function IdeSidecar() {
       <div className="p-4 border-t border-[#333] bg-[#252526] flex justify-end gap-3">
         <button 
           onClick={handleRun}
-          className="flex items-center gap-2 px-4 py-2 bg-[#333] hover:bg-[#444] text-white rounded text-sm transition-colors"
+          disabled={isRunning}
+          className="flex items-center gap-2 px-4 py-2 bg-[#333] hover:bg-[#444] disabled:opacity-50 text-white rounded text-sm transition-colors"
         >
-          <Play size={16} /> Run Code
+          <Play size={16} /> {isRunning ? 'Running...' : 'Run Code'}
         </button>
         <button 
           onClick={handleSubmit}
