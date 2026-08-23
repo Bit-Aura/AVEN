@@ -27,6 +27,7 @@ export default function Home() {
   const toggleOffline = usePathStore((state) => state.toggleOffline);
   const isFocusMode = usePathStore((state) => state.isFocusMode);
   const toggleFocusMode = usePathStore((state) => state.toggleFocusMode);
+  const activeMilestone = usePathStore((state) => state.activeMilestone);
 
   // 1. If the user hasn't set a goal yet, show the GoalChat UI fullscreen.
   if (!userGoal) {
@@ -39,12 +40,6 @@ export default function Home() {
   }
 
   // 3. Once both are complete, show the actual dashboard.
-  const dummyMilestone = {
-    id: '1',
-    title: 'Python Basics',
-    explanation: 'Based on your diagnostic, this is the most critical starting point for Backend Engineering. Python provides the fundamental syntax and concepts you will use for the rest of your path.',
-    status: 'active' as const,
-  };
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 p-8 flex flex-col md:flex-row gap-8 relative overflow-hidden">
@@ -100,7 +95,7 @@ export default function Home() {
       {/* Milestone Card - Elevated during Focus Mode */}
       <div className={`w-full md:w-96 flex flex-col gap-6 pt-[88px] transition-all duration-700 ${isFocusMode ? 'relative z-20 scale-105' : ''}`}>
         <h2 className={`text-2xl font-bold mb-2 transition-colors ${isFocusMode ? 'text-indigo-300' : ''}`}>Active Milestone</h2>
-        <MilestoneCard milestone={dummyMilestone} />
+        {activeMilestone && <MilestoneCard milestone={activeMilestone} />}
         
         <div className={`transition-opacity duration-700 ${isFocusMode ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'}`}>
           <RankingSliders />

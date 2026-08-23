@@ -59,6 +59,10 @@ class CheckpointSubmitInput(BaseModel):
     skill_id: str
     user_answer: str
 
+class CoachChatInput(BaseModel):
+    skill_id: str
+    message: str
+
 class SliderWeightsInput(BaseModel):
     profile_id: int
     speed: float = Field(default=0.5, ge=0.0, le=1.0)
@@ -214,10 +218,14 @@ async def submit_diagnostic_answer(
         )
         await db.commit()
         
+        # Format the path for the frontend
+        ordered_skills = path_version.changed_nodes.get("all_ordered_skills", [])
+        formatted_path = [{"id": s, "name": s.replace('_', ' ').title()} for s in ordered_skills]
+        
         return {
             "status": "completed",
             "message": "Diagnostic complete! Learning path generated.",
-            "path": path_version.changed_nodes
+            "path": formatted_path
         }
     else:
         # Generate next question
@@ -309,6 +317,54 @@ async def simulate_what_if_skip(
         "risk_explanation": explanation,
         "updated_path": new_path_version.changed_nodes
     }
+
+@app.get("/api/v1/checkpoint/{skill_id}")
+async def get_checkpoint(
+    skill_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Fetches the assessment question and options for a given skill.
+    Strips out the correct_answer to prevent cheating.
+    """
+    stmt = select(AssessmentItem)
+    result = await db.execute(stmt)
+    items = result.scalars().all()
+    
+    for item in items:
+        content = json.loads(item.content)
+        if content.get("target_skill") == skill_id:
+            return {
+                "question": content.get("question", ""),
+                "options": content.get("options", [])
+            }
+            
+    raise HTTPException(status_code=404, detail=f"No assessment found for skill {skill_id}")
+
+@app.post("/api/v1/coach/chat")
+async def chat_with_coach(
+    data: CoachChatInput,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Chats with the AI coach about a specific skill.
+    """
+    # For now, just generate a dynamic message instead of passing through full LLM stream
+    # to keep it fast and simple for the demo.
+    from app.infrastructure.ai.gateway import ai_provider
+    prompt = f"The user is asking a question about the skill '{data.skill_id}': '{data.message}'. Give a brief, encouraging, 1-2 sentence response explaining a concept."
+    try:
+        response = await ai_provider.client.messages.create(
+            model="claude-3-5-sonnet-20240620",
+            max_tokens=300,
+            system="You are an expert, encouraging technical AI coach. Be concise.",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        reply = response.content[0].text.strip()
+    except Exception as e:
+        reply = f"That's a great question about {data.skill_id}! I'd love to explain {data.message} in more detail when I have full connectivity."
+        
+    return {"reply": reply}
 
 @app.post("/api/v1/checkpoint/submit")
 async def submit_checkpoint_answer(

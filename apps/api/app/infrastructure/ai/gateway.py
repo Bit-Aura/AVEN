@@ -79,7 +79,6 @@ Do not include any explanation or markdown formatting other than the JSON string
             response = await self.client.messages.create(
                 model="claude-3-5-sonnet-20240620",
                 max_tokens=1000,
-                temperature=0.0,
                 system="You are an expert curriculum assistant. You parse user intents and output only valid, schema-compliant JSON.",
                 messages=[{"role": "user", "content": prompt}]
             )
@@ -137,7 +136,6 @@ Do not include any explanation or markdown formatting.
             response = await self.client.messages.create(
                 model="claude-3-5-sonnet-20240620",
                 max_tokens=1000,
-                temperature=0.2,
                 system="You are conducting a structured technical assessment diagnostic. You must output only valid, schema-compliant JSON.",
                 messages=[{"role": "user", "content": prompt}]
             )
@@ -179,7 +177,6 @@ Keep the explanation clear, brief (1-3 sentences), and trace-grounded.
             response = await self.client.messages.create(
                 model="claude-3-5-sonnet-20240620",
                 max_tokens=500,
-                temperature=0.0,
                 system="You explain recommendation decisions. You strictly base your explanations on the facts in the DecisionTrace.",
                 messages=[{"role": "user", "content": prompt}]
             )

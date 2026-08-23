@@ -1,20 +1,22 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { ReactFlow, Background, Controls, MiniMap, Node, Edge, addEdge, Connection, useNodesState, useEdgesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { usePathStore } from '../store/usePathStore';
 
-const initialNodes: Node[] = [
-  { id: '1', position: { x: 0, y: 0 }, data: { label: 'Python Basics' }, type: 'input' },
-  { id: '2', position: { x: 0, y: 100 }, data: { label: 'Data Structures' } },
-];
-const initialEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2' }];
-
 export default function SkillGraph() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const storeNodes = usePathStore((state) => state.nodes);
+  const storeEdges = usePathStore((state) => state.edges);
   const isSimulatingSkip = usePathStore((state) => state.isSimulatingSkip);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(storeNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(storeEdges);
+
+  useEffect(() => {
+    setNodes(storeNodes);
+    setEdges(storeEdges);
+  }, [storeNodes, storeEdges, setNodes, setEdges]);
   
   const onConnect = useCallback((params: Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 

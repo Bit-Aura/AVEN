@@ -3,26 +3,70 @@ import { render } from '@testing-library/react';
 import SkillMap from '../SkillMap';
 import { usePathStore } from '../../store/usePathStore';
 
-// Mock child component
-jest.mock('../SkillGraph', () => () => <div data-testid="skill-graph" />);
-
-jest.mock('../../store/usePathStore', () => ({
-  usePathStore: jest.fn()
+jest.mock('@xyflow/react', () => ({
+  ReactFlow: () => <div data-testid="react-flow-mock"></div>,
+  Background: () => <div />,
+  Controls: () => <div />,
+  MiniMap: () => <div />
 }));
 
-describe('SkillMap Component', () => {
-  beforeEach(() => {
-    (usePathStore as unknown as jest.Mock).mockImplementation((selector) => {
-      return selector({
-        isFocusMode: false,
-        nodes: [],
-        edges: []
-      });
-    });
-  });
+jest.mock('../../store/usePathStore', () => ({ usePathStore: jest.fn() }));
 
+const baseMock = {
+  userGoal: 'Backend Engineer',
+  diagnosticComplete: true,
+  isSimulatingSkip: false,
+  simulatedConsequence: null,
+  isTakingAssessment: false,
+  isTrustPanelOpen: false,
+  activeIdeNodeId: null,
+  activeCoachNodeId: null,
+  isOffline: false,
+  streak: 5,
+  xp: 1250,
+  showCelebration: false,
+  showUndoToast: false,
+  isCommandPaletteOpen: false,
+  isFocusMode: false,
+  activeProofCard: null,
+  rankingPreferences: { speedVsDepth: 50, freeVsPaid: 50, videoVsProject: 50 },
+  collaborators: [{ id: '1', name: 'Alice', isOnline: true, color: 'bg-red-500' }],
+  nodes: [{id: 'node-1', data: {}}],
+  edges: [],
+  activeMilestone: { id: 'm1', title: 'Test Node', explanation: 'Why this.', status: 'active' },
+  setGraph: jest.fn(),
+  setActiveMilestone: jest.fn(),
+  setUserGoal: jest.fn(),
+  completeDiagnostic: jest.fn(),
+  simulateSkip: jest.fn(),
+  cancelSimulation: jest.fn(),
+  startAssessment: jest.fn(),
+  stopAssessment: jest.fn(),
+  bypassMilestone: jest.fn(),
+  completeMilestoneViaIde: jest.fn(),
+  toggleTrustPanel: jest.fn(),
+  openIde: jest.fn(),
+  closeIde: jest.fn(),
+  openCoach: jest.fn(),
+  closeCoach: jest.fn(),
+  toggleOffline: jest.fn(),
+  syncOfflineProgress: jest.fn(),
+  awardXp: jest.fn(),
+  hideCelebration: jest.fn(),
+  undoLastAction: jest.fn(),
+  hideUndoToast: jest.fn(),
+  toggleCommandPalette: jest.fn(),
+  closeCommandPalette: jest.fn(),
+  toggleFocusMode: jest.fn(),
+  openProofCard: jest.fn(),
+  closeProofCard: jest.fn(),
+  updateRankingPreference: jest.fn(),
+};
+
+describe('SkillMap Component', () => {
   it('renders the skill graph wrapper', () => {
+    (usePathStore as unknown as jest.Mock).mockImplementation((selector) => selector({ ...baseMock, nodes: [{id: 'n1'}], edges: [] }));
     const { getByTestId } = render(<SkillMap />);
-    expect(getByTestId('skill-graph')).toBeInTheDocument();
+    expect(getByTestId('react-flow-mock')).toBeInTheDocument();
   });
-});\n
+});

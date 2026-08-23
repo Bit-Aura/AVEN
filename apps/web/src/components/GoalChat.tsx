@@ -7,10 +7,11 @@ import { SendHorizonal } from 'lucide-react';
 export default function GoalChat() {
   const [input, setInput] = useState('');
   const setUserGoal = usePathStore((state) => state.setUserGoal);
+  const isLoading = usePathStore((state) => state.isLoading);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
     setUserGoal(input.trim());
   };
 
@@ -39,11 +40,15 @@ export default function GoalChat() {
           />
           <button
             type="submit"
-            disabled={!input.trim()}
+            disabled={!input.trim() || isLoading}
             className="absolute bottom-4 right-4 p-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors flex items-center justify-center"
             title="Start Path"
           >
-            <SendHorizonal size={20} />
+            {isLoading ? (
+              <span className="w-5 h-5 border-2 border-slate-300 border-t-transparent rounded-full animate-spin"></span>
+            ) : (
+              <SendHorizonal size={20} />
+            )}
           </button>
         </form>
       </div>

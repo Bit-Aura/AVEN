@@ -5,47 +5,41 @@ import { X, Send, Bot, User } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function AiCoachDrawer() {
-  const activeCoachNodeId = usePathStore((state) => state.activeCoachNodeId);
-  const closeCoach = usePathStore((state) => state.closeCoach);
-  const nodes = usePathStore((state) => state.nodes);
+  const { 
+    activeCoachNodeId, 
+    closeCoach, 
+    nodes,
+    coachMessages,
+    isCoachTyping,
+    sendCoachMessage
+  } = usePathStore();
 
   const [inputMessage, setInputMessage] = useState('');
-  const [messages, setMessages] = useState<{role: 'ai' | 'user', text: string}[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const activeNode = nodes.find(n => n.id === activeCoachNodeId);
 
-  // Seed the initial context
-  useEffect(() => {
-    if (activeCoachNodeId && activeNode) {
-      setMessages([
-        {
-          role: 'ai',
-          text: `Hi! I see you're working on "${(activeNode.data as any)?.label || ''}". What specific part is confusing you? I'm here to help.`
-        }
-      ]);
-    }
-  }, [activeCoachNodeId, activeNode]);
-
   // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [coachMessages, isCoachTyping]);
 
-  const handleSend = (e: React.FormEvent) => {
+  // Escape to close
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeCoach();
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [closeCoach]);
+
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || isCoachTyping) return;
 
-    setMessages(prev => [...prev, { role: 'user', text: inputMessage }]);
+    const message = inputMessage.trim();
     setInputMessage('');
-
-    // Mock AI response
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: 'ai', 
-        text: "That's a great question! Let's think about it step-by-step. What do you think happens if we change the initialization parameters?" 
-      }]);
-    }, 1000);
+    await sendCoachMessage(activeCoachNodeId!, message);
   };
 
   if (!activeCoachNodeId) return null;
@@ -59,6 +53,7 @@ export default function AiCoachDrawer() {
           <span>AI Coach</span>
         </div>
         <button 
+          data-testid="close-coach"
           onClick={closeCoach}
           className="text-slate-400 hover:text-slate-200 transition-colors"
         >
@@ -73,7 +68,7 @@ export default function AiCoachDrawer() {
 
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg, i) => (
+        {coachMessages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
             <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
               msg.role === 'ai' ? 'bg-indigo-600' : 'bg-slate-700'
@@ -89,6 +84,16 @@ export default function AiCoachDrawer() {
             </div>
           </div>
         ))}
+        {isCoachTyping && (
+          <div className="flex gap-3">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-indigo-600">
+              <Bot size={16} />
+            </div>
+            <div className="px-4 py-2 rounded-2xl text-sm bg-slate-800 text-slate-400 rounded-tl-none animate-pulse">
+              Thinking...
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -100,11 +105,13 @@ export default function AiCoachDrawer() {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder="Ask your coach..."
-            className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+            disabled={isCoachTyping}
+            className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors disabled:opacity-50"
           />
           <button 
             type="submit"
-            className="p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors flex items-center justify-center shrink-0"
+            disabled={isCoachTyping || !inputMessage.trim()}
+            className="p-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white rounded-lg transition-colors flex items-center justify-center shrink-0"
           >
             <Send size={18} />
           </button>

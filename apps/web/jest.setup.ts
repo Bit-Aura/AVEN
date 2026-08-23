@@ -12,3 +12,9 @@ afterAll(() => {
   // If tests generated any temp files in a standard location, we would clean them up here.
   // For standard React component tests, no files are generated.
 });
+
+// Mock all lucide-react icons
+jest.mock('lucide-react', () => new Proxy({}, { get: () => () => 'Icon' }));
+
+// Mock HTMLElement.scrollIntoView
+window.HTMLElement.prototype.scrollIntoView = jest.fn();

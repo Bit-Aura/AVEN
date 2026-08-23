@@ -8,15 +8,28 @@ export default function TrustPanel() {
 
   if (!isTrustPanelOpen) return null;
 
-  // Mocking the readiness vector calculation for MVP
+  const userGoal = usePathStore((state) => state.userGoal);
+  const activeMilestone = usePathStore((state) => state.activeMilestone);
+  const nodes = usePathStore((state) => state.nodes);
+
+  // Dynamic readiness metrics based on current state
+  const completedNodesCount = nodes.filter(n => n.id !== activeMilestone?.id && nodes.indexOf(n) < nodes.findIndex(x => x.id === activeMilestone?.id)).length;
+  const progressPercent = nodes.length > 0 ? Math.round((completedNodesCount / nodes.length) * 100) : 15;
+  
+  const modules = nodes.map(n => {
+    let status = 'locked';
+    if (n.id === activeMilestone?.id) status = 'active';
+    else if (nodes.indexOf(n) < nodes.findIndex(x => x.id === activeMilestone?.id)) status = 'completed';
+    return { name: (n.data as any)?.label || n.id, status };
+  });
+
   const readinessMetrics = {
-    overall: 15,
-    modules: [
-      { name: "Python Basics", status: "completed" },
-      { name: "API Design", status: "active" },
-      { name: "Database Schema", status: "locked" }
+    overall: progressPercent,
+    modules: modules.length > 0 ? modules : [
+      { name: "Initial Assessment", status: "completed" },
+      { name: "Path Generation", status: "active" }
     ],
-    reasoning: "Based on your diagnostic, you already possess basic programming knowledge. The AI has plotted this optimal path to fast-track you into Backend Engineering, focusing heavily on API construction and Data Modeling."
+    reasoning: `Based on your diagnostic, you have demonstrated a foundation to begin your journey toward "${userGoal || 'your goal'}". The AI has plotted this optimal path to fast-track you, focusing heavily on your most critical gaps first.`
   };
 
   return (

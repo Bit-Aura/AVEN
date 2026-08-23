@@ -1,19 +1,24 @@
 'use client';
 
 import { usePathStore } from '../store/usePathStore';
-import { Terminal, Code, HelpCircle, WifiOff, Focus, X, Command } from 'lucide-react';
-import { useEffect } from 'react';
+import { Terminal, Code, HelpCircle, WifiOff, Focus, X, Command, MapPin } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function CommandPalette() {
-  const isCommandPaletteOpen = usePathStore((state) => state.isCommandPaletteOpen);
-  const toggleCommandPalette = usePathStore((state) => state.toggleCommandPalette);
-  const closeCommandPalette = usePathStore((state) => state.closeCommandPalette);
-  
-  const activeMilestone = usePathStore((state) => state.activeMilestone);
-  const openIde = usePathStore((state) => state.openIde);
-  const openCoach = usePathStore((state) => state.openCoach);
-  const toggleOffline = usePathStore((state) => state.toggleOffline);
-  const toggleFocusMode = usePathStore((state) => state.toggleFocusMode);
+  const {
+    isCommandPaletteOpen,
+    toggleCommandPalette,
+    closeCommandPalette,
+    activeMilestone,
+    openIde,
+    openCoach,
+    toggleOffline,
+    toggleFocusMode,
+    nodes,
+    setActiveMilestone
+  } = usePathStore();
+
+  const [search, setSearch] = useState('');
 
   // Global Keyboard Listener
   useEffect(() => {
@@ -78,6 +83,11 @@ export default function CommandPalette() {
 
   if (!isCommandPaletteOpen) return null;
 
+  const filteredNodes = nodes.filter(n => {
+    const label = (n.data?.label as string) || '';
+    return label.toLowerCase().includes(search.toLowerCase());
+  });
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 p-4">
       <div className="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden flex flex-col">
@@ -87,7 +97,9 @@ export default function CommandPalette() {
           <Terminal size={20} className="text-slate-500" />
           <input 
             type="text" 
-            placeholder="Search commands..." 
+            placeholder="Search commands or skills..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="bg-transparent border-none outline-none w-full text-lg placeholder:text-slate-600"
             autoFocus
           />
@@ -97,7 +109,36 @@ export default function CommandPalette() {
         </div>
 
         {/* Commands List */}
-        <div className="p-2 space-y-1">
+        <div className="p-2 space-y-1 max-h-96 overflow-y-auto">
+          {search && filteredNodes.length > 0 && (
+            <>
+              <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Skills in Path
+              </div>
+              {filteredNodes.map(node => (
+                <button 
+                  key={node.id}
+                  onClick={() => {
+                    setActiveMilestone({
+                      id: node.id,
+                      title: (node.data?.label as string) || node.id,
+                      explanation: 'Selected from command palette',
+                      status: 'active'
+                    });
+                    closeCommandPalette();
+                  }}
+                  className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-800 text-left transition-colors group"
+                >
+                  <div className="flex items-center gap-3 text-slate-300 group-hover:text-white">
+                    <MapPin size={18} className="text-emerald-400" />
+                    <span>Jump to: {(node.data?.label as string) || node.id}</span>
+                  </div>
+                </button>
+              ))}
+              <div className="my-2 border-t border-slate-800"></div>
+            </>
+          )}
+
           <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
             Quick Actions
           </div>
