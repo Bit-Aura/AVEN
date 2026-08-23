@@ -8,7 +8,7 @@ export interface DiagnosticQuestion {
   target_skill: string;
 }
 
-interface Milestone {
+export interface Milestone {
   id: string;
   title: string;
   explanation: string;
@@ -70,7 +70,7 @@ interface PathState {
   isFetchingAssessment: boolean;
   
   nodes: Node[];
-  edges: Node[];
+  edges: Edge[];
   activeMilestone: Milestone | null;
   setGraph: (nodes: Node[], edges: Edge[]) => void;
   setActiveMilestone: (milestone: Milestone) => void;

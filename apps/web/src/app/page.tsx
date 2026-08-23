@@ -1,137 +1,62 @@
-'use client';
+import Link from 'next/link';
 
-import SkillGraph from '../components/SkillGraph';
-import MilestoneCard from '../components/MilestoneCard';
-import GoalChat from '../components/GoalChat';
-import DiagnosticChat from '../components/DiagnosticChat';
-import TrustPanel from '../components/TrustPanel';
-import PresenceBar from '../components/PresenceBar';
-import IdeSidecar from '../components/IdeSidecar';
-import AiCoachDrawer from '../components/AiCoachDrawer';
-import OfflineSyncBanner from '../components/OfflineSyncBanner';
-import GamificationHud from '../components/GamificationHud';
-import MicroCelebration from '../components/MicroCelebration';
-import UndoToast from '../components/UndoToast';
-import CommandPalette from '../components/CommandPalette';
-import ProofCard from '../components/ProofCard';
-import RankingSliders from '../components/RankingSliders';
-import { usePathStore } from '../store/usePathStore';
-import { Wifi, WifiOff, Focus } from 'lucide-react';
-
-export default function Home() {
-  const userGoal = usePathStore((state) => state.userGoal);
-  const diagnosticComplete = usePathStore((state) => state.diagnosticComplete);
-  const isTrustPanelOpen = usePathStore((state) => state.isTrustPanelOpen);
-  const toggleTrustPanel = usePathStore((state) => state.toggleTrustPanel);
-  const isOffline = usePathStore((state) => state.isOffline);
-  const toggleOffline = usePathStore((state) => state.toggleOffline);
-  const isFocusMode = usePathStore((state) => state.isFocusMode);
-  const toggleFocusMode = usePathStore((state) => state.toggleFocusMode);
-  const activeMilestone = usePathStore((state) => state.activeMilestone);
-
-  // 1. If the user hasn't set a goal yet, show the GoalChat UI fullscreen.
-  if (!userGoal) {
-    return <GoalChat />;
-  }
-
-  // 2. If the user has a goal but hasn't completed the diagnostic, show the diagnostic chat.
-  if (!diagnosticComplete) {
-    return <DiagnosticChat />;
-  }
-
-  // 3. Once both are complete, show the actual dashboard.
-
+export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 p-8 flex flex-col md:flex-row gap-8 relative overflow-hidden">
-      
-      {/* Background Dimming for Focus Mode */}
-      <div className={`absolute inset-0 bg-slate-950/80 z-10 transition-opacity duration-700 pointer-events-none ${isFocusMode ? 'opacity-100' : 'opacity-0'}`} />
+    <div className="min-h-screen bg-neo-bg text-neo-text font-sans p-8 md:p-16 selection:bg-neo-yellow">
+      <nav className="flex justify-between items-center mb-24 border-b-4 border-black pb-6">
+        <h1 className="text-4xl font-black uppercase tracking-tighter">PathFinder</h1>
+        <div className="flex gap-4">
+          <Link href="/sign-in" className="text-xl font-bold uppercase border-4 border-transparent hover:border-black px-4 py-2 transition-all">Login</Link>
+          <Link href="/sign-up" className="text-xl font-bold uppercase bg-neo-yellow border-4 border-black shadow-brutal hover:shadow-brutal-active hover:translate-y-1 hover:translate-x-1 px-4 py-2 transition-all">Start Now</Link>
+        </div>
+      </nav>
 
-      <div className={`flex-1 flex flex-col transition-all duration-700 ${isFocusMode ? 'opacity-30 blur-sm grayscale pointer-events-none' : ''}`}>
-        <div className="mb-6 flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Your PathFinder Learning Graph</h1>
-            <div className="flex items-center gap-4">
-              <p className="text-slate-400 font-medium px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg inline-block">
-                Goal: <span className="text-emerald-400">{userGoal}</span>
-              </p>
-              <PresenceBar />
-            </div>
+      <main className="max-w-5xl mx-auto flex flex-col gap-32">
+        {/* Hero Section */}
+        <section className="text-center flex flex-col items-center gap-8">
+          <h2 className="text-6xl md:text-8xl font-black uppercase leading-tight bg-neo-yellow inline-block px-4 border-4 border-black shadow-brutal">
+            Stop Guessing. <br/> Start Knowing.
+          </h2>
+          <p className="text-2xl md:text-3xl font-bold max-w-3xl border-l-8 border-black pl-6 text-left">
+            An AI-native learning platform where the curriculum adapts to your real gaps, not your symptoms.
+          </p>
+          <div className="mt-8">
+            <Link href="/sign-up" className="inline-block text-2xl font-black uppercase bg-neo-blue text-white border-4 border-black shadow-brutal-lg hover:shadow-brutal-active hover:translate-y-2 hover:translate-x-2 px-8 py-4 transition-all">
+              Build Your Path
+            </Link>
           </div>
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={toggleOffline}
-              className={`p-2 rounded-lg border transition-colors flex items-center justify-center shadow-lg ${
-                isOffline 
-                  ? 'bg-amber-900/50 border-amber-700 text-amber-500 hover:bg-amber-900/70' 
-                  : 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-emerald-400'
-              }`}
-              title={isOffline ? "Go Online" : "Simulate Offline Mode"}
-            >
-              {isOffline ? <WifiOff size={20} /> : <Wifi size={20} />}
-            </button>
-            <button 
-              onClick={toggleFocusMode}
-              className={`p-2 rounded-lg border transition-colors flex items-center justify-center shadow-lg ${
-                isFocusMode 
-                  ? 'bg-indigo-900/50 border-indigo-700 text-indigo-400 hover:bg-indigo-900/70' 
-                  : 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-indigo-400'
-              }`}
-              title={isFocusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
-            >
-              <Focus size={20} />
-            </button>
-            <button 
-              onClick={toggleTrustPanel}
-              className="px-4 py-2 bg-slate-900 border border-slate-700 text-slate-300 rounded-lg hover:bg-slate-800 hover:text-slate-100 transition-colors flex items-center gap-2 shadow-lg"
-            >
-              <span>⚡</span> Why this path?
-            </button>
+        </section>
+
+        {/* Differentiators Section */}
+        <section className="grid md:grid-cols-2 gap-12">
+          {/* Readiness vs Progress */}
+          <div className="bg-neo-green border-4 border-black shadow-brutal p-8 flex flex-col gap-6">
+            <h3 className="text-4xl font-black uppercase">Readiness, Not a Progress Bar</h3>
+            <p className="text-xl font-bold bg-white border-4 border-black p-4">
+              Generic MOOCs give you a 100% progress bar for watching videos. We give you a Readiness % based on verified micro-assessments. Don't just click through—prove it.
+            </p>
           </div>
-        </div>
-        <SkillGraph />
-      </div>
-      
-      {/* Milestone Card - Elevated during Focus Mode */}
-      <div className={`w-full md:w-96 flex flex-col gap-6 pt-[88px] transition-all duration-700 ${isFocusMode ? 'relative z-20 scale-105' : ''}`}>
-        <h2 className={`text-2xl font-bold mb-2 transition-colors ${isFocusMode ? 'text-indigo-300' : ''}`}>Active Milestone</h2>
-        {activeMilestone && <MilestoneCard milestone={activeMilestone} />}
-        
-        <div className={`transition-opacity duration-700 ${isFocusMode ? 'opacity-0 pointer-events-none hidden' : 'opacity-100'}`}>
-          <RankingSliders />
-        </div>
-      </div>
 
-      {/* Trust Panel Overlay */}
-      {isTrustPanelOpen && (
-        <div className="absolute top-0 right-0 h-full z-40">
-          <TrustPanel />
-        </div>
-      )}
+          {/* Root-cause diagnosis */}
+          <div className="bg-neo-red text-white border-4 border-black shadow-brutal p-8 flex flex-col gap-6">
+            <h3 className="text-4xl font-black uppercase">Diagnose the Cause, Not the Symptom</h3>
+            <p className="text-xl font-bold bg-black text-white p-4">
+              If you fail an API design task, we don't serve you an easier API task. We walk back the prerequisite graph to find out if you actually forgot HTTP methods, and fix the root cause.
+            </p>
+          </div>
+        </section>
 
-      {/* Gamification HUD */}
-      <GamificationHud />
-
-      {/* IDE Sidecar Overlay */}
-      <IdeSidecar />
-
-      {/* AI Coach Overlay */}
-      <AiCoachDrawer />
-
-      {/* Offline Sync Banner */}
-      <OfflineSyncBanner />
-
-      {/* Micro-celebration Overlay */}
-      <MicroCelebration />
-
-      {/* Undo Toast */}
-      <UndoToast />
-
-      {/* Command Palette */}
-      <CommandPalette />
-
-      {/* Proof Card Overlay */}
-      <ProofCard />
-    </main>
+        {/* Call to Action */}
+        <section className="bg-neo-blue border-4 border-black shadow-brutal p-12 text-center text-white flex flex-col items-center gap-8">
+          <h2 className="text-5xl font-black uppercase">Your Goal. Your Timeline.</h2>
+          <p className="text-2xl font-bold max-w-2xl">
+            Declare your target role and weekly hours. The AI planner builds a deterministic skill graph tailored to your exact time budget.
+          </p>
+          <Link href="/sign-up" className="mt-4 text-2xl font-black uppercase bg-neo-yellow text-black border-4 border-black shadow-brutal hover:shadow-brutal-active hover:translate-y-1 hover:translate-x-1 px-8 py-4 transition-all">
+            Get Started For Free
+          </Link>
+        </section>
+      </main>
+    </div>
   );
 }
