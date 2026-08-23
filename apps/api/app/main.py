@@ -75,6 +75,18 @@ class ScrapeJobsInput(BaseModel):
     company_name: Optional[str] = Field(default=None, description="Optional company display name")
     limit: Optional[int] = Field(default=None, ge=1, description="Max jobs to return")
 
+# --- Innovation Endpoint Schemas (imported from service modules) ---
+# These are re-exported here so they appear in the OpenAPI schema.
+from app.services.process_diagnostics import DebuggingTelemetryInput, DebuggingDiagnosticReport
+from app.services.skip_delta import SkipDeltaInput, SkipDeltaReport
+from app.services.calibration import CalibrationInput, CalibrationReport
+from app.services.career_engine import CareerAlternativesReport
+from app.services.placement_engine import (
+    PlacementDriveInput, PlacementPlanReport,
+    MentorTriageInput, MentorTriageReport,
+)
+from app.services.noise_filter import RoadmapAnalysisInput, RoadmapAnalysisReport
+
 
 # Helper function to get or create a demo user profile
 async def get_or_create_profile(email: str, db: AsyncSession) -> LearnerProfile:
@@ -650,3 +662,182 @@ async def scrape_jobs_endpoint(data: ScrapeJobsInput):
     return result
 
 
+# =============================================================================
+# INNOVATION ENDPOINTS
+# =============================================================================
+
+@app.post("/api/v1/diagnostics/debug-telemetry", response_model=DebuggingDiagnosticReport)
+async def submit_debug_telemetry(data: DebuggingTelemetryInput):
+    """
+    [Innovation 1] SDT Evidence-Based Process-Praise — Keystroke & Diff Debugging Diagnostic.
+
+    Accepts a sequence of IDE snapshots (diffs, test results, timestamps) from the
+    embedded coding sandbox and returns a structured DebuggingDiagnosticReport with:
+    - Thrash Index (T_i) quantifying the efficiency of the debugging strategy.
+    - Strategy classification: BINARY_SEARCH_ISOLATION | HYPOTHESIS_DRIVEN | EXPLORATORY | RANDOM_THRASHING.
+    - Evidence-based process-praise text grounded in real session metrics.
+    - Competency deltas for Systematic Debugging, TDD, and Code Precision.
+    """
+    from app.services.process_diagnostics import analyze_debug_session
+    try:
+        report = await analyze_debug_session(data, ai_provider)
+        return report
+    except Exception as e:
+        logger.exception("Debug telemetry analysis failed")
+        raise HTTPException(status_code=500, detail=f"Process diagnostics failed: {e}")
+
+
+@app.post("/api/v1/simulate-skip-delta", response_model=SkipDeltaReport)
+async def simulate_skip_with_date_delta(
+    data: SkipDeltaInput,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    [Innovation 2] Live What-If-Skip Graph Simulation with Target Date-Delta.
+
+    Computes the full downstream impact of skipping skill S:
+    - All blocked descendants in the DAG (Neo4j → NetworkX traversal).
+    - Friction hours penalty per blocked node.
+    - Exact calendar date shift projected against the learner's weekly study budget.
+    - Human-readable verdict and skip recommendation.
+
+    Frontend should use blocked_nodes list to pulse amber borders on the React Flow graph
+    and update the target date display live as the user adjusts their weekly_study_hours slider.
+    """
+    from app.services.skip_delta import compute_skip_delta
+    try:
+        report = await compute_skip_delta(data, db, neo4j_client)
+        return report
+    except Exception as e:
+        logger.exception("Skip delta simulation failed")
+        raise HTTPException(status_code=500, detail=f"Skip simulation failed: {e}")
+
+
+@app.post("/api/v1/calibration/evaluate", response_model=CalibrationReport)
+async def evaluate_calibration_check(data: CalibrationInput):
+    """
+    [Innovation 3] Confidence–Competence 2x2 Calibration Matrix Evaluator.
+
+    Accepts the learner's pre-quiz self-rated confidence and post-quiz actual score
+    and classifies them into one of four calibration quadrants:
+    - CALIBRATED_MASTERY: Self-model is accurate. Proof Card unlock if score ≥ 0.80.
+    - BLINDSPOT: Dunning-Kruger detected. Counterexample injection triggered.
+    - IMPOSTER_ZONE: Imposter Syndrome detected. Proof Card forced-unlocked.
+    - CALIBRATED_NOVICE: Accurate awareness of beginner status. Encouragement mode.
+    """
+    from app.services.calibration import evaluate_calibration
+    try:
+        report = evaluate_calibration(data)
+        return report
+    except Exception as e:
+        logger.exception("Calibration evaluation failed")
+        raise HTTPException(status_code=500, detail=f"Calibration check failed: {e}")
+
+
+@app.get("/api/v1/career/alternatives/{profile_id}", response_model=CareerAlternativesReport)
+async def get_career_alternatives(
+    profile_id: int,
+    current_role_id: str = "backend_swe",
+    weekly_study_hours: float = 10.0,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    [Innovation 5] Dynamic Career Alternatives & Pivot Panel.
+
+    Computes the learner's weighted readiness score across 5 adjacent role clusters
+    (Backend SWE, Data Engineer, DevOps/Platform, MLOps, Full-Stack) by comparing
+    their BKT ReadinessSnapshot vector against each role's required skill list.
+
+    Returns roles sorted by:
+    1. Fast-Track first (reachable sooner than current target role).
+    2. Readiness descending.
+    3. Market demand score.
+    """
+    from app.services.career_engine import get_career_alternatives
+    try:
+        report = await get_career_alternatives(
+            profile_id=profile_id,
+            db=db,
+            neo4j_client=neo4j_client,
+            current_role_id=current_role_id,
+            weekly_study_hours=weekly_study_hours,
+        )
+        return report
+    except Exception as e:
+        logger.exception("Career alternatives computation failed")
+        raise HTTPException(status_code=500, detail=f"Career alternatives failed: {e}")
+
+
+@app.post("/api/v1/placement/plan", response_model=PlacementPlanReport)
+async def generate_placement_sprint_plan(
+    data: PlacementDriveInput,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    [Innovation 6a] Placement Season War Room — Sprint Planner.
+
+    Given a company target and interview date, generates a week-by-week sprint plan
+    tailored to the company's known skill priorities (Microsoft, Amazon, Google, Stripe, etc.).
+
+    Includes:
+    - Gap skill identification (company priority skills not yet mastered).
+    - Weekly task allocations with focus areas.
+    - Final crunch-review week with mock interview tasks.
+    - Feasibility check: flags if study budget is insufficient.
+    """
+    from app.services.placement_engine import generate_placement_plan
+    try:
+        report = await generate_placement_plan(data, db, neo4j_client)
+        return report
+    except Exception as e:
+        logger.exception("Placement plan generation failed")
+        raise HTTPException(status_code=500, detail=f"Placement plan failed: {e}")
+
+
+@app.post("/api/v1/placement/triage", response_model=MentorTriageReport)
+async def generate_mentor_triage(
+    data: MentorTriageInput,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    [Innovation 6b] Mentor Load Balancer — Triage Queue Generator.
+
+    Computes a triage-sorted queue of learners for mentor office hours.
+    Priority formula: readiness * (1 + urgency_factor) * proximity_bonus
+    where proximity_bonus = 1.5 for learners in the 80-95% readiness breakthrough zone.
+
+    Mentors should focus on breakthrough-zone learners first — they need only one
+    targeted session to clear a hiring-readiness threshold.
+    """
+    from app.services.placement_engine import generate_mentor_triage_queue
+    try:
+        report = await generate_mentor_triage_queue(data, db, neo4j_client)
+        return report
+    except Exception as e:
+        logger.exception("Mentor triage generation failed")
+        raise HTTPException(status_code=500, detail=f"Mentor triage failed: {e}")
+
+
+@app.post("/api/v1/roadmap/sanity-check", response_model=RoadmapAnalysisReport)
+async def roadmap_sanity_check(data: RoadmapAnalysisInput):
+    """
+    [Innovation 7] Tutor Noise & Roadmap Sanity Filter.
+
+    Accepts any pasted external roadmap advice (YouTube titles, Reddit post, blog text)
+    and classifies each extracted skill mention against:
+    1. The canonical PathFinder Neo4j skill graph.
+    2. Live market demand data from the Greenhouse job scraping pipeline.
+
+    Output labels per skill:
+    🟢 ALIGNED          — In graph, high market demand. This advice is solid.
+    🟡 HARMLESS_EXTRA   — Valid but not on the critical hiring path. Low opportunity cost.
+    🔴 MISLEADING       — Outside graph, outdated, or low market demand. Can delay readiness.
+    ⚪ UNKNOWN          — Could not be matched to any graph node.
+    """
+    from app.services.noise_filter import analyze_roadmap_noise
+    try:
+        report = await analyze_roadmap_noise(data, neo4j_client, ai_provider)
+        return report
+    except Exception as e:
+        logger.exception("Roadmap sanity check failed")
+        raise HTTPException(status_code=500, detail=f"Roadmap analysis failed: {e}")
