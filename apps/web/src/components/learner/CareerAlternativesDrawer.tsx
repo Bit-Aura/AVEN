@@ -1,37 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { Briefcase, ArrowRight, X, Sparkles, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Briefcase, ArrowRight, X, Sparkles, RefreshCw, Loader2 } from 'lucide-react';
+import { usePathStore } from '../../store/usePathStore';
 
 export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [selectedPivot, setSelectedPivot] = useState<string | null>(null);
+  const [alternatives, setAlternatives] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const fetchCareerAlternatives = usePathStore(state => state.fetchCareerAlternatives);
 
-  const alternatives = [
-    {
-      id: 'data-engineer',
-      role: 'Data Engineer',
-      match: 72,
-      salvagedSkills: 18,
-      totalSkills: 25,
-      description: 'Your strong Python and SQL foundation makes this a highly efficient pivot.'
-    },
-    {
-      id: 'devops',
-      role: 'DevOps Engineer',
-      match: 65,
-      salvagedSkills: 15,
-      totalSkills: 23,
-      description: 'Leverage your backend architecture knowledge into infrastructure.'
-    },
-    {
-      id: 'fullstack',
-      role: 'Full Stack Developer',
-      match: 61,
-      salvagedSkills: 20,
-      totalSkills: 33,
-      description: 'Add frontend skills to your existing backend mastery.'
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(true);
+      fetchCareerAlternatives().then((res) => {
+        if (res && res.alternatives) {
+          // Transform backend schema to frontend representation
+          setAlternatives(res.alternatives.map((alt: any) => ({
+            id: alt.role_id,
+            role: alt.role_title,
+            match: Math.round(alt.match_score * 100),
+            salvagedSkills: alt.salvaged_skills_count,
+            totalSkills: alt.total_skills_count,
+            description: alt.pivot_recommendation || 'Consider this alternative path.'
+          })));
+        }
+      }).finally(() => setIsLoading(false));
     }
-  ];
+  }, [isOpen, fetchCareerAlternatives]);
 
   if (!isOpen) return null;
 
@@ -76,7 +72,14 @@ export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: 
           </div>
 
           <div className="space-y-4">
-            {alternatives.map((alt) => (
+            {isLoading ? (
+              <div className="flex justify-center p-8">
+                <Loader2 className="animate-spin text-indigo-400" size={32} />
+              </div>
+            ) : alternatives.length === 0 ? (
+              <div className="text-center text-slate-400 p-8">No career alternatives found.</div>
+            ) : (
+              alternatives.map((alt) => (
               <div 
                 key={alt.id}
                 onClick={() => setSelectedPivot(alt.id)}
@@ -117,7 +120,7 @@ export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: 
                   </div>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
         </div>
 

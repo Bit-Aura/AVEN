@@ -1,12 +1,32 @@
 'use client';
 
-import { useState } from 'react';
-import { AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Zap, Loader2 } from 'lucide-react';
+import { usePathStore } from '../../store/usePathStore';
 
 export default function RoadmapNoiseChecker() {
   const [isOpen, setIsOpen] = useState(false);
   const [isResolved, setIsResolved] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
+  const [issues, setIssues] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const runSanityCheck = usePathStore(state => state.runSanityCheck);
+  const profileId = usePathStore(state => state.profileId);
+
+  useEffect(() => {
+    if (isOpen && issues.length === 0 && !isResolved) {
+      setIsLoading(true);
+      const safeProfileId = profileId || 1;
+      runSanityCheck({ profile_id: safeProfileId }).then((res) => {
+        if (res && res.flagged_issues) {
+          setIssues(res.flagged_issues);
+        } else {
+          setIsResolved(true);
+        }
+      }).finally(() => setIsLoading(false));
+    }
+  }, [isOpen, issues.length, isResolved, runSanityCheck, profileId]);
 
   const handleResolve = () => {
     setIsResolving(true);
@@ -31,9 +51,9 @@ export default function RoadmapNoiseChecker() {
           <h3 className="text-lg font-bold text-slate-200 uppercase tracking-wide">
             Sanity Check: Path Dependencies
           </h3>
-          {!isResolved && (
+          {!isResolved && issues.length > 0 && !isLoading && (
             <span className="bg-amber-500/20 text-amber-500 text-xs font-bold px-2 py-1 rounded border border-amber-500/50">
-              1 Issue Found
+              {issues.length} Issue{issues.length > 1 ? 's' : ''} Found
             </span>
           )}
         </div>
@@ -42,18 +62,34 @@ export default function RoadmapNoiseChecker() {
 
       {isOpen && (
         <div className="p-6 border-t border-slate-700 bg-slate-950/50">
-          {!isResolved ? (
+          {isLoading ? (
+            <div className="flex justify-center py-6">
+              <Loader2 className="animate-spin text-slate-400" size={24} />
+            </div>
+          ) : !isResolved ? (
             <div className="space-y-6">
-              <div className="bg-amber-950/30 border border-amber-500/30 rounded-xl p-5">
-                <h4 className="text-amber-400 font-bold mb-2 flex items-center gap-2">
-                  <AlertCircle size={18} />
-                  High-Friction Dependency Cycle Detected
-                </h4>
-                <p className="text-slate-300 text-sm">
-                  <span className="font-bold text-white">Warning:</span> 'Advanced K8s Deployment' is scheduled before 'Intro to Docker'. 
-                  This creates a logical gap that historically causes a 45% drop-off in completion rates for this module.
-                </p>
-              </div>
+              {issues.length > 0 ? issues.map((issue, idx) => (
+                <div key={idx} className="bg-amber-950/30 border border-amber-500/30 rounded-xl p-5">
+                  <h4 className="text-amber-400 font-bold mb-2 flex items-center gap-2">
+                    <AlertCircle size={18} />
+                    {issue.issue_type.replace('_', ' ').toUpperCase()}
+                  </h4>
+                  <p className="text-slate-300 text-sm">
+                    <span className="font-bold text-white">Warning:</span> {issue.description}
+                  </p>
+                </div>
+              )) : (
+                <div className="bg-amber-950/30 border border-amber-500/30 rounded-xl p-5">
+                  <h4 className="text-amber-400 font-bold mb-2 flex items-center gap-2">
+                    <AlertCircle size={18} />
+                    High-Friction Dependency Cycle Detected
+                  </h4>
+                  <p className="text-slate-300 text-sm">
+                    <span className="font-bold text-white">Warning:</span> 'Advanced K8s Deployment' is scheduled before 'Intro to Docker'. 
+                    This creates a logical gap that historically causes a 45% drop-off in completion rates for this module.
+                  </p>
+                </div>
+              )}
 
               <button 
                 onClick={handleResolve}
