@@ -13,6 +13,11 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
   const [feedback, setFeedback] = useState('');
   
   const openProofCard = usePathStore(state => state.openProofCard);
+  const bypassMilestone = usePathStore(state => state.bypassMilestone);
+  const submitCalibration = usePathStore(state => state.submitCalibration);
+  const profileId = usePathStore(state => state.profileId);
+
+  const [calibrationData, setCalibrationData] = useState<any>(null);
 
   const handleCalibrationComplete = (val: number) => {
     setConfidence(val);
@@ -22,27 +27,39 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
   const handleSubmit = async () => {
     setStatus('submitting');
     try {
-      // MOCK DELAY
-      await new Promise(r => setTimeout(r, 600));
+      const safeProfileId = profileId || 1;
       
-      // MOCK LOGIC: Pass if answer includes 'def' or 'function'
-      const isCorrect = answer.includes('def') || answer.includes('function') || answer.includes('=>');
+      // Step 1: Submit checkpoint answer
+      // Wait, bypassMilestone doesn't return the result in our simple implementation.
+      // Let's call the API client directly for the assessment result to get is_correct.
+      const { submitCheckpoint } = await import('../../api/client');
+      const res = await submitCheckpoint(safeProfileId, skillId, answer);
+      const isCorrect = res.is_correct;
       
+      // Step 2: Evaluate calibration matrix
+      const calRes = await submitCalibration({
+        profile_id: safeProfileId,
+        skill_id: skillId,
+        confidence_pre_assessment: confidence / 100,
+        actual_score: isCorrect ? 1.0 : 0.0
+      });
+      
+      setCalibrationData(calRes);
       setStatus(isCorrect ? 'passed' : 'failed');
-      setFeedback(isCorrect ? 'Perfect! Your logic is sound.' : 'There are some fundamental issues with this approach.');
+      setFeedback(res.explanation || (isCorrect ? 'Perfect! Your logic is sound.' : 'There are some fundamental issues with this approach.'));
       setStep('result');
       
-      if (isCorrect && confidence < 60) {
-        // Trigger Imposter Zone unlock
+      if (calRes && calRes.quadrant === 'IMPOSTER_ZONE') {
         openProofCard({
           skillName: skillId,
           confidenceScore: 100,
           evidenceTags: ["Overcame Imposter Syndrome", "Verified Competence"],
-          narrative: "You scored perfectly despite low initial confidence. Trust your skills!",
+          narrative: calRes.explanation || "You scored perfectly despite low initial confidence.",
           issueDate: new Date().toLocaleDateString()
         });
       }
     } catch (e) {
+      console.error(e);
       setStatus('failed');
       setFeedback('Error submitting assessment.');
       setStep('result');
@@ -53,10 +70,12 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
     return <CalibrationModal skillId={skillId} onComplete={handleCalibrationComplete} />;
   }
 
-  const isBlindspot = status === 'failed' && confidence > 70;
-  const isImposter = status === 'passed' && confidence < 60;
-  const isMastery = status === 'passed' && confidence >= 60;
-  const isLearning = status === 'failed' && confidence <= 70;
+  // Use API returned quadrant, or fallback to mock logic
+  const quadrant = calibrationData?.quadrant || '';
+  const isBlindspot = quadrant === 'BLINDSPOT' || (status === 'failed' && confidence > 70);
+  const isImposter = quadrant === 'IMPOSTER_ZONE' || (status === 'passed' && confidence < 60);
+  const isMastery = quadrant === 'CALIBRATED_MASTERY' || (status === 'passed' && confidence >= 60);
+  const isLearning = quadrant === 'CALIBRATED_NOVICE' || (status === 'failed' && confidence <= 70);
 
   return (
     <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
