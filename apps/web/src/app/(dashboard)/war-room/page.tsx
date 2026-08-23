@@ -1,11 +1,33 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertTriangle, Clock, Target, TrendingDown } from 'lucide-react';
+import { AlertTriangle, Clock, Target, TrendingDown, Loader2 } from 'lucide-react';
+import { usePathStore } from '../../../store/usePathStore';
 
 export default function WarRoomDashboard() {
   const [daysRemaining, setDaysRemaining] = useState(45);
   const [burnoutRisk, setBurnoutRisk] = useState(78); // High risk
+  const [isLoaded, setIsLoaded] = useState(false);
+  const fetchPlacementPlan = usePathStore(state => state.fetchPlacementPlan);
+  const profileId = usePathStore(state => state.profileId);
+
+  useEffect(() => {
+    const loadPlan = async () => {
+      const safeProfileId = profileId || 1;
+      const res = await fetchPlacementPlan({
+        profile_id: safeProfileId,
+        target_company_id: 'google',
+        target_interview_date: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      });
+      if (res && res.timeline_weeks) {
+        setDaysRemaining(res.timeline_weeks * 7);
+        // Burnout risk is set based on feasibility or just a mock metric updated
+        setBurnoutRisk(res.is_feasible ? 35 : 85);
+      }
+      setIsLoaded(true);
+    };
+    loadPlan();
+  }, [fetchPlacementPlan, profileId]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-sans">
@@ -20,6 +42,11 @@ export default function WarRoomDashboard() {
       <main className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           
+          {!isLoaded ? (
+            <div className="flex justify-center p-12">
+              <Loader2 className="animate-spin text-indigo-500" size={48} />
+            </div>
+          ) : (
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
             
@@ -52,6 +79,7 @@ export default function WarRoomDashboard() {
               </div>
             </div>
           </div>
+          )}
 
         </div>
         

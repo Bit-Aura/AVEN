@@ -1,37 +1,52 @@
 'use client';
 
-import { Shield, AlertTriangle, MessageSquare, TrendingUp, TrendingDown } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shield, AlertTriangle, MessageSquare, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
+import { usePathStore } from '../../../store/usePathStore';
 
 export default function MentorDashboard() {
-  const learners = [
-    {
-      id: 'L-1023',
-      name: 'Surya Kumar',
-      role: 'SDE-1',
-      burnoutRisk: 78,
-      status: 'Critical',
-      lastActive: '2 mins ago',
-      hoursToday: 14
-    },
-    {
-      id: 'L-0891',
-      name: 'Priya Sharma',
-      role: 'Data Engineer',
-      burnoutRisk: 62,
-      status: 'Warning',
-      lastActive: '1 hr ago',
-      hoursToday: 9
-    },
-    {
-      id: 'L-1144',
-      name: 'Rahul Patel',
-      role: 'Full Stack',
-      burnoutRisk: 34,
-      status: 'Healthy',
-      lastActive: '3 hrs ago',
-      hoursToday: 4
-    }
-  ];
+  const [learners, setLearners] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const fetchMentorQueue = usePathStore(state => state.fetchMentorQueue);
+
+  useEffect(() => {
+    fetchMentorQueue({ cohort_id: 'default' }).then((res) => {
+      if (res && res.queue) {
+        setLearners(res.queue.map((item: any) => ({
+          id: `L-${item.profile_id}`,
+          name: `Learner ${item.profile_id}`,
+          role: 'SDE',
+          burnoutRisk: Math.round(item.triage_score * 100),
+          status: item.intervention_reason,
+          lastActive: 'Recently',
+          hoursToday: 10
+        })));
+      } else {
+        // Fallback mock if API not populated
+        setLearners([
+          {
+            id: 'L-1023',
+            name: 'Surya Kumar',
+            role: 'SDE-1',
+            burnoutRisk: 78,
+            status: 'Critical',
+            lastActive: '2 mins ago',
+            hoursToday: 14
+          },
+          {
+            id: 'L-0891',
+            name: 'Priya Sharma',
+            role: 'Data Engineer',
+            burnoutRisk: 62,
+            status: 'Warning',
+            lastActive: '1 hr ago',
+            hoursToday: 9
+          }
+        ]);
+      }
+    }).finally(() => setIsLoading(false));
+  }, [fetchMentorQueue]);
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-sans">
@@ -67,11 +82,25 @@ export default function MentorDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
-                {learners.map((learner) => (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center">
+                      <Loader2 className="animate-spin text-indigo-400 mx-auto" size={32} />
+                    </td>
+                  </tr>
+                ) : learners.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-slate-400">
+                      No learners require intervention right now.
+                    </td>
+                  </tr>
+                ) : (
+                  learners.map((learner) => (
                   <tr key={learner.id} className="hover:bg-slate-800/50 transition-colors">
                     <td className="p-4">
                       <div className="font-bold text-white">{learner.name}</div>
                       <div className="text-xs text-slate-500">{learner.id} • Last active: {learner.lastActive}</div>
+                      <div className="text-xs text-rose-400 mt-1">{learner.status}</div>
                     </td>
                     <td className="p-4 text-slate-300 font-medium">{learner.role}</td>
                     <td className="p-4">
@@ -104,7 +133,7 @@ export default function MentorDashboard() {
                       </button>
                     </td>
                   </tr>
-                ))}
+                )))}
               </tbody>
             </table>
           </div>
