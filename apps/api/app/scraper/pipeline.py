@@ -3,23 +3,31 @@ from typing import Optional, List, Dict, Any
 from .models import ScrapedJob, ScrapeResult
 from .sources.base import BaseJobSource, ScraperException
 from .sources.greenhouse import GreenhouseSource
+from .sources.lever import LeverSource
 from .deduplicator import deduplicate_jobs
+from .filter import FilterPolicy, FilterResult, filter_jobs
 
 logger = logging.getLogger(__name__)
 
 class JobScrapingPipeline:
     """
     Main orchestrator for fetching, extracting, normalizing, validating,
-    and deduplicating job postings from external job boards.
+    deduplicating, and optionally filtering job postings from external job boards.
     """
-    def __init__(self, greenhouse_source: Optional[GreenhouseSource] = None):
+    def __init__(
+        self,
+        greenhouse_source: Optional[GreenhouseSource] = None,
+        lever_source: Optional[LeverSource] = None
+    ):
         self.greenhouse_source = greenhouse_source or GreenhouseSource()
+        self.lever_source = lever_source or LeverSource()
 
     async def run_pipeline(
         self,
         source: BaseJobSource,
         board_identifier: str,
-        company_name: Optional[str] = None
+        company_name: Optional[str] = None,
+        filter_policy: Optional[FilterPolicy] = None
     ) -> ScrapeResult:
         """
         Executes the end-to-end data collection pipeline for a given source adapter.
@@ -28,9 +36,10 @@ class JobScrapingPipeline:
             source (BaseJobSource): The configured source adapter.
             board_identifier (str): Board token or account name.
             company_name (Optional[str]): Human-readable company name for tagging.
+            filter_policy (Optional[FilterPolicy]): Optional domain/seniority filter policy.
             
         Returns:
-            ScrapeResult: Summary report containing normalized, deduplicated jobs.
+            ScrapeResult: Summary report containing normalized, deduplicated (and optionally filtered) jobs.
         """
         result = ScrapeResult(
             source=source.source_name,
@@ -72,12 +81,23 @@ class JobScrapingPipeline:
         # 3. Deduplicate in-memory
         deduped_jobs, removed_dupes_count = deduplicate_jobs(valid_jobs)
         result.total_deduplicated = len(deduped_jobs)
-        result.jobs = deduped_jobs
+
+        # 4. Optional Universal Filter
+        if filter_policy is not None:
+            filtered_result = filter_jobs(deduped_jobs, policy=filter_policy)
+            result.jobs = filtered_result.jobs
+            logger.info(
+                f"Universal filter applied ({filter_policy.name}): "
+                f"{filtered_result.accepted_count}/{filtered_result.total_input} jobs accepted."
+            )
+        else:
+            result.jobs = deduped_jobs
 
         logger.info(
             f"Pipeline completed for '{board_identifier}': "
             f"Fetched={result.total_fetched}, Valid={result.total_valid}, "
-            f"Deduplicated={result.total_deduplicated} (removed {removed_dupes_count} duplicates)."
+            f"Deduplicated={result.total_deduplicated} (removed {removed_dupes_count} duplicates), "
+            f"Returned={len(result.jobs)}."
         )
 
         return result
@@ -85,7 +105,8 @@ class JobScrapingPipeline:
     async def scrape_greenhouse(
         self,
         board_token: str,
-        company_name: Optional[str] = None
+        company_name: Optional[str] = None,
+        filter_policy: Optional[FilterPolicy] = None
     ) -> ScrapeResult:
         """
         Convenience wrapper to scrape a Greenhouse public job board.
@@ -93,5 +114,32 @@ class JobScrapingPipeline:
         return await self.run_pipeline(
             source=self.greenhouse_source,
             board_identifier=board_token,
-            company_name=company_name
+            company_name=company_name,
+            filter_policy=filter_policy
         )
+
+    async def scrape_lever(
+        self,
+        site: str,
+        company_name: Optional[str] = None,
+        filter_policy: Optional[FilterPolicy] = None
+    ) -> ScrapeResult:
+        """
+        Convenience wrapper to scrape a Lever public job board.
+        """
+        return await self.run_pipeline(
+            source=self.lever_source,
+            board_identifier=site,
+            company_name=company_name,
+            filter_policy=filter_policy
+        )
+
+    def filter(
+        self,
+        jobs: List[ScrapedJob],
+        policy: Optional[FilterPolicy] = None
+    ) -> FilterResult:
+        """
+        Direct convenience helper to execute universal filtering on an existing job list.
+        """
+        return filter_jobs(jobs, policy=policy)

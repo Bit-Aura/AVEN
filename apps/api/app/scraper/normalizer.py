@@ -164,8 +164,9 @@ def normalize_location(location_raw: Any) -> Optional[str]:
 def normalize_date(date_raw: Any) -> Optional[str]:
     """
     Normalizes timestamp into standard ISO-8601 UTC string format (YYYY-MM-DDTHH:MM:SSZ).
+    Supports datetime objects, ISO-8601 strings, and Unix epoch timestamps (seconds or milliseconds).
     """
-    if not date_raw:
+    if date_raw is None or date_raw == "":
         return None
 
     if isinstance(date_raw, datetime):
@@ -173,10 +174,33 @@ def normalize_date(date_raw: Any) -> Optional[str]:
             return date_raw.replace(tzinfo=timezone.utc).isoformat()
         return date_raw.astimezone(timezone.utc).isoformat()
 
+    if isinstance(date_raw, (int, float)):
+        try:
+            # If timestamp in milliseconds (e.g. > 1e11), divide by 1000
+            ts = date_raw / 1000.0 if date_raw > 1e11 else float(date_raw)
+            # Modern timestamp guard (between year 2000 and 2100)
+            if ts < 946684800 or ts > 4102444800:
+                return None
+            dt = datetime.fromtimestamp(ts, tz=timezone.utc)
+            return dt.isoformat()
+        except (ValueError, OSError, OverflowError):
+            return None
+
     if isinstance(date_raw, str):
         cleaned = date_raw.strip()
         if not cleaned:
             return None
+        # Try numeric string timestamp (e.g. "1711403416463")
+        if cleaned.isdigit():
+            try:
+                num = int(cleaned)
+                ts = num / 1000.0 if num > 1e11 else float(num)
+                if ts < 946684800 or ts > 4102444800:
+                    return None
+                dt = datetime.fromtimestamp(ts, tz=timezone.utc)
+                return dt.isoformat()
+            except (ValueError, OSError, OverflowError):
+                return None
         # Try parsing common ISO-8601 formats
         try:
             # Replaces Z with +00:00 for standard fromisoformat in Python <3.11 compatibility

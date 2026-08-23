@@ -7,6 +7,14 @@ from typing import Optional
 
 from app.scraper.pipeline import JobScrapingPipeline
 from app.scraper.sources.greenhouse import GreenhouseSource
+from app.scraper.sources.lever import LeverSource
+from app.scraper.filter import (
+    FilterPolicy,
+    AI_TECH_POLICY,
+    EARLY_CAREER_AI_POLICY,
+    STRICT_AI_POLICY,
+    filter_jobs,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,20 +28,50 @@ async def run_cli(
     company: Optional[str] = None,
     limit: Optional[int] = None,
     output_path: Optional[str] = None,
-    pretty: bool = True
+    pretty: bool = True,
+    filter_preset: Optional[str] = None,
+    exclude_senior: bool = False
 ):
     """
-    Executes the standalone scraping pipeline from command line.
+    Executes the standalone scraping pipeline from command line with optional filtering.
     """
     pipeline = JobScrapingPipeline()
+    source_lower = source_name.lower().strip()
 
-    if source_name.lower() == "greenhouse":
+    # Determine filter policy if requested
+    policy: Optional[FilterPolicy] = None
+    if filter_preset:
+        preset_lower = filter_preset.lower().strip()
+        if preset_lower in ("ai_tech", "ai_technology", "default"):
+            policy = AI_TECH_POLICY.model_copy(deep=True)
+        elif preset_lower in ("early_career", "early_career_ai", "internship"):
+            policy = EARLY_CAREER_AI_POLICY.model_copy(deep=True)
+        elif preset_lower in ("strict", "strict_ai", "strict_ai_only"):
+            policy = STRICT_AI_POLICY.model_copy(deep=True)
+        else:
+            logger.warning(f"Unknown filter preset '{filter_preset}', using default AI_TECH_POLICY.")
+            policy = AI_TECH_POLICY.model_copy(deep=True)
+
+    if policy and exclude_senior:
+        policy.exclude_senior_roles = True
+    elif exclude_senior and not policy:
+        policy = AI_TECH_POLICY.model_copy(deep=True)
+        policy.exclude_senior_roles = True
+
+    if source_lower == "greenhouse":
         result = await pipeline.scrape_greenhouse(
             board_token=board_token,
-            company_name=company
+            company_name=company,
+            filter_policy=policy
+        )
+    elif source_lower == "lever":
+        result = await pipeline.scrape_lever(
+            site=board_token,
+            company_name=company,
+            filter_policy=policy
         )
     else:
-        logger.error(f"Unsupported source '{source_name}'. Currently supported: 'greenhouse'")
+        logger.error(f"Unsupported source '{source_name}'. Currently supported: 'greenhouse', 'lever'")
         sys.exit(1)
 
     # Optional result truncation for CLI preview
@@ -48,6 +86,7 @@ async def run_cli(
         "total_fetched": result.total_fetched,
         "total_valid": result.total_valid,
         "total_deduplicated": result.total_deduplicated,
+        "filter_applied": policy.name if policy else None,
         "returned_count": len(output_jobs),
         "errors": result.errors,
         "jobs": [j.model_dump() for j in output_jobs]
@@ -74,19 +113,30 @@ def main():
         "--source",
         type=str,
         default="greenhouse",
-        help="Job board source adapter (default: 'greenhouse')"
+        help="Job board source adapter: 'greenhouse' or 'lever' (default: 'greenhouse')"
     )
     parser.add_argument(
         "--board-token",
         type=str,
         required=True,
-        help="Greenhouse board identifier token (e.g. 'canonical', 'stripe')"
+        help="Board identifier token or site slug (e.g. 'canonical', 'palantir')"
     )
     parser.add_argument(
         "--company",
         type=str,
         default=None,
         help="Optional company display name"
+    )
+    parser.add_argument(
+        "--filter-policy",
+        type=str,
+        default=None,
+        help="Optional filter preset: 'ai_tech', 'early_career', 'strict_ai'"
+    )
+    parser.add_argument(
+        "--exclude-senior",
+        action="store_true",
+        help="Exclude senior, staff, principal, lead, and director roles"
     )
     parser.add_argument(
         "--limit",
@@ -115,7 +165,9 @@ def main():
             company=args.company,
             limit=args.limit,
             output_path=args.output,
-            pretty=not args.no_pretty
+            pretty=not args.no_pretty,
+            filter_preset=args.filter_policy,
+            exclude_senior=args.exclude_senior
         )
     )
 
