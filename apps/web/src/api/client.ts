@@ -1,63 +1,116 @@
-import axios from 'axios';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+async function fetchApi(endpoint: string, options: RequestInit = {}) {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`API error: ${res.statusText}`);
+  }
+  return res.json();
+}
 
 export const getHealth = async () => {
-  const { data } = await api.get('/health');
-  return data;
+  return await fetchApi('/health');
 };
 
 export const submitGoal = async (userEmail: string, goalText: string, modality: string = 'project') => {
-  const { data } = await api.post('/goal', {
-    user_email: userEmail,
-    goal_text: goalText,
-    preferred_modality: modality
+  return await fetchApi('/goal', {
+    method: 'POST',
+    body: JSON.stringify({
+      user_email: userEmail,
+      goal_text: goalText,
+      preferred_modality: modality
+    })
   });
-  return data;
 };
 
 export const submitDiagnostic = async (sessionId: number, questionId: string, answer: string) => {
-  const { data } = await api.post('/diagnostic/submit', {
-    session_id: sessionId,
-    question_id: questionId,
-    answer: answer
+  return await fetchApi('/diagnostic/submit', {
+    method: 'POST',
+    body: JSON.stringify({
+      session_id: sessionId,
+      question_id: questionId,
+      answer: answer
+    })
   });
-  return data;
-};
-
-export const simulateSkip = async (profileId: number, skillId: string) => {
-  const { data } = await api.post('/path/skip', {
-    profile_id: profileId,
-    skill_id: skillId
-  });
-  return data;
 };
 
 export const getCheckpointQuestion = async (skillId: string) => {
-  const { data } = await api.get(`/checkpoint/${skillId}`);
-  return data;
+  return await fetchApi(`/checkpoint/${skillId}`);
 };
 
 export const submitCheckpoint = async (profileId: number, skillId: string, userAnswer: string) => {
-  const { data } = await api.post('/checkpoint/submit', {
-    profile_id: profileId,
-    skill_id: skillId,
-    user_answer: userAnswer
+  return await fetchApi('/checkpoint/submit', {
+    method: 'POST',
+    body: JSON.stringify({
+      profile_id: profileId,
+      skill_id: skillId,
+      user_answer: userAnswer
+    })
   });
-  return data;
 };
 
 export const sendCoachMessage = async (skillId: string, message: string) => {
-  const { data } = await api.post('/coach/chat', {
-    skill_id: skillId,
-    message: message
+  return await fetchApi('/coach/chat', {
+    method: 'POST',
+    body: JSON.stringify({
+      skill_id: skillId,
+      message: message
+    })
   });
-  return data;
 };
 
-export default api;
+export const submitDebugTelemetry = async (payload: any) => {
+  return await fetchApi('/diagnostics/debug-telemetry', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const simulateSkipDelta = async (profileId: number, skippedSkillId: string, weeklyStudyHours: number) => {
+  return await fetchApi('/simulate-skip-delta', {
+    method: 'POST',
+    body: JSON.stringify({
+      profile_id: profileId,
+      skipped_skill_id: skippedSkillId,
+      weekly_study_hours: weeklyStudyHours
+    })
+  });
+};
+
+export const evaluateCalibration = async (payload: any) => {
+  return await fetchApi('/calibration/evaluate', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const getCareerAlternatives = async (profileId: number, currentRoleId: string = 'backend_swe', weeklyHours: number = 10) => {
+  return await fetchApi(`/career/alternatives/${profileId}?current_role_id=${currentRoleId}&weekly_study_hours=${weeklyHours}`);
+};
+
+export const generatePlacementPlan = async (payload: any) => {
+  return await fetchApi('/placement/plan', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const generateMentorTriage = async (payload: any) => {
+  return await fetchApi('/placement/triage', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const checkRoadmapSanity = async (payload: any) => {
+  return await fetchApi('/roadmap/sanity-check', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};

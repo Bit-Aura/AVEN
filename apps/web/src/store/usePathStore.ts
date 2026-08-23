@@ -35,6 +35,8 @@ export interface RankingPreferences {
   speedVsDepth: number;
   theoryVsPractice: number;
   directedVsAutonomous: number;
+  freeVsPaid: number;
+  videoVsProject: number;
 }
 
 interface PathState {
@@ -79,7 +81,7 @@ interface PathState {
   setActiveMilestone: (milestone: Milestone) => void;
   setUserGoal: (goal: string) => Promise<void>;
   completeDiagnostic: (questionId: string, answer: string) => Promise<void>;
-  simulateSkip: (nodeId: string) => Promise<void>;
+  simulateSkip: (nodeId: string, weeklyStudyHours?: number) => Promise<void>;
   cancelSimulation: () => void;
   startAssessment: () => void;
   stopAssessment: () => void;
@@ -105,6 +107,14 @@ interface PathState {
   openProofCard: (card: ProofCardData) => void;
   closeProofCard: () => void;
   updateRankingPreference: (key: keyof RankingPreferences, value: number) => void;
+
+  // New Backend Integrations
+  submitIdeTelemetry: (payload: any) => Promise<void>;
+  submitCalibration: (payload: any) => Promise<any>;
+  fetchCareerAlternatives: (currentRoleId?: string, weeklyHours?: number) => Promise<any>;
+  fetchPlacementPlan: (payload: any) => Promise<any>;
+  fetchMentorQueue: (payload: any) => Promise<any>;
+  runSanityCheck: (payload: any) => Promise<any>;
 }
 
 export const usePathStore = create<PathState>()((set, get) => ({
@@ -133,6 +143,8 @@ export const usePathStore = create<PathState>()((set, get) => ({
     speedVsDepth: 50,
     theoryVsPractice: 50,
     directedVsAutonomous: 50,
+    freeVsPaid: 50,
+    videoVsProject: 50,
   },
   previousStateSnapshot: null,
   syncQueue: [],
@@ -230,21 +242,20 @@ export const usePathStore = create<PathState>()((set, get) => ({
       set({ diagnosticComplete: true });
     }
   },
-  simulateSkip: async (nodeId) => {
+  simulateSkip: async (nodeId, weeklyStudyHours = 10) => {
     const { profileId } = get();
-    if (profileId) {
-      try {
-        // @ts-ignore
-        const { simulateSkip } = await import('../api/client');
-        const res = await simulateSkip(profileId, nodeId);
-        set({
-          isSimulatingSkip: true,
-          simulatedConsequence: res.downstream_impact?.[0]?.impact_reason || "Mock Consequence: Skipping this fundamental concept means you will likely fail the API Design module, which strictly requires it."
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
+    const safeProfileId = profileId || 1;
+    set({ isSimulatingSkip: true, simulatedConsequence: "Calculating downstream impact..." });
+    try {
+      // @ts-ignore
+      const { simulateSkipDelta } = await import('../api/client');
+      const res = await simulateSkipDelta(safeProfileId, nodeId, weeklyStudyHours);
+      set({
+        isSimulatingSkip: true,
+        simulatedConsequence: res.verdict || `Skipping this delays your goal by ${res.delta_days_calendar} days due to downstream friction.`
+      });
+    } catch (e) {
+      console.error(e);
       set({ 
         isSimulatingSkip: true, 
         simulatedConsequence: "Mock Consequence: Skipping this fundamental concept means you will likely fail the API Design module, which strictly requires it." 
@@ -378,4 +389,79 @@ export const usePathStore = create<PathState>()((set, get) => ({
       [key]: value
     }
   })),
+
+  // New Backend Integrations
+  submitIdeTelemetry: async (payload) => {
+    try {
+      // @ts-ignore
+      const { submitDebugTelemetry } = await import('../api/client');
+      const res = await submitDebugTelemetry(payload);
+      set({
+        coachPraiseCard: {
+          message: res.process_praise,
+          badge: res.thrash_index < 0.3 ? {
+            skillName: "Systematic Debugging",
+            confidenceScore: 0.9,
+            evidenceTags: ["Low Thrash", res.strategy_classification],
+            narrative: res.process_praise,
+            issueDate: new Date().toISOString()
+          } : undefined
+        }
+      });
+    } catch (e) {
+      console.error("Telemetry failed", e);
+    }
+  },
+  submitCalibration: async (payload) => {
+    try {
+      // @ts-ignore
+      const { evaluateCalibration } = await import('../api/client');
+      return await evaluateCalibration(payload);
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
+  fetchCareerAlternatives: async (currentRoleId = 'backend_swe', weeklyHours = 10) => {
+    const { profileId } = get();
+    if (!profileId) return null;
+    try {
+      // @ts-ignore
+      const { getCareerAlternatives } = await import('../api/client');
+      return await getCareerAlternatives(profileId, currentRoleId, weeklyHours);
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
+  fetchPlacementPlan: async (payload) => {
+    try {
+      // @ts-ignore
+      const { generatePlacementPlan } = await import('../api/client');
+      return await generatePlacementPlan(payload);
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
+  fetchMentorQueue: async (payload) => {
+    try {
+      // @ts-ignore
+      const { generateMentorTriage } = await import('../api/client');
+      return await generateMentorTriage(payload);
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
+  runSanityCheck: async (payload) => {
+    try {
+      // @ts-ignore
+      const { checkRoadmapSanity } = await import('../api/client');
+      return await checkRoadmapSanity(payload);
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
 }));
