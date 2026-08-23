@@ -33,8 +33,8 @@ export interface ProofCardData {
 
 export interface RankingPreferences {
   speedVsDepth: number;
-  freeVsPaid: number;
-  videoVsProject: number;
+  theoryVsPractice: number;
+  directedVsAutonomous: number;
 }
 
 interface PathState {
@@ -55,6 +55,7 @@ interface PathState {
   xp: number;
   showCelebration: boolean;
   showUndoToast: boolean;
+  showHeatmap: boolean;
   isCommandPaletteOpen: boolean;
   isFocusMode: boolean;
   activeProofCard: ProofCardData | null;
@@ -66,6 +67,8 @@ interface PathState {
   // New State for Coach & Checkpoint
   coachMessages: { role: 'user' | 'ai', text: string }[];
   isCoachTyping: boolean;
+  coachPraiseCard: { message: string, badge?: ProofCardData } | null;
+  setCoachPraiseCard: (card: { message: string, badge?: ProofCardData } | null) => void;
   currentAssessment: { question: string; options: string[] } | null;
   isFetchingAssessment: boolean;
   
@@ -95,6 +98,7 @@ interface PathState {
   hideCelebration: () => void;
   undoLastAction: () => void;
   hideUndoToast: () => void;
+  toggleHeatmap: () => void;
   toggleCommandPalette: () => void;
   closeCommandPalette: () => void;
   toggleFocusMode: () => void;
@@ -103,7 +107,7 @@ interface PathState {
   updateRankingPreference: (key: keyof RankingPreferences, value: number) => void;
 }
 
-export const usePathStore = create<PathState>((set, get) => ({
+export const usePathStore = create<PathState>()((set, get) => ({
   profileId: null,
   sessionId: null,
   userGoal: null,
@@ -121,13 +125,14 @@ export const usePathStore = create<PathState>((set, get) => ({
   xp: 1250,
   showCelebration: false,
   showUndoToast: false,
+  showHeatmap: false,
   isCommandPaletteOpen: false,
   isFocusMode: false,
   activeProofCard: null,
   rankingPreferences: {
     speedVsDepth: 50,
-    freeVsPaid: 50,
-    videoVsProject: 50,
+    theoryVsPractice: 50,
+    directedVsAutonomous: 50,
   },
   previousStateSnapshot: null,
   syncQueue: [],
@@ -138,6 +143,8 @@ export const usePathStore = create<PathState>((set, get) => ({
   ],
   coachMessages: [{ role: 'ai', text: "Hi! I'm your AI Coach. How can I help you with this milestone?" }],
   isCoachTyping: false,
+  coachPraiseCard: null,
+  setCoachPraiseCard: (card) => set({ coachPraiseCard: card }),
   currentAssessment: null,
   isFetchingAssessment: false,
   nodes: [],
@@ -348,6 +355,7 @@ export const usePathStore = create<PathState>((set, get) => ({
   awardXp: (amount) => set((state) => ({ xp: state.xp + amount })),
   hideCelebration: () => set({ showCelebration: false }),
   hideUndoToast: () => set({ showUndoToast: false }),
+  toggleHeatmap: () => set((state) => ({ showHeatmap: !state.showHeatmap })),
   undoLastAction: () => set((state) => {
     if (state.previousStateSnapshot) {
       return {
