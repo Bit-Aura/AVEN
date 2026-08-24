@@ -35,41 +35,6 @@ export default function RoadmapNoiseChecker() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-<<<<<<< HEAD
-  useEffect(() => {
-    if (isOpen && issues.length === 0 && !isResolved) {
-      setIsLoading(true);
-      const safeProfileId = profileId || 1;
-      runSanityCheck({
-        advice_text: `Python, System Design, Docker, Kubernetes, Advanced Math, Blockchain, K8s Deployment`,
-        source_label: `Profile #${safeProfileId} — auto-scan`
-      }).then((res) => {
-        if (res && res.verdicts && res.verdicts.length > 0) {
-          const issues = res.verdicts
-            .filter((v: any) => v.label === 'MISLEADING' || v.label === 'UNKNOWN')
-            .map((v: any) => ({
-              issue_type: v.label,
-              description: v.reason
-            }));
-          setIssues(issues);
-        } else {
-          setIsResolved(true);
-        }
-      }).finally(() => setIsLoading(false));
-    }
-  }, [isOpen, issues.length, isResolved, runSanityCheck, profileId]);
-
-  const handleResolve = async () => {
-    setIsResolving(true);
-    try {
-      setIsResolved(true);
-      setIssues([]);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsResolving(false);
-    }
-=======
   const handleAnalyze = async (customText?: string) => {
     const textToSubmit = customText || adviceText;
     if (!textToSubmit || textToSubmit.length < 10) return;
@@ -89,7 +54,6 @@ export default function RoadmapNoiseChecker() {
     } finally {
       setIsLoading(false);
     }
->>>>>>> 418ec5c8664f0a88bb20054a234187ae3b0f82a0
   };
 
   return (

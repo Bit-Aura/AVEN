@@ -126,6 +126,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/checkpoint/{skill_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Checkpoint
+         * @description Fetches the assessment question and options for a given skill.
+         *     Strips out the correct_answer to prevent cheating.
+         */
+        get: operations["get_checkpoint_api_v1_checkpoint__skill_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/coach/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Chat With Coach
+         * @description Chats with the AI coach about a specific skill.
+         */
+        post: operations["chat_with_coach_api_v1_coach_chat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/checkpoint/submit": {
         parameters: {
             query?: never;
@@ -137,7 +178,8 @@ export interface paths {
         put?: never;
         /**
          * Submit Checkpoint Answer
-         * @description Submits a Prove-It quiz check. If fails, runs backtrace, decays weak
+         * @description Submits a Prove-It quiz check with flexible grading (regex, case/whitespace normalization,
+         *     option indexing). If fails, runs root-cause backtrace with parent fallback, decays weak
          *     prerequisites, replans, and returns results.
          */
         post: operations["submit_checkpoint_answer_api_v1_checkpoint_submit_post"];
@@ -177,7 +219,7 @@ export interface paths {
         };
         /**
          * Get Role Readiness
-         * @description Calculates dynamic role readiness bar stats and proof cards.
+         * @description Calculates dynamic role readiness bar stats and cryptographically signed proof cards.
          */
         get: operations["get_role_readiness_api_v1_readiness__profile_id__get"];
         put?: never;
@@ -188,10 +230,510 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/readiness/decay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Trigger Active Decay
+         * @description Actively triggers Ebbinghaus forgetting curve decay on all learner profiles (Feature 5).
+         */
+        post: operations["trigger_active_decay_api_v1_readiness_decay_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/proof-card/{profile_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Proof Card
+         * @description Generates and returns a cryptographically signed Proof Card credential (Feature 6).
+         */
+        get: operations["get_proof_card_api_v1_proof_card__profile_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/proof-card/{profile_id}/svg": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Proof Card Svg Endpoint
+         * @description Exports a rendered high-fidelity SVG badge certificate for the Proof Card (Feature 6).
+         */
+        get: operations["get_proof_card_svg_endpoint_api_v1_proof_card__profile_id__svg_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/proof-card/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify Proof Card Endpoint
+         * @description Cryptographically verifies the authenticity of a submitted Proof Card credential (Feature 6).
+         */
+        post: operations["verify_proof_card_endpoint_api_v1_proof_card_verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scraper/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Scraper Sources
+         * @description Returns available job board source adapters for data collection.
+         */
+        get: operations["get_scraper_sources_api_v1_scraper_sources_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scraper/scrape": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Scrape Jobs Endpoint
+         * @description Executes the job scraping pipeline to fetch, clean, normalize, validate,
+         *     and deduplicate job postings from an external applicant tracking system.
+         */
+        post: operations["scrape_jobs_endpoint_api_v1_scraper_scrape_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/diagnostics/debug-telemetry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit Debug Telemetry
+         * @description [Innovation 1] SDT Evidence-Based Process-Praise — Keystroke & Diff Debugging Diagnostic.
+         *
+         *     Accepts a sequence of IDE snapshots (diffs, test results, timestamps) from the
+         *     embedded coding sandbox and returns a structured DebuggingDiagnosticReport with:
+         *     - Thrash Index (T_i) quantifying the efficiency of the debugging strategy.
+         *     - Strategy classification: BINARY_SEARCH_ISOLATION | HYPOTHESIS_DRIVEN | EXPLORATORY | RANDOM_THRASHING.
+         *     - Evidence-based process-praise text grounded in real session metrics.
+         *     - Competency deltas for Systematic Debugging, TDD, and Code Precision.
+         */
+        post: operations["submit_debug_telemetry_api_v1_diagnostics_debug_telemetry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/simulate-skip-delta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulate Skip With Date Delta
+         * @description [Innovation 2] Live What-If-Skip Graph Simulation with Target Date-Delta.
+         *
+         *     Computes the full downstream impact of skipping skill S:
+         *     - All blocked descendants in the DAG (Neo4j → NetworkX traversal).
+         *     - Friction hours penalty per blocked node.
+         *     - Exact calendar date shift projected against the learner's weekly study budget.
+         *     - Human-readable verdict and skip recommendation.
+         *
+         *     Frontend should use blocked_nodes list to pulse amber borders on the React Flow graph
+         *     and update the target date display live as the user adjusts their weekly_study_hours slider.
+         */
+        post: operations["simulate_skip_with_date_delta_api_v1_simulate_skip_delta_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/calibration/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Evaluate Calibration Check
+         * @description [Innovation 3] Confidence–Competence 2x2 Calibration Matrix Evaluator.
+         *
+         *     Accepts the learner's pre-quiz self-rated confidence and post-quiz actual score
+         *     and classifies them into one of four calibration quadrants:
+         *     - CALIBRATED_MASTERY: Self-model is accurate. Proof Card unlock if score ≥ 0.80.
+         *     - BLINDSPOT: Dunning-Kruger detected. Counterexample injection triggered.
+         *     - IMPOSTER_ZONE: Imposter Syndrome detected. Proof Card forced-unlocked.
+         *     - CALIBRATED_NOVICE: Accurate awareness of beginner status. Encouragement mode.
+         */
+        post: operations["evaluate_calibration_check_api_v1_calibration_evaluate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/career/alternatives/{profile_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Career Alternatives
+         * @description [Innovation 5] Dynamic Career Alternatives & Pivot Panel.
+         *
+         *     Computes the learner's weighted readiness score across 5 adjacent role clusters
+         *     (Backend SWE, Data Engineer, DevOps/Platform, MLOps, Full-Stack) by comparing
+         *     their BKT ReadinessSnapshot vector against each role's required skill list.
+         *
+         *     Returns roles sorted by:
+         *     1. Fast-Track first (reachable sooner than current target role).
+         *     2. Readiness descending.
+         *     3. Market demand score.
+         */
+        get: operations["get_career_alternatives_api_v1_career_alternatives__profile_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/placement/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate Placement Sprint Plan
+         * @description [Innovation 6a] Placement Season War Room — Sprint Planner.
+         *
+         *     Given a company target and interview date, generates a week-by-week sprint plan
+         *     tailored to the company's known skill priorities (Microsoft, Amazon, Google, Stripe, etc.).
+         *
+         *     Includes:
+         *     - Gap skill identification (company priority skills not yet mastered).
+         *     - Weekly task allocations with focus areas.
+         *     - Final crunch-review week with mock interview tasks.
+         *     - Feasibility check: flags if study budget is insufficient.
+         */
+        post: operations["generate_placement_sprint_plan_api_v1_placement_plan_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/placement/triage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate Mentor Triage
+         * @description [Innovation 6b] Mentor Load Balancer — Triage Queue Generator.
+         *
+         *     Computes a triage-sorted queue of learners for mentor office hours.
+         *     Priority formula: readiness * (1 + urgency_factor) * proximity_bonus
+         *     where proximity_bonus = 1.5 for learners in the 80-95% readiness breakthrough zone.
+         *
+         *     Mentors should focus on breakthrough-zone learners first — they need only one
+         *     targeted session to clear a hiring-readiness threshold.
+         */
+        post: operations["generate_mentor_triage_api_v1_placement_triage_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roadmap/sanity-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Roadmap Sanity Check
+         * @description [Innovation 7] Tutor Noise & Roadmap Sanity Filter.
+         *
+         *     Accepts any pasted external roadmap advice (YouTube titles, Reddit post, blog text)
+         *     and classifies each extracted skill mention against:
+         *     1. The canonical PathFinder Neo4j skill graph.
+         *     2. Live market demand data from the Greenhouse job scraping pipeline.
+         *
+         *     Output labels per skill:
+         *     🟢 ALIGNED          — In graph, high market demand. This advice is solid.
+         *     🟡 HARMLESS_EXTRA   — Valid but not on the critical hiring path. Low opportunity cost.
+         *     🔴 MISLEADING       — Outside graph, outdated, or low market demand. Can delay readiness.
+         *     ⚪ UNKNOWN          — Could not be matched to any graph node.
+         */
+        post: operations["roadmap_sanity_check_api_v1_roadmap_sanity_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/simulator/tickets/{profile_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Tickets
+         * @description [Day-One Simulator] Fetches all Kanban board tickets derived from the user's latest path.
+         */
+        get: operations["get_tickets_api_v1_simulator_tickets__profile_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/simulator/ticket/{ticket_id}/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Chat With Stakeholder Endpoint
+         * @description [Day-One Simulator] Sends a message to the AI PM or AI Client persona for ticket requirements.
+         */
+        post: operations["chat_with_stakeholder_endpoint_api_v1_simulator_ticket__ticket_id__chat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/simulator/ticket/{ticket_id}/submit-pr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit Pr Endpoint
+         * @description [Day-One Simulator] Submits code for code review by AI Senior Developer.
+         */
+        post: operations["submit_pr_endpoint_api_v1_simulator_ticket__ticket_id__submit_pr_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AlternativeRole
+         * @description A single adjacent role with readiness data.
+         */
+        AlternativeRole: {
+            /** Role Id */
+            role_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Readiness Pct
+             * @description Percentage of required skills mastered (0–100).
+             */
+            readiness_pct: number;
+            /** Mastered Skills */
+            mastered_skills: string[];
+            /** Missing Skills */
+            missing_skills: string[];
+            /** Estimated Weeks To Ready */
+            estimated_weeks_to_ready: number;
+            /** Estimated Target Date */
+            estimated_target_date: string;
+            /** Market Demand Score */
+            market_demand_score: number;
+            /** Avg Salary Usd */
+            avg_salary_usd: number;
+            /** Job Growth Pct */
+            job_growth_pct: number;
+            /**
+             * Is Fast Track
+             * @description True if this role is reachable faster than the learner's current target.
+             */
+            is_fast_track: boolean;
+            /** Recommendation Badge */
+            recommendation_badge?: string | null;
+        };
+        /**
+         * BlockedNode
+         * @description A single downstream node that becomes unreachable if skill S is skipped.
+         */
+        BlockedNode: {
+            /** Skill Id */
+            skill_id: string;
+            /** Skill Name */
+            skill_name: string;
+            /** Estimated Hours */
+            estimated_hours: number;
+            /** Friction Hours */
+            friction_hours: number;
+            /** Depth From Skipped */
+            depth_from_skipped: number;
+        };
+        /**
+         * CalibrationInput
+         * @description Request payload: the learner's pre-quiz self-rating and post-quiz actual score.
+         */
+        CalibrationInput: {
+            /**
+             * Profile Id
+             * @description ID of the learner profile.
+             */
+            profile_id: number;
+            /**
+             * Skill Id
+             * @description The skill/milestone being calibrated.
+             */
+            skill_id: string;
+            /**
+             * Self Rated Confidence
+             * @description Learner's self-rated mastery probability (0.0–1.0) collected before the quiz.
+             */
+            self_rated_confidence: number;
+            /**
+             * Actual Score
+             * @description Actual quiz/assessment score (0.0–1.0) from the BKT grader.
+             */
+            actual_score: number;
+        };
+        /**
+         * CalibrationQuadrant
+         * @description The four quadrants of the Confidence–Competence 2x2 Matrix.
+         * @enum {string}
+         */
+        CalibrationQuadrant: "CALIBRATED_MASTERY" | "BLINDSPOT" | "IMPOSTER_ZONE" | "CALIBRATED_NOVICE";
+        /**
+         * CalibrationReport
+         * @description Full calibration report returned to the frontend.
+         */
+        CalibrationReport: {
+            /** Profile Id */
+            profile_id: number;
+            /** Skill Id */
+            skill_id: string;
+            /** Self Rated Confidence */
+            self_rated_confidence: number;
+            /** Actual Score */
+            actual_score: number;
+            /** Calibration Gap */
+            calibration_gap: number;
+            quadrant: components["schemas"]["CalibrationQuadrant"];
+            /** Quadrant Label */
+            quadrant_label: string;
+            /** Explanation */
+            explanation: string;
+            pedagogical_action: components["schemas"]["PedagogicalAction"];
+        };
+        /**
+         * CareerAlternativesReport
+         * @description Full report showing readiness across all adjacent roles.
+         */
+        CareerAlternativesReport: {
+            /** Profile Id */
+            profile_id: number;
+            /** Current Role Id */
+            current_role_id: string | null;
+            /** Weekly Study Hours */
+            weekly_study_hours: number;
+            /** Alternatives */
+            alternatives: components["schemas"]["AlternativeRole"][];
+        };
         /** CheckpointSubmitInput */
         CheckpointSubmitInput: {
             /** Profile Id */
@@ -200,6 +742,128 @@ export interface components {
             skill_id: string;
             /** User Answer */
             user_answer: string;
+        };
+        /** CoachChatInput */
+        CoachChatInput: {
+            /** Skill Id */
+            skill_id: string;
+            /** Message */
+            message: string;
+        };
+        /**
+         * CompetencyDelta
+         * @description Specific, evidence-backed competency score changes from this debug session.
+         */
+        CompetencyDelta: {
+            /**
+             * Systematic Debugging
+             * @description Delta for Root-Cause Isolation skill.
+             * @default 0
+             */
+            systematic_debugging: number;
+            /**
+             * Test Driven Development
+             * @description Delta for TDD practice score.
+             * @default 0
+             */
+            test_driven_development: number;
+            /**
+             * Code Precision
+             * @description Delta for edit precision and minimal change.
+             * @default 0
+             */
+            code_precision: number;
+        };
+        /**
+         * DebugSnapshot
+         * @description A single moment-in-time snapshot of the learner's IDE state during a debug session.
+         */
+        DebugSnapshot: {
+            /**
+             * Timestamp
+             * @description Unix epoch timestamp of this snapshot.
+             */
+            timestamp: number;
+            /**
+             * Diff
+             * @description Unified diff text of code changes since last snapshot.
+             */
+            diff: string;
+            /**
+             * Lines Changed
+             * @description List of source line numbers that were modified in this snapshot.
+             */
+            lines_changed?: number[];
+            /**
+             * Test Ran
+             * @description Did the learner run tests after this edit?
+             * @default false
+             */
+            test_ran: boolean;
+            /**
+             * Test Passed
+             * @description Did at least one test pass?
+             * @default false
+             */
+            test_passed: boolean;
+            /**
+             * Failed Test Names
+             * @description Names of test functions that failed.
+             */
+            failed_test_names?: string[];
+            /**
+             * Execution Output
+             * @description Raw stdout/stderr from the test run, if any.
+             */
+            execution_output?: string | null;
+        };
+        /**
+         * DebuggingDiagnosticReport
+         * @description The full structured report returned to the frontend after analyzing a debug session.
+         */
+        DebuggingDiagnosticReport: {
+            /** Milestone Id */
+            milestone_id: string;
+            /** Strategy */
+            strategy: string;
+            /** Thrash Index */
+            thrash_index: number;
+            /**
+             * Steps To First Pass
+             * @description Number of test runs before at least one test passed.
+             */
+            steps_to_first_pass: number;
+            /** Total Snapshots */
+            total_snapshots: number;
+            /** Total Test Runs */
+            total_test_runs: number;
+            /**
+             * Process Praise
+             * @description Evidence-based, specific process-praise text for display in the AI Coach Drawer.
+             */
+            process_praise: string;
+            competency_deltas: components["schemas"]["CompetencyDelta"];
+            /**
+             * Coaching Note
+             * @description Coaching nudge shown when the strategy is suboptimal.
+             */
+            coaching_note?: string | null;
+        };
+        /**
+         * DebuggingTelemetryInput
+         * @description Full telemetry payload submitted by the frontend IDE after a coding challenge.
+         */
+        DebuggingTelemetryInput: {
+            /**
+             * Milestone Id
+             * @description The skill/milestone node ID being practiced.
+             */
+            milestone_id: string;
+            /**
+             * Snapshots
+             * @description Ordered list of IDE snapshots during the debug session.
+             */
+            snapshots: components["schemas"]["DebugSnapshot"][];
         };
         /** DiagnosticSubmitInput */
         DiagnosticSubmitInput: {
@@ -235,6 +899,362 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /**
+         * MentorTriageEntry
+         * @description A single learner entry in the mentor triage queue.
+         */
+        MentorTriageEntry: {
+            /** Profile Id */
+            profile_id: number;
+            /** Display Label */
+            display_label: string;
+            /** Readiness Pct */
+            readiness_pct: number;
+            /** Triage Score */
+            triage_score: number;
+            /** Breakthrough Zone */
+            breakthrough_zone: boolean;
+            /** Gap Skills Count */
+            gap_skills_count: number;
+            /** Days Until Next Drive */
+            days_until_next_drive: number | null;
+            /** Recommended Action */
+            recommended_action: string;
+        };
+        /**
+         * MentorTriageInput
+         * @description Request to generate the triage queue across all active learners.
+         */
+        MentorTriageInput: {
+            /**
+             * Profile Ids
+             * @description List of all active learner profile IDs.
+             */
+            profile_ids: number[];
+            /**
+             * Drive Date
+             * @description Optional upcoming drive date for urgency weighting.
+             */
+            drive_date?: string | null;
+        };
+        /**
+         * MentorTriageReport
+         * @description Ordered mentor triage queue for all tracked learners.
+         */
+        MentorTriageReport: {
+            /** Generated At */
+            generated_at: string;
+            /** Queue */
+            queue: components["schemas"]["MentorTriageEntry"][];
+        };
+        /** PRReviewComment */
+        PRReviewComment: {
+            /**
+             * Line Number
+             * @description Target line number in the file
+             */
+            line_number: number;
+            /**
+             * File Path
+             * @description Target file name
+             */
+            file_path: string;
+            /**
+             * Comment
+             * @description Constructive criticism or instructions
+             */
+            comment: string;
+            /**
+             * Severity
+             * @description BLOCKER | SUGGESTION | LINT
+             */
+            severity: string;
+        };
+        /** PRReviewResult */
+        PRReviewResult: {
+            /**
+             * Approved
+             * @description Whether the PR is accepted and merged
+             */
+            approved: boolean;
+            /**
+             * General Feedback
+             * @description Overarching code review comments
+             */
+            general_feedback: string;
+            /**
+             * Comments
+             * @description Line-by-line annotations
+             * @default []
+             */
+            comments: components["schemas"]["PRReviewComment"][];
+        };
+        /**
+         * PedagogicalAction
+         * @description A concrete action the system should take as a result of the calibration quadrant.
+         */
+        PedagogicalAction: {
+            /** Action Type */
+            action_type: string;
+            /** Display Message */
+            display_message: string;
+            /**
+             * Unlock Proof Card
+             * @default false
+             */
+            unlock_proof_card: boolean;
+            /**
+             * Inject Counterexample
+             * @default false
+             */
+            inject_counterexample: boolean;
+            /** Confidence Nudge */
+            confidence_nudge?: string | null;
+        };
+        /**
+         * PlacementDriveInput
+         * @description Request to generate a sprint plan for a specific company drive.
+         */
+        PlacementDriveInput: {
+            /** Profile Id */
+            profile_id: number;
+            /**
+             * Company Id
+             * @description Company key (e.g., 'microsoft', 'amazon', 'stripe', 'startup').
+             */
+            company_id: string;
+            /**
+             * Drive Date
+             * @description ISO date string for the target interview/OA date (YYYY-MM-DD).
+             */
+            drive_date: string;
+            /**
+             * Weekly Study Hours
+             * @default 10
+             */
+            weekly_study_hours: number;
+        };
+        /**
+         * PlacementPlanReport
+         * @description Full week-by-week sprint plan for a placement drive.
+         */
+        PlacementPlanReport: {
+            /** Profile Id */
+            profile_id: number;
+            /** Company Name */
+            company_name: string;
+            /** Drive Date */
+            drive_date: string;
+            /** Days Remaining */
+            days_remaining: number;
+            /** Weeks Available */
+            weeks_available: number;
+            /** Is Feasible */
+            is_feasible: boolean;
+            /** Gap Skills */
+            gap_skills: string[];
+            /** Sprint Weeks */
+            sprint_weeks: components["schemas"]["WeekSprint"][];
+            /** Overall Recommendation */
+            overall_recommendation: string;
+        };
+        /**
+         * RoadmapAnalysisInput
+         * @description Raw input from the learner — a snippet of external advice to analyze.
+         */
+        RoadmapAnalysisInput: {
+            /**
+             * Advice Text
+             * @description Paste any roadmap text, YouTube title sequence, or advice paragraph.
+             */
+            advice_text: string;
+            /**
+             * Source Label
+             * @description Optional label for the source (e.g., 'YouTube: TechWorld Pro Roadmap').
+             */
+            source_label?: string | null;
+        };
+        /**
+         * RoadmapAnalysisReport
+         * @description Full analysis report for the pasted roadmap advice.
+         */
+        RoadmapAnalysisReport: {
+            /** Source Label */
+            source_label: string | null;
+            /** Original Text */
+            original_text: string;
+            /** Extracted Mentions */
+            extracted_mentions: string[];
+            /** Verdicts */
+            verdicts: components["schemas"]["SkillVerdict"][];
+            /** Summary */
+            summary: string;
+            /** Aligned Count */
+            aligned_count: number;
+            /** Harmless Extra Count */
+            harmless_extra_count: number;
+            /** Misleading Count */
+            misleading_count: number;
+            /** Unknown Count */
+            unknown_count: number;
+            /** Overall Rating */
+            overall_rating: string;
+        };
+        /** ScrapeJobsInput */
+        ScrapeJobsInput: {
+            /**
+             * Source
+             * @description Source adapter name (e.g. 'greenhouse')
+             * @default greenhouse
+             */
+            source: string;
+            /**
+             * Board Token
+             * @description Job board identifier token (e.g. 'canonical', 'stripe')
+             */
+            board_token: string;
+            /**
+             * Company Name
+             * @description Optional company display name
+             */
+            company_name?: string | null;
+            /**
+             * Limit
+             * @description Max jobs to return
+             */
+            limit?: number | null;
+        };
+        /** SimulatorChatInput */
+        SimulatorChatInput: {
+            /**
+             * Profile Id
+             * @description User's profile ID
+             */
+            profile_id: number;
+            /**
+             * Message
+             * @description User's message to the stakeholder
+             */
+            message: string;
+            /**
+             * Persona
+             * @description pm | client
+             * @default pm
+             */
+            persona: string;
+        };
+        /** SimulatorChatResponse */
+        SimulatorChatResponse: {
+            /**
+             * Persona
+             * @description The replying persona
+             */
+            persona: string;
+            /**
+             * Message
+             * @description AI response text
+             */
+            message: string;
+        };
+        /** SimulatorPRInput */
+        SimulatorPRInput: {
+            /**
+             * Profile Id
+             * @description User's profile ID
+             */
+            profile_id: number;
+            /**
+             * Code Content
+             * @description The updated code written in the IDE
+             */
+            code_content: string;
+            /**
+             * Snapshots
+             * @description Telemetry sequence collected by the IDE
+             * @default []
+             */
+            snapshots: {
+                [key: string]: unknown;
+            }[];
+        };
+        /**
+         * SkillVerdict
+         * @description Verdict for a single extracted skill mention.
+         */
+        SkillVerdict: {
+            /** Extracted Mention */
+            extracted_mention: string;
+            /** Matched Skill Id */
+            matched_skill_id: string | null;
+            /** Matched Skill Name */
+            matched_skill_name: string | null;
+            /** Label */
+            label: string;
+            /** Label Emoji */
+            label_emoji: string;
+            /** Reason */
+            reason: string;
+            /** Market Demand Score */
+            market_demand_score: number | null;
+            /** Is In Graph */
+            is_in_graph: boolean;
+        };
+        /**
+         * SkipDeltaInput
+         * @description Request payload for the live What-If-Skip simulation.
+         */
+        SkipDeltaInput: {
+            /**
+             * Profile Id
+             * @description ID of the learner profile.
+             */
+            profile_id: number;
+            /**
+             * Skipped Skill Id
+             * @description The Neo4j Skill node ID to simulate skipping.
+             */
+            skipped_skill_id: string;
+            /**
+             * Weekly Study Hours
+             * @description The learner's real weekly study budget in hours.
+             * @default 10
+             */
+            weekly_study_hours: number;
+        };
+        /**
+         * SkipDeltaReport
+         * @description Full simulation result returned to the frontend.
+         */
+        SkipDeltaReport: {
+            /** Skipped Skill Id */
+            skipped_skill_id: string;
+            /** Skipped Skill Name */
+            skipped_skill_name: string;
+            /** Skipped Skill Hours */
+            skipped_skill_hours: number;
+            /** Blocked Nodes */
+            blocked_nodes: components["schemas"]["BlockedNode"][];
+            /** Total Blocked Count */
+            total_blocked_count: number;
+            /** Original Path Hours */
+            original_path_hours: number;
+            /** Hours Saved Today */
+            hours_saved_today: number;
+            /** Total Friction Hours */
+            total_friction_hours: number;
+            /** Net Hour Change */
+            net_hour_change: number;
+            /** Original Target Date */
+            original_target_date: string;
+            /** New Target Date */
+            new_target_date: string;
+            /** Delta Days */
+            delta_days: number;
+            /** Verdict */
+            verdict: string;
+            /** Is Recommended To Skip */
+            is_recommended_to_skip: boolean;
+        };
         /** SkipSimulationInput */
         SkipSimulationInput: {
             /** Profile Id */
@@ -262,6 +1282,46 @@ export interface components {
              */
             cost: number;
         };
+        /** TicketSchema */
+        TicketSchema: {
+            /**
+             * Id
+             * @description Unique ticket identifier, e.g., T-101
+             */
+            id: string;
+            /**
+             * Title
+             * @description Short summary of the task
+             */
+            title: string;
+            /**
+             * Skill Id
+             * @description The associated skill ID in the DAG
+             */
+            skill_id: string;
+            /**
+             * Status
+             * @description BACKLOG | TODO | IN_PROGRESS | UNDER_REVIEW | MERGED
+             */
+            status: string;
+            /**
+             * Description
+             * @description Extended task description detailing the problem
+             */
+            description: string;
+            /**
+             * Acceptance Criteria
+             * @description Definition of done criteria
+             * @default []
+             */
+            acceptance_criteria: string[];
+            /**
+             * Affected Files
+             * @description List of target codebase files
+             * @default []
+             */
+            affected_files: string[];
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -274,6 +1334,27 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /**
+         * WeekSprint
+         * @description A single weekly sprint in the placement plan.
+         */
+        WeekSprint: {
+            /** Week Number */
+            week_number: number;
+            /** Week Label */
+            week_label: string;
+            /** Target Skills */
+            target_skills: string[];
+            /** Focus Area */
+            focus_area: string;
+            /** Tasks */
+            tasks: string[];
+            /**
+             * Is Crunch Week
+             * @default false
+             */
+            is_crunch_week: boolean;
         };
     };
     responses: never;
@@ -454,6 +1535,70 @@ export interface operations {
             };
         };
     };
+    get_checkpoint_api_v1_checkpoint__skill_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                skill_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    chat_with_coach_api_v1_coach_chat_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoachChatInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     submit_checkpoint_answer_api_v1_checkpoint_submit_post: {
         parameters: {
             query?: never;
@@ -538,6 +1683,509 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trigger_active_decay_api_v1_readiness_decay_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_proof_card_api_v1_proof_card__profile_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profile_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_proof_card_svg_endpoint_api_v1_proof_card__profile_id__svg_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profile_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    verify_proof_card_endpoint_api_v1_proof_card_verify_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_scraper_sources_api_v1_scraper_sources_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    scrape_jobs_endpoint_api_v1_scraper_scrape_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScrapeJobsInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_debug_telemetry_api_v1_diagnostics_debug_telemetry_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DebuggingTelemetryInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebuggingDiagnosticReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulate_skip_with_date_delta_api_v1_simulate_skip_delta_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SkipDeltaInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkipDeltaReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluate_calibration_check_api_v1_calibration_evaluate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CalibrationInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalibrationReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_career_alternatives_api_v1_career_alternatives__profile_id__get: {
+        parameters: {
+            query?: {
+                current_role_id?: string;
+                weekly_study_hours?: number;
+            };
+            header?: never;
+            path: {
+                profile_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CareerAlternativesReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_placement_sprint_plan_api_v1_placement_plan_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlacementDriveInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlacementPlanReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_mentor_triage_api_v1_placement_triage_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MentorTriageInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MentorTriageReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    roadmap_sanity_check_api_v1_roadmap_sanity_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoadmapAnalysisInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoadmapAnalysisReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_tickets_api_v1_simulator_tickets__profile_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profile_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TicketSchema"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    chat_with_stakeholder_endpoint_api_v1_simulator_ticket__ticket_id__chat_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticket_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulatorChatInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimulatorChatResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_pr_endpoint_api_v1_simulator_ticket__ticket_id__submit_pr_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticket_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulatorPRInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PRReviewResult"];
                 };
             };
             /** @description Validation Error */
