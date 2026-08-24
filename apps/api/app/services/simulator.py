@@ -233,10 +233,14 @@ async def chat_with_stakeholder(
 async def review_pull_request(
     ticket_id: str,
     input_data: SimulatorPRInput,
-    ai_provider: AIProvider
+    ai_provider: AIProvider,
+    db: AsyncSession,
+    neo4j_client: Any
 ) -> PRReviewResult:
     """
     Simulates a Pull Request code review by an AI Senior Developer.
+    If approved, updates the learner's BKT status and regenerates their path plan,
+    directly synchronizing with their cryptographic Proof Card.
     """
     prompt = f"""
     You are an expert Senior Developer reviewing a Pull Request.
@@ -273,6 +277,7 @@ async def review_pull_request(
         ]
     )
     
+    result = mock_result
     if hasattr(ai_provider, "client") and ai_provider.client:
         try:
             response = await ai_provider.client.messages.create(
@@ -292,13 +297,46 @@ async def review_pull_request(
             data = json.loads(content_text)
             
             comments = [PRReviewComment(**c) for c in data.get("comments", [])]
-            return PRReviewResult(
+            result = PRReviewResult(
                 approved=bool(data.get("approved", True)),
                 general_feedback=str(data.get("general_feedback", "")),
                 comments=comments
             )
         except Exception as e:
             logger.error(f"Failed to generate AI PR review: {e}")
-            return mock_result
+            result = mock_result
             
-    return mock_result
+    # Persist database changes if the PR is approved
+    if result.approved:
+        try:
+            from app.services.path_planner import update_bkt_score, generate_or_replan_path
+            
+            tickets = await get_simulator_board(input_data.profile_id, db)
+            target_ticket = next((t for t in tickets if t.id == ticket_id), None)
+            skill_id = target_ticket.skill_id if target_ticket else "python_basics"
+            
+            # 1. Update BKT mastery score
+            await update_bkt_score(
+                profile_id=input_data.profile_id,
+                skill_id=skill_id,
+                is_correct=True,
+                db=db,
+                neo4j_client=neo4j_client
+            )
+            
+            # 2. Re-plan learner path to mark skill as completed
+            await generate_or_replan_path(
+                profile_id=input_data.profile_id,
+                trigger_event=f"PR_APPROVED_TICKET_{ticket_id}",
+                db=db,
+                neo4j_client=neo4j_client,
+                ai_provider=ai_provider
+            )
+            
+            await db.commit()
+            logger.info(f"Successfully processed PR approval for {skill_id} and synchronized Proof Card data.")
+        except Exception as e:
+            logger.exception("Failed to update BKT and replan path upon PR approval")
+            await db.rollback()
+            
+    return result
