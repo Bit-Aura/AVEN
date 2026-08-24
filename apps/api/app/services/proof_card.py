@@ -15,15 +15,31 @@ def generate_signed_proof_card(
     role: str,
     mastered_skills: List[str],
     readiness_score: float,
+    xapi_events: Optional[List[Dict[str, Any]]] = None,
     secret_key: str = PROOF_CARD_SECRET
 ) -> Dict[str, Any]:
     """
     Generates a cryptographically signed Proof Card credential payload with HMAC-SHA256 verification signature.
+    Includes an auto-generated narrative based on actual problem-solving behavior if xAPI events are provided.
     """
     issue_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     timestamp = datetime.now(timezone.utc).isoformat()
     credential_id = f"CP-VERIFIED-{profile_id:04d}-{abs(hash(f'{profile_id}-{issue_date}')) % 100000:05d}"
     
+    # Auto-generate narrative based on xAPI telemetry
+    narrative_summary = (
+        f"Demonstrated verified competency across {len(mastered_skills)} technical milestones "
+        f"for '{role}' with a role readiness index of {round(readiness_score * 100, 1)}%."
+    )
+    if xapi_events:
+        bugs_fixed = sum(1 for e in xapi_events if e.get("verb") == "fixed" and e.get("objectId") == "bug")
+        reqs_clarified = sum(1 for e in xapi_events if e.get("verb") == "clarified" and e.get("objectId") == "requirement")
+        if bugs_fixed > 0 or reqs_clarified > 0:
+            narrative_summary += (
+                f" Evidence of engineering grit: successfully fixed {bugs_fixed} build errors/bugs "
+                f"and clarified {reqs_clarified} ambiguous requirements in a simulated corporate environment."
+            )
+            
     # Canonical payload for signing
     payload = {
         "credential_id": credential_id,
@@ -31,7 +47,8 @@ def generate_signed_proof_card(
         "role": role,
         "mastered_count": len(mastered_skills),
         "readiness_score": round(readiness_score, 4),
-        "issue_date": issue_date
+        "issue_date": issue_date,
+        "narrative_summary": narrative_summary
     }
     
     canonical_string = json.dumps(payload, sort_keys=True)
@@ -55,10 +72,7 @@ def generate_signed_proof_card(
         "signature": signature,
         "signature_algorithm": "HMAC-SHA256",
         "is_verified": True,
-        "narrative_summary": (
-            f"Demonstrated verified competency across {len(mastered_skills)} technical milestones "
-            f"for '{role}' with a role readiness index of {round(readiness_score * 100, 1)}%."
-        ),
+        "narrative_summary": narrative_summary,
         "verification_endpoint": f"/api/v1/proof-card/verify?credential_id={credential_id}&sig={signature}"
     }
 

@@ -77,6 +77,18 @@
   - Overall rating: `TRUSTWORTHY | MOSTLY_OK | REVIEW_CAREFULLY | MISLEADING` based on mislead ratio.
   - Neo4j fallback to static set if graph unavailable.
 
+### Task 8: Day-One Simulator Engine ✅
+- **File:** `apps/api/app/services/simulator.py`
+- **Endpoints:**
+  - `GET /api/v1/simulator/tickets/{profile_id}`
+  - `POST /api/v1/simulator/ticket/{ticket_id}/chat`
+  - `POST /api/v1/simulator/ticket/{ticket_id}/submit-pr`
+- **What was built:**
+  - Dynamic Kanban Board builder fetching and mapping tickets based on user's active BKT graph/roadmap.
+  - Conversational AI stakeholder client/PM roleplaying engine utilizing Anthropic SDK.
+  - Dynamic Senior Developer code reviewer checking code submissions for edge cases and styling.
+  - Automated PR approval trigger updating BKT skill mastery, executing graph path replanning, and updating the cryptographic Proof Card and narratives (via xAPI telemetry logs).
+
 ---
 
 ## 3. API Endpoint Registry (All Innovation Endpoints in main.py)
@@ -90,6 +102,9 @@
 | POST | `/api/v1/placement/plan` | `placement_engine.py` | Sprint Planner |
 | POST | `/api/v1/placement/triage` | `placement_engine.py` | Mentor Triage Queue |
 | POST | `/api/v1/roadmap/sanity-check` | `noise_filter.py` | Roadmap Sanity Filter |
+| GET | `/api/v1/simulator/tickets/{profile_id}` | `simulator.py` | Day-One Simulator Tickets |
+| POST | `/api/v1/simulator/ticket/{ticket_id}/chat` | `simulator.py` | Stakeholder Persona Chat |
+| POST | `/api/v1/simulator/ticket/{ticket_id}/submit-pr` | `simulator.py` | PR Review & Approval |
 
 ---
 

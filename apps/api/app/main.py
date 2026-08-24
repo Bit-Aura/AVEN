@@ -1042,14 +1042,15 @@ async def chat_with_stakeholder_endpoint(
 @app.post("/api/v1/simulator/ticket/{ticket_id}/submit-pr", response_model=PRReviewResult)
 async def submit_pr_endpoint(
     ticket_id: str,
-    data: SimulatorPRInput
+    data: SimulatorPRInput,
+    db: AsyncSession = Depends(get_db)
 ):
     """
     [Day-One Simulator] Submits code for code review by AI Senior Developer.
     """
     from app.services.simulator import review_pull_request
     try:
-        result = await review_pull_request(ticket_id, data, ai_provider)
+        result = await review_pull_request(ticket_id, data, ai_provider, db, neo4j_client)
         return result
     except Exception as e:
         logger.exception("PR submission failed")
