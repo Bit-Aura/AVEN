@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Radar, 
   Search, 
@@ -14,109 +14,124 @@ import {
   Clock, 
   ShieldCheck, 
   Layers,
-  AlertCircle
+  AlertCircle,
+  HelpCircle,
+  RefreshCw
 } from 'lucide-react';
 import { scrapeJobs, ScrapedJob, ScrapeResult } from '../../../api/client';
 
+// Optional quick-pick convenience presets (strictly verified active public boards)
 const SOURCE_PRESETS = [
-  { source: 'google', token: 'software engineer', company: 'Google', tag: 'Distributed Systems & AI' },
-  { source: 'amazon', token: 'software-development', company: 'Amazon', tag: 'AWS Cloud & Infrastructure' },
-  { source: 'greenhouse', token: 'canonical', company: 'Canonical', tag: 'Linux & Cloud' },
   { source: 'greenhouse', token: 'stripe', company: 'Stripe', tag: 'FinTech Infrastructure' },
+  { source: 'greenhouse', token: 'cloudflare', company: 'Cloudflare', tag: 'Global Network & Security' },
+  { source: 'greenhouse', token: 'figma', company: 'Figma', tag: 'Design Systems' },
+  { source: 'greenhouse', token: 'canonical', company: 'Canonical', tag: 'Linux & Cloud' },
+  { source: 'greenhouse', token: 'airbnb', company: 'Airbnb', tag: 'Travel Marketplace' },
   { source: 'lever', token: 'palantir', company: 'Palantir', tag: 'Enterprise AI & Data' },
   { source: 'ashby', token: 'linear', company: 'Linear', tag: 'Productivity Tech' },
+  { source: 'ashby', token: 'openai', company: 'OpenAI', tag: 'Frontier AI Research' },
   { source: 'ashby', token: 'sentry', company: 'Sentry', tag: 'Developer Tooling' },
+  { source: 'ashby', token: 'ramp', company: 'Ramp', tag: 'Finance Automation' },
+  { source: 'amazon', token: 'software-development', company: 'Amazon', tag: 'AWS Cloud & Infrastructure' },
+  { source: 'google', token: 'software engineer', company: 'Google', tag: 'Distributed Systems & AI' },
 ];
 
+const SOURCE_GUIDANCE: Record<string, {
+  name: string;
+  inputLabel: string;
+  placeholder: string;
+  helper: string;
+  defaultCompany?: string;
+}> = {
+  greenhouse: {
+    name: 'Greenhouse REST API',
+    inputLabel: 'Board Token / Slug',
+    placeholder: 'e.g. stripe, cloudflare, figma, airbnb, canonical (or any Greenhouse board token)',
+    helper: 'Enter the public board token (from https://boards.greenhouse.io/{board_token})',
+  },
+  lever: {
+    name: 'Lever Postings API',
+    inputLabel: 'Site Slug / Identifier',
+    placeholder: 'e.g. palantir (or any valid Lever site slug)',
+    helper: 'Enter the company site slug (from https://jobs.lever.co/{site})',
+  },
+  ashby: {
+    name: 'Ashby Board API',
+    inputLabel: 'Job Board Identifier',
+    placeholder: 'e.g. linear, openai, sentry, ramp (or any Ashby board identifier)',
+    helper: 'Enter the job board identifier (from https://jobs.ashbyhq.com/{jobBoardName})',
+  },
+  amazon: {
+    name: 'Amazon Jobs Public API',
+    inputLabel: 'Category or Keyword',
+    placeholder: 'e.g. software-development, machine-learning',
+    helper: 'Enter a category slug (e.g. software-development) or keyword query for Amazon Jobs',
+    defaultCompany: 'Amazon',
+  },
+  google: {
+    name: 'Google Careers Search',
+    inputLabel: 'Search Query / Role Title',
+    placeholder: 'e.g. software engineer, data engineer, distributed systems',
+    helper: 'Enter a search query or role title for Google Careers',
+    defaultCompany: 'Google',
+  },
+};
 
 export default function MarketRadarPage() {
   const [selectedSource, setSelectedSource] = useState('greenhouse');
-  const [boardToken, setBoardToken] = useState('canonical');
-  const [companyName, setCompanyName] = useState('Canonical');
+  const [boardToken, setBoardToken] = useState('stripe');
+  const [companyName, setCompanyName] = useState('Stripe');
   const [searchQuery, setSearchQuery] = useState('');
   const [jobTypeFilter, setJobTypeFilter] = useState('all');
 
   const [isLoading, setIsLoading] = useState(false);
   const [scrapeResult, setScrapeResult] = useState<ScrapeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  // Auto-run initial scrape for demo presentation
-  useEffect(() => {
-    handleScrape('greenhouse', 'canonical', 'Canonical');
-  }, []);
+  const activeGuidance = SOURCE_GUIDANCE[selectedSource] || SOURCE_GUIDANCE['greenhouse'];
+
+  const handleSourceChange = (newSource: string) => {
+    setSelectedSource(newSource);
+    const guidance = SOURCE_GUIDANCE[newSource];
+    if (guidance?.defaultCompany) {
+      setCompanyName(guidance.defaultCompany);
+    }
+  };
 
   const handleScrape = async (src?: string, token?: string, comp?: string) => {
     const activeSource = src || selectedSource;
-    const activeToken = token || boardToken;
-    const activeCompany = comp || companyName;
+    const activeToken = (token !== undefined ? token : boardToken).trim();
+    const activeCompany = (comp !== undefined ? comp : companyName).trim();
 
-    if (!activeToken.trim()) return;
+    if (!activeToken) {
+      setError('Please provide a valid board token or search identifier.');
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
+    setHasSearched(true);
 
     try {
       const result = await scrapeJobs({
         source: activeSource,
-        board_token: activeToken.trim(),
-        company_name: activeCompany.trim() || undefined,
-        limit: 25
+        board_token: activeToken,
+        company_name: activeCompany || undefined,
+        limit: 30
       });
       setScrapeResult(result);
+
+      if (result.errors && result.errors.length > 0) {
+        setError(result.errors.join(' | '));
+      }
     } catch (e: any) {
-      console.warn("Scrape live fallback", e);
-      // Fallback normalized jobs for demo presentation
-      setScrapeResult({
-        source: activeSource,
-        board_identifier: activeToken,
-        total_fetched: 6,
-        total_valid: 6,
-        total_deduplicated: 6,
-        timestamp: new Date().toISOString(),
-        errors: [],
-        jobs: [
-          {
-            external_id: "job-1",
-            source: activeSource,
-            title: `Backend Software Engineer (${activeCompany})`,
-            company: activeCompany,
-            location: "Remote / London / Bengaluru",
-            job_type: "full_time",
-            description: "Building scalable distributed services in Python, Go, and PostgreSQL. Responsible for high-throughput APIs and cloud infrastructure.",
-            url: "https://boards.greenhouse.io/canonical",
-            posted_date: new Date().toISOString(),
-            scraped_at: new Date().toISOString()
-          },
-          {
-            external_id: "job-2",
-            source: activeSource,
-            title: `Distributed Systems Engineer (${activeCompany})`,
-            company: activeCompany,
-            location: "Remote (Global)",
-            job_type: "full_time",
-            description: "Designing reliable storage clusters, asynchronous task schedulers, and Linux kernel integration systems.",
-            url: "https://boards.greenhouse.io/canonical",
-            posted_date: new Date().toISOString(),
-            scraped_at: new Date().toISOString()
-          },
-          {
-            external_id: "job-3",
-            source: activeSource,
-            title: `Early Career / Associate SDE`,
-            company: activeCompany,
-            location: "Austin, TX / Remote",
-            job_type: "full_time",
-            description: "Foundational backend development, API endpoint construction, and unit testing within modern CI/CD pipelines.",
-            url: "https://boards.greenhouse.io/canonical",
-            posted_date: new Date().toISOString(),
-            scraped_at: new Date().toISOString()
-          }
-        ]
-      });
+      const msg = e?.message || 'Failed to execute job scrape request.';
+      setError(msg);
+      setScrapeResult(null);
     } finally {
       setIsLoading(false);
     }
-
   };
 
   const handlePresetSelect = (preset: typeof SOURCE_PRESETS[0]) => {
@@ -159,6 +174,11 @@ export default function MarketRadarPage() {
         {scrapeResult && (
           <div className="flex items-center gap-3 text-xs bg-surface border border-border px-3.5 py-2 rounded-xl">
             <div className="flex items-center gap-1.5">
+              <span className="text-slate-400">Source:</span>
+              <span className="font-bold text-indigo-400 uppercase">{scrapeResult.source}</span>
+            </div>
+            <div className="w-px h-3 bg-border" />
+            <div className="flex items-center gap-1.5">
               <span className="text-slate-400">Fetched:</span>
               <span className="font-bold text-white">{scrapeResult.total_fetched}</span>
             </div>
@@ -173,9 +193,14 @@ export default function MarketRadarPage() {
 
       {/* Scraper Configuration Bar */}
       <div className="p-6 rounded-2xl bg-surface border border-border shadow-glass space-y-5">
-        <div className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-          <Filter size={14} className="text-indigo-400" />
-          <span>ATS Pipeline Target</span>
+        <div className="flex items-center justify-between">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <Filter size={14} className="text-indigo-400" />
+            <span>Target Any Public Career Board / Search Query</span>
+          </div>
+          <span className="text-[11px] text-slate-500">
+            Supports arbitrary companies on Greenhouse, Lever, Ashby, Amazon, Google
+          </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -184,27 +209,26 @@ export default function MarketRadarPage() {
             <label className="text-[11px] font-semibold text-slate-400 uppercase">Adapter Source</label>
             <select
               value={selectedSource}
-              onChange={(e) => setSelectedSource(e.target.value)}
+              onChange={(e) => handleSourceChange(e.target.value)}
               className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-brand-500"
             >
-              <option value="google">Google Careers Portal</option>
-              <option value="amazon">Amazon Jobs Public API</option>
               <option value="greenhouse">Greenhouse REST API</option>
               <option value="lever">Lever Postings API</option>
               <option value="ashby">Ashby Board API</option>
+              <option value="amazon">Amazon Jobs Public API</option>
+              <option value="google">Google Careers Search</option>
             </select>
-
           </div>
 
-          {/* Board Token */}
+          {/* Board Token / Identifier Input */}
           <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold text-slate-400 uppercase">Board Token / Identifier</label>
+            <label className="text-[11px] font-semibold text-slate-400 uppercase">{activeGuidance.inputLabel}</label>
             <input
               type="text"
               value={boardToken}
               onChange={(e) => setBoardToken(e.target.value)}
-              placeholder="e.g. canonical, stripe, linear"
-              className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+              placeholder={activeGuidance.placeholder}
+              className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500"
             />
           </div>
 
@@ -215,8 +239,8 @@ export default function MarketRadarPage() {
               type="text"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
-              placeholder="e.g. Canonical Ltd"
-              className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+              placeholder="e.g. Stripe, Cloudflare, Linear"
+              className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500"
             />
           </div>
 
@@ -242,10 +266,16 @@ export default function MarketRadarPage() {
           </div>
         </div>
 
+        {/* Dynamic Source Helper Guidance */}
+        <div className="text-[11px] text-slate-400 flex items-center gap-1.5 bg-surface-secondary/40 px-3 py-2 rounded-lg border border-border/50">
+          <HelpCircle size={13} className="text-indigo-400 shrink-0" />
+          <span>{activeGuidance.helper}</span>
+        </div>
+
         {/* Quick Presets */}
-        <div className="flex items-center gap-2 pt-2 overflow-x-auto">
+        <div className="flex items-center gap-2 pt-1 overflow-x-auto">
           <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider shrink-0">
-            Presets:
+            Quick Picks:
           </span>
           <div className="flex gap-2">
             {SOURCE_PRESETS.map((preset, idx) => (
@@ -253,7 +283,7 @@ export default function MarketRadarPage() {
                 key={idx}
                 onClick={() => handlePresetSelect(preset)}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all shrink-0 ${
-                  boardToken === preset.token && selectedSource === preset.source
+                  boardToken.toLowerCase() === preset.token.toLowerCase() && selectedSource === preset.source
                     ? 'bg-brand-500/20 border-brand-500/50 text-brand-300'
                     : 'bg-surface-secondary/50 border-border text-slate-400 hover:text-white'
                 }`}
@@ -266,7 +296,7 @@ export default function MarketRadarPage() {
       </div>
 
       {/* Filter / Search within scraped results */}
-      {scrapeResult && (
+      {scrapeResult && scrapeResult.jobs.length > 0 && (
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="relative flex-1 max-w-md">
             <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -274,7 +304,7 @@ export default function MarketRadarPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter by title, city, or keyword..."
+              placeholder="Filter extracted jobs by title, city, or keyword..."
               className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
             />
           </div>
@@ -298,15 +328,18 @@ export default function MarketRadarPage() {
         </div>
       )}
 
-      {/* Error Message */}
+      {/* Prominent Error Message Display */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-2">
-          <AlertCircle size={16} />
-          <span>{error}</span>
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-3">
+          <AlertCircle size={18} className="shrink-0 text-rose-400" />
+          <div className="flex-1">
+            <p className="font-bold text-rose-200">Scrape Request Error</p>
+            <p className="text-[11px] text-rose-300/90 mt-0.5">{error}</p>
+          </div>
         </div>
       )}
 
-      {/* Job Results Grid */}
+      {/* Job Results Grid or Empty/State Screens */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -329,7 +362,7 @@ export default function MarketRadarPage() {
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-slate-400 flex items-center gap-1.5">
                     <Building2 size={13} className="text-brand-400" />
-                    {job.company || companyName}
+                    {job.company || companyName || 'Company Board'}
                   </span>
                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                     job.job_type === 'internship'
@@ -381,19 +414,52 @@ export default function MarketRadarPage() {
             </div>
           ))}
         </div>
-      ) : (
+      ) : hasSearched && scrapeResult && scrapeResult.total_deduplicated > 0 ? (
+        /* Case C: Jobs returned by scrape, but filtered out by local search/type filter */
         <div className="text-center py-16 bg-surface border border-border rounded-2xl p-8">
-          <Radar className="text-slate-600 mx-auto mb-3" size={40} />
-          <h3 className="text-base font-bold text-white mb-1">No Scraped Jobs Found</h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto mb-6">
-            Execute a live ATS scrape query or adjust your local search filters.
+          <Filter className="text-slate-600 mx-auto mb-3" size={38} />
+          <h3 className="text-base font-bold text-white mb-1">No Jobs Match Active Local Filters</h3>
+          <p className="text-xs text-slate-400 max-w-md mx-auto mb-5">
+            {scrapeResult.total_deduplicated} jobs were extracted from {scrapeResult.board_identifier}, but none matched your filter &quot;{searchQuery}&quot; (type: {jobTypeFilter}).
           </p>
           <button
-            onClick={() => handleScrape('greenhouse', 'canonical', 'Canonical')}
-            className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs rounded-xl transition-colors shadow-glow-indigo"
+            onClick={() => { setSearchQuery(''); setJobTypeFilter('all'); }}
+            className="px-4 py-2 bg-surface-secondary hover:bg-surface-tertiary text-white font-bold text-xs rounded-xl transition-colors border border-border"
           >
-            Load Canonical Pipeline
+            Clear Filters
           </button>
+        </div>
+      ) : hasSearched && scrapeResult && scrapeResult.total_fetched === 0 && !error ? (
+        /* Case B: Scrape completed successfully, but the external board currently has 0 postings */
+        <div className="text-center py-16 bg-surface border border-border rounded-2xl p-8">
+          <Radar className="text-slate-600 mx-auto mb-3" size={40} />
+          <h3 className="text-base font-bold text-white mb-1">No Active Postings Found</h3>
+          <p className="text-xs text-slate-400 max-w-sm mx-auto mb-6">
+            The board &apos;{boardToken}&apos; was queried successfully, but returned 0 active job postings.
+          </p>
+        </div>
+      ) : (
+        /* Case D: Initial landing state before running a scrape */
+        <div className="text-center py-16 bg-surface border border-border rounded-2xl p-8">
+          <Radar className="text-brand-500/70 mx-auto mb-3 animate-pulse" size={44} />
+          <h3 className="text-base font-bold text-white mb-1">Ready to Query Live Job Markets</h3>
+          <p className="text-xs text-slate-400 max-w-md mx-auto mb-6">
+            Enter any public ATS board identifier (Greenhouse, Lever, Ashby) or query Big Tech portals (Amazon, Google) to extract and normalize live hiring data.
+          </p>
+          <div className="flex justify-center gap-3">
+            <button
+              onClick={() => handleScrape('greenhouse', 'stripe', 'Stripe')}
+              className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs rounded-xl transition-colors shadow-glow-indigo"
+            >
+              Scrape Stripe (Greenhouse)
+            </button>
+            <button
+              onClick={() => handleScrape('ashby', 'linear', 'Linear')}
+              className="px-4 py-2 bg-surface-secondary hover:bg-surface-tertiary text-white font-bold text-xs rounded-xl transition-colors border border-border"
+            >
+              Scrape Linear (Ashby)
+            </button>
+          </div>
         </div>
       )}
     </div>

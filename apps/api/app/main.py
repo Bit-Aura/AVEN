@@ -668,6 +668,7 @@ async def verify_proof_card_endpoint(card_data: Dict[str, Any] = Body(...)):
 async def get_scraper_sources():
     """
     Returns available job board source adapters for data collection.
+    Accurately describes all ATS platforms and search adapters supported by the API.
     """
     return {
         "sources": [
@@ -676,7 +677,55 @@ async def get_scraper_sources():
                 "name": "Greenhouse ATS",
                 "description": "Scrapes public Greenhouse job boards via REST API",
                 "requires_token": True,
-                "example_tokens": ["canonical", "stripe", "github"]
+                "input_label": "Board Token",
+                "input_type": "board_token",
+                "supports_custom_token": True,
+                "identifier_description": "The board token from the public careers URL (https://boards.greenhouse.io/{board_token})",
+                "example_tokens": ["canonical", "stripe", "cloudflare", "figma"]
+            },
+            {
+                "id": "lever",
+                "name": "Lever Postings API",
+                "description": "Scrapes public Lever job boards via Postings API",
+                "requires_token": True,
+                "input_label": "Site Identifier",
+                "input_type": "board_token",
+                "supports_custom_token": True,
+                "identifier_description": "The site slug from the public careers URL (https://jobs.lever.co/{site})",
+                "example_tokens": ["palantir"]
+            },
+            {
+                "id": "ashby",
+                "name": "Ashby Board API",
+                "description": "Scrapes public Ashby job boards via Board API",
+                "requires_token": True,
+                "input_label": "Job Board Identifier",
+                "input_type": "board_token",
+                "supports_custom_token": True,
+                "identifier_description": "The job board identifier from the public careers URL (https://jobs.ashbyhq.com/{jobBoardName})",
+                "example_tokens": ["linear", "sentry", "ramp", "openai"]
+            },
+            {
+                "id": "amazon",
+                "name": "Amazon Jobs Public API",
+                "description": "Searches Amazon Jobs public search API by category slug or query",
+                "requires_token": True,
+                "input_label": "Category or Keyword",
+                "input_type": "search_query",
+                "supports_custom_token": True,
+                "identifier_description": "Amazon category slug (e.g. 'software-development') or keyword query",
+                "example_tokens": ["software-development", "machine-learning"]
+            },
+            {
+                "id": "google",
+                "name": "Google Careers Search",
+                "description": "Searches Google Careers listings by role title or keywords",
+                "requires_token": True,
+                "input_label": "Search Query",
+                "input_type": "search_query",
+                "supports_custom_token": True,
+                "identifier_description": "Role keyword search query (e.g. 'software engineer')",
+                "example_tokens": ["software engineer", "data engineer"]
             }
         ]
     }
@@ -686,6 +735,7 @@ async def scrape_jobs_endpoint(data: ScrapeJobsInput):
     """
     Executes the job scraping pipeline to fetch, clean, normalize, validate,
     and deduplicate job postings from an external applicant tracking system.
+    Supports arbitrary public board tokens and queries across all supported sources.
     """
     from app.scraper.pipeline import JobScrapingPipeline
     from app.scraper.sources import (
@@ -696,8 +746,15 @@ async def scrape_jobs_endpoint(data: ScrapeJobsInput):
         GoogleCareersSource,
     )
     
+    cleaned_token = (data.board_token or "").strip()
+    if not cleaned_token:
+        raise HTTPException(
+            status_code=400,
+            detail="Board token / search query identifier cannot be empty."
+        )
+
     pipeline = JobScrapingPipeline()
-    src_lower = data.source.lower()
+    src_lower = data.source.lower().strip()
     if src_lower == "greenhouse":
         source = GreenhouseSource()
     elif src_lower == "lever":
@@ -714,10 +771,12 @@ async def scrape_jobs_endpoint(data: ScrapeJobsInput):
             detail=f"Unsupported source '{data.source}'. Supported sources: 'greenhouse', 'lever', 'ashby', 'amazon', 'google'"
         )
         
+    resolved_company = data.company_name.strip() if (data.company_name and data.company_name.strip()) else None
+
     result = await pipeline.run_pipeline(
         source=source,
-        board_identifier=data.board_token,
-        company_name=data.company_name
+        board_identifier=cleaned_token,
+        company_name=resolved_company
     )
     
     if data.limit and data.limit > 0:
