@@ -21,6 +21,7 @@ const navigationGroups = [
     title: 'Core Engine',
     items: [
       { name: 'Learning Path', href: '/learner', icon: Compass, badge: 'Live' },
+      { name: 'Day-One Simulator', href: '/learner/simulator', icon: BrainCircuit, badge: 'Job' },
       { name: 'Skill Graph', href: '/learner/graph', icon: Network },
       { name: 'Market Radar', href: '/market-radar', icon: Radar, badge: 'ETL' },
       { name: 'Proof Portfolio', href: '/learner/portfolio', icon: Award },
