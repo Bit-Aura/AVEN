@@ -17,23 +17,65 @@ from app.models.domain import (
 from app.infrastructure.neo4j.client import neo4j_client
 from app.infrastructure.ai.gateway import AnthropicAdapter, MockAIProvider
 
+from contextlib import asynccontextmanager
+
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Auto-initialize database tables and seed demo profile if not present on startup.
+    """
+    try:
+        from app.core.db import engine, async_session
+        from app.models.base import Base
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        
+        async with async_session() as session:
+            stmt = select(User).where(User.email == "demo@pathfinder.dev")
+            user = (await session.execute(stmt)).scalars().first()
+            if not user:
+                user = User(clerk_id="clerk_demo_user", email="demo@pathfinder.dev")
+                session.add(user)
+                await session.flush()
+                profile = LearnerProfile(user_id=user.id, current_context="Backend Software Engineer")
+                session.add(profile)
+                await session.flush()
+                
+                # Seed initial baseline readiness snapshots for demo
+                for skill in ["python_basics", "sql_basics", "git_foundations", "http_methods"]:
+                    session.add(ReadinessSnapshot(profile_id=profile.id, skill_id=skill, readiness_score=0.85))
+                await session.commit()
+                logger.info("[Startup] Successfully initialized database tables and demo profile #1.")
+    except Exception as e:
+        logger.warning(f"[Startup] Database table initialization warning: {e}")
+    yield
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    lifespan=lifespan
 )
+
 
 # Enable CORS for frontend connections
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ],
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Instantiate AI Provider safely based on configuration
 ai_provider = AnthropicAdapter() if settings.ANTHROPIC_API_KEY else MockAIProvider()

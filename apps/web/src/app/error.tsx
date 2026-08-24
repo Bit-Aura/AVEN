@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 export default function Error({
   error,
@@ -14,17 +15,23 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-neo-bg flex items-center justify-center p-8">
-      <div className="bg-neo-red text-white border-8 border-black shadow-brutal p-12 flex flex-col items-center gap-6 max-w-2xl text-center">
-        <h2 className="text-4xl font-black uppercase">Something Broke!</h2>
-        <p className="text-xl font-bold bg-black p-4">
-          The deterministic domain engine encountered an unexpected state. 
-        </p>
+    <div className="min-h-screen bg-background flex items-center justify-center p-8 text-slate-100">
+      <div className="bg-surface border border-border rounded-2xl p-10 flex flex-col items-center gap-6 max-w-lg text-center shadow-glass">
+        <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center shadow-glow-rose">
+          <AlertTriangle className="text-rose-400" size={28} />
+        </div>
+        <div>
+          <h2 className="text-2xl font-extrabold text-white">Something went wrong</h2>
+          <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+            {error?.message || "The deterministic skill graph engine encountered an unexpected state. Please retry."}
+          </p>
+        </div>
         <button
           onClick={() => reset()}
-          className="bg-white text-black border-4 border-black px-8 py-4 font-black uppercase shadow-brutal hover:shadow-brutal-active hover:translate-y-1 hover:translate-x-1 transition-all"
+          className="flex items-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs rounded-xl shadow-glow-indigo transition-all"
         >
-          Try Again
+          <RefreshCw size={14} />
+          <span>Retry Operation</span>
         </button>
       </div>
     </div>

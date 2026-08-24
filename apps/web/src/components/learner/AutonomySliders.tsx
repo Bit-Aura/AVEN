@@ -1,67 +1,72 @@
 'use client';
 
-import { useState } from 'react';
+import { usePathStore } from '../../store/usePathStore';
+import { Sliders, Zap } from 'lucide-react';
 
 export default function AutonomySliders() {
-  const [speed, setSpeed] = useState(50);
-  const [cost, setCost] = useState(50);
-  const [modality, setModality] = useState(50);
-
-  const handleReRoute = () => {
-    // Stub for live re-route logic
-    console.log("Re-routing based on:", { speed, cost, modality });
-  };
+  const rankingPreferences = usePathStore((state) => state.rankingPreferences);
+  const updatePreference = usePathStore((state) => state.updateRankingPreference);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <label className="flex justify-between font-bold uppercase mb-2">
-          <span>Fast / Shallow</span>
-          <span>Slow / Deep</span>
-        </label>
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center justify-between text-xs text-slate-400 border-b border-border pb-2">
+        <div className="flex items-center gap-1.5 font-bold uppercase text-slate-300">
+          <Sliders size={14} className="text-indigo-400" />
+          <span>Curriculum Tuning</span>
+        </div>
+        <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+          <Zap size={10} /> Live Re-route
+        </span>
+      </div>
+
+      {/* Speed vs Depth */}
+      <div className="space-y-1.5">
+        <div className="flex justify-between text-xs font-semibold text-slate-300">
+          <span className="text-slate-400">Fast-Track</span>
+          <span>Deep Mastery</span>
+        </div>
         <input 
           type="range" 
           min="0" max="100" 
-          value={speed} 
-          onChange={(e) => setSpeed(Number(e.target.value))}
-          onMouseUp={handleReRoute}
-          className="w-full accent-black h-2 bg-white border-2 border-black appearance-none" 
+          value={rankingPreferences.speedVsDepth} 
+          onChange={(e) => updatePreference('speedVsDepth', Number(e.target.value))}
+          className="w-full h-1.5 bg-surface-secondary rounded-lg appearance-none cursor-pointer accent-brand-500" 
         />
       </div>
 
-      <div>
-        <label className="flex justify-between font-bold uppercase mb-2">
-          <span>Free Tools</span>
-          <span>Paid Tools</span>
-        </label>
+      {/* Theory vs Practice */}
+      <div className="space-y-1.5">
+        <div className="flex justify-between text-xs font-semibold text-slate-300">
+          <span className="text-slate-400">Theoretical</span>
+          <span>Hands-on Project</span>
+        </div>
         <input 
           type="range" 
           min="0" max="100" 
-          value={cost} 
-          onChange={(e) => setCost(Number(e.target.value))}
-          onMouseUp={handleReRoute}
-          className="w-full accent-black h-2 bg-white border-2 border-black appearance-none" 
+          value={rankingPreferences.theoryVsPractice} 
+          onChange={(e) => updatePreference('theoryVsPractice', Number(e.target.value))}
+          className="w-full h-1.5 bg-surface-secondary rounded-lg appearance-none cursor-pointer accent-emerald-500" 
         />
       </div>
 
-      <div>
-        <label className="flex justify-between font-bold uppercase mb-2">
-          <span>Video Heavy</span>
-          <span>Project Heavy</span>
-        </label>
+      {/* Free vs Paid Resources */}
+      <div className="space-y-1.5">
+        <div className="flex justify-between text-xs font-semibold text-slate-300">
+          <span className="text-slate-400">Free Resources</span>
+          <span>Paid Credentials</span>
+        </div>
         <input 
           type="range" 
           min="0" max="100" 
-          value={modality} 
-          onChange={(e) => setModality(Number(e.target.value))}
-          onMouseUp={handleReRoute}
-          className="w-full accent-black h-2 bg-white border-2 border-black appearance-none" 
+          value={rankingPreferences.freeVsPaid} 
+          onChange={(e) => updatePreference('freeVsPaid', Number(e.target.value))}
+          className="w-full h-1.5 bg-surface-secondary rounded-lg appearance-none cursor-pointer accent-cyan-500" 
         />
       </div>
-      
-      <p className="text-sm font-bold bg-white p-2 border-2 border-black">
-        Note: Moving these sliders triggers a live re-route in the PathPlanner.
-      </p>
+
+      <div className="p-3 rounded-xl bg-surface-secondary/60 border border-border text-[11px] text-slate-400 leading-relaxed">
+        Adjusting preference weights updates topological resource ranking without altering prerequisite correctness.
+      </div>
     </div>
   );
 }

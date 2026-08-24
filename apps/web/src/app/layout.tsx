@@ -13,13 +13,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className="bg-gray-900 text-gray-100 min-h-screen antialiased">
-          <Providers>{children}</Providers>
-        </body>
-      </html>
-    </ClerkProvider>
+  const hasClerkKey = Boolean(
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
+    !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes('dummy')
   );
+
+  const bodyContent = (
+    <html lang="en">
+      <body className="bg-background text-slate-100 min-h-screen antialiased font-sans">
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+
+  if (hasClerkKey) {
+    return <ClerkProvider>{bodyContent}</ClerkProvider>;
+  }
+
+  return bodyContent;
 }

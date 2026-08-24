@@ -7,7 +7,7 @@ name = "career-pathfinder-api"
 version = "0.1.0"
 description = "Career PathFinder API"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "fastapi[standard]>=0.111.0",
     "sqlalchemy[asyncio]>=2.0.30",
