@@ -1,4 +1,49 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || `${BACKEND_URL}/api/v1`;
+
+export interface GoalInput {
+  user_email?: string;
+  goal_text: string;
+  preferred_modality?: string;
+}
+
+export interface SliderWeightsInput {
+  profile_id: number;
+  speed?: number;
+  depth?: number;
+  cost?: number;
+}
+
+export interface ScrapeJobsInput {
+  source: string;
+  board_token: string;
+  company_name?: string;
+  limit?: number;
+}
+
+export interface ScrapedJob {
+  external_id: string;
+  source: string;
+  title: string;
+  company?: string;
+  location?: string;
+  job_type?: string;
+  description?: string;
+  url?: string;
+  posted_date?: string;
+  scraped_at: string;
+}
+
+export interface ScrapeResult {
+  source: string;
+  board_identifier: string;
+  total_fetched: number;
+  total_valid: number;
+  total_deduplicated: number;
+  jobs: ScrapedJob[];
+  errors: string[];
+  timestamp: string;
+}
 
 async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
@@ -9,13 +54,16 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
     },
   });
   if (!res.ok) {
-    throw new Error(`API error: ${res.statusText}`);
+    const errorBody = await res.text().catch(() => '');
+    throw new Error(`API error (${res.status} ${res.statusText}): ${errorBody}`);
   }
   return res.json();
 }
 
 export const getHealth = async () => {
-  return await fetchApi('/health');
+  const res = await fetch(`${BACKEND_URL}/health`);
+  if (!res.ok) throw new Error(`Health check failed: ${res.statusText}`);
+  return res.json();
 };
 
 export const submitGoal = async (userEmail: string, goalText: string, modality: string = 'project') => {
@@ -38,6 +86,14 @@ export const submitDiagnostic = async (sessionId: number, questionId: string, an
       answer: answer
     })
   });
+};
+
+export const getPath = async (profileId: number) => {
+  return await fetchApi(`/path/${profileId}`);
+};
+
+export const getReadiness = async (profileId: number) => {
+  return await fetchApi(`/readiness/${profileId}`);
 };
 
 export const getCheckpointQuestion = async (skillId: string) => {
@@ -114,3 +170,37 @@ export const checkRoadmapSanity = async (payload: any) => {
     body: JSON.stringify(payload)
   });
 };
+
+export const updateWeights = async (payload: SliderWeightsInput) => {
+  return await fetchApi('/weights/update', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const getProofCard = async (profileId: number) => {
+  return await fetchApi(`/proof-card/${profileId}`);
+};
+
+export const getProofCardSvgUrl = (profileId: number) => {
+  return `${BASE_URL}/proof-card/${profileId}/svg`;
+};
+
+export const verifyProofCard = async (cardData: any) => {
+  return await fetchApi('/proof-card/verify', {
+    method: 'POST',
+    body: JSON.stringify(cardData)
+  });
+};
+
+export const getScraperSources = async () => {
+  return await fetchApi('/scraper/sources');
+};
+
+export const scrapeJobs = async (payload: ScrapeJobsInput): Promise<ScrapeResult> => {
+  return await fetchApi('/scraper/scrape', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+

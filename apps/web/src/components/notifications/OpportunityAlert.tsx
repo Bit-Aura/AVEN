@@ -1,4 +1,7 @@
+'use client';
+
 import { useState } from 'react';
+import { Sparkles, X, ArrowRight, Zap } from 'lucide-react';
 
 export default function OpportunityAlert({ skill, spikePercent }: { skill: string, spikePercent: number }) {
   const [visible, setVisible] = useState(true);
@@ -6,16 +9,31 @@ export default function OpportunityAlert({ skill, spikePercent }: { skill: strin
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-8 right-8 bg-neo-yellow border-8 border-black shadow-brutal p-6 max-w-sm z-50 animate-bounce">
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-black uppercase tracking-tight">⚡ Opportunity Shock!</h3>
-        <button onClick={() => setVisible(false)} className="text-xl font-bold hover:text-neo-red">&times;</button>
+    <div className="fixed bottom-6 right-6 bg-surface border border-brand-500/40 rounded-2xl shadow-glass p-5 max-w-sm z-50 animate-in slide-in-from-bottom-5 duration-300">
+      <div className="flex justify-between items-start mb-2">
+        <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-brand-400">
+          <Zap size={14} className="text-amber-400" />
+          <span>Market Opportunity Alert</span>
+        </div>
+        <button 
+          onClick={() => setVisible(false)} 
+          className="text-slate-500 hover:text-slate-300 transition-colors p-1"
+        >
+          <X size={14} />
+        </button>
       </div>
-      <p className="font-bold text-lg">
-        Demand for <span className="bg-white px-1 border-2 border-black">{skill}</span> just spiked by <span className="text-neo-red font-black">{spikePercent}%</span> in active job postings.
+
+      <p className="text-xs text-slate-300 leading-relaxed mb-4">
+        Market demand for <strong className="text-white font-bold">{skill}</strong> just increased by{' '}
+        <span className="text-emerald-400 font-extrabold">+{spikePercent}%</span> across scraped enterprise job boards.
       </p>
-      <button className="w-full mt-4 bg-black text-white px-4 py-3 uppercase font-black border-2 border-white hover:bg-gray-800 transition-all">
-        Prioritize this skill
+
+      <button 
+        onClick={() => setVisible(false)}
+        className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs rounded-xl shadow-glow-indigo transition-all"
+      >
+        <span>Prioritize in Path Planner</span>
+        <ArrowRight size={13} />
       </button>
     </div>
   );

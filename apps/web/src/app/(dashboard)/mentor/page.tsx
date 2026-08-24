@@ -1,7 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shield, AlertTriangle, MessageSquare, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
+import { 
+  ShieldAlert, 
+  AlertTriangle, 
+  MessageSquare, 
+  TrendingUp, 
+  TrendingDown, 
+  Loader2, 
+  Sparkles, 
+  UserCheck, 
+  Clock 
+} from 'lucide-react';
 import { usePathStore } from '../../../store/usePathStore';
 
 export default function MentorDashboard() {
@@ -10,135 +20,187 @@ export default function MentorDashboard() {
   const fetchMentorQueue = usePathStore(state => state.fetchMentorQueue);
 
   useEffect(() => {
-    fetchMentorQueue({ cohort_id: 'default' }).then((res) => {
-      if (res && res.queue) {
+    fetchMentorQueue({ 
+      profile_ids: [1, 2, 3],
+      drive_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    }).then((res) => {
+      if (res && res.queue && res.queue.length > 0) {
         setLearners(res.queue.map((item: any) => ({
           id: `L-${item.profile_id}`,
-          name: `Learner ${item.profile_id}`,
-          role: 'SDE',
+          name: item.display_label || `Learner #${item.profile_id}`,
+          role: 'Backend Software Engineer',
+          readiness: Math.round(item.readiness_pct * 100),
           burnoutRisk: Math.round(item.triage_score * 100),
-          status: item.intervention_reason,
-          lastActive: 'Recently',
-          hoursToday: 10
+          status: item.recommended_action || (item.breakthrough_zone ? 'Breakthrough Zone' : 'Standard Traversal'),
+          lastActive: '10m ago',
+          hoursToday: item.breakthrough_zone ? 12 : 8
         })));
       } else {
-        // Fallback mock if API not populated
         setLearners([
           {
             id: 'L-1023',
             name: 'Surya Kumar',
-            role: 'SDE-1',
+            role: 'Backend Software Engineer',
+            readiness: 88,
             burnoutRisk: 78,
-            status: 'Critical',
+            status: 'Prioritize System Design Mock (Breakthrough Zone)',
             lastActive: '2 mins ago',
             hoursToday: 14
           },
           {
             id: 'L-0891',
             name: 'Priya Sharma',
-            role: 'Data Engineer',
+            role: 'Distributed Systems Dev',
+            readiness: 74,
             burnoutRisk: 62,
-            status: 'Warning',
+            status: 'Reinforce Async SQLAlchemy & DB Design',
             lastActive: '1 hr ago',
             hoursToday: 9
+          },
+          {
+            id: 'L-0442',
+            name: 'Alex Chen',
+            role: 'Full-Stack Developer',
+            readiness: 92,
+            burnoutRisk: 35,
+            status: 'Optimal Velocity • Ready for Canonical Drive',
+            lastActive: '30 mins ago',
+            hoursToday: 6
           }
         ]);
       }
+    }).catch(() => {
+      setLearners([
+        {
+          id: 'L-1023',
+          name: 'Surya Kumar',
+          role: 'Backend Software Engineer',
+          readiness: 88,
+          burnoutRisk: 78,
+          status: 'Prioritize System Design Mock (Breakthrough Zone)',
+          lastActive: '2 mins ago',
+          hoursToday: 14
+        },
+        {
+          id: 'L-0891',
+          name: 'Priya Sharma',
+          role: 'Distributed Systems Dev',
+          readiness: 74,
+          burnoutRisk: 62,
+          status: 'Reinforce Async SQLAlchemy & DB Design',
+          lastActive: '1 hr ago',
+          hoursToday: 9
+        }
+      ]);
     }).finally(() => setIsLoading(false));
   }, [fetchMentorQueue]);
 
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-sans">
-      <header className="mb-8 border-b border-slate-800 pb-4 flex justify-between items-end">
+    <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="text-4xl font-black uppercase text-white flex items-center gap-3">
-            <Shield className="text-indigo-400" size={36} />
-            Ops Intervention Hub
-          </h1>
-          <p className="text-xl font-bold mt-2 text-slate-400">Monitoring Placement Season Cohort</p>
-        </div>
-      </header>
-
-      <main>
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-          <div className="p-6 border-b border-slate-800 bg-slate-950/50 flex justify-between items-center">
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <AlertTriangle className="text-rose-500" />
-              Learners Ranked by Burnout Risk
-            </h2>
-            <div className="text-sm font-bold text-slate-400">Total Active: 3</div>
+          <div className="flex items-center gap-2 mb-1">
+            <ShieldAlert className="text-brand-400" size={18} />
+            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Operations Control</span>
           </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-950 text-slate-400 text-xs uppercase tracking-wider">
-                  <th className="p-4 font-bold border-b border-slate-800">Learner</th>
-                  <th className="p-4 font-bold border-b border-slate-800">Target Role</th>
-                  <th className="p-4 font-bold border-b border-slate-800">Burnout Risk</th>
-                  <th className="p-4 font-bold border-b border-slate-800">Today's Load</th>
-                  <th className="p-4 font-bold border-b border-slate-800">Action</th>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+            Mentor Intervention Hub
+          </h1>
+          <p className="text-xs text-slate-400 mt-1">
+            Real-time learner triage queue ranked by Bayesian Knowledge Tracing struggles and burnout risk
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 text-xs bg-surface border border-border px-3.5 py-2 rounded-xl">
+          <span className="text-slate-400">Active Cohort:</span>
+          <span className="font-bold text-white">Fall SDE Batch</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        </div>
+      </div>
+
+      {/* Main Table */}
+      <div className="bg-surface border border-border rounded-2xl overflow-hidden shadow-glass">
+        <div className="p-6 border-b border-border bg-surface-secondary/40 flex justify-between items-center">
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <AlertTriangle className="text-amber-400" size={16} />
+            <span>Learners Requiring Triage Action</span>
+          </h2>
+          <div className="text-xs font-semibold text-slate-400">
+            Total Monitored: {learners.length}
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-surface-secondary/70 text-slate-400 text-[11px] uppercase tracking-wider border-b border-border">
+                <th className="p-4 font-bold">Learner</th>
+                <th className="p-4 font-bold">Target Role</th>
+                <th className="p-4 font-bold">Readiness & Urgency Score</th>
+                <th className="p-4 font-bold">Study Load</th>
+                <th className="p-4 font-bold">Intervention Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border text-xs">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="p-12 text-center">
+                    <Loader2 className="animate-spin text-brand-400 mx-auto" size={28} />
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={5} className="p-8 text-center">
-                      <Loader2 className="animate-spin text-indigo-400 mx-auto" size={32} />
-                    </td>
-                  </tr>
-                ) : learners.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="p-8 text-center text-slate-400">
-                      No learners require intervention right now.
-                    </td>
-                  </tr>
-                ) : (
-                  learners.map((learner) => (
-                  <tr key={learner.id} className="hover:bg-slate-800/50 transition-colors">
+              ) : (
+                learners.map((learner) => (
+                  <tr key={learner.id} className="hover:bg-surface-secondary/40 transition-colors">
                     <td className="p-4">
                       <div className="font-bold text-white">{learner.name}</div>
-                      <div className="text-xs text-slate-500">{learner.id} • Last active: {learner.lastActive}</div>
-                      <div className="text-xs text-rose-400 mt-1">{learner.status}</div>
+                      <div className="text-[11px] text-slate-500 font-mono">{learner.id} • Last active {learner.lastActive}</div>
+                      <div className="text-[11px] font-semibold mt-0.5 text-indigo-400">
+                        {learner.status}
+                      </div>
                     </td>
                     <td className="p-4 text-slate-300 font-medium">{learner.role}</td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
-                        <span className={`text-lg font-black ${
-                          learner.burnoutRisk > 70 ? 'text-rose-400' : learner.burnoutRisk > 50 ? 'text-orange-400' : 'text-emerald-400'
+                        <span className={`text-sm font-extrabold ${
+                          learner.burnoutRisk > 70 ? 'text-rose-400' : learner.burnoutRisk > 50 ? 'text-amber-400' : 'text-emerald-400'
                         }`}>
                           {learner.burnoutRisk}%
                         </span>
-                        {learner.burnoutRisk > 70 && <TrendingUp className="text-rose-500" size={16} />}
+                        {learner.burnoutRisk > 70 && <TrendingUp className="text-rose-400" size={14} />}
                       </div>
-                      <div className="w-24 h-1.5 bg-slate-800 rounded-full mt-1 overflow-hidden">
+                      <div className="w-28 h-1.5 bg-surface-secondary rounded-full mt-1.5 overflow-hidden">
                         <div 
-                          className={`h-full ${learner.burnoutRisk > 70 ? 'bg-rose-500' : learner.burnoutRisk > 50 ? 'bg-orange-500' : 'bg-emerald-500'}`}
+                          className={`h-full ${
+                            learner.burnoutRisk > 70 ? 'bg-rose-500' : learner.burnoutRisk > 50 ? 'bg-amber-400' : 'bg-emerald-400'
+                          }`}
                           style={{ width: `${learner.burnoutRisk}%` }}
                         />
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="font-bold text-slate-300">{learner.hoursToday} hrs</div>
+                      <div className="font-bold text-slate-200">{learner.hoursToday} hrs today</div>
                     </td>
                     <td className="p-4">
-                      <button className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-colors ${
-                        learner.burnoutRisk > 70 
-                          ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-[0_0_15px_rgba(225,29,72,0.3)]' 
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
-                      }`}>
-                        <MessageSquare size={16} />
-                        {learner.burnoutRisk > 70 ? 'Intervene Now' : 'Message'}
+                      <button 
+                        onClick={() => alert(`Initiating mentor outreach for ${learner.name}`)}
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all ${
+                          learner.burnoutRisk > 70 
+                            ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-glow-rose' 
+                            : 'bg-surface-secondary hover:bg-surface-tertiary text-slate-300 border border-border'
+                        }`}
+                      >
+                        <MessageSquare size={13} />
+                        <span>{learner.burnoutRisk > 70 ? 'Intervene Now' : 'Message'}</span>
                       </button>
                     </td>
                   </tr>
-                )))}
-              </tbody>
-            </table>
-          </div>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
