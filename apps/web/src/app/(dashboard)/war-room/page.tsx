@@ -7,6 +7,9 @@ import { usePathStore } from '../../../store/usePathStore';
 export default function WarRoomDashboard() {
   const [daysRemaining, setDaysRemaining] = useState(45);
   const [burnoutRisk, setBurnoutRisk] = useState(78); // High risk
+  const [targetCompany, setTargetCompany] = useState('SDE-1');
+  const [gapSkillsCount, setGapSkillsCount] = useState(0);
+  const [totalSprintWeeks, setTotalSprintWeeks] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const fetchPlacementPlan = usePathStore(state => state.fetchPlacementPlan);
   const profileId = usePathStore(state => state.profileId);
@@ -16,11 +19,15 @@ export default function WarRoomDashboard() {
       const safeProfileId = profileId || 1;
       const res = await fetchPlacementPlan({
         profile_id: safeProfileId,
-        target_company_id: 'google',
-        target_interview_date: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        company_id: 'google',
+        drive_date: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        weekly_study_hours: 10
       });
-      if (res && res.timeline_weeks) {
-        setDaysRemaining(res.timeline_weeks * 7);
+      if (res && res.days_remaining !== undefined) {
+        setDaysRemaining(res.days_remaining);
+        setTargetCompany(res.company_name || 'SDE-1');
+        setGapSkillsCount(res.gap_skills?.length || 0);
+        setTotalSprintWeeks(res.weeks_available || 0);
         // Burnout risk is set based on feasibility or just a mock metric updated
         setBurnoutRisk(res.is_feasible ? 35 : 85);
       }
@@ -67,15 +74,15 @@ export default function WarRoomDashboard() {
             <div className="mt-8 grid grid-cols-3 gap-4">
               <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
                 <div className="text-sm text-slate-400 uppercase font-bold tracking-wider mb-1">Target Role</div>
-                <div className="text-lg font-bold text-white">SDE-1</div>
+                <div className="text-lg font-bold text-white">{targetCompany}</div>
               </div>
               <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
-                <div className="text-sm text-slate-400 uppercase font-bold tracking-wider mb-1">Mock Interviews</div>
-                <div className="text-lg font-bold text-white">4 / 10 Completed</div>
+                <div className="text-sm text-slate-400 uppercase font-bold tracking-wider mb-1">Gap Skills</div>
+                <div className="text-lg font-bold text-white">{gapSkillsCount} Remaining</div>
               </div>
               <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
-                <div className="text-sm text-slate-400 uppercase font-bold tracking-wider mb-1">Core CS Readiness</div>
-                <div className="text-lg font-bold text-emerald-400">82%</div>
+                <div className="text-sm text-slate-400 uppercase font-bold tracking-wider mb-1">Sprint Timeline</div>
+                <div className="text-lg font-bold text-emerald-400">{totalSprintWeeks} Weeks</div>
               </div>
             </div>
           </div>

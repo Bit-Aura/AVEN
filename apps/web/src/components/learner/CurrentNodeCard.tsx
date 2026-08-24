@@ -25,8 +25,8 @@ export default function CurrentNodeCard({ nodeName, whyThisStep, whatIfSkip }: {
         const safeProfileId = usePathStore.getState().profileId || 1;
         const nodeId = activeMilestone?.id || 'current';
         const data = await simulateSkipDelta(safeProfileId, nodeId, weeklyHours);
-        setProjectedDate(data.projectedDate || data.delta_days_calendar || 'Nov 04');
-        setDeltaText(data.deltaText || `(+${data.delta_days || 0} days)`);
+        setProjectedDate(data.new_target_date || 'Nov 04');
+        setDeltaText(`(${data.delta_days > 0 ? '+' : ''}${data.delta_days || 0} days)`);
       } catch (e) {
         // Fallback for UI if API is missing
         const daysAdded = Math.max(0, 21 - Math.floor(weeklyHours * 0.5));

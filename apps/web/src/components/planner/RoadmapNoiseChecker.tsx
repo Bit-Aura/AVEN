@@ -18,9 +18,18 @@ export default function RoadmapNoiseChecker() {
     if (isOpen && issues.length === 0 && !isResolved) {
       setIsLoading(true);
       const safeProfileId = profileId || 1;
-      runSanityCheck({ profile_id: safeProfileId }).then((res) => {
-        if (res && res.flagged_issues) {
-          setIssues(res.flagged_issues);
+      runSanityCheck({
+        advice_text: `Python, System Design, Docker, Kubernetes, Advanced Math, Blockchain, K8s Deployment`,
+        source_label: `Profile #${safeProfileId} — auto-scan`
+      }).then((res) => {
+        if (res && res.verdicts && res.verdicts.length > 0) {
+          const issues = res.verdicts
+            .filter((v: any) => v.label === 'MISLEADING' || v.label === 'UNKNOWN')
+            .map((v: any) => ({
+              issue_type: v.label,
+              description: v.reason
+            }));
+          setIssues(issues);
         } else {
           setIsResolved(true);
         }
@@ -28,12 +37,16 @@ export default function RoadmapNoiseChecker() {
     }
   }, [isOpen, issues.length, isResolved, runSanityCheck, profileId]);
 
-  const handleResolve = () => {
+  const handleResolve = async () => {
     setIsResolving(true);
-    setTimeout(() => {
-      setIsResolving(false);
+    try {
       setIsResolved(true);
-    }, 1500);
+      setIssues([]);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsResolving(false);
+    }
   };
 
   return (

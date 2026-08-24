@@ -47,7 +47,7 @@ export default function IdeSidecar() {
       
       try {
         await submitIdeTelemetry({
-          session_id: "demo-session",
+          milestone_id: activeIdeNodeId,
           snapshots: updatedSnapshots
         });
         openCoach(activeIdeNodeId);

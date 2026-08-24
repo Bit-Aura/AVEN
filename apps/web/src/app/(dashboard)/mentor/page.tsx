@@ -10,16 +10,16 @@ export default function MentorDashboard() {
   const fetchMentorQueue = usePathStore(state => state.fetchMentorQueue);
 
   useEffect(() => {
-    fetchMentorQueue({ cohort_id: 'default' }).then((res) => {
+    fetchMentorQueue({ profile_ids: [1023, 891, 1144] }).then((res) => {
       if (res && res.queue) {
         setLearners(res.queue.map((item: any) => ({
           id: `L-${item.profile_id}`,
-          name: `Learner ${item.profile_id}`,
+          name: item.display_label || `Learner ${item.profile_id}`,
           role: 'SDE',
           burnoutRisk: Math.round(item.triage_score * 100),
-          status: item.intervention_reason,
+          status: item.breakthrough_zone ? 'Breakthrough Zone' : item.recommended_action?.split('.')[0] || 'Active',
           lastActive: 'Recently',
-          hoursToday: 10
+          hoursToday: item.gap_skills_count || 0
         })));
       } else {
         // Fallback mock if API not populated
