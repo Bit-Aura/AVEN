@@ -434,3 +434,124 @@ async def test_cli_execution_to_file(tmp_path):
     assert data["returned_count"] == 1
     assert data["jobs"][0]["title"] == "DevOps Engineer"
 
+
+# ====================================================================
+# Integration & API Tests: Multi-Source Arbitrary Board Support
+# ====================================================================
+
+@pytest.mark.asyncio
+async def test_api_get_scraper_sources():
+    from httpx import AsyncClient, ASGITransport
+    from app.main import app
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.get("/api/v1/scraper/sources")
+        assert response.status_code == 200
+        data = response.json()
+        assert "sources" in data
+        source_ids = [s["id"] for s in data["sources"]]
+        assert "greenhouse" in source_ids
+        assert "lever" in source_ids
+        assert "ashby" in source_ids
+        assert "amazon" in source_ids
+        assert "google" in source_ids
+
+        # Check greenhouse metadata
+        gh = next(s for s in data["sources"] if s["id"] == "greenhouse")
+        assert gh["supports_custom_token"] is True
+        assert gh["requires_token"] is True
+
+
+@pytest.mark.asyncio
+async def test_api_scrape_arbitrary_board_success():
+    """Verify arbitrary custom company tokens work end-to-end through the API endpoint with mocked transport."""
+    from unittest.mock import patch
+    from httpx import AsyncClient, ASGITransport
+    from app.main import app
+
+    custom_job = ScrapedJob(
+        external_id="cf-999",
+        source="greenhouse",
+        title="Edge Systems Engineer",
+        company="Cloudflare",
+        location="Austin, TX",
+        job_type="full_time",
+        url="https://boards.greenhouse.io/cloudflare/jobs/cf-999"
+    )
+    custom_result = ScrapeResult(
+        source="greenhouse",
+        board_identifier="cloudflare",
+        total_fetched=1,
+        total_valid=1,
+        total_deduplicated=1,
+        jobs=[custom_job],
+        errors=[]
+    )
+
+    with patch.object(JobScrapingPipeline, "run_pipeline", return_value=custom_result):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+            payload = {
+                "source": "greenhouse",
+                "board_token": "cloudflare",
+                "company_name": "Cloudflare",
+                "limit": 10
+            }
+            response = await ac.post("/api/v1/scraper/scrape", json=payload)
+            assert response.status_code == 200
+            data = response.json()
+            assert data["source"] == "greenhouse"
+            assert data["board_identifier"] == "cloudflare"
+            assert len(data["jobs"]) == 1
+            assert data["jobs"][0]["company"] == "Cloudflare"
+            assert data["jobs"][0]["title"] == "Edge Systems Engineer"
+            assert data["errors"] == []
+
+
+@pytest.mark.asyncio
+async def test_api_scrape_empty_token_validation():
+    from httpx import AsyncClient, ASGITransport
+    from app.main import app
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        payload = {
+            "source": "greenhouse",
+            "board_token": "   ",
+            "company_name": "Test"
+        }
+        response = await ac.post("/api/v1/scraper/scrape", json=payload)
+        assert response.status_code == 400
+        assert "empty" in response.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_api_scrape_board_not_found_error_propagation():
+    """Verify external board 404 is recorded in result.errors without producing fake jobs."""
+    from unittest.mock import patch
+    from httpx import AsyncClient, ASGITransport
+    from app.main import app
+
+    error_result = ScrapeResult(
+        source="greenhouse",
+        board_identifier="nonexistent_company_token_12345",
+        total_fetched=0,
+        total_valid=0,
+        total_deduplicated=0,
+        jobs=[],
+        errors=["Greenhouse board token 'nonexistent_company_token_12345' was not found."]
+    )
+
+    with patch.object(JobScrapingPipeline, "run_pipeline", return_value=error_result):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+            payload = {
+                "source": "greenhouse",
+                "board_token": "nonexistent_company_token_12345",
+                "company_name": "NonExistent"
+            }
+            response = await ac.post("/api/v1/scraper/scrape", json=payload)
+            assert response.status_code == 200
+            data = response.json()
+            assert len(data["jobs"]) == 0
+            assert len(data["errors"]) == 1
+            assert "not found" in data["errors"][0].lower()
+
+

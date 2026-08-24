@@ -14,6 +14,22 @@ export interface SliderWeightsInput {
   cost?: number;
 }
 
+export interface ScraperSourceInfo {
+  id: string;
+  name: string;
+  description: string;
+  requires_token: boolean;
+  input_label?: string;
+  input_type?: string;
+  supports_custom_token?: boolean;
+  identifier_description?: string;
+  example_tokens?: string[];
+}
+
+export interface ScraperSourcesResponse {
+  sources: ScraperSourceInfo[];
+}
+
 export interface ScrapeJobsInput {
   source: string;
   board_token: string;
@@ -193,7 +209,7 @@ export const verifyProofCard = async (cardData: any) => {
   });
 };
 
-export const getScraperSources = async () => {
+export const getScraperSources = async (): Promise<ScraperSourcesResponse> => {
   return await fetchApi('/scraper/sources');
 };
 
