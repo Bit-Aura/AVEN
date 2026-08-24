@@ -67,6 +67,10 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3002",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
     ],
@@ -75,6 +79,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 # Instantiate AI Provider safely based on configuration
@@ -683,13 +688,31 @@ async def scrape_jobs_endpoint(data: ScrapeJobsInput):
     and deduplicate job postings from an external applicant tracking system.
     """
     from app.scraper.pipeline import JobScrapingPipeline
-    from app.scraper.sources.greenhouse import GreenhouseSource
+    from app.scraper.sources import (
+        GreenhouseSource,
+        LeverSource,
+        AshbySource,
+        AmazonJobsSource,
+        GoogleCareersSource,
+    )
     
     pipeline = JobScrapingPipeline()
-    if data.source.lower() == "greenhouse":
+    src_lower = data.source.lower()
+    if src_lower == "greenhouse":
         source = GreenhouseSource()
+    elif src_lower == "lever":
+        source = LeverSource()
+    elif src_lower == "ashby":
+        source = AshbySource()
+    elif src_lower in ("amazon", "amazon_jobs"):
+        source = AmazonJobsSource()
+    elif src_lower in ("google", "google_careers"):
+        source = GoogleCareersSource()
     else:
-        raise HTTPException(status_code=400, detail=f"Unsupported source '{data.source}'. Supported: 'greenhouse'")
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Unsupported source '{data.source}'. Supported sources: 'greenhouse', 'lever', 'ashby', 'amazon', 'google'"
+        )
         
     result = await pipeline.run_pipeline(
         source=source,
@@ -702,6 +725,7 @@ async def scrape_jobs_endpoint(data: ScrapeJobsInput):
         result.total_deduplicated = len(result.jobs)
         
     return result
+
 
 
 # =============================================================================
