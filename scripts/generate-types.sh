@@ -17,7 +17,7 @@ NEO4J_URI="bolt://localhost:7687" \
 NEO4J_USERNAME="neo4j" \
 NEO4J_PASSWORD="password" \
 PYTHONPATH="$PROJECT_ROOT/apps/api" \
-python3 -c "
+"$PROJECT_ROOT/.venv/bin/python" -c "
 import json
 from app.main import app
 print(json.dumps(app.openapi()))

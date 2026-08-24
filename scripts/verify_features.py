@@ -105,20 +105,52 @@ def run_golden_scenario():
         print("✓ Checkpoint graded and BKT mastery updated.")
 
         # 7. Readiness Bar & Proof Card
-        print("\\n[7/7] Fetching Readiness and Proof Card...")
+        print("\n[7/7] Fetching Readiness and Proof Card...")
         response = client.get(f"/api/v1/readiness/{profile_id}")
         assert response.status_code == 200, f"Failed readiness fetch: {response.text}"
         readiness_data = response.json()
         assert "readiness" in readiness_data, "Missing readiness data"
         print("✓ Role readiness and cryptographic Proof Card verified.")
 
-    print("\\n=== All 7 Golden Scenario Steps Passed (100% Score) ===")
+        # 8. Day-One Simulator Tickets Board
+        print("\n[8/9] Fetching Day-One Simulator Kanban Board...")
+        response = client.get(f"/api/v1/simulator/tickets/{profile_id}")
+        assert response.status_code == 200, f"Failed simulator board fetch: {response.text}"
+        tickets = response.json()
+        assert len(tickets) > 0, "Should have mapped tickets from active path"
+        ticket_id = tickets[0]["id"]
+        print(f"✓ Found {len(tickets)} tickets. Target Ticket: {ticket_id}")
+
+        # 9. Day-One Simulator Chat & PR Submissions
+        print("\n[9/9] Testing Stakeholder Chat and PR Reviews...")
+        chat_payload = {
+            "profile_id": profile_id,
+            "message": "Should I use default config settings?",
+            "persona": "pm"
+        }
+        response = client.post(f"/api/v1/simulator/ticket/{ticket_id}/chat", json=chat_payload)
+        assert response.status_code == 200, f"Failed stakeholder chat: {response.text}"
+        chat_res = response.json()
+        assert "message" in chat_res, "Missing chat response message"
+        
+        pr_payload = {
+            "profile_id": profile_id,
+            "code_content": "export const DB_PORT=5432;",
+            "snapshots": []
+        }
+        response = client.post(f"/api/v1/simulator/ticket/{ticket_id}/submit-pr", json=pr_payload)
+        assert response.status_code == 200, f"Failed PR review: {response.text}"
+        pr_res = response.json()
+        assert "approved" in pr_res, "Missing approval status"
+        print("✓ Day-One Simulator verification passed.")
+
+    print("\n=== All 9 Golden Scenario Steps Passed (100% Score) ===")
 
 if __name__ == "__main__":
     try:
         run_golden_scenario()
     except AssertionError as e:
-        print(f"\\n❌ Verification Failed: {e}")
+        print(f"\n❌ Verification Failed: {e}")
         sys.exit(1)
     except Exception as e:
         print(f"\\n❌ Verification Failed with Exception: {e}")

@@ -907,3 +907,65 @@ async def roadmap_sanity_check(data: RoadmapAnalysisInput):
     except Exception as e:
         logger.exception("Roadmap sanity check failed")
         raise HTTPException(status_code=500, detail=f"Roadmap analysis failed: {e}")
+
+
+# =============================================================================
+# DAY-ONE SIMULATOR ENDPOINTS
+# =============================================================================
+
+from app.models.simulator import (
+    TicketSchema,
+    SimulatorChatInput,
+    SimulatorChatResponse,
+    PRReviewResult,
+    SimulatorPRInput
+)
+
+@app.get("/api/v1/simulator/tickets/{profile_id}", response_model=List[TicketSchema])
+async def get_tickets(
+    profile_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    [Day-One Simulator] Fetches all Kanban board tickets derived from the user's latest path.
+    """
+    from app.services.simulator import get_simulator_board
+    try:
+        tickets = await get_simulator_board(profile_id, db)
+        return tickets
+    except Exception as e:
+        logger.exception("Failed to fetch simulator tickets")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch tickets: {e}")
+
+@app.post("/api/v1/simulator/ticket/{ticket_id}/chat", response_model=SimulatorChatResponse)
+async def chat_with_stakeholder_endpoint(
+    ticket_id: str,
+    data: SimulatorChatInput
+):
+    """
+    [Day-One Simulator] Sends a message to the AI PM or AI Client persona for ticket requirements.
+    """
+    from app.services.simulator import chat_with_stakeholder
+    try:
+        response = await chat_with_stakeholder(ticket_id, data, ai_provider)
+        return response
+    except Exception as e:
+        logger.exception("Failed to chat with stakeholder")
+        raise HTTPException(status_code=500, detail=f"Stakeholder chat failed: {e}")
+
+@app.post("/api/v1/simulator/ticket/{ticket_id}/submit-pr", response_model=PRReviewResult)
+async def submit_pr_endpoint(
+    ticket_id: str,
+    data: SimulatorPRInput
+):
+    """
+    [Day-One Simulator] Submits code for code review by AI Senior Developer.
+    """
+    from app.services.simulator import review_pull_request
+    try:
+        result = await review_pull_request(ticket_id, data, ai_provider)
+        return result
+    except Exception as e:
+        logger.exception("PR submission failed")
+        raise HTTPException(status_code=500, detail=f"PR review failed: {e}")
+
