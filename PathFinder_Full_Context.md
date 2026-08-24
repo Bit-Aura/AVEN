@@ -173,19 +173,25 @@ This single scenario is the one thing every component in Sections 4–6 must wor
 ---
 
 ## 9. Completed Extensions & In-Progress Innovations
-The following features are fully integrated into the codebase:
+The following features and innovations are fully integrated into the codebase:
+- **Keystroke & Diff Debugging Diagnostic (SDT Process-Praise)**: (`process_diagnostics.py`, `IdeSidecar.tsx`, `AiCoachDrawer.tsx`)
+- **Live What-If-Skip Graph Simulation with Date-Delta**: (`skip_delta.py`, `SkillGraph.tsx`, `CurrentNodeCard.tsx`)
+- **Confidence-Competence 2x2 Calibration Matrix**: (`calibration.py`, `CalibrationModal.tsx`, `MicroAssessmentModal.tsx`)
+- **Prerequisite Root-Cause Failure Backtracer**: (`path_planner.py`, `CheckpointSubmitInput`)
+- **Dynamic Career Alternatives & Pivot Panel**: (`career_engine.py`, `CareerAlternativesDrawer.tsx`)
+- **Placement War Room Dashboard & Mentor Triage Queue**: (`placement_engine.py`, `war-room/page.tsx`, `mentor/page.tsx`)
+- **Tutor Noise & Roadmap Sanity Filter**: (`noise_filter.py`, `RoadmapNoiseChecker.tsx`)
+- **Day-One Simulator Workspace**: (`simulator.py`, `learner/simulator/page.tsx`, `KanbanBoard.tsx`, `MockPullRequest.tsx`, `StakeholderChat.tsx`)
+- **Identity-Aligned Onboarding Flow**: (`identity/page.tsx`, `usePathStore.ts`)
 - **Cohort Challenge Rings & Peer Presence**: (`CohortRing.tsx`, `PeerPresenceBadge.tsx`)
 - **Staleness Warnings & Ebbinghaus Decay Worker**: (`StalenessWarning.tsx`, `decay_worker.py`)
-- **Opportunity Alerts & ATS Job Ingestion**: (`OpportunityAlert.tsx`, `apps/api/app/scraper/`)
+- **Opportunity Alerts & ATS Job Ingestion (Greenhouse, Lever, Ashby, Google, Amazon)**: (`OpportunityAlert.tsx`, `apps/api/app/scraper/`)
 - **Autonomy Sliders & Readiness Bar**: (`AutonomySliders.tsx`, `ReadinessBar.tsx`)
-- **Micro-Assessment Gate Modals**: (`MicroAssessmentModal.tsx`, `ProveItAssessment.tsx`)
-
-For the comprehensive technical specification of in-progress and planned innovations (including **Keystroke & Diff Debugging Diagnostic for SDT Process-Praise**, **Live What-If-Skip Date Simulation**, **Confidence-Competence 2x2 Calibration Matrix**, and **Career Alternatives Panel**), see:
-👉 [**`docs/INNOVATIONS_TO_BE_DONE.md`**](file:///g:/AVEN/docs/INNOVATIONS_TO_BE_DONE.md) and [**`docs/INNOVATIONS_ROADMAP.md`**](file:///g:/AVEN/docs/INNOVATIONS_ROADMAP.md).
+- **Micro-Assessment Gate Modals & Prove-It Gates**: (`MicroAssessmentModal.tsx`, `ProveItAssessment.tsx`)
 
 ---
 
 ## 10. Rule for Any Agent Building From This Document
 
-If a feature request comes in, check `docs/INNOVATIONS_TO_BE_DONE.md` and this document first to maintain strict architectural alignment with the deterministic neuro-symbolic domain engine.
+If a feature request comes in, check the existing service implementations first to maintain strict architectural alignment with the deterministic neuro-symbolic domain engine.
 
