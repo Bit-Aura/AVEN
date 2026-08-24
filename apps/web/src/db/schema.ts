@@ -14,9 +14,40 @@ export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   clerkId: text('clerk_id').unique().notNull(),
   email: text('email').unique().notNull(),
+  name: text('name'),
   organizationId: integer('organization_id').references(() => organizations.id),
-  role: text('role').default('learner'), // learner, mentor, tpo-admin
+  role: text('role').default('learner'), // learner, mentor, admin
+  isActive: boolean('is_active').default(true),
   createdAt: timestamp('created_at').defaultNow(),
+});
+
+// --- Mentor Applications ---
+export const mentorApplications = pgTable('mentor_applications', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  name: text('name').notNull(),
+  expertise: text('expertise').notNull(),
+  bio: text('bio'),
+  linkedinUrl: text('linkedin_url'),
+  status: text('status').default('PENDING'), // PENDING, APPROVED, REJECTED
+  rejectionReason: text('rejection_reason'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// --- Resources ---
+export const resources = pgTable('resources', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  url: text('url').notNull(),
+  resourceType: text('resource_type').default('tutorial'),
+  skillId: text('skill_id'),
+  submittedById: integer('submitted_by_id').references(() => users.id),
+  status: text('status').default('APPROVED'), // PENDING, APPROVED, REJECTED
+  rejectionReason: text('rejection_reason'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 // --- EIKG Nodes (Skills) ---

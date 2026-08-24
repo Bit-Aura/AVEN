@@ -10,7 +10,7 @@ import {
   Layers, 
   Flame, 
   ShieldAlert, 
-  Briefcase,
+  ShieldCheck,
   ChevronRight,
   BrainCircuit
 } from 'lucide-react';
@@ -38,7 +38,7 @@ const navigationGroups = [
     title: 'Operations',
     items: [
       { name: 'Mentor Hub', href: '/mentor', icon: ShieldAlert },
-      { name: 'Hiring Admin', href: '/admin', icon: Briefcase },
+      { name: 'Platform Admin', href: '/admin', icon: ShieldCheck },
     ]
   }
 ];

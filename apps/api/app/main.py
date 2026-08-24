@@ -35,10 +35,11 @@ async def lifespan(app: FastAPI):
             await conn.run_sync(Base.metadata.create_all)
         
         async with async_session() as session:
+            # Seed Demo Admin User
             stmt = select(User).where(User.email == "demo@pathfinder.dev")
             user = (await session.execute(stmt)).scalars().first()
             if not user:
-                user = User(clerk_id="clerk_demo_user", email="demo@pathfinder.dev")
+                user = User(clerk_id="clerk_demo_user", email="demo@pathfinder.dev", name="Demo Admin", role="admin", is_active=True)
                 session.add(user)
                 await session.flush()
                 profile = LearnerProfile(user_id=user.id, current_context="Backend Software Engineer")
@@ -48,8 +49,30 @@ async def lifespan(app: FastAPI):
                 # Seed initial baseline readiness snapshots for demo
                 for skill in ["python_basics", "sql_basics", "git_foundations", "http_methods"]:
                     session.add(ReadinessSnapshot(profile_id=profile.id, skill_id=skill, readiness_score=0.85))
-                await session.commit()
-                logger.info("[Startup] Successfully initialized database tables and demo profile #1.")
+            else:
+                user.role = "admin"
+                user.is_active = True
+                
+            # Seed Platform Admin User
+            stmt_admin = select(User).where(User.email == "admin@pathfinder.dev")
+            admin_user = (await session.execute(stmt_admin)).scalars().first()
+            if not admin_user:
+                admin_user = User(clerk_id="clerk_admin_user", email="admin@pathfinder.dev", name="Platform Administrator", role="admin", is_active=True)
+                session.add(admin_user)
+                await session.flush()
+                session.add(LearnerProfile(user_id=admin_user.id, current_context="Platform Administrator"))
+                
+            # Seed Approved Mentor User
+            stmt_mentor = select(User).where(User.email == "mentor@pathfinder.dev")
+            mentor_user = (await session.execute(stmt_mentor)).scalars().first()
+            if not mentor_user:
+                mentor_user = User(clerk_id="clerk_mentor_user", email="mentor@pathfinder.dev", name="Alex Rivera (Staff Mentor)", role="mentor", is_active=True)
+                session.add(mentor_user)
+                await session.flush()
+                session.add(LearnerProfile(user_id=mentor_user.id, current_context="Senior Systems Engineer"))
+                
+            await session.commit()
+            logger.info("[Startup] Successfully initialized database tables and seeded admin/mentor profiles.")
     except Exception as e:
         logger.warning(f"[Startup] Database table initialization warning: {e}")
     yield
@@ -59,6 +82,10 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     lifespan=lifespan
 )
+
+# Include Platform Admin & Resource Router
+from app.api.admin import router as admin_router
+app.include_router(admin_router)
 
 
 # Enable CORS for frontend connections

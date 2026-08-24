@@ -12,9 +12,30 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     clerk_id: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    role: Mapped[str] = mapped_column(String(50), default="learner") # learner, mentor, admin
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     
     profile: Mapped[Optional["LearnerProfile"]] = relationship(back_populates="user", uselist=False)
+    mentor_applications: Mapped[List["MentorApplication"]] = relationship(back_populates="user")
+    submitted_resources: Mapped[List["Resource"]] = relationship(back_populates="submitted_by_user")
+
+class MentorApplication(Base):
+    __tablename__ = "mentor_applications"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    name: Mapped[str] = mapped_column(String(255))
+    expertise: Mapped[str] = mapped_column(String(255))
+    bio: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    linkedin_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    status: Mapped[str] = mapped_column(String(50), default="PENDING") # PENDING, APPROVED, REJECTED
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    user: Mapped["User"] = relationship(back_populates="mentor_applications")
 
 class LearnerProfile(Base):
     __tablename__ = "learner_profiles"
@@ -123,10 +144,17 @@ class Resource(Base):
     title: Mapped[str] = mapped_column(String(255))
     content: Mapped[str] = mapped_column(Text)
     url: Mapped[str] = mapped_column(String(512))
+    resource_type: Mapped[str] = mapped_column(String(50), default="tutorial") # course, tutorial, video, article, project, documentation, practice
+    skill_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    submitted_by_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True)
+    status: Mapped[str] = mapped_column(String(50), default="APPROVED") # PENDING, APPROVED, REJECTED
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(384))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
-    metadata_relations: Mapped[List["ResourceMetadata"]] = relationship(back_populates="resource")
+    metadata_relations: Mapped[List["ResourceMetadata"]] = relationship(back_populates="resource", cascade="all, delete-orphan")
+    submitted_by_user: Mapped[Optional["User"]] = relationship(back_populates="submitted_resources")
 
 class ResourceMetadata(Base):
     __tablename__ = "resource_metadata"

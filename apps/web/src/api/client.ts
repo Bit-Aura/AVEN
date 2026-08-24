@@ -220,3 +220,264 @@ export const scrapeJobs = async (payload: ScrapeJobsInput): Promise<ScrapeResult
   });
 };
 
+// =============================================================================
+// PLATFORM ADMIN & RESOURCE MANAGEMENT CONTRACTS
+// =============================================================================
+
+export interface PendingActionItem {
+  type: string;
+  count: number;
+  message: string;
+  action_url: string;
+}
+
+export interface AdminOverviewResponse {
+  total_users: number;
+  active_users: number;
+  total_mentors: number;
+  pending_mentors: number;
+  total_resources: number;
+  pending_resources: number;
+  pending_actions: PendingActionItem[];
+}
+
+export interface AdminSystemResponse {
+  status: string;
+  uptime_seconds: number;
+  api_status: string;
+  database_status: string;
+  graph_db_status: string;
+  scraper_sources_count: number;
+  timestamp: string;
+}
+
+export interface AdminUserItem {
+  id: number;
+  clerk_id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface AdminUsersResponse {
+  users: AdminUserItem[];
+  total: number;
+}
+
+export interface MentorApplicationItem {
+  id: number;
+  user_id: number;
+  user_email: string;
+  name: string;
+  expertise: string;
+  bio?: string | null;
+  linkedin_url?: string | null;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  rejection_reason?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MentorApplicationsResponse {
+  applications: MentorApplicationItem[];
+  total: number;
+}
+
+export interface MentorApplyInput {
+  name: string;
+  expertise: string;
+  bio?: string;
+  linkedin_url?: string;
+}
+
+export interface PlatformResourceItem {
+  id: number;
+  title: string;
+  content: string;
+  url: string;
+  resource_type: string;
+  skill_id?: string | null;
+  submitted_by_id?: number | null;
+  submitted_by_email?: string | null;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  rejection_reason?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PlatformResourcesResponse {
+  resources: PlatformResourceItem[];
+  total: number;
+}
+
+export interface ResourceCreateInput {
+  title: string;
+  content: string;
+  url: string;
+  resource_type?: string;
+  skill_id?: string;
+}
+
+export interface ResourceUpdateInput {
+  title?: string;
+  content?: string;
+  url?: string;
+  resource_type?: string;
+  skill_id?: string;
+}
+
+// Admin Overview & System
+export const getAdminOverview = async (): Promise<AdminOverviewResponse> => {
+  return await fetchApi('/admin/overview');
+};
+
+export const getAdminSystemStatus = async (): Promise<AdminSystemResponse> => {
+  return await fetchApi('/admin/system');
+};
+
+// Admin Users
+export const getAdminUsers = async (params?: {
+  q?: string;
+  role?: string;
+  is_active?: boolean;
+  limit?: number;
+  offset?: number;
+}): Promise<AdminUsersResponse> => {
+  const searchParams = new URLSearchParams();
+  if (params?.q) searchParams.set('q', params.q);
+  if (params?.role) searchParams.set('role', params.role);
+  if (params?.is_active !== undefined) searchParams.set('is_active', String(params.is_active));
+  if (params?.limit) searchParams.set('limit', String(params.limit));
+  if (params?.offset) searchParams.set('offset', String(params.offset));
+  const qs = searchParams.toString();
+  return await fetchApi(`/admin/users${qs ? `?${qs}` : ''}`);
+};
+
+export const updateUserStatus = async (userId: number, isActive: boolean): Promise<AdminUserItem> => {
+  return await fetchApi(`/admin/users/${userId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ is_active: isActive })
+  });
+};
+
+export const updateUserRole = async (userId: number, role: string): Promise<AdminUserItem> => {
+  return await fetchApi(`/admin/users/${userId}/role`, {
+    method: 'PATCH',
+    body: JSON.stringify({ role })
+  });
+};
+
+// Mentors
+export const getAdminMentors = async (statusFilter?: string): Promise<MentorApplicationsResponse> => {
+  const qs = statusFilter ? `?status=${encodeURIComponent(statusFilter)}` : '';
+  return await fetchApi(`/admin/mentors${qs}`);
+};
+
+export const approveMentor = async (applicationId: number): Promise<MentorApplicationItem> => {
+  return await fetchApi(`/admin/mentors/${applicationId}/approve`, {
+    method: 'POST'
+  });
+};
+
+export const rejectMentor = async (applicationId: number, reason?: string): Promise<MentorApplicationItem> => {
+  return await fetchApi(`/admin/mentors/${applicationId}/reject`, {
+    method: 'POST',
+    body: JSON.stringify({ reason })
+  });
+};
+
+export const applyAsMentor = async (payload: MentorApplyInput): Promise<MentorApplicationItem> => {
+  return await fetchApi('/mentor/apply', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const getMyMentorApplication = async (): Promise<MentorApplicationItem | null> => {
+  return await fetchApi('/mentor/application');
+};
+
+// Resources
+export const getAdminResources = async (params?: {
+  status?: string;
+  resource_type?: string;
+  skill_id?: string;
+  q?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<PlatformResourcesResponse> => {
+  const searchParams = new URLSearchParams();
+  if (params?.status) searchParams.set('status', params.status);
+  if (params?.resource_type) searchParams.set('resource_type', params.resource_type);
+  if (params?.skill_id) searchParams.set('skill_id', params.skill_id);
+  if (params?.q) searchParams.set('q', params.q);
+  if (params?.limit) searchParams.set('limit', String(params.limit));
+  if (params?.offset) searchParams.set('offset', String(params.offset));
+  const qs = searchParams.toString();
+  return await fetchApi(`/admin/resources${qs ? `?${qs}` : ''}`);
+};
+
+export const createAdminResource = async (payload: ResourceCreateInput): Promise<PlatformResourceItem> => {
+  return await fetchApi('/admin/resources', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const updateAdminResource = async (resourceId: number, payload: ResourceUpdateInput): Promise<PlatformResourceItem> => {
+  return await fetchApi(`/admin/resources/${resourceId}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const deleteAdminResource = async (resourceId: number): Promise<{ status: string; message: string }> => {
+  return await fetchApi(`/admin/resources/${resourceId}`, {
+    method: 'DELETE'
+  });
+};
+
+export const approveResource = async (resourceId: number): Promise<PlatformResourceItem> => {
+  return await fetchApi(`/admin/resources/${resourceId}/approve`, {
+    method: 'POST'
+  });
+};
+
+export const rejectResource = async (resourceId: number, reason?: string): Promise<PlatformResourceItem> => {
+  return await fetchApi(`/admin/resources/${resourceId}/reject`, {
+    method: 'POST',
+    body: JSON.stringify({ reason })
+  });
+};
+
+export const submitMentorResource = async (payload: ResourceCreateInput): Promise<PlatformResourceItem> => {
+  return await fetchApi('/resources/submit', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const getMyResourceSubmissions = async (): Promise<PlatformResourcesResponse> => {
+  return await fetchApi('/resources/my-submissions');
+};
+
+export const getPublicResources = async (params?: {
+  skill_id?: string;
+  resource_type?: string;
+  q?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<PlatformResourcesResponse> => {
+  const searchParams = new URLSearchParams();
+  if (params?.skill_id) searchParams.set('skill_id', params.skill_id);
+  if (params?.resource_type) searchParams.set('resource_type', params.resource_type);
+  if (params?.q) searchParams.set('q', params.q);
+  if (params?.limit) searchParams.set('limit', String(params.limit));
+  if (params?.offset) searchParams.set('offset', String(params.offset));
+  const qs = searchParams.toString();
+  return await fetchApi(`/resources${qs ? `?${qs}` : ''}`);
+};
+
+
