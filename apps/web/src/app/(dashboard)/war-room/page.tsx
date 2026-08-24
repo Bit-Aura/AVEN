@@ -4,16 +4,11 @@ import { useState, useEffect } from 'react';
 import { 
   Flame, 
   Clock, 
-  Target, 
   AlertTriangle, 
   Building2, 
   Calendar, 
   Loader2, 
-  Sparkles, 
-  TrendingDown, 
-  ShieldCheck, 
   CheckCircle2,
-  Zap,
   ListTodo
 } from 'lucide-react';
 import { usePathStore } from '../../../store/usePathStore';
@@ -52,17 +47,15 @@ export default function WarRoomDashboard() {
       setPlan(res);
     } catch (e) {
       console.error("Placement plan failed", e);
-      // Fallback sensible metrics
       setPlan({
         company_name: TARGET_COMPANIES.find(c => c.id === compId)?.name || compId.toUpperCase(),
         drive_date: dateStr,
         is_feasible: true,
-        days_until_drive: 42,
-        timeline_weeks: 6,
+        days_remaining: 42,
+        weeks_available: 6,
         weekly_study_hours: 14.0,
-        total_gap_skills: 3,
         gap_skills: ["system_design", "async_python", "api_design"],
-        sprints: [
+        sprint_weeks: [
           {
             week_number: 1,
             week_label: "Week 1: Prerequisite Foundation",
@@ -96,7 +89,7 @@ export default function WarRoomDashboard() {
   }, []);
 
   const calculateDaysRemaining = () => {
-    if (plan?.days_until_drive) return plan.days_until_drive;
+    if (plan?.days_remaining) return plan.days_remaining;
     const diff = new Date(interviewDate).getTime() - Date.now();
     return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
@@ -104,6 +97,8 @@ export default function WarRoomDashboard() {
   const daysRemaining = calculateDaysRemaining();
   const isFeasible = plan ? plan.is_feasible : true;
   const burnoutRisk = isFeasible ? 45 : 85;
+  // sprint_weeks is the correct API field name
+  const sprints = plan?.sprint_weeks || plan?.sprints || [];
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -201,11 +196,11 @@ export default function WarRoomDashboard() {
               <div className="space-y-4">
                 <div className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                   <ListTodo size={14} className="text-indigo-400" />
-                  <span>Curated Weekly Sprints ({plan?.sprints?.length || 3} Weeks)</span>
+                  <span>Curated Weekly Sprints ({sprints.length} Weeks)</span>
                 </div>
                 
                 <div className="space-y-3">
-                  {(plan?.sprints || []).map((sprint: any, idx: number) => (
+                  {sprints.map((sprint: any, idx: number) => (
                     <div 
                       key={idx} 
                       className={`p-4 rounded-xl border space-y-2 ${

@@ -57,11 +57,19 @@ export default function CurrentNodeCard({
     setIsCalculating(true);
     const timer = setTimeout(async () => {
       try {
+<<<<<<< HEAD
+        const safeProfileId = usePathStore.getState().profileId || 1;
+        const nodeId = activeMilestone?.id || 'current';
+        const data = await simulateSkipDelta(safeProfileId, nodeId, weeklyHours);
+        setProjectedDate(data.new_target_date || 'Nov 04');
+        setDeltaText(`(${data.delta_days > 0 ? '+' : ''}${data.delta_days || 0} days)`);
+=======
         const targetId = profileId || 1;
         const data = await simulateSkipDelta(targetId, currentSkillId, weeklyHours);
         setProjectedDate(data.projected_target_date || 'Nov 04');
         setDeltaText(`+${data.delta_days_calendar || 14} calendar days`);
         setBlockedNodes(data.blocked_descendants || []);
+>>>>>>> 418ec5c8664f0a88bb20054a234187ae3b0f82a0
       } catch (e) {
         const daysAdded = Math.max(7, 21 - Math.floor(weeklyHours * 0.4));
         setProjectedDate('Nov 04');

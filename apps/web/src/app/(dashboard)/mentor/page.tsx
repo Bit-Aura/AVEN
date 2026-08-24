@@ -20,6 +20,18 @@ export default function MentorDashboard() {
   const fetchMentorQueue = usePathStore(state => state.fetchMentorQueue);
 
   useEffect(() => {
+<<<<<<< HEAD
+    fetchMentorQueue({ profile_ids: [1023, 891, 1144] }).then((res) => {
+      if (res && res.queue) {
+        setLearners(res.queue.map((item: any) => ({
+          id: `L-${item.profile_id}`,
+          name: item.display_label || `Learner ${item.profile_id}`,
+          role: 'SDE',
+          burnoutRisk: Math.round(item.triage_score * 100),
+          status: item.breakthrough_zone ? 'Breakthrough Zone' : item.recommended_action?.split('.')[0] || 'Active',
+          lastActive: 'Recently',
+          hoursToday: item.gap_skills_count || 0
+=======
     fetchMentorQueue({ 
       profile_ids: [1, 2, 3],
       drive_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
@@ -34,6 +46,7 @@ export default function MentorDashboard() {
           status: item.recommended_action || (item.breakthrough_zone ? 'Breakthrough Zone' : 'Standard Traversal'),
           lastActive: '10m ago',
           hoursToday: item.breakthrough_zone ? 12 : 8
+>>>>>>> 418ec5c8664f0a88bb20054a234187ae3b0f82a0
         })));
       } else {
         setLearners([
