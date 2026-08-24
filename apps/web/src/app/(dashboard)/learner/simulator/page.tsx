@@ -332,7 +332,7 @@ export default function DayOneSimulatorPage() {
                       : 'border-transparent text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  📋 Task Specs
+                  Task Specs
                 </button>
                 <button
                   onClick={() => setActiveTab('chat')}
@@ -342,7 +342,7 @@ export default function DayOneSimulatorPage() {
                       : 'border-transparent text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  💬 Slack Chat
+                  Slack Chat
                 </button>
                 <button
                   onClick={() => setActiveTab('code')}
@@ -352,7 +352,7 @@ export default function DayOneSimulatorPage() {
                       : 'border-transparent text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  💻 IDE Editor
+                  IDE Editor
                 </button>
                 <button
                   onClick={() => setActiveTab('review')}
@@ -362,7 +362,7 @@ export default function DayOneSimulatorPage() {
                       : 'border-transparent text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  🔍 PR Review
+                  PR Review
                 </button>
               </div>
 
