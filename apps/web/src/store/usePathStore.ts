@@ -317,7 +317,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
       
       const allSkills: string[] = res.plan?.all_ordered_skills || res.plan?.remaining_path || [];
       const remainingSkills: string[] = res.plan?.remaining_path || allSkills;
-      const activeId = remainingSkills[0] || allSkills[0] || null;
+      const activeId = remainingSkills[0] || allSkills[0] || '';
       
       const nodes: Node[] = allSkills.map((skillId: string, idx: number) => {
         const isCompleted = res.plan?.completed_skills?.includes(skillId) || (!remainingSkills.includes(skillId) && allSkills.indexOf(skillId) < allSkills.indexOf(activeId));

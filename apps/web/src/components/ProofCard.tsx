@@ -67,7 +67,7 @@ export default function ProofCard() {
               <span className="text-xs text-slate-400 mt-2 uppercase tracking-wide font-semibold">Confidence Score</span>
             </div>
             <div className="flex-1 flex flex-col justify-center gap-3">
-              {activeProofCard.evidenceTags.map((tag, i) => (
+              {(activeProofCard.evidenceTags || activeProofCard.evidence_tags || []).map((tag, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm text-slate-300 bg-slate-800/30 px-3 py-2 rounded-lg border border-slate-700/50">
                   <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
                   <span>{tag}</span>
