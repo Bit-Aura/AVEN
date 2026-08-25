@@ -1,20 +1,53 @@
+import logging
+import math
+import hashlib
 from typing import List, Any, Dict
 from sqlalchemy import select
-from sentence_transformers import SentenceTransformer
 from app.models.domain import SkillRecord
 from app.infrastructure.ai.gateway import AIProvider
 from app.infrastructure.neo4j.client import Neo4jClient
 
+logger = logging.getLogger(__name__)
+
 # Lazy-loaded embedding model to minimize startup memory overhead
 _model = None
 
-def get_embedding_model() -> SentenceTransformer:
+class FallbackEmbeddingModel:
     """
-    Lazy loads and returns the SentenceTransformer model.
+    Lightweight deterministic 384-dimensional unit vector generator
+    used as fallback when sentence-transformers is not available.
+    """
+    def encode(self, text: str, convert_to_numpy: bool = True):
+        h = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        vec = []
+        for i in range(384):
+            val = (int(h[(i % 64)], 16) - 7.5) / 7.5
+            vec.append(float(val))
+        norm = math.sqrt(sum(x * x for x in vec)) or 1.0
+        normalized = [x / norm for x in vec]
+
+        class VectorResult(list):
+            def tolist(self):
+                return self
+
+        return VectorResult(normalized)
+
+def get_embedding_model():
+    """
+    Lazy loads and returns the SentenceTransformer model with fallback.
     """
     global _model
     if _model is None:
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
+        try:
+            from sentence_transformers import SentenceTransformer
+            _model = SentenceTransformer("all-MiniLM-L6-v2")
+            logger.info("[Semantic Mapper] Successfully loaded SentenceTransformer (all-MiniLM-L6-v2)")
+        except ImportError:
+            logger.warning("[Semantic Mapper] sentence-transformers not installed; using FallbackEmbeddingModel")
+            _model = FallbackEmbeddingModel()
+        except Exception as e:
+            logger.warning(f"[Semantic Mapper] Could not initialize SentenceTransformer ({e}); using FallbackEmbeddingModel")
+            _model = FallbackEmbeddingModel()
     return _model
 
 async def find_relevant_skills(
