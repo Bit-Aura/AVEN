@@ -1,147 +1,252 @@
 'use client';
 
 import Link from 'next/link';
+import { UserButton } from '@clerk/nextjs';
 import { 
-  BrainCircuit, 
   ArrowRight, 
   ShieldCheck, 
   Network, 
-  Radar, 
-  Award, 
-  Terminal, 
-  Sparkles, 
-  CheckCircle2, 
-  Compass 
+  Award 
 } from 'lucide-react';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background text-slate-100 font-sans selection:bg-brand-500/30 overflow-hidden relative">
-      {/* Ambient background glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-brand-500/15 to-transparent blur-3xl pointer-events-none" />
-      <div className="absolute top-96 right-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+    <>
+      <style dangerouslySetInnerHTML={{__html: `
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap');
 
-      {/* Navigation Header */}
-      <nav className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center relative z-10 border-b border-border/80">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-glow-indigo">
-            <BrainCircuit className="text-white" size={22} />
-          </div>
-          <div>
-            <span className="font-extrabold text-white tracking-tight text-xl">PathFinder</span>
-            <span className="ml-2 text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-brand-500/20 text-brand-400 border border-brand-500/30">
-              AVEN
-            </span>
-          </div>
+        .cinematic-hero {
+          --background: 201 100% 13%;
+          --foreground: 0 0% 100%;
+          --muted-foreground: 240 4% 66%;
+          background-color: hsl(var(--background));
+          color: hsl(var(--foreground));
+          font-family: 'Inter', sans-serif;
+        }
+
+        .cinematic-hero .font-display {
+          font-family: 'Instrument Serif', serif;
+        }
+
+        .liquid-glass {
+          background: rgba(255, 255, 255, 0.01);
+          background-blend-mode: luminosity;
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          border: none;
+          box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+          position: relative;
+          overflow: hidden;
+        }
+        .liquid-glass::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          padding: 1.4px;
+          background: linear-gradient(180deg,
+            rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.15) 20%,
+            rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%,
+            rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.45) 100%);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
+        }
+
+        @keyframes fade-rise {
+          from { opacity: 0; transform: translateY(24px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-rise { animation: fade-rise 0.8s ease-out both; }
+        .animate-fade-rise-delay { animation: fade-rise 0.8s ease-out 0.2s both; }
+        .animate-fade-rise-delay-2 { animation: fade-rise 0.8s ease-out 0.4s both; }
+      `}} />
+
+      <div className="bg-background text-slate-100 font-sans selection:bg-brand-500/30 overflow-x-hidden">
+        {/* CINEMATIC HERO SECTION */}
+        <div className="cinematic-hero h-screen max-h-screen relative overflow-hidden flex flex-col">
+          {/* VIDEO BACKGROUND */}
+          <video 
+            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4"
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover z-0"
+          />
+
+          {/* NAVIGATION BAR */}
+          <nav className="relative z-10 flex flex-row justify-between items-center px-8 py-6 max-w-7xl mx-auto w-full">
+            <div className="flex items-center gap-2">
+              <span className="font-display text-5xl md:text-6xl tracking-tight text-white">
+                PathFinder
+              </span>
+              <sup className="text-sm md:text-base text-white tracking-widest mt-2">AVEN</sup>
+            </div>
+            <div className="flex items-center">
+              <UserButton appearance={{ elements: { userButtonAvatarBox: "w-10 h-10 border border-white/20" } }} />
+            </div>
+          </nav>
+
+          {/* HERO CONTENT */}
+          <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 pb-[20vh] md:pb-[30vh] w-full">
+            
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full liquid-glass text-[#a1a1aa] text-xs font-medium mb-6 animate-fade-rise">
+              <span>Deterministic Prerequisite Graphs • Zero LLM Hallucinations</span>
+            </div>
+
+            <h1 className="text-5xl sm:text-7xl md:text-8xl leading-[0.95] tracking-[-2.46px] max-w-7xl font-normal font-display text-white animate-fade-rise">
+              Stop Guessing. <br/>
+              <em className="not-italic text-[hsl(var(--muted-foreground))]">Start Knowing Your Real Readiness.</em>
+            </h1>
+
+            <p className="text-[hsl(var(--muted-foreground))] text-base sm:text-lg max-w-2xl mt-6 leading-relaxed animate-fade-rise-delay">
+              An AI-native career intelligence engine that builds topologically sound skill paths, tracks Bayesian Knowledge Tracing priors, and cryptographically signs your portfolio.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 mt-10 animate-fade-rise-delay-2">
+              <Link
+                href="/diagnostic"
+                className="liquid-glass rounded-full px-10 py-4 text-base text-white hover:scale-[1.03] cursor-pointer transition-transform"
+              >
+                Launch Cold-Start Diagnostic
+              </Link>
+              <Link
+                href="/learner"
+                className="liquid-glass rounded-full px-10 py-4 text-base text-white hover:scale-[1.03] cursor-pointer transition-transform"
+              >
+                Explore Active Dashboard
+              </Link>
+            </div>
+          </main>
         </div>
 
-        <div className="flex items-center gap-4">
-          <Link
-            href="/learner"
-            className="text-xs font-bold text-slate-300 hover:text-white px-4 py-2 rounded-lg hover:bg-surface transition-colors"
-          >
-            Live Demo
-          </Link>
-          <Link
-            href="/diagnostic"
-            className="flex items-center gap-2 text-xs font-bold bg-brand-600 hover:bg-brand-500 text-white px-4 py-2.5 rounded-xl shadow-glow-indigo transition-all"
-          >
-            <span>Start Diagnostic</span>
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-      </nav>
+        {/* REST OF PAGE */}
+        <main className="max-w-7xl mx-auto px-6 py-24 space-y-32 relative z-10">
+          {/* Feature Grid (Tensorik UI Style) */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Card 1: DAG vs Video Progress */}
+            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-pointer select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
+              {/* Ambient White Glow (Resting State) */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.06] rounded-full blur-[70px] pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500"></div>
 
-      {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-6 pt-20 pb-32 relative z-10 space-y-32">
-        <section className="text-center flex flex-col items-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-bold mb-6 shadow-glow-indigo">
-            <Sparkles size={14} className="text-brand-400" />
-            <span>Deterministic Prerequisite Graphs • Zero LLM Hallucinations</span>
-          </div>
-
-          <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-6">
-            Stop Guessing. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-300 to-emerald-400">
-              Start Knowing Your Real Readiness.
-            </span>
-          </h1>
-
-          <p className="text-base md:text-xl text-slate-400 max-w-2xl leading-relaxed mb-10">
-            An AI-native career intelligence engine that builds topologically sound skill paths, tracks Bayesian Knowledge Tracing priors, and cryptographically signs your portfolio.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
-            <Link
-              href="/diagnostic"
-              className="flex items-center justify-center gap-2.5 w-full sm:w-auto px-8 py-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-sm shadow-glow-indigo transition-all"
-            >
-              <Compass size={18} />
-              <span>Launch Cold-Start Diagnostic</span>
-            </Link>
-            <Link
-              href="/learner"
-              className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-xl bg-surface hover:bg-surface-secondary text-slate-200 hover:text-white border border-border font-bold text-sm transition-all"
-            >
-              <span>Explore Active Dashboard</span>
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        </section>
-
-        {/* Feature Grid */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Card 1: DAG vs Video Progress */}
-          <div className="p-8 rounded-2xl bg-surface border border-border shadow-glass hover:border-brand-500/40 transition-all space-y-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-              <ShieldCheck className="text-emerald-400" size={24} />
+              {/* Layer 1 (Static) */}
+              <div className="relative z-10 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-0 group-hover:scale-95 group-hover:translate-y-6 pointer-events-auto group-hover:pointer-events-none">
+                <h3 className="text-2xl font-bold text-white tracking-tight">
+                  Bayesian Readiness
+                </h3>
+                <p className="mt-3 text-[15px] text-[#aaaaaa] font-normal leading-relaxed">
+                  Standard MOOCs give 100% progress for passive video completion. PathFinder estimates actual posterior mastery through verified micro-assessments and sandbox telemetry.
+                </p>
+              </div>
+              
+              {/* Layer 2 (Curtain Hover Effect - Slides up from bottom) */}
+              <div className="absolute inset-0 z-20 flex flex-col justify-end p-7 sm:p-8 bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] rounded-[28px] opacity-0 translate-y-[100%] group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none group-hover:pointer-events-auto overflow-hidden">
+                <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-90" />
+                <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white/[0.09] to-transparent pointer-events-none" />
+                <div className="absolute -top-20 -left-20 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="relative z-30 flex flex-col translate-y-6 group-hover:translate-y-0 transition-transform duration-500 delay-[50ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                    Bayesian Readiness
+                  </h3>
+                  <p className="mt-3 text-sm sm:text-[15px] text-[#cccccc] font-normal leading-relaxed">
+                    Standard MOOCs give 100% progress for passive video completion. PathFinder estimates actual posterior mastery through verified micro-assessments and sandbox telemetry.
+                  </p>
+                </div>
+              </div>
             </div>
-            <h3 className="text-xl font-bold text-white">Bayesian Readiness, Not Video Bars</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Standard MOOCs give 100% progress for passive video completion. PathFinder estimates actual posterior mastery through verified micro-assessments and sandbox telemetry.
-            </p>
-          </div>
 
-          {/* Card 2: Date-Delta Engine */}
-          <div className="p-8 rounded-2xl bg-surface border border-border shadow-glass hover:border-brand-500/40 transition-all space-y-4">
-            <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center">
-              <Network className="text-indigo-400" size={24} />
+            {/* Card 2: Date-Delta Engine */}
+            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-pointer select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
+              {/* Ambient White Glow (Resting State) */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.06] rounded-full blur-[70px] pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500"></div>
+
+              {/* Layer 1 (Static) */}
+              <div className="relative z-10 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-0 group-hover:scale-95 group-hover:translate-y-6 pointer-events-auto group-hover:pointer-events-none">
+                <h3 className="text-2xl font-bold text-white tracking-tight">
+                  Date-Delta Engine
+                </h3>
+                <p className="mt-3 text-[15px] text-[#aaaaaa] font-normal leading-relaxed">
+                  Wondering what happens if you skip a fundamental concept? Our NetworkX DAG simulator calculates downstream friction days and blocked dependent nodes in real-time.
+                </p>
+              </div>
+              
+              {/* Layer 2 (Curtain Hover Effect - Slides down from top) */}
+              <div className="absolute inset-0 z-20 flex flex-col justify-end p-7 sm:p-8 bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] rounded-[28px] opacity-0 translate-y-[-100%] group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none group-hover:pointer-events-auto overflow-hidden">
+                <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-90" />
+                <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white/[0.09] to-transparent pointer-events-none" />
+                <div className="absolute -top-20 -left-20 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="relative z-30 flex flex-col translate-y-6 group-hover:translate-y-0 transition-transform duration-500 delay-[50ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                    Date-Delta Engine
+                  </h3>
+                  <p className="mt-3 text-sm sm:text-[15px] text-[#cccccc] font-normal leading-relaxed">
+                    Wondering what happens if you skip a fundamental concept? Our NetworkX DAG simulator calculates downstream friction days and blocked dependent nodes in real-time.
+                  </p>
+                </div>
+              </div>
             </div>
-            <h3 className="text-xl font-bold text-white">Date-Delta Skip Simulation</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Wondering what happens if you skip a fundamental concept? Our NetworkX DAG simulator calculates downstream friction days and blocked dependent nodes in real-time.
-            </p>
-          </div>
 
-          {/* Card 3: ATS Market Radar & HMAC Proofs */}
-          <div className="p-8 rounded-2xl bg-surface border border-border shadow-glass hover:border-brand-500/40 transition-all space-y-4">
-            <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
-              <Award className="text-cyan-400" size={24} />
+            {/* Card 3: ATS Market Radar & HMAC Proofs */}
+            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-pointer select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
+              {/* Ambient White Glow (Resting State) */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.06] rounded-full blur-[70px] pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500"></div>
+
+              {/* Layer 1 (Static) */}
+              <div className="relative z-10 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-0 group-hover:scale-95 group-hover:translate-y-6 pointer-events-auto group-hover:pointer-events-none">
+                <h3 className="text-2xl font-bold text-white tracking-tight">
+                  Market Radar
+                </h3>
+                <p className="mt-3 text-[15px] text-[#aaaaaa] font-normal leading-relaxed">
+                  Live ATS scraper pulling verified openings from Canonical, Stripe, and Linear paired with HMAC-SHA256 tamper-evident proof credentials.
+                </p>
+              </div>
+              
+              {/* Layer 2 (Curtain Hover Effect - Slides up from bottom) */}
+              <div className="absolute inset-0 z-20 flex flex-col justify-end p-7 sm:p-8 bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] rounded-[28px] opacity-0 translate-y-[100%] group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none group-hover:pointer-events-auto overflow-hidden">
+                <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-90" />
+                <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white/[0.09] to-transparent pointer-events-none" />
+                <div className="absolute -top-20 -left-20 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="relative z-30 flex flex-col translate-y-6 group-hover:translate-y-0 transition-transform duration-500 delay-[50ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                    Market Radar
+                  </h3>
+                  <p className="mt-3 text-sm sm:text-[15px] text-[#cccccc] font-normal leading-relaxed">
+                    Live ATS scraper pulling verified openings from Canonical, Stripe, and Linear paired with HMAC-SHA256 tamper-evident proof credentials.
+                  </p>
+                </div>
+              </div>
             </div>
-            <h3 className="text-xl font-bold text-white">Market Radar & Proof Portfolio</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Live ATS scraper pulling verified openings from Canonical, Stripe, and Linear paired with HMAC-SHA256 tamper-evident proof credentials.
-            </p>
-          </div>
-        </section>
+          </section>
 
-        {/* CTA Footer Banner */}
-        <section className="p-12 rounded-3xl bg-gradient-to-br from-surface to-surface-secondary border border-border shadow-glass text-center flex flex-col items-center space-y-6">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white">
-            Ready to Build Your Verified Career Path?
-          </h2>
-          <p className="text-slate-400 text-sm max-w-lg">
-            Takes under 2 minutes. Enter your target career goal and let the Neo4j topological planner generate your shortest path.
-          </p>
-          <Link
-            href="/diagnostic"
-            className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-glow-indigo transition-all"
-          >
-            <span>Get Started Free</span>
-            <ArrowRight size={16} />
-          </Link>
-        </section>
-      </main>
-    </div>
+          {/* CTA Footer Banner */}
+          <section className="relative overflow-hidden p-16 md:p-24 rounded-[32px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)] text-center flex flex-col items-center justify-center">
+            {/* Ambient Blue Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] md:w-[60%] h-[150%] bg-blue-500/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+            <div className="relative z-10 flex flex-col items-center">
+              <h2 className="text-4xl md:text-6xl font-display font-normal tracking-tight text-white max-w-3xl leading-[1.1]">
+                Ready to Build Your Verified Career Path?
+              </h2>
+              <p className="text-[#cccccc] text-base md:text-lg max-w-2xl mt-6 leading-relaxed">
+                Takes under 2 minutes. Enter your target career goal and let the Neo4j topological planner generate your shortest path.
+              </p>
+              
+              <Link
+                href="/diagnostic"
+                className="mt-10 flex items-center gap-2 px-10 py-4 rounded-full liquid-glass text-white font-bold text-base shadow-[0_0_30px_rgba(59,130,246,0.3)] transition-transform hover:scale-[1.03]"
+              >
+                <span>Get Started Free</span>
+                <ArrowRight size={18} />
+              </Link>
+            </div>
+          </section>
+        </main>
+      </div>
+    </>
   );
 }

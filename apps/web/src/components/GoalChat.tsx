@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { usePathStore } from '../store/usePathStore';
 import { SendHorizonal, Sparkles, Target, Compass } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
 
 const PRESET_GOALS = [
   "I want to become a Backend Software Engineer in 4 months.",
@@ -15,12 +16,14 @@ export default function GoalChat() {
   const setUserGoal = usePathStore((state) => state.setUserGoal);
   const isLoading = usePathStore((state) => state.isLoading);
   const pathError = usePathStore((state) => state.pathError);
+  const { user } = useUser();
 
   const handleSubmit = (e?: React.FormEvent, preset?: string) => {
     if (e) e.preventDefault();
     const text = preset || input;
     if (!text.trim() || isLoading) return;
-    setUserGoal(text.trim());
+    const email = user?.primaryEmailAddress?.emailAddress || 'demo@pathfinder.dev';
+    setUserGoal(text.trim(), email);
   };
 
   return (

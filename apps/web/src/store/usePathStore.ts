@@ -93,7 +93,7 @@ interface PathState {
   setProfileId: (id: number) => void;
   setGraph: (nodes: Node[], edges: Edge[]) => void;
   setActiveMilestone: (milestone: Milestone) => void;
-  setUserGoal: (goal: string) => Promise<void>;
+  setUserGoal: (goal: string, email?: string) => Promise<void>;
   completeDiagnostic: (questionId: string, answer: string) => Promise<void>;
   fetchActivePath: (profileId?: number) => Promise<void>;
   fetchReadiness: (profileId?: number) => Promise<void>;
@@ -217,11 +217,11 @@ export const usePathStore = create<PathState>()((set, get) => ({
   setGraph: (nodes, edges) => set({ nodes, edges }),
   setActiveMilestone: (activeMilestone) => set({ activeMilestone }),
 
-  setUserGoal: async (userGoal) => {
+  setUserGoal: async (userGoal, email = 'demo@pathfinder.dev') => {
     set({ isLoading: true, pathError: null });
     try {
       const { submitGoal } = await import('../api/client');
-      const res = await submitGoal('demo@pathfinder.dev', userGoal);
+      const res = await submitGoal(email, userGoal);
       if (typeof window !== 'undefined') {
         try {
           localStorage.setItem('pathfinder_profile_id', res.profile_id.toString());
@@ -412,7 +412,8 @@ export const usePathStore = create<PathState>()((set, get) => ({
         set({
           readinessScore: Math.round((res.readiness.readiness_score || 0.65) * 100),
           readinessBreakdown: res.readiness,
-          activeProofCard: res.proof_card || null
+          activeProofCard: res.proof_card || null,
+          targetRole: res.target_role || get().targetRole
         });
       }
     } catch (e) {

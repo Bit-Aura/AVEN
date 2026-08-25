@@ -15,6 +15,7 @@ import {
   BrainCircuit
 } from 'lucide-react';
 import { usePathStore } from '../../store/usePathStore';
+import { useUser, UserButton } from '@clerk/nextjs';
 
 const navigationGroups = [
   {
@@ -47,6 +48,11 @@ export default function Sidebar() {
   const pathname = usePathname();
   const targetRole = usePathStore((state) => state.targetRole);
   const readinessScore = usePathStore((state) => state.readinessScore);
+  const { user, isLoaded } = useUser();
+
+  const userEmail = user?.primaryEmailAddress?.emailAddress || 'demo@pathfinder.dev';
+  const userName = user?.fullName || user?.firstName || user?.username || 'Demo Learner';
+  const userInitials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'DL';
 
   return (
     <aside className="w-64 bg-surface border-r border-border flex flex-col shrink-0 min-h-screen select-none">
@@ -88,25 +94,31 @@ export default function Sidebar() {
             </div>
             <div className="space-y-1">
               {group.items.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
-                      isActive
-                        ? 'bg-brand-600 text-white shadow-glow-indigo'
-                        : 'text-slate-300 hover:text-white hover:bg-surface-secondary'
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
+                      isActive 
+                        ? 'bg-brand-500/10 text-brand-400' 
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-surface-secondary/50'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
-                      <Icon size={16} className={isActive ? 'text-white' : 'text-slate-400'} />
+                    <div className="flex items-center gap-3">
+                      <item.icon 
+                        size={16} 
+                        className={isActive ? 'text-brand-400' : 'text-slate-500 group-hover:text-slate-400'} 
+                      />
                       <span>{item.name}</span>
                     </div>
                     {item.badge && (
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
+                      <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded ${
                         isActive 
+                          ? 'bg-brand-500/20 text-brand-300' 
+                          : item.badge === 'Live' 
+                          ? 'bg-rose-500/20 text-rose-400'
+                          : item.badge === 'Sprint'
                           ? 'bg-white/20 text-white' 
                           : 'bg-surface-tertiary text-slate-400'
                       }`}>
@@ -123,13 +135,17 @@ export default function Sidebar() {
 
       {/* Bottom Profile Info */}
       <div className="p-4 border-t border-border bg-surface-secondary/20 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-xs">
-            DL
-          </div>
-          <div>
-            <div className="text-xs font-bold text-white">Demo Learner</div>
-            <div className="text-[10px] text-slate-400">demo@pathfinder.dev</div>
+        <div className="flex items-center gap-2.5 overflow-hidden">
+          {isLoaded && user ? (
+            <UserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 rounded-full" } }} />
+          ) : (
+            <div className="w-8 h-8 shrink-0 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-xs">
+              {userInitials}
+            </div>
+          )}
+          <div className="overflow-hidden">
+            <div className="text-xs font-bold text-white truncate">{userName}</div>
+            <div className="text-[10px] text-slate-400 truncate">{userEmail}</div>
           </div>
         </div>
       </div>
