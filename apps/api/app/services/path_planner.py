@@ -267,7 +267,14 @@ async def generate_or_replan_path(
     
     # 3. Retrieve readiness snapshots (mastered skills are those with score >= 0.70)
     readiness_stmt = select(ReadinessSnapshot).where(ReadinessSnapshot.profile_id == profile_id)
-    snapshots = {s.skill_id: s.readiness_score for s in (await db.execute(readiness_stmt)).scalars().all()}
+    snapshot_records = (await db.execute(readiness_stmt)).scalars().all()
+    snapshots = {}
+    for s in snapshot_records:
+        score = s.readiness_score
+        snapshots[s.skill_id] = score
+        snapshots[s.skill_id.lower()] = score
+        snapshots[s.skill_id.lower().replace("_", " ")] = score
+        snapshots[s.skill_id.lower().replace(" ", "_")] = score
     
     # 4. Build subgraph from Neo4j using target skills
     G = build_skill_subgraph(target_skills, ai_provider, neo4j_client)
@@ -281,8 +288,17 @@ async def generate_or_replan_path(
         to_remove = descendants | {skip_skill_id}
         all_ordered_skills = [s for s in all_ordered_skills if s not in to_remove]
         
+    def get_skill_score(skill_name: str) -> float:
+        return max(
+            snapshots.get(skill_name, 0.0),
+            snapshots.get(skill_name.lower(), 0.0),
+            snapshots.get(skill_name.lower().replace("_", " "), 0.0),
+            snapshots.get(skill_name.lower().replace(" ", "_"), 0.0)
+        )
+
     # Filter out skills already mastered (mastered score >= 0.70)
-    unmet_skills = [s for s in all_ordered_skills if snapshots.get(s, DEFAULT_BKT_PRIOR) < 0.70]
+    unmet_skills = [s for s in all_ordered_skills if get_skill_score(s) < 0.70]
+    completed_skills = [s for s in all_ordered_skills if get_skill_score(s) >= 0.70]
     
     if not unmet_skills:
         active_skill = None
@@ -447,9 +463,15 @@ async def calculate_readiness_bar(
     
     mastered_skills = [s for s in snapshots if s.readiness_score >= 0.70]
     
+    def get_node_weight(skill_id_str: str) -> float:
+        for node in G.nodes:
+            if node == skill_id_str or node.lower().replace(" ", "_") == skill_id_str.lower().replace(" ", "_"):
+                return skill_weights.get(node, 1.0 / total_nodes)
+        return skill_weights.get(skill_id_str, 1.0 / total_nodes)
+
     # 4. Calculate Weighted Skill Coverage (foundational skills count more)
     if skill_weights:
-        mastered_weight_sum = sum(skill_weights.get(s.skill_id, 1.0 / total_nodes) for s in mastered_skills)
+        mastered_weight_sum = sum(get_node_weight(s.skill_id) for s in mastered_skills)
         weighted_coverage = min(1.0, max(0.0, mastered_weight_sum))
     else:
         weighted_coverage = len(mastered_skills) / max(1, total_nodes)

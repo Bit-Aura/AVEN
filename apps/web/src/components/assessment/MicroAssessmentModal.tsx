@@ -21,6 +21,8 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
   const bypassMilestone = usePathStore(state => state.bypassMilestone);
   const submitCalibration = usePathStore(state => state.submitCalibration);
   const profileId = usePathStore(state => state.profileId);
+  const fetchActivePath = usePathStore(state => state.fetchActivePath);
+  const fetchReadiness = usePathStore(state => state.fetchReadiness);
 
   const [calibrationData, setCalibrationData] = useState<any>(null);
 
@@ -75,6 +77,10 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
         confidence_pre_assessment: confidence / 100,
         actual_score: isCorrect ? 1.0 : 0.0
       });
+      
+      // Step 3: Refresh user path plan and readiness score in real-time
+      await fetchActivePath(safeProfileId);
+      await fetchReadiness(safeProfileId);
       
       setCalibrationData(calRes);
       setStatus(isCorrect ? 'passed' : 'failed');
@@ -234,7 +240,12 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
             </div>
 
             <button 
-              onClick={onClose}
+              onClick={async () => {
+                const safeProfileId = profileId || 1;
+                await fetchActivePath(safeProfileId);
+                await fetchReadiness(safeProfileId);
+                onClose();
+              }}
               className={`w-full font-bold py-3 rounded-xl transition-all ${
                 status === 'passed' ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'
               }`}
