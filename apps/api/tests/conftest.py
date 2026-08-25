@@ -1,7 +1,6 @@
 import os
 
-# Set environment variables before any other imports to avoid Pydantic validation errors
-os.environ["DATABASE_URL"] = "postgresql+asyncpg://postgres:postgres@localhost:5432/test_db"
+os.environ["DATABASE_URL"] = os.environ.get("TEST_DATABASE_URL", "sqlite+aiosqlite:///./test_pathfinder.db")
 os.environ["ANTHROPIC_API_KEY"] = "mock-api-key"
 os.environ["NEO4J_URI"] = "bolt://localhost:7687"
 os.environ["NEO4J_USERNAME"] = "neo4j"

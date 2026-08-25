@@ -400,12 +400,17 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
         if existing:
             continue
             
-        emb = model.encode(res_data["content"], convert_to_numpy=True).tolist()
+        modality = res_data.get("metadata", {}).get("modality", "tutorial")
+        resource_type_map = {"video": "video", "project": "project", "text": "article"}
+        res_type = resource_type_map.get(modality, "tutorial")
         
         resource = Resource(
             title=res_data["title"],
             content=res_data["content"],
             url=res_data["url"],
+            resource_type=res_type,
+            skill_id=res_data["skill_id"],
+            status="APPROVED",
             embedding=emb
         )
         db.add(resource)

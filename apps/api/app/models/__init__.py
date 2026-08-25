@@ -14,6 +14,7 @@ from .domain import (
     FeedbackEvent,
     DomainEvent,
     SkillRecord,
+    MentorApplication,
 )
 
 __all__ = [
@@ -32,4 +33,5 @@ __all__ = [
     "FeedbackEvent",
     "DomainEvent",
     "SkillRecord",
+    "MentorApplication",
 ]

@@ -32,17 +32,21 @@ async def rank_resources_for_skill(
     if db_session is None:
         return []
 
-    # 1. Try to fetch resources explicitly tagged with this skill_id
+    # 1. Try to fetch resources explicitly tagged with this skill_id (approved only)
     stmt = (
         select(Resource)
         .join(ResourceMetadata)
-        .where(ResourceMetadata.key == "skill_id", ResourceMetadata.value == skill_id)
+        .where(
+            ResourceMetadata.key == "skill_id",
+            ResourceMetadata.value == skill_id,
+            Resource.status == "APPROVED"
+        )
         .options(selectinload(Resource.metadata_relations))
     )
     result = await db_session.execute(stmt)
     resources = list(result.scalars().all())
 
-    # 2. Fallback: If no tagged resources, perform a pgvector semantic search using similarity
+    # 2. Fallback: If no tagged resources, perform a pgvector semantic search using similarity (approved only)
     if not resources:
         try:
             from app.services.semantic_mapper import get_embedding_model
@@ -52,6 +56,7 @@ async def rank_resources_for_skill(
             # Use cosine distance to order resources
             stmt = (
                 select(Resource)
+                .where(Resource.status == "APPROVED")
                 .order_by(Resource.embedding.cosine_distance(query_vector))
                 .limit(5)
                 .options(selectinload(Resource.metadata_relations))
@@ -59,8 +64,8 @@ async def rank_resources_for_skill(
             result = await db_session.execute(stmt)
             resources = list(result.scalars().all())
         except Exception:
-            # If embedding fails, fetch all resources to avoid returning empty
-            stmt = select(Resource).limit(10).options(selectinload(Resource.metadata_relations))
+            # If embedding fails, fetch approved resources
+            stmt = select(Resource).where(Resource.status == "APPROVED").limit(10).options(selectinload(Resource.metadata_relations))
             result = await db_session.execute(stmt)
             resources = list(result.scalars().all())
 
