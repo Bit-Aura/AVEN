@@ -416,13 +416,27 @@ async def get_checkpoint(
     Fetches the assessment question and options for a given skill.
     Strips out the correct_answer to prevent cheating.
     """
+    # Resolve skill_id (name or normalized slug) to the correct DB ID
+    db_skill_id = skill_id
+    stmt_skill = select(SkillRecord).where((SkillRecord.id == skill_id) | (SkillRecord.name == skill_id))
+    skill_rec = (await db.execute(stmt_skill)).scalars().first()
+    if skill_rec:
+        db_skill_id = skill_rec.id
+    else:
+        normalized = skill_id.lower().replace(" ", "_")
+        stmt_skill_norm = select(SkillRecord).where(SkillRecord.id == normalized)
+        skill_rec_norm = (await db.execute(stmt_skill_norm)).scalars().first()
+        if skill_rec_norm:
+            db_skill_id = skill_rec_norm.id
+
     stmt = select(AssessmentItem)
     result = await db.execute(stmt)
     items = result.scalars().all()
     
     for item in items:
         content = json.loads(item.content)
-        if content.get("target_skill") == skill_id:
+        target = content.get("target_skill", "")
+        if target == db_skill_id or target.lower().replace(" ", "_") == db_skill_id.lower().replace(" ", "_"):
             return {
                 "question": content.get("question", ""),
                 "options": content.get("options", [])
@@ -474,6 +488,22 @@ async def submit_checkpoint_answer(
     from app.services.path_planner import update_bkt_score, failure_root_cause_backtrace, generate_or_replan_path
     from app.services.grader import evaluate_answer
     
+    # Resolve skill_id (name or normalized slug) to the correct DB ID
+    db_skill_id = data.skill_id
+    stmt_skill = select(SkillRecord).where((SkillRecord.id == data.skill_id) | (SkillRecord.name == data.skill_id))
+    skill_rec = (await db.execute(stmt_skill)).scalars().first()
+    if skill_rec:
+        db_skill_id = skill_rec.id
+    else:
+        normalized = data.skill_id.lower().replace(" ", "_")
+        stmt_skill_norm = select(SkillRecord).where(SkillRecord.id == normalized)
+        skill_rec_norm = (await db.execute(stmt_skill_norm)).scalars().first()
+        if skill_rec_norm:
+            db_skill_id = skill_rec_norm.id
+            
+    # Update input skill_id with resolved ID to ensure downstream updates use the correct identifier
+    data.skill_id = db_skill_id
+
     # 1. Find the assessment item for the skill
     stmt = select(AssessmentItem)
     result = await db.execute(stmt)
@@ -482,7 +512,8 @@ async def submit_checkpoint_answer(
     matched_item = None
     for item in items:
         content = json.loads(item.content)
-        if content.get("target_skill") == data.skill_id:
+        target = content.get("target_skill", "")
+        if target == db_skill_id or target.lower().replace(" ", "_") == db_skill_id.lower().replace(" ", "_"):
             matched_item = item
             break
             
