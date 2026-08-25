@@ -22,18 +22,33 @@ class MockNeo4jDriver:
                     return self._data
 
             if "RETURN s.id" in query:
-                # Return nodes
+                # Return all 15 curated skills
+                from app.services.seeder import SKILLS_SEED
                 return [
-                    MockRecord({"id": "python_basics", "name": "Python Basics", "description": "Python fundamentals"}),
-                    MockRecord({"id": "sql_basics", "name": "SQL Basics", "description": "SQL basics"}),
-                    MockRecord({"id": "api_design", "name": "REST API Design", "description": "API design"}),
+                    MockRecord({
+                        "id": s["id"],
+                        "name": s["name"],
+                        "description": s["description"],
+                        "bkt_p_l0": s.get("bkt", {}).get("p_l0", 0.15),
+                        "bkt_p_t": s.get("bkt", {}).get("p_t", 0.20),
+                        "bkt_p_s": s.get("bkt", {}).get("p_s", 0.10),
+                        "bkt_p_g": s.get("bkt", {}).get("p_g", 0.20)
+                    })
+                    for s in SKILLS_SEED
                 ]
             elif "RETURN pre.name" in query:
-                # Return edges
-                return [
-                    MockRecord({"pre_name": "Python Basics", "skill_name": "SQL Basics"}),
-                    MockRecord({"pre_name": "SQL Basics", "skill_name": "REST API Design"}),
-                ]
+                # Return all prerequisite edges
+                from app.services.seeder import SKILLS_SEED
+                id_to_name = {s["id"]: s["name"] for s in SKILLS_SEED}
+                edges = []
+                for s in SKILLS_SEED:
+                    for prereq_id in s.get("prereqs", []):
+                        if prereq_id in id_to_name:
+                            edges.append(MockRecord({
+                                "pre_name": id_to_name[prereq_id],
+                                "skill_name": s["name"]
+                            }))
+                return edges
             return []
             
     def session(self):

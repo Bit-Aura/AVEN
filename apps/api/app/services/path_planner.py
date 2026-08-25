@@ -265,16 +265,24 @@ async def generate_or_replan_path(
     # 2. Check skill decay first before sorting topology
     await check_skill_decay(profile_id, db)
     
+    # Map all skill IDs to their display names and vice-versa
+    skill_records = (await db.execute(select(SkillRecord))).scalars().all()
+    id_to_name = {s.id: s.name for s in skill_records}
+    name_to_id = {s.name: s.id for s in skill_records}
+    
     # 3. Retrieve readiness snapshots (mastered skills are those with score >= 0.70)
     readiness_stmt = select(ReadinessSnapshot).where(ReadinessSnapshot.profile_id == profile_id)
     snapshot_records = (await db.execute(readiness_stmt)).scalars().all()
-    snapshots = {}
+    snapshots: Dict[str, float] = {}
     for s in snapshot_records:
         score = s.readiness_score
-        snapshots[s.skill_id] = score
-        snapshots[s.skill_id.lower()] = score
-        snapshots[s.skill_id.lower().replace("_", " ")] = score
-        snapshots[s.skill_id.lower().replace(" ", "_")] = score
+        sid = s.skill_id
+        sname = id_to_name.get(sid, sid)
+        
+        for k in [sid, sname, sid.lower(), sname.lower(),
+                  sid.replace("_", " "), sname.replace("_", " "),
+                  sid.replace(" ", "_"), sname.replace(" ", "_")]:
+            snapshots[k.lower()] = max(snapshots.get(k.lower(), 0.0), score)
     
     # 4. Build subgraph from Neo4j using target skills
     G = build_skill_subgraph(target_skills, ai_provider, neo4j_client)
@@ -289,11 +297,15 @@ async def generate_or_replan_path(
         all_ordered_skills = [s for s in all_ordered_skills if s not in to_remove]
         
     def get_skill_score(skill_name: str) -> float:
+        norm = skill_name.strip().lower()
+        mapped_id = name_to_id.get(skill_name, "").lower()
         return max(
-            snapshots.get(skill_name, 0.0),
-            snapshots.get(skill_name.lower(), 0.0),
-            snapshots.get(skill_name.lower().replace("_", " "), 0.0),
-            snapshots.get(skill_name.lower().replace(" ", "_"), 0.0)
+            snapshots.get(norm, 0.0),
+            snapshots.get(norm.replace("_", " "), 0.0),
+            snapshots.get(norm.replace(" ", "_"), 0.0),
+            snapshots.get(mapped_id, 0.0),
+            snapshots.get(mapped_id.replace("_", " "), 0.0),
+            snapshots.get(mapped_id.replace(" ", "_"), 0.0)
         )
 
     # Filter out skills already mastered (mastered score >= 0.70)
@@ -311,6 +323,14 @@ async def generate_or_replan_path(
     active_resource = None
     explanation = ""
     decision_trace = {}
+    
+    if not active_skill:
+        explanation = "Outstanding achievement! You have mastered all prerequisite milestones for this path."
+        decision_trace = {
+            "target_goal": target_goal,
+            "status": "ALL_MILESTONES_MASTERED",
+            "completed_count": len(completed_skills)
+        }
     
     # Build user profile context dict
     user_context = {
