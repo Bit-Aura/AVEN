@@ -242,7 +242,8 @@ async def generate_or_replan_path(
     db: AsyncSession,
     neo4j_client: Neo4jClient,
     ai_provider: AIProvider,
-    skip_skill_id: Optional[str] = None
+    skip_skill_id: Optional[str] = None,
+    weights: Optional[Dict[str, float]] = None
 ) -> PathVersion:
     """
     Drives the Core Path Generation & Replanning Pipeline.
@@ -257,10 +258,7 @@ async def generate_or_replan_path(
         
     goal_stmt = select(Goal).where(Goal.profile_id == profile_id).order_by(Goal.created_at.desc())
     goal = (await db.execute(goal_stmt)).scalars().first()
-    target_goal = goal.title if goal else "Backend Software Engineer"
-    
-    # Target skill for backend SWE
-    target_skills = [{"name": "System Design & Scale"}]
+    target_goal = goal.title if goal else (profile.current_context or "Backend Software Engineer")
     
     # 2. Check skill decay first before sorting topology
     await check_skill_decay(profile_id, db)
@@ -269,6 +267,27 @@ async def generate_or_replan_path(
     skill_records = (await db.execute(select(SkillRecord))).scalars().all()
     id_to_name = {s.id: s.name for s in skill_records}
     name_to_id = {s.name: s.id for s in skill_records}
+    
+    # Resolve target skills dynamically based on target role/goal cluster
+    from app.services.career_engine import ROLE_CLUSTERS
+    target_skills = []
+    matched_cluster = None
+    for r_id, cluster in ROLE_CLUSTERS.items():
+        if (
+            target_goal.lower() == r_id.lower() 
+            or target_goal.lower() == cluster["title"].lower()
+            or (profile.current_context and profile.current_context.lower() == cluster["title"].lower())
+            or (profile.current_context and profile.current_context.lower() == r_id.lower())
+        ):
+            matched_cluster = cluster
+            break
+
+    if matched_cluster:
+        for sid in matched_cluster["required_skills"]:
+            sname = id_to_name.get(sid, sid.replace("_", " ").title())
+            target_skills.append({"name": sname})
+    else:
+        target_skills = [{"name": "System Design & Scale"}]
     
     # 3. Retrieve readiness snapshots (mastered skills are those with score >= 0.70)
     readiness_stmt = select(ReadinessSnapshot).where(ReadinessSnapshot.profile_id == profile_id)
@@ -335,7 +354,7 @@ async def generate_or_replan_path(
     # Build user profile context dict
     user_context = {
         "preferred_modality": "video",
-        "weights": {"speed": 0.5, "depth": 0.5, "cost": 0.5}
+        "weights": weights or {"speed": 0.5, "depth": 0.5, "cost": 0.5}
     }
     if goal and goal.description:
         user_context["preferred_modality"] = goal.description
@@ -403,6 +422,7 @@ async def generate_or_replan_path(
         "active_resource_title": active_resource.title if active_resource else None,
         "active_resource_url": active_resource.url if active_resource else None,
         "remaining_path": remaining_path,
+        "completed_skills": completed_skills,
         "all_ordered_skills": all_ordered_skills,
     }
     

@@ -81,24 +81,39 @@ export default function LearnerDashboard() {
           )}
 
           {/* Quick Progress Summary */}
-          {nodes.length > 0 && (
+          {nodes.length > 0 && (() => {
+            // Build a dynamic window: completed nodes + active + next 3 locked
+            const completedNodes = nodes.filter(n => n.data?.status === 'completed');
+            const activeNode = nodes.find(n => n.data?.status === 'active');
+            const lockedNodes = nodes.filter(n => n.data?.status === 'locked');
+            const displayNodes = [
+              ...completedNodes,
+              ...(activeNode ? [activeNode] : []),
+              ...lockedNodes.slice(0, 3),
+            ];
+            return (
             <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                   <Sparkles size={15} className="text-indigo-400" />
-                  <span>Upcoming Prerequisite Milestones</span>
+                  <span>Your Learning Path</span>
                 </h3>
-                <Link
-                  href="/learner/graph"
-                  className="text-xs font-bold text-brand-400 hover:text-brand-300 flex items-center gap-1 transition-colors"
-                >
-                  <span>Explore Full DAG</span>
-                  <ArrowRight size={13} />
-                </Link>
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-semibold text-slate-400">
+                    {completedNodes.length}/{nodes.length} Mastered
+                  </span>
+                  <Link
+                    href="/learner/graph"
+                    className="text-xs font-bold text-brand-400 hover:text-brand-300 flex items-center gap-1 transition-colors"
+                  >
+                    <span>Explore Full DAG</span>
+                    <ArrowRight size={13} />
+                  </Link>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {nodes.slice(0, 4).map((node, idx) => (
+                {displayNodes.map((node, idx) => (
                   <div 
                     key={node.id} 
                     className={`p-3 rounded-xl border flex items-center justify-between text-xs ${
@@ -122,7 +137,8 @@ export default function LearnerDashboard() {
                 ))}
               </div>
             </div>
-          )}
+            );
+          })()}
         </div>
 
         {/* Sidebar Controls */}
