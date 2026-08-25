@@ -11,15 +11,20 @@ const isProtectedRoute = createRouteMatcher([
   '/learner(.*)',
   '/mentor(.*)',
   '/admin(.*)',
+  '/diagnostic(.*)',
 ]);
 
-export default hasClerkKey
-  ? clerkMiddleware(async (auth, req) => {
-      if (isProtectedRoute(req)) {
-        await auth.protect();
-      }
-    })
-  : () => NextResponse.next();
+export default clerkMiddleware(async (auth, req) => {
+  const path = req.nextUrl.pathname;
+  if (path.startsWith('/diagnostic') || isProtectedRoute(req)) {
+    const { userId } = await auth();
+    if (!userId) {
+      const signInUrl = new URL('/sign-in', req.url);
+      signInUrl.searchParams.set('redirect_url', req.url);
+      return NextResponse.redirect(signInUrl);
+    }
+  }
+});
 
 export const config = {
   matcher: [
