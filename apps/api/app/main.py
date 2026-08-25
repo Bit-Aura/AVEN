@@ -81,6 +81,9 @@ app.add_middleware(
 )
 
 
+# Import and include routers
+from app.routers.admin import router as admin_router
+app.include_router(admin_router)
 
 # Instantiate AI Provider safely based on configuration
 ai_provider = AnthropicAdapter() if settings.ANTHROPIC_API_KEY else MockAIProvider()
@@ -584,9 +587,15 @@ async def get_role_readiness(profile_id: int, db: AsyncSession = Depends(get_db)
             readiness_score=readiness_data["readiness_score"]
         )
         
+    # Fetch the profile to get the target role
+    stmt_profile = select(LearnerProfile).where(LearnerProfile.id == profile_id)
+    profile = (await db.execute(stmt_profile)).scalars().first()
+    target_role = profile.current_context if profile else "Backend Software Engineer"
+
     return {
         "readiness": readiness_data,
-        "proof_card": proof_card
+        "proof_card": proof_card,
+        "target_role": target_role
     }
 
 @app.post("/api/v1/readiness/decay")
