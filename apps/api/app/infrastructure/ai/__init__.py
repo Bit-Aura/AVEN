@@ -1,3 +1,3 @@
-from .gateway import AIProvider, AnthropicAdapter, MockAIProvider
+from .gateway import AIProvider, OllamaAdapter, AntigravityProxyAdapter, AnthropicAdapter, MockAIProvider, create_ai_provider
 
-__all__ = ["AIProvider", "AnthropicAdapter", "MockAIProvider"]
+__all__ = ["AIProvider", "OllamaAdapter", "AntigravityProxyAdapter", "AnthropicAdapter", "MockAIProvider", "create_ai_provider"]

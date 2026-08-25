@@ -188,6 +188,7 @@ The following features and innovations are fully integrated into the codebase:
 - **Opportunity Alerts & ATS Job Ingestion (Greenhouse, Lever, Ashby, Google, Amazon)**: (`OpportunityAlert.tsx`, `apps/api/app/scraper/`)
 - **Autonomy Sliders & Readiness Bar**: (`AutonomySliders.tsx`, `ReadinessBar.tsx`)
 - **Micro-Assessment Gate Modals & Prove-It Gates**: (`MicroAssessmentModal.tsx`, `ProveItAssessment.tsx`)
+- **Platform Admin & Resource Curation Engine**: (`admin.py`, `auth.py`, `admin/page.tsx`, `0003_admin_platform_system.py`, `Feature_Platform_Admin.md`)
 
 ---
 

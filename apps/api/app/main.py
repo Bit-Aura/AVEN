@@ -12,10 +12,11 @@ from app.core.config import settings
 from app.core.db import get_db
 from app.models.domain import (
     User, LearnerProfile, Goal, DiagnosticSession,
-    DiagnosticTurn, PathVersion, AssessmentItem, AssessmentAttempt, ReadinessSnapshot
+    DiagnosticTurn, PathVersion, AssessmentItem, AssessmentAttempt, ReadinessSnapshot,
+    SkillRecord
 )
 from app.infrastructure.neo4j.client import neo4j_client
-from app.infrastructure.ai.gateway import AnthropicAdapter, MockAIProvider
+from app.infrastructure.ai.gateway import AntigravityProxyAdapter, AnthropicAdapter, MockAIProvider, create_ai_provider
 
 from contextlib import asynccontextmanager
 
@@ -117,8 +118,8 @@ app.add_middleware(
 from app.routers.admin import router as admin_router
 app.include_router(admin_router)
 
-# Instantiate AI Provider safely based on configuration
-ai_provider = AnthropicAdapter() if settings.ANTHROPIC_API_KEY else MockAIProvider()
+# Instantiate AI Provider via factory (Antigravity Proxy > Anthropic > Mock)
+ai_provider = create_ai_provider()
 
 # --- Pydantic Schemas for API Requests/Responses ---
 
@@ -421,13 +422,27 @@ async def get_checkpoint(
     Fetches the assessment question and options for a given skill.
     Strips out the correct_answer to prevent cheating.
     """
+    # Resolve skill_id (name or normalized slug) to the correct DB ID
+    db_skill_id = skill_id
+    stmt_skill = select(SkillRecord).where((SkillRecord.id == skill_id) | (SkillRecord.name == skill_id))
+    skill_rec = (await db.execute(stmt_skill)).scalars().first()
+    if skill_rec:
+        db_skill_id = skill_rec.id
+    else:
+        normalized = skill_id.lower().replace(" ", "_")
+        stmt_skill_norm = select(SkillRecord).where(SkillRecord.id == normalized)
+        skill_rec_norm = (await db.execute(stmt_skill_norm)).scalars().first()
+        if skill_rec_norm:
+            db_skill_id = skill_rec_norm.id
+
     stmt = select(AssessmentItem)
     result = await db.execute(stmt)
     items = result.scalars().all()
     
     for item in items:
         content = json.loads(item.content)
-        if content.get("target_skill") == skill_id:
+        target = content.get("target_skill", "")
+        if target == db_skill_id or target.lower().replace(" ", "_") == db_skill_id.lower().replace(" ", "_"):
             return {
                 "question": content.get("question", ""),
                 "options": content.get("options", [])
@@ -445,16 +460,22 @@ async def chat_with_coach(
     """
     # For now, just generate a dynamic message instead of passing through full LLM stream
     # to keep it fast and simple for the demo.
-    from app.infrastructure.ai.gateway import ai_provider
     prompt = f"The user is asking a question about the skill '{data.skill_id}': '{data.message}'. Give a brief, encouraging, 1-2 sentence response explaining a concept."
     try:
-        response = await ai_provider.client.messages.create(
-            model="claude-3-5-sonnet-20240620",
-            max_tokens=300,
-            system="You are an expert, encouraging technical AI coach. Be concise.",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        reply = response.content[0].text.strip()
+        if hasattr(ai_provider, 'coach_chat'):
+            # Use the proxy-compatible method (AntigravityProxyAdapter)
+            reply = await ai_provider.coach_chat(data.skill_id, data.message)
+        elif hasattr(ai_provider, 'client') and ai_provider.client:
+            # Fallback to direct Anthropic client
+            response = await ai_provider.client.messages.create(
+                model="claude-3-5-sonnet-20240620",
+                max_tokens=300,
+                system="You are an expert, encouraging technical AI coach. Be concise.",
+                messages=[{"role": "user", "content": prompt}]
+            )
+            reply = response.content[0].text.strip()
+        else:
+            reply = f"That's a great question about {data.skill_id}! I'd love to explain {data.message} in more detail when I have full connectivity."
     except Exception as e:
         reply = f"That's a great question about {data.skill_id}! I'd love to explain {data.message} in more detail when I have full connectivity."
         
@@ -473,6 +494,22 @@ async def submit_checkpoint_answer(
     from app.services.path_planner import update_bkt_score, failure_root_cause_backtrace, generate_or_replan_path
     from app.services.grader import evaluate_answer
     
+    # Resolve skill_id (name or normalized slug) to the correct DB ID
+    db_skill_id = data.skill_id
+    stmt_skill = select(SkillRecord).where((SkillRecord.id == data.skill_id) | (SkillRecord.name == data.skill_id))
+    skill_rec = (await db.execute(stmt_skill)).scalars().first()
+    if skill_rec:
+        db_skill_id = skill_rec.id
+    else:
+        normalized = data.skill_id.lower().replace(" ", "_")
+        stmt_skill_norm = select(SkillRecord).where(SkillRecord.id == normalized)
+        skill_rec_norm = (await db.execute(stmt_skill_norm)).scalars().first()
+        if skill_rec_norm:
+            db_skill_id = skill_rec_norm.id
+            
+    # Update input skill_id with resolved ID to ensure downstream updates use the correct identifier
+    data.skill_id = db_skill_id
+
     # 1. Find the assessment item for the skill
     stmt = select(AssessmentItem)
     result = await db.execute(stmt)
@@ -481,7 +518,8 @@ async def submit_checkpoint_answer(
     matched_item = None
     for item in items:
         content = json.loads(item.content)
-        if content.get("target_skill") == data.skill_id:
+        target = content.get("target_skill", "")
+        if target == db_skill_id or target.lower().replace(" ", "_") == db_skill_id.lower().replace(" ", "_"):
             matched_item = item
             break
             

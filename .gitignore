@@ -1,3 +1,17 @@
+# Database files
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Local Environment files
+.env
+.env.local
+.env.*.local
+*.local
+
 # Virtual Environment
 .venv/
 venv/
@@ -6,7 +20,7 @@ ENV/
 dist/
 build/
 
-# Node dependencies
+# Node dependencies & Next.js
 node_modules/
 .next/
 out/
@@ -15,6 +29,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnp/
 .pnp.js
+*.tsbuildinfo
+.oxlintrc.json
+playwright-report/
+test-results/
 
 # Python cache & test artifacts
 __pycache__/
@@ -28,14 +46,7 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Local Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDEs and Editors
+# IDEs, Editors & Agents
 .vscode/
 .idea/
 *.swp
@@ -43,7 +54,10 @@ htmlcov/
 .project
 .classpath
 .settings/
+.agents/
+.gemini/
 
 # OS-specific
 .DS_Store
 Thumbs.db
+

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { usePathStore } from '../store/usePathStore';
 import { SendHorizonal, Sparkles, Target, Compass } from 'lucide-react';
-import { useUser } from '@clerk/nextjs';
+import { useSafeUser } from '../lib/clerkSafe';
 
 const PRESET_GOALS = [
   "I want to become a Backend Software Engineer in 4 months.",
@@ -16,7 +16,7 @@ export default function GoalChat() {
   const setUserGoal = usePathStore((state) => state.setUserGoal);
   const isLoading = usePathStore((state) => state.isLoading);
   const pathError = usePathStore((state) => state.pathError);
-  const { user } = useUser();
+  const { user } = useSafeUser();
 
   const handleSubmit = (e?: React.FormEvent, preset?: string) => {
     if (e) e.preventDefault();

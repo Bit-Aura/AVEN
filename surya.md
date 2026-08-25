@@ -69,6 +69,15 @@
   - Integrated active task requirements spec boards and multi-channel Slack-like chat dialogs with PM and Client personas.
   - Built an in-browser IDE editor coupled with a PR review dashboard detailing compiler errors, automated test results, and inline code annotations.
 
+### Task 10: Platform Admin & Curation Dashboard Console ✅
+- **Files:** `apps/web/src/app/(dashboard)/admin/page.tsx`, `apps/web/src/api/client.ts`, `apps/web/src/components/layout/Sidebar.tsx`
+- **What was built:**
+  - System Overview & Health: Live widgets displaying active infrastructure green/red statuses and key counts.
+  - User Audit Console: Table view with server-side pagination, search queries, role adjustment dropdowns, and activation/suspension toggles.
+  - Mentor Review Panel: Interactive applications triage flow allowing admins to accept applicants (automatically changing their role) or reject with comments.
+  - Resource Curation Board: CRUD grid for reviewing, editing metadata parameters, deleting, or approving mentor-submitted links.
+  - Navigation Integration: Dashboard layout routing and protected routes for admin access.
+
 ---
 
 ## 3. Developer Workflow & Anti-Conflict Protocol

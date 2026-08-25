@@ -1,10 +1,19 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const hasClerkKey = Boolean(
-  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && 
-  process.env.CLERK_SECRET_KEY &&
-  !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes('dummy')
+const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "";
+const secretKey = process.env.CLERK_SECRET_KEY || "";
+
+const isRealClerkKey = Boolean(
+  publishableKey &&
+  secretKey &&
+  publishableKey.startsWith("pk_") &&
+  publishableKey.length > 25 &&
+  !publishableKey.includes("placeholder") &&
+  !publishableKey.includes("dummy") &&
+  !publishableKey.includes("ZGVtby") &&
+  !secretKey.includes("placeholder") &&
+  !secretKey.includes("dummy")
 );
 
 const isProtectedRoute = createRouteMatcher([
@@ -14,17 +23,21 @@ const isProtectedRoute = createRouteMatcher([
   '/diagnostic(.*)',
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
-  const path = req.nextUrl.pathname;
-  if (path.startsWith('/diagnostic') || isProtectedRoute(req)) {
-    const { userId } = await auth();
-    if (!userId) {
-      const signInUrl = new URL('/sign-in', req.url);
-      signInUrl.searchParams.set('redirect_url', req.url);
-      return NextResponse.redirect(signInUrl);
-    }
-  }
-});
+export default isRealClerkKey
+  ? clerkMiddleware(async (auth, req) => {
+      const path = req.nextUrl.pathname;
+      if (path.startsWith('/diagnostic') || isProtectedRoute(req)) {
+        const { userId } = await auth();
+        if (!userId) {
+          const signInUrl = new URL('/sign-in', req.url);
+          signInUrl.searchParams.set('redirect_url', req.url);
+          return NextResponse.redirect(signInUrl);
+        }
+      }
+    })
+  : function middleware() {
+      return NextResponse.next();
+    };
 
 export const config = {
   matcher: [
@@ -34,3 +47,4 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 };
+

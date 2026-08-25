@@ -89,11 +89,20 @@
   - Dynamic Senior Developer code reviewer checking code submissions for edge cases and styling.
   - Automated PR approval trigger updating BKT skill mastery, executing graph path replanning, and updating the cryptographic Proof Card and narratives (via xAPI telemetry logs).
 
+### Task 9: Platform Admin & Resource Curation API System ✅
+- **Files:** `apps/api/app/api/admin.py`, `apps/api/app/core/auth.py`, `apps/api/alembic/versions/0003_admin_platform_system.py`, `apps/api/app/schemas/admin.py`
+- **What was built:**
+  - Strict role-based protection helpers in `auth.py` (`require_admin`, `require_approved_mentor`, `require_active_user`).
+  - System health pings: live status checks verifying PostgreSQL and Neo4j connectivity.
+  - User auditing: pagination and filtering by roles/status, with guards preventing self-deactivation/demotion.
+  - Mentor workflow: apply portal, status tracking (`PENDING`, `APPROVED`, `REJECTED`), and automatic role upgrading.
+  - Content Curation CRUD: approved mentor submission channel, admin approval gate, meta validation, and path planner indexing integration.
+
 ---
 
-## 3. API Endpoint Registry (All Innovation Endpoints in main.py)
+## 3. API Endpoint Registry (All Innovation Endpoints in main.py & admin.py)
 
-| Method | Endpoint | Service File | Innovation |
+| Method | Endpoint | Service/API File | Innovation |
 |--------|----------|-------------|------------|
 | POST | `/api/v1/diagnostics/debug-telemetry` | `process_diagnostics.py` | SDT Debugging Diagnostic |
 | POST | `/api/v1/simulate-skip-delta` | `skip_delta.py` | Live Skip Date Simulation |
@@ -105,6 +114,15 @@
 | GET | `/api/v1/simulator/tickets/{profile_id}` | `simulator.py` | Day-One Simulator Tickets |
 | POST | `/api/v1/simulator/ticket/{ticket_id}/chat` | `simulator.py` | Stakeholder Persona Chat |
 | POST | `/api/v1/simulator/ticket/{ticket_id}/submit-pr` | `simulator.py` | PR Review & Approval |
+| GET | `/api/v1/admin/overview` | `api/admin.py` | System Metrics Dashboard |
+| GET | `/api/v1/admin/system` | `api/admin.py` | Infrastructure Health checks |
+| GET | `/api/v1/admin/users` | `api/admin.py` | User management & Role editing |
+| PATCH | `/api/v1/admin/users/{id}/status` | `api/admin.py` | User activation/suspension |
+| GET | `/api/v1/admin/mentors` | `api/admin.py` | Mentor applications review queue |
+| POST | `/api/v1/admin/mentors/{id}/approve`| `api/admin.py` | Mentor approval & role upgrade |
+| GET | `/api/v1/admin/resources` | `api/admin.py` | Curation engine resource overview|
+| POST | `/api/v1/admin/resources` | `api/admin.py` | Direct resource CRUD creation |
+| POST | `/api/v1/admin/resources/{id}/approve`| `api/admin.py` | Admin approval of submitted resource|
 
 ---
 

@@ -15,7 +15,7 @@ import {
   BrainCircuit
 } from 'lucide-react';
 import { usePathStore } from '../../store/usePathStore';
-import { useUser, UserButton } from '@clerk/nextjs';
+import { useSafeUser, SafeUserButton } from '../../lib/clerkSafe';
 
 const navigationGroups = [
   {
@@ -48,7 +48,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const targetRole = usePathStore((state) => state.targetRole);
   const readinessScore = usePathStore((state) => state.readinessScore);
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded } = useSafeUser();
 
   const userEmail = user?.primaryEmailAddress?.emailAddress || 'demo@pathfinder.dev';
   const userName = user?.fullName || user?.firstName || user?.username || 'Demo Learner';
@@ -137,7 +137,7 @@ export default function Sidebar() {
       <div className="p-4 border-t border-border bg-surface-secondary/20 flex items-center justify-between">
         <div className="flex items-center gap-2.5 overflow-hidden">
           {isLoaded && user ? (
-            <UserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 rounded-full" } }} />
+            <SafeUserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 rounded-full" } }} />
           ) : (
             <div className="w-8 h-8 shrink-0 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-xs">
               {userInitials}

@@ -17,7 +17,7 @@ Thresholds (configurable):
 import logging
 from enum import Enum
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, AliasChoices
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,7 @@ class CalibrationInput(BaseModel):
     skill_id: str = Field(..., description="The skill/milestone being calibrated.")
     self_rated_confidence: float = Field(
         ..., ge=0.0, le=1.0,
+        validation_alias=AliasChoices("self_rated_confidence", "confidence_pre_assessment"),
         description="Learner's self-rated mastery probability (0.0–1.0) collected before the quiz."
     )
     actual_score: float = Field(
