@@ -15,7 +15,7 @@ from app.models.domain import (
     DiagnosticTurn, PathVersion, AssessmentItem, AssessmentAttempt, ReadinessSnapshot
 )
 from app.infrastructure.neo4j.client import neo4j_client
-from app.infrastructure.ai.gateway import AnthropicAdapter, MockAIProvider
+from app.infrastructure.ai.gateway import AntigravityProxyAdapter, AnthropicAdapter, MockAIProvider, create_ai_provider
 
 from contextlib import asynccontextmanager
 
@@ -112,8 +112,8 @@ app.add_middleware(
 from app.routers.admin import router as admin_router
 app.include_router(admin_router)
 
-# Instantiate AI Provider safely based on configuration
-ai_provider = AnthropicAdapter() if settings.ANTHROPIC_API_KEY else MockAIProvider()
+# Instantiate AI Provider via factory (Antigravity Proxy > Anthropic > Mock)
+ai_provider = create_ai_provider()
 
 # --- Pydantic Schemas for API Requests/Responses ---
 
@@ -440,16 +440,22 @@ async def chat_with_coach(
     """
     # For now, just generate a dynamic message instead of passing through full LLM stream
     # to keep it fast and simple for the demo.
-    from app.infrastructure.ai.gateway import ai_provider
     prompt = f"The user is asking a question about the skill '{data.skill_id}': '{data.message}'. Give a brief, encouraging, 1-2 sentence response explaining a concept."
     try:
-        response = await ai_provider.client.messages.create(
-            model="claude-3-5-sonnet-20240620",
-            max_tokens=300,
-            system="You are an expert, encouraging technical AI coach. Be concise.",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        reply = response.content[0].text.strip()
+        if hasattr(ai_provider, 'coach_chat'):
+            # Use the proxy-compatible method (AntigravityProxyAdapter)
+            reply = await ai_provider.coach_chat(data.skill_id, data.message)
+        elif hasattr(ai_provider, 'client') and ai_provider.client:
+            # Fallback to direct Anthropic client
+            response = await ai_provider.client.messages.create(
+                model="claude-3-5-sonnet-20240620",
+                max_tokens=300,
+                system="You are an expert, encouraging technical AI coach. Be concise.",
+                messages=[{"role": "user", "content": prompt}]
+            )
+            reply = response.content[0].text.strip()
+        else:
+            reply = f"That's a great question about {data.skill_id}! I'd love to explain {data.message} in more detail when I have full connectivity."
     except Exception as e:
         reply = f"That's a great question about {data.skill_id}! I'd love to explain {data.message} in more detail when I have full connectivity."
         

@@ -212,8 +212,17 @@ async def chat_with_stakeholder(
     
     response_text = "I received your message. Please proceed with the requirements listed in the ticket description."
     
-    # Try calling Anthropic API via provider client if configured
-    if hasattr(ai_provider, "client") and ai_provider.client:
+    # Route through Antigravity Proxy adapter if available, else fallback to direct Anthropic
+    if hasattr(ai_provider, 'stakeholder_chat'):
+        try:
+            response_text = await ai_provider.stakeholder_chat(
+                persona=input_data.persona,
+                ticket_id=ticket_id,
+                message=input_data.message
+            )
+        except Exception as e:
+            logger.error(f"Failed to fetch stakeholder chat completion via proxy: {e}")
+    elif hasattr(ai_provider, "client") and ai_provider.client:
         try:
             response = await ai_provider.client.messages.create(
                 model="claude-3-5-sonnet-20240620",
@@ -278,7 +287,32 @@ async def review_pull_request(
     )
     
     result = mock_result
-    if hasattr(ai_provider, "client") and ai_provider.client:
+    if hasattr(ai_provider, 'review_pr_code'):
+        # Route through Antigravity Proxy adapter
+        try:
+            content_text = await ai_provider.review_pr_code(input_data.code_content)
+            content_text = content_text.strip()
+            if content_text.startswith("```json"):
+                content_text = content_text[7:]
+            if content_text.startswith("```"):
+                content_text = content_text[3:]
+            if content_text.endswith("```"):
+                content_text = content_text[:-3]
+            content_text = content_text.strip()
+            
+            import json
+            data = json.loads(content_text)
+            
+            comments = [PRReviewComment(**c) for c in data.get("comments", [])]
+            result = PRReviewResult(
+                approved=bool(data.get("approved", True)),
+                general_feedback=str(data.get("general_feedback", "")),
+                comments=comments
+            )
+        except Exception as e:
+            logger.error(f"Failed to generate AI PR review via proxy: {e}")
+            result = mock_result
+    elif hasattr(ai_provider, "client") and ai_provider.client:
         try:
             response = await ai_provider.client.messages.create(
                 model="claude-3-5-sonnet-20240620",
