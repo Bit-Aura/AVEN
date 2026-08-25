@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { UserButton } from '@clerk/nextjs';
+import { SafeUserButton } from '../lib/clerkSafe';
 import { 
   ArrowRight, 
   ShieldCheck, 
@@ -85,7 +85,7 @@ export default function LandingPage() {
               <sup className="text-sm md:text-base text-white tracking-widest mt-2">AVEN</sup>
             </div>
             <div className="flex items-center">
-              <UserButton appearance={{ elements: { userButtonAvatarBox: "w-10 h-10 border border-white/20" } }} />
+              <SafeUserButton appearance={{ elements: { userButtonAvatarBox: "w-10 h-10 border border-white/20" } }} />
             </div>
           </nav>
 

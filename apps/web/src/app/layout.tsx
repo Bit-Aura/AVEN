@@ -3,6 +3,8 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { ClerkProvider } from "@clerk/nextjs";
 
+import { isClerkConfigured } from "@/lib/clerkSafe";
+
 export const metadata: Metadata = {
   title: "Career PathFinder",
   description: "AI-powered personalized learning path recommender",
@@ -13,10 +15,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const hasClerkKey = Boolean(
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-    !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes('dummy')
-  );
+  const hasClerkKey = isClerkConfigured;
 
   const bodyContent = (
     <html lang="en">

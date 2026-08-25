@@ -5,7 +5,7 @@ import GoalChat from '../../../components/GoalChat';
 import DiagnosticChat from '../../../components/DiagnosticChat';
 import Link from 'next/link';
 import { ArrowLeft, Compass } from 'lucide-react';
-import { UserButton } from '@clerk/nextjs';
+import { SafeUserButton } from '../../../lib/clerkSafe';
 
 export default function DiagnosticPage() {
   const nextQuestion = usePathStore((state) => state.nextQuestion);
@@ -35,7 +35,7 @@ export default function DiagnosticPage() {
             <Compass size={14} className="text-brand-400" />
             <span>Cold-Start Diagnostic</span>
           </div>
-          <UserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 border border-white/20" } }} />
+          <SafeUserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 border border-white/20" } }} />
         </div>
       </header>
 

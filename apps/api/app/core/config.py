@@ -15,13 +15,18 @@ class Settings(BaseSettings):
     # ──────────────────────────────────────────────
     # LLM Provider Switch
     # ──────────────────────────────────────────────
+    # Set to "ollama"      → local Ollama instance (e.g. llama3:latest, qwen2.5-coder:14b)
     # Set to "antigravity" → free proxy via Antigravity reverse proxy
     # Set to "anthropic"   → direct Anthropic API (requires real key)
     # Set to "mock"        → deterministic mock responses (offline/test)
-    LLM_PROVIDER: str = "antigravity"
+    LLM_PROVIDER: str = "ollama"
 
     # Anthropic Direct API (only used when LLM_PROVIDER=anthropic)
     ANTHROPIC_API_KEY: str = "your_anthropic_api_key_here"
+
+    # Ollama Local LLM (only used when LLM_PROVIDER=ollama)
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama3:latest"
 
     # Antigravity Proxy (only used when LLM_PROVIDER=antigravity)
     #
