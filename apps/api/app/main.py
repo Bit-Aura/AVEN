@@ -12,7 +12,8 @@ from app.core.config import settings
 from app.core.db import get_db
 from app.models.domain import (
     User, LearnerProfile, Goal, DiagnosticSession,
-    DiagnosticTurn, PathVersion, AssessmentItem, AssessmentAttempt, ReadinessSnapshot
+    DiagnosticTurn, PathVersion, AssessmentItem, AssessmentAttempt, ReadinessSnapshot,
+    SkillRecord
 )
 from app.infrastructure.neo4j.client import neo4j_client
 from app.infrastructure.ai.gateway import AntigravityProxyAdapter, AnthropicAdapter, MockAIProvider, create_ai_provider
