@@ -16,7 +16,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # Setup pgvector extension
-    op.execute('CREATE EXTENSION IF NOT EXISTS vector')
+    bind = op.get_bind()
+    if bind.engine.name == 'postgresql':
+        op.execute('CREATE EXTENSION IF NOT EXISTS vector')
     
     # 1. users table
     op.create_table(
@@ -197,4 +199,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_index(op.f('ix_users_clerk_id'), table_name='users')
     op.drop_table('users')
-    op.execute('DROP EXTENSION IF EXISTS vector')
+    bind = op.get_bind()
+    if bind.engine.name == 'postgresql':
+        op.execute('DROP EXTENSION IF EXISTS vector')
