@@ -143,6 +143,15 @@ const getStoredProfileId = (): number | null => {
   }
 };
 
+const getStoredDiagnosticStatus = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  try {
+    return localStorage.getItem('pathfinder_diagnostic_complete') === 'true';
+  } catch {
+    return false;
+  }
+};
+
 const getStoredSessionId = (): number | null => {
   if (typeof window === 'undefined') return null;
   try {
@@ -163,7 +172,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
   activePathPlan: null,
   pathExplanation: null,
   pathError: null,
-  diagnosticComplete: false,
+  diagnosticComplete: getStoredDiagnosticStatus(),
   nextQuestion: null,
   isLoading: false,
   isSimulatingSkip: false,
@@ -285,6 +294,12 @@ export const usePathStore = create<PathState>()((set, get) => ({
               animated: i === 0,
               style: { stroke: i === 0 ? '#6366f1' : '#334155', strokeWidth: 2 }
             });
+          }
+
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem('pathfinder_diagnostic_complete', 'true');
+            } catch {}
           }
 
           set({ 

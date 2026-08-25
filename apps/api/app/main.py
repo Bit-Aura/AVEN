@@ -31,6 +31,12 @@ async def lifespan(app: FastAPI):
     try:
         from app.core.db import engine, async_session
         from app.models.base import Base
+        from sqlalchemy import text
+        
+        async with engine.connect() as conn:
+            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+            await conn.commit()
+            
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         
@@ -39,7 +45,7 @@ async def lifespan(app: FastAPI):
             stmt = select(User).where(User.email == "demo@pathfinder.dev")
             user = (await session.execute(stmt)).scalars().first()
             if not user:
-                user = User(clerk_id="clerk_demo_user", email="demo@pathfinder.dev", name="Demo Admin", role="admin", is_active=True)
+                user = User(clerk_id="clerk_demo_user", email="demo@pathfinder.dev", role="admin")
                 session.add(user)
                 await session.flush()
                 profile = LearnerProfile(user_id=user.id, current_context="Backend Software Engineer")
@@ -51,13 +57,12 @@ async def lifespan(app: FastAPI):
                     session.add(ReadinessSnapshot(profile_id=profile.id, skill_id=skill, readiness_score=0.85))
             else:
                 user.role = "admin"
-                user.is_active = True
                 
             # Seed Platform Admin User
             stmt_admin = select(User).where(User.email == "admin@pathfinder.dev")
             admin_user = (await session.execute(stmt_admin)).scalars().first()
             if not admin_user:
-                admin_user = User(clerk_id="clerk_admin_user", email="admin@pathfinder.dev", name="Platform Administrator", role="admin", is_active=True)
+                admin_user = User(clerk_id="clerk_admin_user", email="admin@pathfinder.dev", role="admin")
                 session.add(admin_user)
                 await session.flush()
                 session.add(LearnerProfile(user_id=admin_user.id, current_context="Platform Administrator"))
@@ -66,7 +71,7 @@ async def lifespan(app: FastAPI):
             stmt_mentor = select(User).where(User.email == "mentor@pathfinder.dev")
             mentor_user = (await session.execute(stmt_mentor)).scalars().first()
             if not mentor_user:
-                mentor_user = User(clerk_id="clerk_mentor_user", email="mentor@pathfinder.dev", name="Alex Rivera (Staff Mentor)", role="mentor", is_active=True)
+                mentor_user = User(clerk_id="clerk_mentor_user", email="mentor@pathfinder.dev", role="mentor")
                 session.add(mentor_user)
                 await session.flush()
                 session.add(LearnerProfile(user_id=mentor_user.id, current_context="Senior Systems Engineer"))
