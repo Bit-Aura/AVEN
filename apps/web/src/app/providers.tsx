@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
 import { useAuth } from '@clerk/nextjs';
-import { useEffect } from 'react';
 import { usePathStore } from '../store/usePathStore';
+import { isClerkConfigured } from '../lib/clerkSafe';
 
-function ClerkSync() {
+function RealClerkSync() {
   const { userId, isLoaded } = useAuth();
   
   useEffect(() => {
@@ -32,6 +31,13 @@ function ClerkSync() {
   }, [userId, isLoaded]);
   
   return null;
+}
+
+function ClerkSync() {
+  if (!isClerkConfigured) {
+    return null;
+  }
+  return <RealClerkSync />;
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {

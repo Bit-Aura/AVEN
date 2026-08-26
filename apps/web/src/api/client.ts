@@ -140,9 +140,24 @@ export const sendCoachMessage = async (skillId: string, message: string, profile
 };
 
 export const submitDebugTelemetry = async (payload: any) => {
+  const formattedPayload = payload?.snapshots ? payload : {
+    milestone_id: payload?.milestone_id || 'default_milestone',
+    snapshots: [
+      {
+        timestamp: Date.now() / 1000,
+        diff: payload?.code || '+ initial solution implementation',
+        lines_changed: [1],
+        test_ran: true,
+        test_passed: Boolean(payload?.passed),
+        failed_test_names: payload?.passed ? [] : [payload?.error_type || 'test_failure'],
+        execution_output: payload?.output || (payload?.passed ? 'Passed' : 'Failed')
+      }
+    ]
+  };
+
   return await fetchApi('/diagnostics/debug-telemetry', {
     method: 'POST',
-    body: JSON.stringify(payload)
+    body: JSON.stringify(formattedPayload)
   });
 };
 

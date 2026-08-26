@@ -629,19 +629,35 @@ export const usePathStore = create<PathState>()((set, get) => ({
   submitIdeTelemetry: async (payload) => {
     try {
       const { submitDebugTelemetry } = await import('../api/client');
-      const res = await submitDebugTelemetry(payload);
-      set({
-        coachPraiseCard: {
-          message: res.process_praise,
-          badge: res.thrash_index < 0.3 ? {
-            skillName: "Systematic Debugging",
-            confidenceScore: 0.9,
-            evidenceTags: ["Low Thrash", res.strategy_classification],
-            narrative: res.process_praise,
-            issueDate: new Date().toISOString()
-          } : undefined
-        }
-      });
+      const telemetryInput = payload.snapshots ? payload : {
+        milestone_id: payload.milestone_id,
+        snapshots: [
+          {
+            timestamp: Date.now() / 1000,
+            diff: payload.code || '+ initial solution implementation',
+            lines_changed: [1],
+            test_ran: true,
+            test_passed: Boolean(payload.passed),
+            failed_test_names: payload.passed ? [] : [payload.error_type || 'test_failure'],
+            execution_output: payload.output || (payload.passed ? 'Passed' : 'Failed')
+          }
+        ]
+      };
+      const res = await submitDebugTelemetry(telemetryInput);
+      if (res?.process_praise) {
+        set({
+          coachPraiseCard: {
+            message: res.process_praise,
+            badge: res.thrash_index < 0.3 ? {
+              skillName: "Systematic Debugging",
+              confidenceScore: 0.9,
+              evidenceTags: ["Low Thrash", res.strategy || "SYSTEMATIC"],
+              narrative: res.process_praise,
+              issueDate: new Date().toISOString()
+            } : undefined
+          }
+        });
+      }
     } catch (e) {
       console.error("Telemetry failed", e);
     }
