@@ -94,6 +94,8 @@ export default function PlatformAdminDashboard() {
     skill_id: ''
   });
 
+  const [apiError, setApiError] = useState<string | null>(null);
+
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
     setActionMessage({ text, type });
     setTimeout(() => setActionMessage(null), 4000);
@@ -102,6 +104,7 @@ export default function PlatformAdminDashboard() {
   // Fetch Overview Data
   const fetchOverviewData = useCallback(async () => {
     try {
+      setApiError(null);
       const [ovData, sysData] = await Promise.all([
         getAdminOverview(),
         getAdminSystemStatus()
@@ -110,12 +113,14 @@ export default function PlatformAdminDashboard() {
       setSystemStatus(sysData);
     } catch (err) {
       console.error('Failed to load overview data', err);
+      setApiError('Unable to connect to backend API server. Please verify backend is running on port 8000.');
     }
   }, []);
 
   // Fetch Users
   const fetchUsersData = useCallback(async () => {
     try {
+      setApiError(null);
       const res = await getAdminUsers({
         q: userSearch,
         role: userRoleFilter || undefined,
@@ -125,22 +130,26 @@ export default function PlatformAdminDashboard() {
       setUserTotal(res.total);
     } catch (err) {
       console.error('Failed to load users', err);
+      setApiError('Failed to load user accounts.');
     }
   }, [userSearch, userRoleFilter]);
 
   // Fetch Mentors
   const fetchMentorsData = useCallback(async () => {
     try {
+      setApiError(null);
       const res = await getAdminMentors(mentorStatusFilter || undefined);
       setMentors(res.applications);
     } catch (err) {
       console.error('Failed to load mentors', err);
+      setApiError('Failed to load mentor applications.');
     }
   }, [mentorStatusFilter]);
 
   // Fetch Resources
   const fetchResourcesData = useCallback(async () => {
     try {
+      setApiError(null);
       const res = await getAdminResources({
         status: resourceStatusFilter || undefined,
         resource_type: resourceTypeFilter || undefined,
@@ -151,6 +160,7 @@ export default function PlatformAdminDashboard() {
       setResourceTotal(res.total);
     } catch (err) {
       console.error('Failed to load resources', err);
+      setApiError('Failed to load learning resources.');
     }
   }, [resourceStatusFilter, resourceTypeFilter, resourceSearch]);
 
@@ -166,6 +176,9 @@ export default function PlatformAdminDashboard() {
         const sys = await getAdminSystemStatus();
         setSystemStatus(sys);
       }
+    } catch (err) {
+      console.error('Error refreshing admin view', err);
+      setApiError('API connection error. Ensure FastAPI server is running.');
     } finally {
       setIsLoading(false);
     }
@@ -343,6 +356,22 @@ export default function PlatformAdminDashboard() {
           </div>
           <button onClick={() => setActionMessage(null)} className="text-slate-400 hover:text-white">
             <X size={14} />
+          </button>
+        </div>
+      )}
+
+      {/* API Connectivity Error Banner */}
+      {apiError && (
+        <div className="p-4 rounded-xl border border-rose-500/40 bg-rose-950/30 text-rose-300 flex items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-2.5 text-xs font-semibold">
+            <AlertCircle size={17} className="text-rose-400 shrink-0" />
+            <span>{apiError}</span>
+          </div>
+          <button
+            onClick={refreshCurrentView}
+            className="px-3 py-1 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 border border-rose-500/50 text-xs font-bold text-white transition-all shrink-0"
+          >
+            Retry
           </button>
         </div>
       )}

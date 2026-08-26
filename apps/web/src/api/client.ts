@@ -66,6 +66,7 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      'X-User-Email': 'demo@pathfinder.dev',
       ...options.headers,
     },
   });
