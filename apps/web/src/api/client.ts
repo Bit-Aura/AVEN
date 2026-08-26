@@ -127,12 +127,13 @@ export const submitCheckpoint = async (profileId: number, skillId: string, userA
   });
 };
 
-export const sendCoachMessage = async (skillId: string, message: string) => {
+export const sendCoachMessage = async (skillId: string, message: string, profileId?: number) => {
   return await fetchApi('/coach/chat', {
     method: 'POST',
     body: JSON.stringify({
       skill_id: skillId,
-      message: message
+      message: message,
+      profile_id: profileId || null
     })
   });
 };
@@ -164,6 +165,16 @@ export const evaluateCalibration = async (payload: any) => {
 
 export const getCareerAlternatives = async (profileId: number, currentRoleId: string = 'backend_swe', weeklyHours: number = 10) => {
   return await fetchApi(`/career/alternatives/${profileId}?current_role_id=${currentRoleId}&weekly_study_hours=${weeklyHours}`);
+};
+
+export const pivotCareerRole = async (profileId: number, roleId: string) => {
+  return await fetchApi('/career/pivot', {
+    method: 'POST',
+    body: JSON.stringify({
+      profile_id: profileId,
+      role_id: roleId
+    })
+  });
 };
 
 export const generatePlacementPlan = async (payload: any) => {

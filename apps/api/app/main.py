@@ -145,12 +145,17 @@ class CheckpointSubmitInput(BaseModel):
 class CoachChatInput(BaseModel):
     skill_id: str
     message: str
+    profile_id: Optional[int] = None
 
 class SliderWeightsInput(BaseModel):
     profile_id: int
     speed: float = Field(default=0.5, ge=0.0, le=1.0)
     depth: float = Field(default=0.5, ge=0.0, le=1.0)
     cost: float = Field(default=0.5, ge=0.0, le=1.0)
+
+class CareerPivotInput(BaseModel):
+    profile_id: int
+    role_id: str
 
 class ScrapeJobsInput(BaseModel):
     source: str = Field(default="greenhouse", description="Source adapter name (e.g. 'greenhouse')")
@@ -456,29 +461,79 @@ async def chat_with_coach(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Chats with the AI coach about a specific skill.
+    RAG-enriched AI Coach. Retrieves learner context (readiness scores, path
+    position, skill descriptions) and injects them into the system prompt so
+    the LLM response is grounded in the learner's actual state.
     """
-    # For now, just generate a dynamic message instead of passing through full LLM stream
-    # to keep it fast and simple for the demo.
-    prompt = f"The user is asking a question about the skill '{data.skill_id}': '{data.message}'. Give a brief, encouraging, 1-2 sentence response explaining a concept."
+    # ---------- 1. Build RAG context from learner's DB state ----------
+    rag_context_parts = []
+    profile_id = data.profile_id
+
+    if profile_id:
+        # Readiness snapshots
+        snap_stmt = select(ReadinessSnapshot).where(ReadinessSnapshot.profile_id == profile_id)
+        snapshots = (await db.execute(snap_stmt)).scalars().all()
+        if snapshots:
+            mastered = [s for s in snapshots if s.readiness_score >= 0.70]
+            in_progress = [s for s in snapshots if s.readiness_score < 0.70]
+            mastered_str = ", ".join(f"{s.skill_id} ({round(s.readiness_score*100)}%)" for s in mastered) or "None yet"
+            progress_str = ", ".join(f"{s.skill_id} ({round(s.readiness_score*100)}%)" for s in in_progress) or "None"
+            rag_context_parts.append(f"MASTERED SKILLS: {mastered_str}")
+            rag_context_parts.append(f"IN-PROGRESS SKILLS: {progress_str}")
+
+        # Current path position
+        path_stmt = select(PathVersion).where(PathVersion.profile_id == profile_id).order_by(PathVersion.created_at.desc())
+        latest_path = (await db.execute(path_stmt)).scalars().first()
+        if latest_path and latest_path.changed_nodes:
+            active = latest_path.changed_nodes.get("active_skill", "unknown")
+            remaining = latest_path.changed_nodes.get("remaining_path", [])
+            rag_context_parts.append(f"CURRENT ACTIVE SKILL: {active}")
+            rag_context_parts.append(f"REMAINING PATH ({len(remaining)} skills): {', '.join(remaining[:5])}{'...' if len(remaining) > 5 else ''}")
+
+    # Skill description from SkillRecord table
+    skill_stmt = select(SkillRecord).where(SkillRecord.id == data.skill_id)
+    skill_rec = (await db.execute(skill_stmt)).scalars().first()
+    if skill_rec:
+        rag_context_parts.append(f"SKILL DESCRIPTION ({skill_rec.name}): {skill_rec.description or 'No description available'}")
+
+    rag_block = "\n".join(rag_context_parts) if rag_context_parts else "No learner context available."
+
+    system_prompt = (
+        "You are an expert, encouraging technical AI Coach for a personalized learning platform. "
+        "Use the learner context below to give responses grounded in their actual progress and skill level. "
+        "Be concise (2-4 sentences), encouraging, and specific to their situation.\n\n"
+        f"--- LEARNER CONTEXT (RAG) ---\n{rag_block}\n--- END CONTEXT ---"
+    )
+    user_prompt = f"Regarding the skill '{data.skill_id}': {data.message}"
+
+    # ---------- 2. Call LLM with enriched context ----------
     try:
-        if hasattr(ai_provider, 'coach_chat'):
-            # Use the proxy-compatible method (AntigravityProxyAdapter)
+        if hasattr(ai_provider, '_chat'):
+            reply = await ai_provider._chat(system=system_prompt, user_prompt=user_prompt, max_tokens=300)
+        elif hasattr(ai_provider, 'coach_chat'):
             reply = await ai_provider.coach_chat(data.skill_id, data.message)
         elif hasattr(ai_provider, 'client') and ai_provider.client:
-            # Fallback to direct Anthropic client
             response = await ai_provider.client.messages.create(
                 model="claude-3-5-sonnet-20240620",
-                max_tokens=300,
-                system="You are an expert, encouraging technical AI coach. Be concise.",
-                messages=[{"role": "user", "content": prompt}]
+                max_tokens=400,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_prompt}]
             )
             reply = response.content[0].text.strip()
         else:
-            reply = f"That's a great question about {data.skill_id}! I'd love to explain {data.message} in more detail when I have full connectivity."
+            # Fallback: generate a context-aware static response
+            if rag_context_parts:
+                reply = (
+                    f"Great question about {skill_rec.name if skill_rec else data.skill_id}! "
+                    f"Based on your current progress, you're working on '{rag_context_parts[0].split(': ')[-1] if rag_context_parts else 'this topic'}'. "
+                    f"Keep building on your mastered foundations — you're making solid progress!"
+                )
+            else:
+                reply = f"That's a great question about {data.skill_id}! Keep practicing and you'll master it."
     except Exception as e:
-        reply = f"That's a great question about {data.skill_id}! I'd love to explain {data.message} in more detail when I have full connectivity."
-        
+        logger.warning(f"Coach chat LLM call failed: {e}")
+        reply = f"Great question about {data.skill_id}! Based on your current roadmap, keep focusing on your active milestone to make continuous progress."
+
     return {"reply": reply}
 
 @app.post("/api/v1/checkpoint/submit")
@@ -619,7 +674,8 @@ async def update_steerable_weights(
         trigger_event="preference_sliders_updated",
         db=db,
         neo4j_client=neo4j_client,
-        ai_provider=ai_provider
+        ai_provider=ai_provider,
+        weights={"speed": data.speed, "depth": data.depth, "cost": data.cost}
     )
     await db.commit()
     return {
@@ -970,6 +1026,64 @@ async def get_career_alternatives(
     except Exception as e:
         logger.exception("Career alternatives computation failed")
         raise HTTPException(status_code=500, detail=f"Career alternatives failed: {e}")
+
+
+@app.post("/api/v1/career/pivot")
+async def pivot_career_role(
+    data: CareerPivotInput,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    [Innovation 5] Switches target role to an adjacent career cluster,
+    updates profile context and active Goal, and replans the learning DAG.
+    """
+    from app.services.career_engine import ROLE_CLUSTERS
+    from app.services.path_planner import generate_or_replan_path
+    
+    # 1. Fetch profile
+    stmt = select(LearnerProfile).where(LearnerProfile.id == data.profile_id)
+    profile = (await db.execute(stmt)).scalars().first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Learner profile not found.")
+        
+    # 2. Match role cluster
+    cluster = ROLE_CLUSTERS.get(data.role_id)
+    if not cluster:
+        for r_id, c in ROLE_CLUSTERS.items():
+            if c["title"].lower() == data.role_id.lower():
+                cluster = c
+                break
+    
+    role_title = cluster["title"] if cluster else data.role_id
+    
+    # 3. Update profile current context and add a new Goal record
+    profile.current_context = role_title
+    new_goal = Goal(
+        profile_id=profile.id,
+        title=role_title,
+        description="career_pivot"
+    )
+    db.add(new_goal)
+    await db.flush()
+    
+    # 4. Replan path for the new target role
+    path_version = await generate_or_replan_path(
+        profile_id=data.profile_id,
+        trigger_event=f"career_pivot_{data.role_id}",
+        db=db,
+        neo4j_client=neo4j_client,
+        ai_provider=ai_provider
+    )
+    await db.commit()
+    
+    return {
+        "status": "success",
+        "target_role": role_title,
+        "role_id": data.role_id,
+        "updated_path": path_version.changed_nodes,
+        "explanation": path_version.decision_trace.get("explanation"),
+        "estimated_hours": path_version.decision_trace.get("estimated_hours")
+    }
 
 
 @app.post("/api/v1/placement/plan", response_model=PlacementPlanReport)

@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
     # Ollama Local LLM (only used when LLM_PROVIDER=ollama)
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "llama3:latest"
+    OLLAMA_MODEL: str = "qwen2.5-coder:14b"
 
     # Antigravity Proxy (only used when LLM_PROVIDER=antigravity)
     #

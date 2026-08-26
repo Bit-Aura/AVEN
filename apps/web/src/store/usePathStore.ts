@@ -123,10 +123,13 @@ interface PathState {
   openProofCard: (card: ProofCardData) => void;
   closeProofCard: () => void;
   updateRankingPreference: (key: keyof RankingPreferences, value: number) => void;
+  setLocalRankingPreference: (key: keyof RankingPreferences, value: number) => void;
+  commitRankingPreferences: () => Promise<void>;
 
   submitIdeTelemetry: (payload: any) => Promise<void>;
   submitCalibration: (payload: any) => Promise<any>;
   fetchCareerAlternatives: (currentRoleId?: string, weeklyHours?: number) => Promise<any>;
+  switchTargetRole: (roleId: string) => Promise<any>;
   fetchPlacementPlan: (payload: any) => Promise<any>;
   fetchMentorQueue: (payload: any) => Promise<any>;
   runSanityCheck: (payload: any) => Promise<any>;
@@ -477,13 +480,14 @@ export const usePathStore = create<PathState>()((set, get) => ({
   },
 
   sendCoachMessage: async (nodeId, message) => {
+    const targetId = get().profileId || getStoredProfileId() || 1;
     set((state) => ({ 
       coachMessages: [...state.coachMessages, { role: 'user', text: message }],
       isCoachTyping: true 
     }));
     try {
       const { sendCoachMessage } = await import('../api/client');
-      const res = await sendCoachMessage(nodeId, message);
+      const res = await sendCoachMessage(nodeId, message, targetId);
       set((state) => ({ 
         coachMessages: [...state.coachMessages, { role: 'ai', text: res.reply }]
       }));
@@ -581,6 +585,29 @@ export const usePathStore = create<PathState>()((set, get) => ({
   openProofCard: (card) => set({ activeProofCard: card }),
   closeProofCard: () => set({ activeProofCard: null }),
   
+  setLocalRankingPreference: (key, value) => {
+    set((state) => ({
+      rankingPreferences: { ...state.rankingPreferences, [key]: value }
+    }));
+  },
+
+  commitRankingPreferences: async () => {
+    const preferences = get().rankingPreferences;
+    const targetId = get().profileId || getStoredProfileId() || 1;
+    try {
+      const { updateWeights } = await import('../api/client');
+      await updateWeights({
+        profile_id: targetId,
+        speed: preferences.speedVsDepth / 100,
+        depth: preferences.theoryVsPractice / 100,
+        cost: preferences.freeVsPaid / 100
+      });
+      await get().fetchActivePath(targetId);
+    } catch (e) {
+      console.error("commitRankingPreferences failed", e);
+    }
+  },
+
   updateRankingPreference: async (key, value) => {
     const updated = { ...get().rankingPreferences, [key]: value };
     set({ rankingPreferences: updated });
@@ -638,6 +665,27 @@ export const usePathStore = create<PathState>()((set, get) => ({
     } catch (e) {
       console.error(e);
       return null;
+    }
+  },
+
+  switchTargetRole: async (roleId: string) => {
+    const targetId = get().profileId || getStoredProfileId() || 1;
+    set({ isLoading: true });
+    try {
+      const { pivotCareerRole } = await import('../api/client');
+      const res = await pivotCareerRole(targetId, roleId);
+      if (res && res.target_role) {
+        set({ targetRole: res.target_role });
+      }
+      await get().fetchActivePath(targetId);
+      await get().fetchReadiness(targetId);
+      set({ showCelebration: true });
+      return res;
+    } catch (e) {
+      console.error("switchTargetRole failed", e);
+      throw e;
+    } finally {
+      set({ isLoading: false });
     }
   },
 
