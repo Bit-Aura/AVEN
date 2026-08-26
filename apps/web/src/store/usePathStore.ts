@@ -134,6 +134,16 @@ interface PathState {
   fetchMentorQueue: (payload: any) => Promise<any>;
   runSanityCheck: (payload: any) => Promise<any>;
   getVerifiedProofCard: (profileId?: number) => Promise<any>;
+
+  currentUser: {
+    id?: number;
+    clerk_id?: string;
+    email?: string;
+    name?: string;
+    role?: string;
+    imageUrl?: string;
+  } | null;
+  setCurrentUser: (user: any) => void;
 }
 
 const getStoredProfileId = (): number | null => {
@@ -141,6 +151,16 @@ const getStoredProfileId = (): number | null => {
   try {
     const raw = localStorage.getItem('pathfinder_profile_id');
     return raw ? parseInt(raw, 10) : null;
+  } catch {
+    return null;
+  }
+};
+
+const getStoredUser = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem('aven_auth_user');
+    return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
@@ -166,6 +186,13 @@ const getStoredSessionId = (): number | null => {
 };
 
 export const usePathStore = create<PathState>()((set, get) => ({
+  currentUser: getStoredUser(),
+  setCurrentUser: (user: any) => {
+    if (typeof window !== 'undefined' && user) {
+      localStorage.setItem('aven_auth_user', JSON.stringify(user));
+    }
+    set({ currentUser: user });
+  },
   profileId: getStoredProfileId(),
   sessionId: getStoredSessionId(),
   userGoal: null,

@@ -18,8 +18,9 @@ import {
   LogOut,
   UserCheck,
 } from 'lucide-react';
+import { useClerk } from '@clerk/nextjs';
 import { usePathStore } from '../../store/usePathStore';
-import { useSafeUser, SafeUserButton } from '../../lib/clerkSafe';
+import { useSafeUser, SafeUserButton, isClerkConfigured } from '../../lib/clerkSafe';
 import { logoutUser } from '../../api/client';
 
 export default function Sidebar() {
@@ -27,6 +28,15 @@ export default function Sidebar() {
   const targetRole = usePathStore((state) => state.targetRole);
   const readinessScore = usePathStore((state) => state.readinessScore);
   const { user, isLoaded } = useSafeUser();
+
+  let clerkInstance: any = null;
+  if (isClerkConfigured) {
+    try {
+      clerkInstance = useClerk();
+    } catch {
+      clerkInstance = null;
+    }
+  }
 
   const userRole = (user?.role || 'LEARNER').toUpperCase();
   const userEmail = user?.primaryEmailAddress?.emailAddress || 'demo@pathfinder.dev';
@@ -96,8 +106,26 @@ export default function Sidebar() {
     ? mentorGroups
     : learnerGroups;
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     logoutUser();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('last_clerk_user');
+      localStorage.removeItem('pathfinder_profile_id');
+      localStorage.removeItem('pathfinder_diagnostic_complete');
+      localStorage.removeItem('aven_auth_token');
+      localStorage.removeItem('aven_auth_user');
+    }
+    usePathStore.setState({ profileId: null, diagnosticComplete: false, nodes: [], edges: [], activePathPlan: null });
+
+    if (clerkInstance?.signOut) {
+      try {
+        await clerkInstance.signOut({ redirectUrl: '/sign-in' });
+        return;
+      } catch (e) {
+        console.error('Clerk sign out error', e);
+      }
+    }
+
     if (typeof window !== 'undefined') {
       window.location.href = '/sign-in';
     }
@@ -125,14 +153,9 @@ export default function Sidebar() {
             {userRole === 'ADMIN' ? 'Platform Control' : userRole === 'MENTOR' ? 'Mentor Mode' : 'Target Role'}
           </div>
           <span
-            className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-              userRole === 'ADMIN'
-                ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
-                : userRole === 'MENTOR'
-                ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
-                : 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/30'
-            }`}
+            className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)] flex items-center gap-1"
           >
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
             {userRole === 'ADMIN' ? 'Administrator' : userRole === 'MENTOR' ? 'Mentor' : 'Learner'}
           </span>
         </div>
@@ -221,7 +244,12 @@ export default function Sidebar() {
             </div>
           )}
           <div className="overflow-hidden">
-            <div className="text-xs font-bold text-white truncate">{userName}</div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-bold text-white truncate max-w-[90px]">{userName}</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-500/40 shadow-[0_0_8px_rgba(245,158,11,0.25)] shrink-0">
+                {userRole === 'ADMIN' ? 'Admin' : userRole === 'MENTOR' ? 'Mentor' : 'Learner'}
+              </span>
+            </div>
             <div className="text-[10px] text-slate-400 truncate">{userEmail}</div>
           </div>
         </div>

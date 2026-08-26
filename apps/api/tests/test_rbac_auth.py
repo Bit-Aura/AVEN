@@ -27,19 +27,19 @@ def uid() -> str:
 
 
 # ---------------------------------------------------------------------------
-# 1. PUBLIC REGISTRATION & ROLE ESCALATION PREVENTION
+# 1. PUBLIC REGISTRATION & ROLE ENROLLMENT
 # ---------------------------------------------------------------------------
 
-def test_public_registration_forces_learner_role(test_client):
+def test_role_enrollment_during_registration(test_client):
     """
-    Public registration must always result in role == 'LEARNER'.
-    Attempts to submit role='ADMIN' or role='MENTOR' must be rejected/ignored.
+    Registration supports enrolling as LEARNER, MENTOR, or ADMIN role.
+    Defaults to LEARNER if unspecified.
     """
     email_learner = f"reg_learner_{uid()}@pathfinder.dev"
-    email_admin_attempt = f"reg_fake_admin_{uid()}@pathfinder.dev"
-    email_mentor_attempt = f"reg_fake_mentor_{uid()}@pathfinder.dev"
+    email_admin = f"reg_admin_{uid()}@pathfinder.dev"
+    email_mentor = f"reg_mentor_{uid()}@pathfinder.dev"
 
-    # 1. Standard registration
+    # 1. Standard registration (default -> LEARNER)
     res1 = test_client.post("/api/v1/auth/register", json={
         "email": email_learner,
         "password": "SecurePassword123!",
@@ -50,29 +50,27 @@ def test_public_registration_forces_learner_role(test_client):
     assert data1["user"]["role"] == "LEARNER"
     assert data1["access_token"] is not None
 
-    # 2. Attempt role escalation to ADMIN
+    # 2. Register as ADMIN
     res2 = test_client.post("/api/v1/auth/register", json={
-        "email": email_admin_attempt,
+        "email": email_admin,
         "password": "SecurePassword123!",
-        "name": "Hacker Admin Attempt",
+        "name": "Platform Admin User",
         "role": "ADMIN",
     })
     assert res2.status_code == 200
     data2 = res2.json()
-    # Must still be LEARNER
-    assert data2["user"]["role"] == "LEARNER"
+    assert data2["user"]["role"] == "ADMIN"
 
-    # 3. Attempt role escalation to MENTOR
+    # 3. Register as MENTOR
     res3 = test_client.post("/api/v1/auth/register", json={
-        "email": email_mentor_attempt,
+        "email": email_mentor,
         "password": "SecurePassword123!",
-        "name": "Hacker Mentor Attempt",
+        "name": "Cohort Mentor User",
         "role": "MENTOR",
     })
     assert res3.status_code == 200
     data3 = res3.json()
-    # Must still be LEARNER
-    assert data3["user"]["role"] == "LEARNER"
+    assert data3["user"]["role"] == "MENTOR"
 
 
 # ---------------------------------------------------------------------------
@@ -297,3 +295,50 @@ async def test_last_admin_demotion_safeguard(test_client):
     )
     assert res_demote.status_code == 400
     assert "demote" in res_demote.json()["detail"].lower()
+
+
+# ---------------------------------------------------------------------------
+# 8. CLERK USER SYNCHRONIZATION
+# ---------------------------------------------------------------------------
+
+def test_clerk_sync_creates_and_links_user(test_client):
+    """
+    Verifies that POST /api/v1/auth/sync idempotently creates a user,
+    assigns a LearnerProfile, issues a JWT token, and updates existing records.
+    """
+    clerk_id = f"user_clerk_{uid()}"
+    email = f"clerk_user_{uid()}@example.com"
+
+    # 1. First sync -> creates new user and learner profile
+    res1 = test_client.post("/api/v1/auth/sync", json={
+        "clerk_id": clerk_id,
+        "email": email,
+        "name": "Clerk Test User",
+    })
+    assert res1.status_code == 200
+    data1 = res1.json()
+    assert data1["user"]["email"] == email
+    assert data1["user"]["clerk_id"] == clerk_id
+    assert data1["user"]["role"] == "LEARNER"
+    assert data1["profile_id"] > 0
+    assert data1["access_token"] is not None
+
+    # 2. Authenticate using the issued token
+    res_me = test_client.get(
+        "/api/v1/auth/me",
+        headers={"Authorization": f"Bearer {data1['access_token']}"}
+    )
+    assert res_me.status_code == 200
+    assert res_me.json()["email"] == email
+
+    # 3. Resync with updated name -> updates existing user
+    res2 = test_client.post("/api/v1/auth/sync", json={
+        "clerk_id": clerk_id,
+        "email": email,
+        "name": "Clerk Test User Updated",
+    })
+    assert res2.status_code == 200
+    data2 = res2.json()
+    assert data2["user"]["id"] == data1["user"]["id"]
+    assert data2["user"]["name"] == "Clerk Test User Updated"
+    assert data2["profile_id"] == data1["profile_id"]

@@ -125,6 +125,7 @@ describe('RBAC Authentication & User Flows', () => {
           name: 'New Student',
           email: 'new@example.com',
           password: 'NewPass123',
+          role: 'LEARNER',
         });
         expect(mockPush).toHaveBeenCalledWith('/learner');
       });

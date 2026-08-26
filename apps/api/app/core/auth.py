@@ -27,8 +27,8 @@ JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "aven-secure-jwt-secret-key-32-char
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
 
-DEFAULT_ADMIN_EMAIL = "admin@aven.com"
-DEFAULT_ADMIN_PASSWORD = "Aven@123"
+DEFAULT_ADMIN_EMAIL = os.getenv("DEFAULT_ADMIN_EMAIL", "admin@aven.com")
+DEFAULT_ADMIN_PASSWORD = os.getenv("DEFAULT_ADMIN_PASSWORD", "Aven@123")
 
 
 # ---------------------------------------------------------------------------
@@ -170,14 +170,17 @@ async def ensure_default_admin(db: AsyncSession) -> User:
 async def get_current_user(
     authorization: Optional[str] = Header(None),
     x_user_email: Optional[str] = Header(None, alias="X-User-Email"),
+    x_clerk_user_id: Optional[str] = Header(None, alias="X-Clerk-User-Id"),
     db: AsyncSession = Depends(get_db)
 ) -> User:
     """
     Resolves the authenticated User entity from either:
     1. Bearer JWT token in Authorization header
-    2. X-User-Email header (for test suite and backward compatibility)
+    2. X-Clerk-User-Id header
+    3. X-User-Email header (for test suite and backward compatibility)
     """
     target_email: Optional[str] = None
+    target_clerk_id: Optional[str] = None
 
     # 1. Try JWT Authorization Header
     if authorization and authorization.startswith("Bearer "):
@@ -189,17 +192,31 @@ async def get_current_user(
                 detail="Invalid or expired authentication token."
             )
         target_email = str(payload["sub"]).strip().lower()
+        if "clerk_id" in payload and payload["clerk_id"]:
+            target_clerk_id = str(payload["clerk_id"]).strip()
 
-    # 2. Fallback to X-User-Email header (for development & automated test suites)
+    # 2. Try X-Clerk-User-Id header
+    if not target_email and x_clerk_user_id and x_clerk_user_id.strip():
+        target_clerk_id = x_clerk_user_id.strip()
+
+    # 3. Fallback to X-User-Email header
     if not target_email and x_user_email and x_user_email.strip():
         target_email = x_user_email.strip().lower()
 
-    # 3. Default demo fallback for local development if neither provided
-    if not target_email:
-        target_email = "demo@pathfinder.dev"
+    user = None
+    if target_clerk_id:
+        stmt = select(User).where(User.clerk_id == target_clerk_id)
+        user = (await db.execute(stmt)).scalars().first()
 
-    stmt = select(User).where(User.email == target_email)
-    user = (await db.execute(stmt)).scalars().first()
+    if not user and target_email:
+        stmt = select(User).where(User.email == target_email)
+        user = (await db.execute(stmt)).scalars().first()
+
+    # Default demo fallback for local development if neither matched
+    if not user and not target_email and not target_clerk_id:
+        target_email = "demo@pathfinder.dev"
+        stmt = select(User).where(User.email == target_email)
+        user = (await db.execute(stmt)).scalars().first()
 
     if not user:
         # Determine canonical role based on known conventions for test/dev auto-creation

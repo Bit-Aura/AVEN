@@ -64,6 +64,7 @@ export interface ScrapeResult {
 async function fetchApi(endpoint: string, options: RequestInit = {}) {
   let authToken: string | null = null;
   let storedEmail: string | null = null;
+  let storedClerkId: string | null = null;
   if (typeof window !== 'undefined') {
     authToken = localStorage.getItem('aven_auth_token');
     const storedUser = localStorage.getItem('aven_auth_user');
@@ -71,6 +72,7 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
       try {
         const u = JSON.parse(storedUser);
         storedEmail = u.email;
+        storedClerkId = u.clerk_id || null;
       } catch (e) {}
     }
   }
@@ -86,6 +88,9 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
     authHeaders['X-User-Email'] = storedEmail;
   } else {
     authHeaders['X-User-Email'] = 'demo@pathfinder.dev';
+  }
+  if (storedClerkId) {
+    authHeaders['X-Clerk-User-Id'] = storedClerkId;
   }
 
   const res = await fetch(`${BASE_URL}${endpoint}`, {
@@ -129,7 +134,7 @@ export const loginUser = async (payload: { email: string; password: string }) =>
   return data;
 };
 
-export const registerUser = async (payload: { email: string; password: string; name?: string }) => {
+export const registerUser = async (payload: { email: string; password: string; name?: string; role?: string }) => {
   const res = await fetch(`${BASE_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -150,6 +155,60 @@ export const registerUser = async (payload: { email: string; password: string; n
   if (typeof window !== 'undefined') {
     localStorage.setItem('aven_auth_token', data.access_token);
     localStorage.setItem('aven_auth_user', JSON.stringify(data.user));
+  }
+  return data;
+};
+
+export interface ClerkSyncInput {
+  clerk_id: string;
+  email: string;
+  name?: string;
+  image_url?: string;
+  role?: string;
+}
+
+export interface ClerkSyncResponse {
+  access_token: string;
+  token_type: string;
+  user: {
+    id: number;
+    clerk_id?: string;
+    email: string;
+    name?: string;
+    role: string;
+    is_active: boolean;
+  };
+  profile_id: number;
+}
+
+export const syncClerkUser = async (payload: ClerkSyncInput): Promise<ClerkSyncResponse> => {
+  const res = await fetch(`${BASE_URL}/auth/sync`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    let detail = 'Clerk sync failed.';
+    try {
+      const parsed = JSON.parse(errText);
+      detail = parsed.detail || detail;
+    } catch {
+      detail = errText || detail;
+    }
+    throw new Error(detail);
+  }
+  const data: ClerkSyncResponse = await res.json();
+  if (typeof window !== 'undefined') {
+    if (data.access_token) {
+      localStorage.setItem('aven_auth_token', data.access_token);
+    }
+    if (data.user) {
+      localStorage.setItem('aven_auth_user', JSON.stringify(data.user));
+    }
+    if (data.profile_id) {
+      localStorage.setItem('pathfinder_profile_id', String(data.profile_id));
+    }
   }
   return data;
 };

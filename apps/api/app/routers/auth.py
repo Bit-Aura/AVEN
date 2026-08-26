@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, or_
 
 from app.core.db import get_db
 from app.core.auth import (
@@ -20,6 +20,7 @@ from app.core.auth import (
     UserRole,
     get_current_user,
     require_active_user,
+    DEFAULT_ADMIN_PASSWORD,
 )
 from app.models.domain import User, LearnerProfile
 
@@ -34,14 +35,22 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6, max_length=128)
     name: Optional[str] = Field(None, max_length=255)
-    # Any client submitted 'role' will be ignored and forced to LEARNER
+    role: Optional[str] = Field(default="LEARNER", max_length=50)
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=1)
 
+class ClerkSyncRequest(BaseModel):
+    clerk_id: str = Field(..., min_length=1, max_length=255)
+    email: EmailStr
+    name: Optional[str] = Field(None, max_length=255)
+    image_url: Optional[str] = Field(None, max_length=1024)
+    role: Optional[str] = Field(default=None, max_length=50)
+
 class UserAuthItem(BaseModel):
     id: int
+    clerk_id: Optional[str] = None
     email: str
     name: Optional[str] = None
     role: str
@@ -51,6 +60,12 @@ class AuthResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserAuthItem
+
+class ClerkSyncResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserAuthItem
+    profile_id: int
 
 
 # ---------------------------------------------------------------------------
@@ -63,8 +78,7 @@ async def register_user(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Public registration endpoint.
-    Strictly creates users with LEARNER role. Privilege escalation attempts are ignored.
+    Registration endpoint supporting LEARNER, MENTOR, or ADMIN role enrollment.
     """
     clean_email = str(payload.email).strip().lower()
 
@@ -77,8 +91,8 @@ async def register_user(
             detail="An account with this email address already exists."
         )
 
-    # Force canonical LEARNER role
-    canonical_role = UserRole.LEARNER.value
+    # Determine canonical role
+    canonical_role = normalize_role(payload.role) if payload.role else UserRole.LEARNER.value
     pwd_hash = hash_password(payload.password)
     user_name = payload.name.strip() if payload.name and payload.name.strip() else clean_email.split("@")[0].title()
 
@@ -94,8 +108,9 @@ async def register_user(
     db.add(new_user)
     await db.flush()
 
-    # Create associated learner profile
-    profile = LearnerProfile(user_id=new_user.id, current_context="Software Engineering Track")
+    # Create associated profile
+    profile_track = "Platform Administration" if canonical_role == "ADMIN" else ("Mentor Track" if canonical_role == "MENTOR" else "Software Engineering Track")
+    profile = LearnerProfile(user_id=new_user.id, current_context=profile_track)
     db.add(profile)
     await db.commit()
     await db.refresh(new_user)
@@ -201,8 +216,104 @@ async def get_current_authenticated_user(
     """
     return UserAuthItem(
         id=current_user.id,
+        clerk_id=current_user.clerk_id,
         email=current_user.email,
         name=current_user.name,
         role=normalize_role(current_user.role),
         is_active=current_user.is_active,
+    )
+
+
+@router.post("/sync", response_model=ClerkSyncResponse)
+@router.post("/clerk-sync", response_model=ClerkSyncResponse)
+async def sync_clerk_user(
+    payload: ClerkSyncRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Idempotently synchronizes a Clerk authenticated user with the PostgreSQL database.
+    Creates or updates the User record and ensures an associated LearnerProfile exists.
+    Returns signed JWT access token, user metadata, and active profile ID.
+    """
+    clean_email = str(payload.email).strip().lower()
+    clean_clerk_id = payload.clerk_id.strip()
+
+    # Find existing user by clerk_id OR email
+    stmt = select(User).where(or_(User.clerk_id == clean_clerk_id, User.email == clean_email))
+    user = (await db.execute(stmt)).scalars().first()
+
+    if user:
+        # Update role if explicitly provided in request
+        if payload.role:
+            user.role = normalize_role(payload.role)
+
+        # Update clerk_id if missing or changed
+        if not user.clerk_id or user.clerk_id != clean_clerk_id:
+            user.clerk_id = clean_clerk_id
+
+        # Update name if provided and existing is default or blank
+        if payload.name and payload.name.strip():
+            user.name = payload.name.strip()
+
+        await db.commit()
+        await db.refresh(user)
+    else:
+        # Determine canonical role
+        if payload.role:
+            assigned_role = normalize_role(payload.role)
+        elif clean_email in ("admin@aven.com", "admin@pathfinder.dev"):
+            assigned_role = UserRole.ADMIN.value
+        elif "mentor" in clean_email:
+            assigned_role = UserRole.MENTOR.value
+        else:
+            assigned_role = UserRole.LEARNER.value
+
+        user_name = payload.name.strip() if payload.name and payload.name.strip() else clean_email.split("@")[0].title()
+
+        user = User(
+            clerk_id=clean_clerk_id,
+            email=clean_email,
+            name=user_name,
+            role=assigned_role,
+            is_active=True,
+            created_at=datetime.now(timezone.utc),
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+
+    # Ensure LearnerProfile exists
+    profile_stmt = select(LearnerProfile).where(LearnerProfile.user_id == user.id)
+    profile = (await db.execute(profile_stmt)).scalars().first()
+    if not profile:
+        profile = LearnerProfile(
+            user_id=user.id,
+            current_context="Backend Software Engineer"
+        )
+        db.add(profile)
+        await db.commit()
+        await db.refresh(profile)
+
+    canonical_role = normalize_role(user.role)
+
+    # Issue JWT Token
+    access_token = create_access_token({
+        "sub": user.email,
+        "user_id": user.id,
+        "clerk_id": user.clerk_id,
+        "role": canonical_role,
+    })
+
+    return ClerkSyncResponse(
+        access_token=access_token,
+        token_type="bearer",
+        user=UserAuthItem(
+            id=user.id,
+            clerk_id=user.clerk_id,
+            email=user.email,
+            name=user.name,
+            role=canonical_role,
+            is_active=user.is_active,
+        ),
+        profile_id=profile.id,
     )
