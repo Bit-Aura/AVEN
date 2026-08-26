@@ -93,6 +93,9 @@ app = FastAPI(
 from app.api.admin import router as admin_router
 app.include_router(admin_router)
 
+# Include IDE Router
+from app.routers.ide import router as ide_router
+app.include_router(ide_router, prefix=settings.API_V1_STR)
 
 # Enable CORS for frontend connections
 app.add_middleware(

@@ -14,8 +14,14 @@ RUN npm install
 COPY apps/web ./
 RUN npm run build
 
-FROM nginx:alpine
-# Serve the static export 'out' folder
-COPY --from=builder /app/apps/web/out /usr/share/nginx/html
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV production
+ENV PORT 80
+
+COPY --from=builder /app/packages/shared-types ./packages/shared-types
+COPY --from=builder /app/apps/web ./apps/web
+WORKDIR /app/apps/web
+
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "start"]

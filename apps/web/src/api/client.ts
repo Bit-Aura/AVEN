@@ -491,4 +491,13 @@ export const getPublicResources = async (params?: {
   return await fetchApi(`/resources${qs ? `?${qs}` : ''}`);
 };
 
-
+export const executeCode = async (language: string, code: string, nodeId: string) => {
+  return await fetchApi('/ide/execute', {
+    method: 'POST',
+    body: JSON.stringify({
+      language,
+      code,
+      node_id: nodeId
+    })
+  });
+};
