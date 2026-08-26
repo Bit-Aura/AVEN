@@ -5,18 +5,16 @@ import { Terminal, Code, HelpCircle, WifiOff, Focus, X, Command, MapPin } from '
 import { useEffect, useState } from 'react';
 
 export default function CommandPalette() {
-  const {
-    isCommandPaletteOpen,
-    toggleCommandPalette,
-    closeCommandPalette,
-    activeMilestone,
-    openIde,
-    openCoach,
-    toggleOffline,
-    toggleFocusMode,
-    nodes,
-    setActiveMilestone
-  } = usePathStore();
+  const isCommandPaletteOpen = usePathStore((state) => state.isCommandPaletteOpen);
+  const toggleCommandPalette = usePathStore((state) => state.toggleCommandPalette);
+  const closeCommandPalette = usePathStore((state) => state.closeCommandPalette);
+  const activeMilestone = usePathStore((state) => state.activeMilestone);
+  const openIde = usePathStore((state) => state.openIde);
+  const openCoach = usePathStore((state) => state.openCoach);
+  const toggleOffline = usePathStore((state) => state.toggleOffline);
+  const toggleFocusMode = usePathStore((state) => state.toggleFocusMode);
+  const nodes = usePathStore((state) => state.nodes);
+  const setActiveMilestone = usePathStore((state) => state.setActiveMilestone);
 
   const [search, setSearch] = useState('');
 

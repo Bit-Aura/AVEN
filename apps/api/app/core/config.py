@@ -17,11 +17,16 @@ class Settings(BaseSettings):
     # ──────────────────────────────────────────────
     # Set to "ollama"      → local Ollama instance (e.g. llama3:latest, qwen2.5-coder:14b)
     # Set to "antigravity" → free proxy via Antigravity reverse proxy
-    # Set to "anthropic"   → direct Anthropic API (requires real key)
+    # Set to "claude" / "anthropic" → Claude LLMsRelay / Anthropic API
     # Set to "mock"        → deterministic mock responses (offline/test)
     LLM_PROVIDER: str = "ollama"
 
-    # Anthropic Direct API (only used when LLM_PROVIDER=anthropic)
+    # Claude / LLMsRelay API Configuration (Backend-only, never exposed to frontend)
+    CLAUDE_API_KEY: str = ""
+    CLAUDE_BASE_URL: str = "https://api.llmsrelay.com"
+    CLAUDE_MODEL: str = "claude-sonnet-5"
+
+    # Anthropic Direct API (kept for backward compatibility)
     ANTHROPIC_API_KEY: str = "your_anthropic_api_key_here"
 
     # Ollama Local LLM (only used when LLM_PROVIDER=ollama)

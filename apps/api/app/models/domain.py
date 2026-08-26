@@ -51,6 +51,7 @@ class LearnerProfile(Base):
     assessment_attempts: Mapped[List["AssessmentAttempt"]] = relationship(back_populates="profile")
     path_versions: Mapped[List["PathVersion"]] = relationship(back_populates="profile")
     readiness_snapshots: Mapped[List["ReadinessSnapshot"]] = relationship(back_populates="profile")
+    coding_submissions: Mapped[List["CodingSandboxSubmission"]] = relationship(back_populates="profile")
 
 class Goal(Base):
     __tablename__ = "goals"
@@ -198,4 +199,23 @@ class SkillRecord(Base):
     bkt_p_g: Mapped[float] = mapped_column(Float, default=0.20)
     embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(384))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+class CodingSandboxSubmission(Base):
+    __tablename__ = "coding_sandbox_submissions"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[Optional[int]] = mapped_column(ForeignKey("learner_profiles.id"), nullable=True, index=True)
+    node_id: Mapped[str] = mapped_column(String(255), index=True)
+    question_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    problem_title: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    language: Mapped[str] = mapped_column(String(50))
+    submitted_code: Mapped[str] = mapped_column(Text)
+    score: Mapped[float] = mapped_column(Float)
+    verdict: Mapped[str] = mapped_column(String(50))
+    is_passing: Mapped[bool] = mapped_column(Boolean, default=False)
+    evaluation_result: Mapped[Any] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    profile: Mapped[Optional["LearnerProfile"]] = relationship(back_populates="coding_submissions")
+
 

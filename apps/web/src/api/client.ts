@@ -511,3 +511,99 @@ export const getIdeProblem = async (nodeId: string, targetRole: string) => {
   const qs = searchParams.toString();
   return await fetchApi(`/ide/problem?${qs}`);
 };
+
+// =============================================================================
+// AI-POWERED CODING SANDBOX EVALUATION CONTRACTS
+// =============================================================================
+
+export interface ChallengeExample {
+  input: string;
+  output: string;
+  explanation?: string;
+}
+
+export interface CodingQuestionRequest {
+  node_id: string;
+  target_role?: string;
+  skill_name?: string;
+  difficulty?: string;
+  programming_language?: string;
+  profile_id?: number;
+}
+
+export interface CodingQuestionResponse {
+  question_id: string;
+  title: string;
+  problem_statement: string;
+  skill: string;
+  difficulty: string;
+  programming_language: string;
+  starter_code: string;
+  constraints: string[];
+  examples: ChallengeExample[];
+  expected_concepts: string[];
+  evaluation_rubric: string[];
+  hints: string[];
+  hidden_tests?: string;
+  description?: string;
+  default_code?: string;
+}
+
+export interface CodeEvaluationRequest {
+  node_id: string;
+  programming_language: string;
+  submitted_code: string;
+  problem_statement?: string;
+  problem_title?: string;
+  question_id?: string;
+  profile_id?: number;
+  target_role?: string;
+  skill_name?: string;
+  expected_concepts?: string[];
+  evaluation_rubric?: string[];
+  hints?: string[];
+}
+
+export interface ComplexityAnalysis {
+  time_complexity: string;
+  space_complexity: string;
+  details: string;
+}
+
+export interface CodeEvaluationResponse {
+  score: number;
+  verdict: 'excellent' | 'good' | 'partial' | 'needs_improvement' | 'incorrect';
+  summary: string;
+  correctness_score: number;
+  reasoning_score: number;
+  code_quality_score: number;
+  strengths: string[];
+  issues: string[];
+  improvements: string[];
+  detailed_feedback: string;
+  complexity_analysis: ComplexityAnalysis;
+  next_steps: string[];
+  is_passing: boolean;
+  evaluation_type: string;
+  evaluation_note: string;
+  submission_id?: number | null;
+}
+
+export const generateCodingChallenge = async (
+  params: CodingQuestionRequest
+): Promise<CodingQuestionResponse> => {
+  return await fetchApi('/ide/question/generate', {
+    method: 'POST',
+    body: JSON.stringify(params)
+  });
+};
+
+export const evaluateCodeSolution = async (
+  payload: CodeEvaluationRequest
+): Promise<CodeEvaluationResponse> => {
+  return await fetchApi('/ide/evaluate', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+

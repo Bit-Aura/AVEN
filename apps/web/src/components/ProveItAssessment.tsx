@@ -8,18 +8,16 @@ interface ProveItAssessmentProps {
 }
 
 export default function ProveItAssessment({ milestoneId }: ProveItAssessmentProps) {
-  const { 
-    bypassMilestone, 
-    stopAssessment, 
-    activeMilestone, 
-    fetchAssessment,
-    currentAssessment,
-    isFetchingAssessment
-  } = usePathStore();
+  const bypassMilestone = usePathStore((state) => state.bypassMilestone);
+  const stopAssessment = usePathStore((state) => state.stopAssessment);
+  const activeMilestone = usePathStore((state) => state.activeMilestone);
+  const fetchAssessment = usePathStore((state) => state.fetchAssessment);
+  const currentAssessment = usePathStore((state) => state.currentAssessment);
+  const isFetchingAssessment = usePathStore((state) => state.isFetchingAssessment);
   const [selectedOpt, setSelectedOpt] = useState<string | null>(null);
 
   useEffect(() => {
-    if (milestoneId) {
+    if (milestoneId && typeof fetchAssessment === 'function') {
       fetchAssessment(milestoneId);
     }
   }, [milestoneId, fetchAssessment]);

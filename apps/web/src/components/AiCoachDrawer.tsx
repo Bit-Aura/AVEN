@@ -5,16 +5,14 @@ import { X, Send, Bot, User, Award } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function AiCoachDrawer() {
-  const { 
-    activeCoachNodeId, 
-    closeCoach, 
-    nodes,
-    coachMessages,
-    isCoachTyping,
-    sendCoachMessage,
-    coachPraiseCard,
-    openProofCard
-  } = usePathStore();
+  const activeCoachNodeId = usePathStore((state) => state.activeCoachNodeId);
+  const closeCoach = usePathStore((state) => state.closeCoach);
+  const nodes = usePathStore((state) => state.nodes) || [];
+  const coachMessages = usePathStore((state) => state.coachMessages) || [];
+  const isCoachTyping = usePathStore((state) => state.isCoachTyping);
+  const sendCoachMessage = usePathStore((state) => state.sendCoachMessage);
+  const coachPraiseCard = usePathStore((state) => state.coachPraiseCard);
+  const openProofCard = usePathStore((state) => state.openProofCard);
 
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);

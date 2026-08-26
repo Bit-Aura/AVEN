@@ -70,6 +70,6 @@ describe('GoalChat Component', () => {
     await userEvent.type(input, 'Backend Engineer');
     fireEvent.submit(form!);
 
-    expect(setUserGoalMock).toHaveBeenCalledWith('Backend Engineer');
+    expect(setUserGoalMock).toHaveBeenCalledWith('Backend Engineer', 'demo@pathfinder.dev');
   });
 });

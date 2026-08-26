@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DiagnosticChat from '../DiagnosticChat';
 import { usePathStore } from '../../store/usePathStore';
@@ -8,7 +8,14 @@ jest.mock('../../store/usePathStore', () => ({ usePathStore: jest.fn() }));
 
 const baseMock = {
   userGoal: 'Backend Engineer',
-  diagnosticComplete: true,
+  diagnosticComplete: false,
+  nextQuestion: {
+    question_id: 'q1',
+    question_text: 'How familiar are you with backend systems?',
+    options: ['I know the basics', 'Built production APIs', 'Architected distributed systems']
+  },
+  isLoading: false,
+  pathError: null,
   isSimulatingSkip: false,
   simulatedConsequence: null,
   isTakingAssessment: false,
@@ -59,16 +66,15 @@ const baseMock = {
 
 describe('DiagnosticChat Component', () => {
   it('progresses to next question on option click', async () => {
-    (usePathStore as unknown as jest.Mock).mockImplementation((selector) => selector(baseMock));
+    const completeDiagnosticMock = jest.fn();
+    (usePathStore as unknown as jest.Mock).mockImplementation((selector) =>
+      selector({ ...baseMock, completeDiagnostic: completeDiagnosticMock })
+    );
     render(<DiagnosticChat />);
     
     const option = screen.getByText(/I know the basics/i);
     await userEvent.click(option);
 
-    expect(screen.getAllByText(/I know the basics/i).length).toBeGreaterThan(0);
-    
-    await waitFor(() => {
-      expect(screen.getAllByText(/interacted with a database/i).length).toBeGreaterThan(0);
-    });
+    expect(completeDiagnosticMock).toHaveBeenCalledWith('q1', 'I know the basics');
   });
 });

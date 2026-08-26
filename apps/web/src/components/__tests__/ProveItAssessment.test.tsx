@@ -60,6 +60,6 @@ describe('ProveItAssessment Component', () => {
   it('renders assessment form', () => {
     (usePathStore as unknown as jest.Mock).mockImplementation((selector) => selector({ ...baseMock, isTakingAssessment: true }));
     render(<ProveItAssessment milestoneId="m1" />);
-    expect(screen.getAllByText(/Prove Your Knowledge/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Checkpoint/i).length).toBeGreaterThan(0);
   });
 });

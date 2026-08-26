@@ -16,5 +16,19 @@ afterAll(() => {
 // Mock all lucide-react icons
 jest.mock('lucide-react', () => new Proxy({}, { get: () => () => 'Icon' }));
 
+// Mock next/navigation for App Router
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    refresh: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 // Mock HTMLElement.scrollIntoView
 window.HTMLElement.prototype.scrollIntoView = jest.fn();
