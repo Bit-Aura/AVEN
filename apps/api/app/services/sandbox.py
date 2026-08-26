@@ -49,18 +49,16 @@ async def execute_code_in_sandbox(language: str, code: str) -> dict:
             "code": 0
         }
 
-def append_hidden_tests(language: str, user_code: str, milestone_id: str) -> str:
+def append_hidden_tests(language: str, user_code: str, hidden_tests_code: str) -> str:
     """
-    Appends hidden test suite based on the milestone_id.
+    Appends dynamically generated hidden test suite.
     """
+    if not hidden_tests_code:
+        return user_code
+        
     if language == "python":
-        if milestone_id == "python_basics":
-            return user_code + "\n\n# --- HIDDEN TESTS ---\nassert solve() == True, 'Expected True'\nprint('Tests passed!')"
-        elif milestone_id == "design_restful_apis":
-            return user_code + "\n\n# --- HIDDEN TESTS ---\nassert 'app' in locals(), 'FastAPI app not defined'\nprint('API Test passed!')"
-        else:
-            return user_code + "\n\n# --- HIDDEN TESTS ---\ntry:\n    assert solve() == True\n    print('Tests passed!')\nexcept:\n    pass"
+        return user_code + "\n\n# --- HIDDEN TESTS ---\n" + hidden_tests_code + "\nprint('Tests passed!')"
     elif language == "typescript" or language == "javascript":
-        return user_code + "\n\n// --- HIDDEN TESTS ---\nif (typeof solve === 'function') {\n  if(solve() === true) { console.log('Tests passed!'); } else { throw new Error('Expected true'); }\n} else { console.log('Tests passed!'); }"
+        return user_code + "\n\n// --- HIDDEN TESTS ---\n" + hidden_tests_code + "\nconsole.log('Tests passed!');"
     
     return user_code

@@ -491,13 +491,22 @@ export const getPublicResources = async (params?: {
   return await fetchApi(`/resources${qs ? `?${qs}` : ''}`);
 };
 
-export const executeCode = async (language: string, code: string, nodeId: string) => {
+export const executeCode = async (language: string, code: string, nodeId: string, hiddenTests: string = "") => {
   return await fetchApi('/ide/execute', {
     method: 'POST',
     body: JSON.stringify({
       language,
       code,
-      node_id: nodeId
+      node_id: nodeId,
+      hidden_tests: hiddenTests
     })
   });
+};
+
+export const getIdeProblem = async (nodeId: string, targetRole: string) => {
+  const searchParams = new URLSearchParams();
+  searchParams.set('node_id', nodeId);
+  searchParams.set('target_role', targetRole);
+  const qs = searchParams.toString();
+  return await fetchApi(`/ide/problem?${qs}`);
 };

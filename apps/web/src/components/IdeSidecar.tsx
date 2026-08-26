@@ -9,11 +9,7 @@ import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'reac
 
 const DEFAULT_PYTHON = `def solve():\n    # Write your solution here\n    return False\n`;
 const DEFAULT_TYPESCRIPT = `function solve() {\n  // Write your solution here\n  return false;\n}\n`;
-
-const MILESTONE_DESCRIPTIONS: Record<string, string> = {
-  "python_basics": "Write a Python function called `solve()` that returns `True`. This verifies you understand basic Python syntax and function returns.",
-  "design_restful_apis": "You need to write a simple FastAPI app. Write a function `solve()` that returns `True`. (The hidden tests will verify this!)",
-};
+// Removed MILESTONE_DESCRIPTIONS
 
 export default function IdeSidecar() {
   const activeIdeNodeId = usePathStore((state) => state.activeIdeNodeId);
@@ -28,6 +24,10 @@ export default function IdeSidecar() {
   const [isRunning, setIsRunning] = useState(false);
   const [isPassed, setIsPassed] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  
+  const [dynamicProblem, setDynamicProblem] = useState<{description: string, hidden_tests: string} | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const targetRole = usePathStore((state) => state.targetRole) || "Software Engineer";
 
   // Initialize and Auto-save
   useEffect(() => {
@@ -53,7 +53,37 @@ export default function IdeSidecar() {
   // Reset isLoaded when milestone changes
   useEffect(() => {
     setIsLoaded(false);
+    setDynamicProblem(null);
   }, [activeIdeNodeId, language]);
+  
+  // Fetch dynamic problem
+  useEffect(() => {
+    if (!activeIdeNodeId || dynamicProblem || isGenerating) return;
+    
+    let isMounted = true;
+    const fetchProblem = async () => {
+        setIsGenerating(true);
+        try {
+            import('../api/client').then(async ({ getIdeProblem }) => {
+                const prob = await getIdeProblem(activeIdeNodeId, targetRole);
+                if (isMounted) {
+                    setDynamicProblem(prob);
+                    // Only override code if they haven't started typing yet
+                    const storageKey = `aven_ide_${activeIdeNodeId}_${language}`;
+                    if (!localStorage.getItem(storageKey) && prob.default_code) {
+                        setCode(prob.default_code);
+                    }
+                }
+            });
+        } catch (e) {
+            console.error("Failed to generate IDE problem", e);
+        } finally {
+            if (isMounted) setIsGenerating(false);
+        }
+    };
+    fetchProblem();
+    return () => { isMounted = false; };
+  }, [activeIdeNodeId, targetRole, dynamicProblem, isGenerating, language]);
 
   if (!activeIdeNodeId) return null;
 
@@ -64,7 +94,7 @@ export default function IdeSidecar() {
     const startTime = performance.now();
     
     try {
-      const res = await executeCode(language, code, activeIdeNodeId);
+      const res = await executeCode(language, code, activeIdeNodeId, dynamicProblem?.hidden_tests || "");
       const executionTimeMs = Math.round(performance.now() - startTime);
       
       let newOutput = "";
@@ -121,7 +151,7 @@ export default function IdeSidecar() {
     completeMilestoneViaIde(activeIdeNodeId);
   };
 
-  const instructionText = MILESTONE_DESCRIPTIONS[activeIdeNodeId] || "Implement the solution to pass the hidden unit tests for this milestone.";
+  const instructionText = isGenerating ? "🤖 Generating tailored coding challenge..." : (dynamicProblem?.description || "Implement the solution to pass the hidden unit tests for this milestone.");
 
   return (
     <div className="absolute top-0 right-0 w-[600px] h-full bg-[#1e1e1e] border-l border-[#333] shadow-2xl flex flex-col animate-in slide-in-from-right z-50 text-[#d4d4d4] font-mono">

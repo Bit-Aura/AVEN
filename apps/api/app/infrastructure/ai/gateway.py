@@ -19,6 +19,11 @@ class DiagnosticQuestion(BaseModel):
     options: List[str] = Field(description="Multiple choice options for the user.")
     target_skill: str = Field(description="The skill node this question is testing.")
 
+class IdeProblem(BaseModel):
+    description: str = Field(description="The markdown problem statement tailored to the user's role.")
+    default_code: str = Field(description="The starting boilerplate code.")
+    hidden_tests: str = Field(description="The assertion code to run secretly after user code to verify correctness.")
+
 class AIProvider(Protocol):
     """
     AIProvider defines the interface for communicating with LLM providers.
@@ -38,6 +43,12 @@ class AIProvider(Protocol):
     async def explain_decision(self, skill_name: str, resource_title: str, decision_trace: Optional[Dict[str, Any]] = None) -> str:
         """
         Generates an explanation for recommending a resource for a skill.
+        """
+        ...
+
+    async def generate_ide_problem(self, target_role: str, milestone_id: str) -> Dict[str, Any]:
+        """
+        Generates a coding problem context, boilerplate code, and hidden tests.
         """
         ...
 
@@ -252,6 +263,36 @@ Do not include any explanation or markdown formatting. Output valid JSON only.
             max_tokens=300
         )
 
+    async def generate_ide_problem(self, target_role: str, milestone_id: str) -> Dict[str, Any]:
+        prompt = f"""
+Generate a coding problem for a learner whose target role is '{target_role}'.
+The milestone they are currently trying to pass is '{milestone_id}'.
+
+Create a relevant, bite-sized programming task.
+Provide your response strictly as a JSON object with these fields:
+- description: string (Markdown formatted instructions for the learner, explaining what to do).
+- default_code: string (Boilerplate Python code for them to start, e.g. `def solve():\n    pass`).
+- hidden_tests: string (Python assertions to test their code, e.g. `assert solve() == True`).
+
+Do not include any markdown fences or explanation outside the JSON.
+"""
+        try:
+            content_text = await self._chat(
+                system="You are a technical coding interviewer. You must output only valid, schema-compliant JSON.",
+                user_prompt=prompt,
+                max_tokens=1500
+            )
+            data = self._parse_json_robust(content_text)
+            validated = IdeProblem(**data)
+            return validated.model_dump()
+        except Exception as e:
+            logger.error(f"Ollama error in generate_ide_problem: {e}")
+            return {
+                "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand basic Python syntax for '{milestone_id}'.",
+                "default_code": "def solve():\n    # Write your solution here\n    return False\n",
+                "hidden_tests": "assert solve() == True, 'Expected solve() to return True'\n"
+            }
+
 
 class AntigravityProxyAdapter(AIProvider):
     """
@@ -456,6 +497,37 @@ Keep the explanation clear, brief (1-3 sentences), and trace-grounded.
             max_tokens=300
         )
 
+    async def generate_ide_problem(self, target_role: str, milestone_id: str) -> Dict[str, Any]:
+        prompt = f"""
+Generate a coding problem for a learner whose target role is '{target_role}'.
+The milestone they are currently trying to pass is '{milestone_id}'.
+
+Create a relevant, bite-sized programming task.
+Provide your response strictly as a JSON object with these fields:
+- description: string (Markdown formatted instructions for the learner, explaining what to do).
+- default_code: string (Boilerplate Python code for them to start, e.g. `def solve():\n    pass`).
+- hidden_tests: string (Python assertions to test their code, e.g. `assert solve() == True`).
+
+Do not include any markdown fences or explanation outside the JSON.
+"""
+        try:
+            content_text = await self._chat(
+                system="You are a technical coding interviewer. You must output only valid, schema-compliant JSON.",
+                user_prompt=prompt,
+                max_tokens=1500
+            )
+            content_text = self._strip_code_fence(content_text)
+            data = json.loads(content_text)
+            validated = IdeProblem(**data)
+            return validated.model_dump()
+        except Exception as e:
+            logger.error(f"Antigravity Proxy error in generate_ide_problem: {e}")
+            return {
+                "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand basic Python syntax for '{milestone_id}'.",
+                "default_code": "def solve():\n    # Write your solution here\n    return False\n",
+                "hidden_tests": "assert solve() == True, 'Expected solve() to return True'\n"
+            }
+
 
 class AnthropicAdapter(AIProvider):
     """
@@ -599,7 +671,53 @@ Keep the explanation clear, brief (1-3 sentences), and trace-grounded.
             return response.content[0].text.strip()
         except Exception as e:
             logger.error(f"Anthropic API error in explain_decision: {e}")
-            return f"The resource '{resource_title}' was selected to cover '{skill_name}' based on your learning preferences."
+            return f"Mock explanation: '{resource_title}' helps you learn '{skill_name}' efficiently based on your path preferences."
+
+    async def generate_ide_problem(self, target_role: str, milestone_id: str) -> Dict[str, Any]:
+        if not self.client:
+            logger.warning("Anthropic client not configured. Returning mock IDE problem.")
+            return {
+                "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand basic Python syntax for '{milestone_id}'.",
+                "default_code": "def solve():\n    # Write your solution here\n    return False\n",
+                "hidden_tests": "assert solve() == True, 'Expected solve() to return True'\n"
+            }
+            
+        prompt = f"""
+Generate a coding problem for a learner whose target role is '{target_role}'.
+The milestone they are currently trying to pass is '{milestone_id}'.
+
+Create a relevant, bite-sized programming task.
+Provide your response strictly as a JSON object with these fields:
+- description: string (Markdown formatted instructions for the learner, explaining what to do).
+- default_code: string (Boilerplate Python code for them to start, e.g. `def solve():\n    pass`).
+- hidden_tests: string (Python assertions to test their code, e.g. `assert solve() == True`).
+
+Do not include any markdown fences or explanation outside the JSON.
+"""
+        try:
+            response = await self.client.messages.create(
+                model="claude-3-5-sonnet-20240620",
+                max_tokens=1500,
+                system="You are a technical coding interviewer. You must output only valid, schema-compliant JSON.",
+                messages=[{"role": "user", "content": prompt}]
+            )
+            content_text = response.content[0].text.strip()
+            if content_text.startswith("```json"):
+                content_text = content_text[7:]
+            if content_text.endswith("```"):
+                content_text = content_text[:-3]
+            content_text = content_text.strip()
+
+            data = json.loads(content_text)
+            validated = IdeProblem(**data)
+            return validated.model_dump()
+        except Exception as e:
+            logger.error(f"Anthropic API error in generate_ide_problem: {e}")
+            return {
+                "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand basic Python syntax for '{milestone_id}'.",
+                "default_code": "def solve():\n    # Write your solution here\n    return False\n",
+                "hidden_tests": "assert solve() == True, 'Expected solve() to return True'\n"
+            }
 
 
 class MockAIProvider(AIProvider):
@@ -625,6 +743,13 @@ class MockAIProvider(AIProvider):
 
     async def explain_decision(self, skill_name: str, resource_title: str, decision_trace: Optional[Dict[str, Any]] = None) -> str:
         return f"Mock decision explanation: '{resource_title}' is recommended for '{skill_name}' because it matches the requested profile context."
+
+    async def generate_ide_problem(self, target_role: str, milestone_id: str) -> Dict[str, Any]:
+        return {
+            "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand basic Python syntax for '{milestone_id}' (Target: {target_role}).",
+            "default_code": "def solve():\n    # Write your solution here\n    return False\n",
+            "hidden_tests": "assert solve() == True, 'Expected solve() to return True'\n"
+        }
 
 
 def create_ai_provider() -> AIProvider:
