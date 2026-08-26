@@ -18,8 +18,13 @@ def setup_test_database():
         import app.models  # Ensures all models (including CodingSandboxSubmission) are registered on Base.metadata
         from app.core.db import engine
         from app.models.base import Base
+        from sqlalchemy import text
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+            try:
+                await conn.execute(text("ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)"))
+            except Exception:
+                pass
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)

@@ -16,6 +16,12 @@ from .domain import (
     SkillRecord,
     MentorApplication,
     CodingSandboxSubmission,
+    Cohort,
+    CohortMember,
+    PlacementDrive,
+    MentorIntervention,
+    AiCoachEscalation,
+    MentorSessionRequest,
 )
 
 __all__ = [
@@ -36,4 +42,10 @@ __all__ = [
     "SkillRecord",
     "MentorApplication",
     "CodingSandboxSubmission",
+    "Cohort",
+    "CohortMember",
+    "PlacementDrive",
+    "MentorIntervention",
+    "AiCoachEscalation",
+    "MentorSessionRequest",
 ]

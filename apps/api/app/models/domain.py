@@ -1,6 +1,6 @@
 from typing import List, Optional, Any
 from datetime import datetime
-from sqlalchemy import String, ForeignKey, Text, DateTime, Integer, Boolean, Float, JSON
+from sqlalchemy import String, ForeignKey, Text, DateTime, Integer, Boolean, Float, JSON, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from pgvector.sqlalchemy import Vector
@@ -10,16 +10,19 @@ class User(Base):
     __tablename__ = "users"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    clerk_id: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    clerk_id: Mapped[Optional[str]] = mapped_column(String(255), unique=True, index=True, nullable=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    password_hash: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    role: Mapped[str] = mapped_column(String(50), default="learner")
+    role: Mapped[str] = mapped_column(String(50), default="LEARNER", index=True) # LEARNER, MENTOR, ADMIN
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     
     profile: Mapped[Optional["LearnerProfile"]] = relationship(back_populates="user", uselist=False)
     mentor_applications: Mapped[List["MentorApplication"]] = relationship(back_populates="user")
     submitted_resources: Mapped[List["Resource"]] = relationship(back_populates="submitted_by_user")
+    conducted_interventions: Mapped[List["MentorIntervention"]] = relationship(back_populates="mentor")
+    mentored_sessions: Mapped[List["MentorSessionRequest"]] = relationship(back_populates="mentor")
 
 class MentorApplication(Base):
     __tablename__ = "mentor_applications"
@@ -52,6 +55,10 @@ class LearnerProfile(Base):
     path_versions: Mapped[List["PathVersion"]] = relationship(back_populates="profile")
     readiness_snapshots: Mapped[List["ReadinessSnapshot"]] = relationship(back_populates="profile")
     coding_submissions: Mapped[List["CodingSandboxSubmission"]] = relationship(back_populates="profile")
+    cohort_memberships: Mapped[List["CohortMember"]] = relationship(back_populates="profile")
+    interventions: Mapped[List["MentorIntervention"]] = relationship(back_populates="profile")
+    ai_escalations: Mapped[List["AiCoachEscalation"]] = relationship(back_populates="profile")
+    mentor_session_requests: Mapped[List["MentorSessionRequest"]] = relationship(back_populates="profile")
 
 class Goal(Base):
     __tablename__ = "goals"
@@ -217,5 +224,123 @@ class CodingSandboxSubmission(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     
     profile: Mapped[Optional["LearnerProfile"]] = relationship(back_populates="coding_submissions")
+
+class Cohort(Base):
+    __tablename__ = "cohorts"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), index=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    institution: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    members: Mapped[List["CohortMember"]] = relationship(back_populates="cohort", cascade="all, delete-orphan")
+    placement_drives: Mapped[List["PlacementDrive"]] = relationship(back_populates="cohort")
+    interventions: Mapped[List["MentorIntervention"]] = relationship(back_populates="cohort")
+
+class CohortMember(Base):
+    __tablename__ = "cohort_members"
+    __table_args__ = (
+        UniqueConstraint("cohort_id", "profile_id", name="uq_cohort_member"),
+    )
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    cohort_id: Mapped[int] = mapped_column(ForeignKey("cohorts.id", ondelete="CASCADE"), index=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id", ondelete="CASCADE"), index=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    joined_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    cohort: Mapped["Cohort"] = relationship(back_populates="members")
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="cohort_memberships")
+
+class PlacementDrive(Base):
+    __tablename__ = "placement_drives"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    cohort_id: Mapped[Optional[int]] = mapped_column(ForeignKey("cohorts.id", ondelete="SET NULL"), nullable=True, index=True)
+    company_name: Mapped[str] = mapped_column(String(255), index=True)
+    role_title: Mapped[str] = mapped_column(String(255))
+    target_date: Mapped[str] = mapped_column(String(50)) # ISO date string YYYY-MM-DD
+    required_skills: Mapped[Any] = mapped_column(JSON) # List[str] of skill identifiers
+    readiness_threshold: Mapped[float] = mapped_column(Float, default=0.70)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    cohort: Mapped[Optional["Cohort"]] = relationship(back_populates="placement_drives")
+    interventions: Mapped[List["MentorIntervention"]] = relationship(back_populates="placement_drive")
+
+class MentorIntervention(Base):
+    __tablename__ = "mentor_interventions"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id", ondelete="CASCADE"), index=True)
+    mentor_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    cohort_id: Mapped[Optional[int]] = mapped_column(ForeignKey("cohorts.id", ondelete="SET NULL"), nullable=True, index=True)
+    placement_drive_id: Mapped[Optional[int]] = mapped_column(ForeignKey("placement_drives.id", ondelete="SET NULL"), nullable=True)
+    action_type: Mapped[str] = mapped_column(String(50)) # TARGETED_1ON1, ASYNC_REVIEW, AI_ESCALATION_REVIEW, URGENT_INTERVENTION, INDEPENDENT_MONITORING
+    priority: Mapped[str] = mapped_column(String(50), default="HIGH") # LOW, MEDIUM, HIGH, CRITICAL
+    focus_skills: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True) # List[str]
+    reason: Mapped[str] = mapped_column(Text)
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(50), default="PENDING") # PENDING, SCHEDULED, IN_PROGRESS, RESOLVED, CANCELLED
+    recommended_timing: Mapped[Optional[str]] = mapped_column(String(50), nullable=True) # WITHIN_24_HOURS, WITHIN_48_HOURS, THIS_WEEK, MONITOR_WEEKLY
+    duration_minutes: Mapped[int] = mapped_column(Integer, default=30)
+    scheduled_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="interventions")
+    mentor: Mapped["User"] = relationship(back_populates="conducted_interventions")
+    cohort: Mapped[Optional["Cohort"]] = relationship(back_populates="interventions")
+    placement_drive: Mapped[Optional["PlacementDrive"]] = relationship(back_populates="interventions")
+
+class AiCoachEscalation(Base):
+    __tablename__ = "ai_coach_escalations"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id", ondelete="CASCADE"), index=True)
+    skill_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    reason: Mapped[str] = mapped_column(Text)
+    severity: Mapped[str] = mapped_column(String(50), default="HIGH") # LOW, MEDIUM, HIGH, CRITICAL
+    thrash_index: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    source: Mapped[str] = mapped_column(String(50)) # ASSESSMENT_FAILURES, DEBUG_THRASH, CIRCULAR_QUESTIONS, SANDBOX_FAILURES
+    status: Mapped[str] = mapped_column(String(50), default="OPEN") # OPEN, IN_REVIEW, RESOLVED
+    context_data: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="ai_escalations")
+
+class MentorSessionRequest(Base):
+    __tablename__ = "mentor_session_requests"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id", ondelete="CASCADE"), index=True)
+    mentor_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
+    skill_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    title: Mapped[str] = mapped_column(String(255))
+    description: Mapped[str] = mapped_column(Text)
+    reason: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(50), default="OPEN", index=True) # OPEN, ACCEPTED, SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
+    requested_duration_minutes: Mapped[int] = mapped_column(Integer, default=30)
+    duration_minutes: Mapped[int] = mapped_column(Integer, default=30)
+    accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    scheduled_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    meeting_room_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    meeting_url: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    mentor_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    recommendations: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    cancelled_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="mentor_session_requests")
+    mentor: Mapped[Optional["User"]] = relationship(back_populates="mentored_sessions")
+
+
 
 

@@ -34,19 +34,37 @@ async def lifespan(app: FastAPI):
         from app.models.base import Base
         from sqlalchemy import text
         
-        async with engine.connect() as conn:
-            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-            await conn.commit()
+        try:
+            async with engine.connect() as conn:
+                await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+                await conn.commit()
+        except Exception:
+            pass
             
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+            try:
+                await conn.execute(text("ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)"))
+            except Exception:
+                pass
         
         async with async_session() as session:
-            # Seed Demo Admin User
+            # 1. Seed Default Admin (admin@aven.com / Aven@123) -> ADMIN
+            from app.core.auth import ensure_default_admin, hash_password
+            await ensure_default_admin(session)
+
+            # 2. Seed Demo Learner (demo@pathfinder.dev / Aven@123) -> LEARNER
             stmt = select(User).where(User.email == "demo@pathfinder.dev")
             user = (await session.execute(stmt)).scalars().first()
             if not user:
-                user = User(clerk_id="clerk_demo_user", email="demo@pathfinder.dev", role="admin")
+                user = User(
+                    clerk_id="clerk_demo_user",
+                    email="demo@pathfinder.dev",
+                    password_hash=hash_password("Aven@123"),
+                    name="Demo Learner",
+                    role="LEARNER",
+                    is_active=True,
+                )
                 session.add(user)
                 await session.flush()
                 profile = LearnerProfile(user_id=user.id, current_context="Backend Software Engineer")
@@ -57,28 +75,52 @@ async def lifespan(app: FastAPI):
                 for skill in ["python_basics", "sql_basics", "git_foundations", "http_methods"]:
                     session.add(ReadinessSnapshot(profile_id=profile.id, skill_id=skill, readiness_score=0.85))
             else:
-                user.role = "admin"
+                user.role = "LEARNER"
+                if not user.password_hash:
+                    user.password_hash = hash_password("Aven@123")
                 
-            # Seed Platform Admin User
+            # 3. Seed Platform Admin User (admin@pathfinder.dev) -> ADMIN
             stmt_admin = select(User).where(User.email == "admin@pathfinder.dev")
             admin_user = (await session.execute(stmt_admin)).scalars().first()
             if not admin_user:
-                admin_user = User(clerk_id="clerk_admin_user", email="admin@pathfinder.dev", role="admin")
+                admin_user = User(
+                    clerk_id="clerk_admin_user",
+                    email="admin@pathfinder.dev",
+                    password_hash=hash_password("Aven@123"),
+                    name="Platform Administrator",
+                    role="ADMIN",
+                    is_active=True,
+                )
                 session.add(admin_user)
                 await session.flush()
                 session.add(LearnerProfile(user_id=admin_user.id, current_context="Platform Administrator"))
+            else:
+                admin_user.role = "ADMIN"
+                if not admin_user.password_hash:
+                    admin_user.password_hash = hash_password("Aven@123")
                 
-            # Seed Approved Mentor User
+            # 4. Seed Approved Mentor User (mentor@pathfinder.dev / Aven@123) -> MENTOR
             stmt_mentor = select(User).where(User.email == "mentor@pathfinder.dev")
             mentor_user = (await session.execute(stmt_mentor)).scalars().first()
             if not mentor_user:
-                mentor_user = User(clerk_id="clerk_mentor_user", email="mentor@pathfinder.dev", role="mentor")
+                mentor_user = User(
+                    clerk_id="clerk_mentor_user",
+                    email="mentor@pathfinder.dev",
+                    password_hash=hash_password("Aven@123"),
+                    name="Lead Mentor",
+                    role="MENTOR",
+                    is_active=True,
+                )
                 session.add(mentor_user)
                 await session.flush()
                 session.add(LearnerProfile(user_id=mentor_user.id, current_context="Senior Systems Engineer"))
+            else:
+                mentor_user.role = "MENTOR"
+                if not mentor_user.password_hash:
+                    mentor_user.password_hash = hash_password("Aven@123")
                 
             await session.commit()
-            logger.info("[Startup] Successfully initialized database tables and seeded admin/mentor profiles.")
+            logger.info("[Startup] Successfully initialized database tables and seeded canonical demo roles (LEARNER, MENTOR, ADMIN).")
     except Exception as e:
         logger.warning(f"[Startup] Database table initialization warning: {e}")
     yield
@@ -89,6 +131,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Include Authentication Router
+from app.routers.auth import router as auth_router
+app.include_router(auth_router)
+
 # Include Platform Admin & Resource Router
 from app.api.admin import router as admin_router
 app.include_router(admin_router)
@@ -96,6 +142,14 @@ app.include_router(admin_router)
 # Include IDE Router
 from app.routers.ide import router as ide_router
 app.include_router(ide_router, prefix=settings.API_V1_STR)
+
+# Include Mentor Intervention Hub Router
+from app.routers.mentor import router as mentor_router
+app.include_router(mentor_router)
+
+# Include Mentor Connect Router
+from app.routers.mentor_connect import router as mentor_connect_router
+app.include_router(mentor_connect_router)
 
 # Enable CORS for frontend connections
 app.add_middleware(

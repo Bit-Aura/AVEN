@@ -229,19 +229,32 @@ async def update_user_role(
     current_user: User = Depends(require_admin)
 ):
     """
-    Updates a user's role (learner, mentor, admin).
+    Updates a user's role (LEARNER, MENTOR, ADMIN).
     """
-    new_role = payload.role.strip().lower()
-    if new_role not in ("learner", "mentor", "admin"):
-        raise HTTPException(status_code=400, detail="Invalid role. Must be 'learner', 'mentor', or 'admin'.")
+    from app.core.auth import normalize_role, UserRole
+    new_role = normalize_role(payload.role)
+    if new_role not in (UserRole.LEARNER.value, UserRole.MENTOR.value, UserRole.ADMIN.value):
+        raise HTTPException(status_code=400, detail="Invalid role. Must be LEARNER, MENTOR, or ADMIN.")
         
     user = (await db.execute(select(User).where(User.id == user_id))).scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
         
-    # Prevent self-demotion from admin
-    if user.id == current_user.id and new_role != "admin":
+    # Prevent self-demotion
+    if user.id == current_user.id and new_role != UserRole.ADMIN.value:
         raise HTTPException(status_code=400, detail="Admins cannot demote their own account.")
+
+    # Prevent removing the last active admin
+    if normalize_role(user.role) == UserRole.ADMIN.value and new_role != UserRole.ADMIN.value:
+        admin_count = (await db.execute(
+            select(func.count(User.id)).where(
+                User.role.in_([UserRole.ADMIN.value, "admin"]),
+                User.is_active == True,
+                User.id != user.id,
+            )
+        )).scalar_one()
+        if admin_count == 0:
+            raise HTTPException(status_code=400, detail="Cannot demote the last active platform administrator.")
         
     user.role = new_role
     await db.commit()
@@ -398,9 +411,9 @@ async def approve_mentor_application(
     app.status = "APPROVED"
     app.rejection_reason = None
     
-    # Update user's role to mentor
+    # Update user's role to MENTOR
     if app.user:
-        app.user.role = "mentor"
+        app.user.role = "MENTOR"
         if not app.user.name and app.name:
             app.user.name = app.name
             

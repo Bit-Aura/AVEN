@@ -62,11 +62,36 @@ export interface ScrapeResult {
 }
 
 async function fetchApi(endpoint: string, options: RequestInit = {}) {
+  let authToken: string | null = null;
+  let storedEmail: string | null = null;
+  if (typeof window !== 'undefined') {
+    authToken = localStorage.getItem('aven_auth_token');
+    const storedUser = localStorage.getItem('aven_auth_user');
+    if (storedUser) {
+      try {
+        const u = JSON.parse(storedUser);
+        storedEmail = u.email;
+      } catch (e) {}
+    }
+  }
+
+  const authHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (authToken) {
+    authHeaders['Authorization'] = `Bearer ${authToken}`;
+  }
+  if (storedEmail) {
+    authHeaders['X-User-Email'] = storedEmail;
+  } else {
+    authHeaders['X-User-Email'] = 'demo@pathfinder.dev';
+  }
+
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      'X-User-Email': 'demo@pathfinder.dev',
+      ...authHeaders,
       ...options.headers,
     },
   });
@@ -76,6 +101,69 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
   }
   return res.json();
 }
+
+// --- Auth Endpoints ---
+
+export const loginUser = async (payload: { email: string; password: string }) => {
+  const res = await fetch(`${BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    let detail = 'Login failed.';
+    try {
+      const parsed = JSON.parse(errText);
+      detail = parsed.detail || detail;
+    } catch {
+      detail = errText || detail;
+    }
+    throw new Error(detail);
+  }
+  const data = await res.json();
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('aven_auth_token', data.access_token);
+    localStorage.setItem('aven_auth_user', JSON.stringify(data.user));
+  }
+  return data;
+};
+
+export const registerUser = async (payload: { email: string; password: string; name?: string }) => {
+  const res = await fetch(`${BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    let detail = 'Registration failed.';
+    try {
+      const parsed = JSON.parse(errText);
+      detail = parsed.detail || detail;
+    } catch {
+      detail = errText || detail;
+    }
+    throw new Error(detail);
+  }
+  const data = await res.json();
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('aven_auth_token', data.access_token);
+    localStorage.setItem('aven_auth_user', JSON.stringify(data.user));
+  }
+  return data;
+};
+
+export const fetchCurrentUser = async () => {
+  return await fetchApi('/auth/me');
+};
+
+export const logoutUser = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('aven_auth_token');
+    localStorage.removeItem('aven_auth_user');
+  }
+};
 
 export const getHealth = async () => {
   const res = await fetch(`${BACKEND_URL}/health`);
@@ -205,6 +293,133 @@ export const generateMentorTriage = async (payload: any) => {
     method: 'POST',
     body: JSON.stringify(payload)
   });
+};
+
+export const fetchMentorCohorts = async () => {
+  return await fetchApi('/mentor/cohorts');
+};
+
+export const fetchCohortDrives = async (cohortId: number) => {
+  return await fetchApi(`/mentor/cohorts/${cohortId}/drives`);
+};
+
+export const fetchCohortTriage = async (
+  cohortId: number,
+  params?: {
+    placement_drive_id?: number;
+    breakthrough_only?: boolean;
+    escalations_only?: boolean;
+    high_urgency_only?: boolean;
+    active_interventions_only?: boolean;
+  }
+) => {
+  const query = new URLSearchParams();
+  if (params?.placement_drive_id) query.set('placement_drive_id', String(params.placement_drive_id));
+  if (params?.breakthrough_only) query.set('breakthrough_only', 'true');
+  if (params?.escalations_only) query.set('escalations_only', 'true');
+  if (params?.high_urgency_only) query.set('high_urgency_only', 'true');
+  if (params?.active_interventions_only) query.set('active_interventions_only', 'true');
+
+  const queryString = query.toString() ? `?${query.toString()}` : '';
+  return await fetchApi(`/mentor/cohorts/${cohortId}/triage${queryString}`);
+};
+
+export const fetchLearnerMentorDetail = async (profileId: number) => {
+  return await fetchApi(`/mentor/learners/${profileId}/detail`);
+};
+
+export const createIntervention = async (payload: any) => {
+  return await fetchApi('/mentor/interventions', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+};
+
+export const updateIntervention = async (id: number, payload: any) => {
+  return await fetchApi(`/mentor/interventions/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+};
+
+export const fetchInterventions = async (params?: { cohort_id?: number; profile_id?: number; status?: string }) => {
+  const query = new URLSearchParams();
+  if (params?.cohort_id) query.set('cohort_id', String(params.cohort_id));
+  if (params?.profile_id) query.set('profile_id', String(params.profile_id));
+  if (params?.status) query.set('status', params.status);
+
+  const queryString = query.toString() ? `?${query.toString()}` : '';
+  return await fetchApi(`/mentor/interventions${queryString}`);
+};
+
+// --- Mentor Connect Endpoints ---
+
+export const createMentorSessionRequest = async (payload: {
+  title: string;
+  description: string;
+  reason: string;
+  skill_id?: string;
+  requested_duration_minutes?: number;
+}) => {
+  return await fetchApi('/mentor-connect/requests', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+};
+
+export const fetchLearnerSessionRequests = async () => {
+  return await fetchApi('/mentor-connect/my-requests');
+};
+
+export const cancelSessionRequest = async (requestId: number) => {
+  return await fetchApi(`/mentor-connect/requests/${requestId}/cancel`, {
+    method: 'POST',
+  });
+};
+
+export const fetchOpenMentorRequests = async () => {
+  return await fetchApi('/mentor-connect/open-requests');
+};
+
+export const acceptMentorRequest = async (requestId: number) => {
+  return await fetchApi(`/mentor-connect/requests/${requestId}/accept`, {
+    method: 'POST',
+  });
+};
+
+export const scheduleMentorSession = async (
+  requestId: number,
+  payload: { scheduled_at: string; duration_minutes: number }
+) => {
+  return await fetchApi(`/mentor-connect/requests/${requestId}/schedule`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+};
+
+export const fetchMentorAssignedSessions = async (statusFilter?: string) => {
+  const query = statusFilter ? `?status=${encodeURIComponent(statusFilter)}` : '';
+  return await fetchApi(`/mentor-connect/mentor-sessions${query}`);
+};
+
+export const startMentorSession = async (requestId: number) => {
+  return await fetchApi(`/mentor-connect/requests/${requestId}/start`, {
+    method: 'POST',
+  });
+};
+
+export const completeMentorSession = async (
+  requestId: number,
+  payload: { mentor_notes: string; recommendations?: string }
+) => {
+  return await fetchApi(`/mentor-connect/requests/${requestId}/complete`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+};
+
+export const fetchSessionDetail = async (requestId: number) => {
+  return await fetchApi(`/mentor-connect/requests/${requestId}`);
 };
 
 export const checkRoadmapSanity = async (payload: any) => {

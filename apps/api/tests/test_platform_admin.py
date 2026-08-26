@@ -143,7 +143,8 @@ def test_admin_user_management():
     assert res.status_code == 200
     users = res.json()["users"]
     assert len(users) >= 1
-    learner_id = users[0]["id"]
+    target_user = next((u for u in users if u["email"] == "test_learner@pathfinder.dev"), users[0])
+    learner_id = target_user["id"]
     
     # 2. Suspend user
     res_suspend = client.patch(f"/api/v1/admin/users/{learner_id}/status", json={"is_active": False}, headers=admin_headers)

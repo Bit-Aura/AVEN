@@ -11,38 +11,16 @@ import {
   Flame, 
   ShieldAlert, 
   ShieldCheck,
-  ChevronRight,
-  BrainCircuit
+  BrainCircuit,
+  Users,
+  Inbox,
+  Calendar,
+  LogOut,
+  UserCheck,
 } from 'lucide-react';
 import { usePathStore } from '../../store/usePathStore';
 import { useSafeUser, SafeUserButton } from '../../lib/clerkSafe';
-
-const navigationGroups = [
-  {
-    title: 'Core Engine',
-    items: [
-      { name: 'Learning Path', href: '/learner', icon: Compass, badge: 'Live' },
-      { name: 'Day-One Simulator', href: '/learner/simulator', icon: BrainCircuit, badge: 'Job' },
-      { name: 'Skill Graph', href: '/learner/graph', icon: Network },
-      { name: 'Market Radar', href: '/market-radar', icon: Radar, badge: 'ETL' },
-      { name: 'Proof Portfolio', href: '/learner/portfolio', icon: Award },
-    ]
-  },
-  {
-    title: 'Intelligence',
-    items: [
-      { name: 'Path Planner', href: '/planner', icon: Layers },
-      { name: 'War Room', href: '/war-room', icon: Flame, badge: 'Sprint' },
-    ]
-  },
-  {
-    title: 'Operations',
-    items: [
-      { name: 'Mentor Hub', href: '/mentor', icon: ShieldAlert },
-      { name: 'Platform Admin', href: '/admin', icon: ShieldCheck },
-    ]
-  }
-];
+import { logoutUser } from '../../api/client';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -50,9 +28,80 @@ export default function Sidebar() {
   const readinessScore = usePathStore((state) => state.readinessScore);
   const { user, isLoaded } = useSafeUser();
 
+  const userRole = (user?.role || 'LEARNER').toUpperCase();
   const userEmail = user?.primaryEmailAddress?.emailAddress || 'demo@pathfinder.dev';
-  const userName = user?.fullName || user?.firstName || user?.username || 'Demo Learner';
-  const userInitials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'DL';
+  const userName = user?.fullName || user?.firstName || user?.username || 'Demo User';
+  const userInitials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'DU';
+
+  // Role-Specific Navigation Definitions
+  const learnerGroups = [
+    {
+      title: 'Core Engine',
+      items: [
+        { name: 'Learning Path', href: '/learner', icon: Compass, badge: 'Live' },
+        { name: '1-on-1 Mentorship', href: '/learner/mentor', icon: Users },
+        { name: 'Day-One Simulator', href: '/learner/simulator', icon: BrainCircuit, badge: 'Job' },
+        { name: 'Skill Graph', href: '/learner/graph', icon: Network },
+        { name: 'Market Radar', href: '/market-radar', icon: Radar, badge: 'ETL' },
+        { name: 'Proof Portfolio', href: '/learner/portfolio', icon: Award },
+      ]
+    },
+    {
+      title: 'Intelligence',
+      items: [
+        { name: 'Path Planner', href: '/planner', icon: Layers },
+        { name: 'War Room', href: '/war-room', icon: Flame, badge: 'Sprint' },
+      ]
+    }
+  ];
+
+  const mentorGroups = [
+    {
+      title: 'Mentor Operations',
+      items: [
+        { name: 'Mentor Connect', href: '/mentor', icon: ShieldAlert, badge: 'Live' },
+        { name: '1-on-1 Mentorship Feed', href: '/mentor', icon: Users },
+      ]
+    },
+    {
+      title: 'Learner Explorer',
+      items: [
+        { name: 'Curriculum & Graph', href: '/learner/graph', icon: Network },
+        { name: 'Market Demand Radar', href: '/market-radar', icon: Radar },
+      ]
+    }
+  ];
+
+  const adminGroups = [
+    {
+      title: 'Administration',
+      items: [
+        { name: 'Platform Admin', href: '/admin', icon: ShieldCheck, badge: 'Master' },
+        { name: 'Mentor Operations', href: '/mentor', icon: ShieldAlert },
+      ]
+    },
+    {
+      title: 'Curriculum Explorer',
+      items: [
+        { name: 'Learning Path View', href: '/learner', icon: Compass },
+        { name: 'Skill Graph View', href: '/learner/graph', icon: Network },
+        { name: 'Market Radar', href: '/market-radar', icon: Radar },
+      ]
+    }
+  ];
+
+  const navigationGroups = userRole === 'ADMIN'
+    ? adminGroups
+    : userRole === 'MENTOR'
+    ? mentorGroups
+    : learnerGroups;
+
+  const handleSignOut = () => {
+    logoutUser();
+    if (typeof window !== 'undefined') {
+      window.location.href = '/sign-in';
+    }
+  };
 
   return (
     <aside className="w-64 bg-surface border-r border-border flex flex-col shrink-0 min-h-screen select-none">
@@ -69,20 +118,46 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Target Role Context Banner */}
+      {/* Target Role Context Banner (For Learners) or Role Identity Banner (Mentors/Admins) */}
       <div className="p-4 mx-3 my-3 rounded-xl bg-surface-secondary/50 border border-border/80">
-        <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Target Role</div>
-        <div className="text-sm font-bold text-white truncate">{targetRole}</div>
-        <div className="mt-2.5 flex items-center justify-between text-xs">
-          <span className="text-slate-400">Readiness</span>
-          <span className="font-bold text-emerald-400">{readinessScore}%</span>
+        <div className="flex items-center justify-between">
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            {userRole === 'ADMIN' ? 'Platform Control' : userRole === 'MENTOR' ? 'Mentor Mode' : 'Target Role'}
+          </div>
+          <span
+            className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+              userRole === 'ADMIN'
+                ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+                : userRole === 'MENTOR'
+                ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+                : 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/30'
+            }`}
+          >
+            {userRole === 'ADMIN' ? 'Administrator' : userRole === 'MENTOR' ? 'Mentor' : 'Learner'}
+          </span>
         </div>
-        <div className="w-full h-1.5 bg-surface rounded-full mt-1.5 overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-700" 
-            style={{ width: `${Math.max(readinessScore, 5)}%` }} 
-          />
-        </div>
+
+        {userRole === 'LEARNER' ? (
+          <>
+            <div className="text-sm font-bold text-white truncate mt-1">{targetRole}</div>
+            <div className="mt-2.5 flex items-center justify-between text-xs">
+              <span className="text-slate-400">Readiness</span>
+              <span className="font-bold text-emerald-400">{readinessScore}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-surface rounded-full mt-1.5 overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-700" 
+                style={{ width: `${Math.max(readinessScore, 5)}%` }} 
+              />
+            </div>
+          </>
+        ) : (
+          <div className="text-xs font-semibold text-slate-300 mt-1">
+            {userRole === 'ADMIN'
+              ? 'Full platform administration, user & mentor governance active.'
+              : 'Assigned 1-on-1 human guidance & session operations active.'}
+          </div>
+        )}
       </div>
 
       {/* Navigation Links */}
@@ -94,7 +169,7 @@ export default function Sidebar() {
             </div>
             <div className="space-y-1">
               {group.items.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                const isActive = pathname === item.href || (item.href !== '/mentor' && item.href !== '/admin' && pathname.startsWith(item.href + '/'));
                 return (
                   <Link
                     key={item.name}
@@ -120,6 +195,8 @@ export default function Sidebar() {
                           ? 'bg-rose-500/20 text-rose-400'
                           : item.badge === 'Sprint'
                           ? 'bg-white/20 text-white' 
+                          : item.badge === 'Master'
+                          ? 'bg-rose-500/20 text-rose-400'
                           : 'bg-surface-tertiary text-slate-400'
                       }`}>
                         {item.badge}
@@ -133,7 +210,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Bottom Profile Info */}
+      {/* Bottom Profile & Sign Out Bar */}
       <div className="p-4 border-t border-border bg-surface-secondary/20 flex items-center justify-between">
         <div className="flex items-center gap-2.5 overflow-hidden">
           {isLoaded && user ? (
@@ -148,6 +225,14 @@ export default function Sidebar() {
             <div className="text-[10px] text-slate-400 truncate">{userEmail}</div>
           </div>
         </div>
+
+        <button
+          onClick={handleSignOut}
+          className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+          title="Sign Out"
+        >
+          <LogOut size={15} />
+        </button>
       </div>
     </aside>
   );
