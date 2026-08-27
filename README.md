@@ -62,6 +62,30 @@ Once the database container is healthy, run the migrations:
 docker-compose exec api alembic upgrade head
 ```
 
+### 4. Run Natively (Windows / PowerShell)
+If you prefer to run the applications natively for development (with hot-reloading) while keeping the DBs in Docker:
+
+1. Start only the databases:
+```powershell
+docker-compose up -d db neo4j
+```
+2. Start the FastAPI Backend:
+```powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -e .\apps\api
+$env:PYTHONPATH = "apps\api"
+alembic -c apps\api\alembic.ini upgrade head
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+3. Start the Next.js Frontend:
+```powershell
+cd apps\web
+npm install
+npm run dev
+```
+
 ---
 
 ## Shared Type Generation Pipeline
