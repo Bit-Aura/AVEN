@@ -3,19 +3,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Fire, 
+  Flame, 
   Clock, 
-  WarningCircle, 
-  Buildings, 
-  CalendarBlank, 
-  Spinner, 
-  CheckCircle,
+  AlertCircle, 
+  Building2, 
+  Calendar, 
+  Loader2, 
+  CheckCircle2,
   ListChecks,
   PlayCircle,
-  BookOpenText,
-  CodeBlock,
-  ArrowSquareOut
-} from '@phosphor-icons/react';
+  BookOpen,
+  Code2,
+  ExternalLink
+} from 'lucide-react';
 import { usePathStore } from '../../../store/usePathStore';
 import { generatePlacementPlan } from '../../../api/client';
 import ProveItAssessment from '../../../components/ProveItAssessment';
@@ -135,7 +135,7 @@ export default function PlacementJourney() {
       >
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <Fire weight="duotone" className="text-brand-400" size={20} />
+            <Flame className="text-brand-400" size={20} />
             <span className="text-xs font-bold tracking-widest uppercase text-brand-300">Focus Path</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">
@@ -146,7 +146,7 @@ export default function PlacementJourney() {
         {/* Action Bar (Contrast & Alignment) */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-3 bg-surface/80 border border-border/80 px-4 py-2.5 rounded-2xl">
-            <Buildings weight="duotone" size={20} className="text-indigo-400" />
+            <Building2 size={20} className="text-indigo-400" />
             <input
               type="text"
               list="company-list"
@@ -168,7 +168,7 @@ export default function PlacementJourney() {
           </div>
           
           <div className="flex items-center gap-3 bg-surface/80 border border-border/80 px-4 py-2.5 rounded-2xl">
-            <CalendarBlank weight="duotone" size={20} className="text-brand-400" />
+            <Calendar size={20} className="text-brand-400" />
             <input
               type="date"
               value={interviewDate}
@@ -187,7 +187,7 @@ export default function PlacementJourney() {
             disabled={isLoading}
             className="bg-white text-slate-950 hover:bg-slate-200 text-sm font-bold px-6 py-2.5 rounded-2xl transition-colors flex items-center gap-2 shadow-md"
           >
-            {isLoading ? <Spinner weight="bold" size={18} className="animate-spin" /> : <Fire weight="bold" size={18} />}
+            {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Flame size={18} />}
             Generate Path
           </motion.button>
         </div>
@@ -222,7 +222,7 @@ export default function PlacementJourney() {
             animate={{ opacity: 1, scale: 1 }}
             className="p-12 text-center bg-rose-950/20 border border-rose-500/20 rounded-3xl"
           >
-            <WarningCircle weight="duotone" className="text-rose-400 mx-auto mb-3" size={40} />
+            <AlertCircle className="text-rose-400 mx-auto mb-3" size={40} />
             <h3 className="text-lg font-semibold text-rose-200 mb-1">We couldn't map this path</h3>
             <p className="text-rose-400/80 text-sm max-w-sm mx-auto">{errorMsg}</p>
           </motion.div>
@@ -242,7 +242,7 @@ export default function PlacementJourney() {
               
               <div className="space-y-1 relative z-10">
                 <div className="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                  <Clock weight="fill" size={16} className="text-brand-400" />
+                  <Clock size={16} className="text-brand-400" />
                   <span>Countdown to {plan?.company_name || companies.find(c => c.id === selectedCompany)?.name}</span>
                 </div>
                 {/* 3. CONTRAST: Massive white number against dark bg */}
@@ -267,7 +267,7 @@ export default function PlacementJourney() {
                   {plan?.weekly_study_hours || 14} <span className="text-sm text-slate-500">hrs/week</span>
                 </div>
                 <div className={`text-xs font-bold mt-2 flex items-center justify-center md:justify-start gap-1.5 ${isFeasible ? 'text-emerald-400' : 'text-rose-400'}`}>
-                  {isFeasible ? <CheckCircle weight="fill" /> : <WarningCircle weight="fill" />}
+                  {isFeasible ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
                   {isFeasible ? 'Comfortable Timeline' : 'Aggressive Pace Needed'}
                 </div>
               </div>
@@ -281,7 +281,7 @@ export default function PlacementJourney() {
             }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <WarningCircle weight="duotone" size={18} className={burnoutRisk > 70 ? 'text-rose-400' : 'text-slate-400'} />
+                  <AlertCircle size={18} className={burnoutRisk > 70 ? 'text-rose-400' : 'text-slate-400'} />
                   <span className="text-xs font-bold uppercase tracking-widest text-slate-300">Pacing & Energy</span>
                 </div>
                 <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded-lg ${
@@ -327,7 +327,7 @@ export default function PlacementJourney() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="py-2.5 px-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 flex items-center gap-2 font-medium"
                   >
-                    <CheckCircle weight="fill" size={16} />
+                    <CheckCircle2 size={16} />
                     <span>Rest scheduled. Keep it up!</span>
                   </motion.div>
                 ) : null}
@@ -337,7 +337,7 @@ export default function PlacementJourney() {
             {/* 5. HIERARCHY: Sprints timeline below emphasis */}
             <motion.div variants={itemVariants} className="lg:col-span-8 bg-surface border border-border/60 rounded-3xl p-8">
               <div className="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2 mb-6">
-                <ListChecks weight="fill" size={16} className="text-indigo-400" />
+                <ListChecks size={16} className="text-indigo-400" />
                 <span>Your Milestones ({sprints.length} Weeks)</span>
               </div>
               
@@ -416,11 +416,11 @@ export default function PlacementJourney() {
                                   }`}
                                 >
                                   <span className="flex items-center gap-3">
-                                    {isCompleted ? <CheckCircle weight="fill" size={16} className="text-emerald-400" /> : (
+                                    {isCompleted ? <CheckCircle2 size={16} className="text-emerald-400" /> : (
                                       <>
-                                        {isAssessment && <PlayCircle weight="fill" size={16} className="text-brand-400" />}
-                                        {isResource && <BookOpenText weight="duotone" size={16} className="text-indigo-400" />}
-                                        {isMock && <CodeBlock weight="duotone" size={16} className="text-rose-400" />}
+                                        {isAssessment && <PlayCircle size={16} className="text-brand-400" />}
+                                        {isResource && <BookOpen size={16} className="text-indigo-400" />}
+                                        {isMock && <Code2 size={16} className="text-rose-400" />}
                                       </>
                                     )}
                                     <span className={`font-semibold ${isCompleted ? 'line-through text-emerald-500/70' : ''}`}>{task.title}</span>
@@ -446,7 +446,7 @@ export default function PlacementJourney() {
             {plan?.market_signals && plan.market_signals.length > 0 && (
               <motion.div variants={itemVariants} className="lg:col-span-4 p-8 rounded-3xl bg-surface border border-border/60 flex flex-col max-h-[600px]">
                 <div className="flex items-center gap-2 mb-6">
-                  <Fire weight="fill" size={16} className="text-amber-400" />
+                  <Flame size={16} className="text-amber-400" />
                   <span className="text-xs font-bold uppercase tracking-widest text-slate-300">Market Signals</span>
                 </div>
                 
@@ -474,7 +474,7 @@ export default function PlacementJourney() {
                             className="text-slate-500 hover:text-brand-400 bg-surface border border-border/50 hover:border-brand-500/30 p-1.5 rounded-lg transition-all flex-shrink-0 shadow-sm"
                             title="View full job posting"
                           >
-                            <ArrowSquareOut weight="bold" size={14} />
+                            <ExternalLink size={14} />
                           </a>
                         )}
                       </div>

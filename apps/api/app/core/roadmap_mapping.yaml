@@ -1,0 +1,22 @@
+# Role to roadmap.sh composite subgraph mapping configuration
+backend_swe:
+  - backend
+  - python
+  - sql
+  - system-design
+frontend_swe:
+  - frontend
+  - javascript
+  - react
+devops_platform:
+  - devops
+  - docker
+  - kubernetes
+mlops_engineer:
+  - mlops
+  - ai-engineer
+  - python
+data_engineer:
+  - data-engineer
+  - sql
+  - python

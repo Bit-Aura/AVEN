@@ -324,7 +324,7 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
         const processor = audioCtx.createScriptProcessor(bufferSize, 1, 1);
         processorNodeRef.current = processor;
 
-        processor.onaudioprocess = (e) => {
+        processor.onaudioprocess = (e: AudioProcessingEvent) => {
           if (!isListeningRef.current) return;
           const inputData = e.inputBuffer.getChannelData(0);
           const downsampled = downsampleBuffer(inputData, sampleRate, 16000);

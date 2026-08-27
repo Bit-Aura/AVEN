@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Compass, 
-  Network, 
-  Radar, 
-  Award, 
-  Layers, 
-  Flame, 
-  ShieldAlert, 
+import {
+  Compass,
+  Network,
+  Radar,
+  Award,
+  Layers,
+  Flame,
+  ShieldAlert,
   ShieldCheck,
   BrainCircuit,
   Users,
@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Mic,
+  Map,
 } from 'lucide-react';
 import { useClerk } from '@clerk/nextjs';
 import { usePathStore } from '../../store/usePathStore';
@@ -75,14 +76,7 @@ export default function Sidebar() {
       title: 'Mentor Operations',
       items: [
         { name: 'Mentor Connect', href: '/mentor', icon: ShieldAlert, badge: 'Live' },
-        { name: '1-on-1 Mentorship Feed', href: '/mentor', icon: Users },
-      ]
-    },
-    {
-      title: 'Learner Explorer',
-      items: [
-        { name: 'Curriculum & Graph', href: '/learner/graph', icon: Network },
-        { name: 'Market Demand Radar', href: '/market-radar', icon: Radar },
+        { name: 'Learner 360° Intel', href: '/mentor/learner-intel', icon: BrainCircuit, badge: '360°' },
       ]
     }
   ];
@@ -92,6 +86,7 @@ export default function Sidebar() {
       title: 'Administration',
       items: [
         { name: 'Platform Admin', href: '/admin', icon: ShieldCheck, badge: 'Master' },
+        { name: 'Roadmap Topology Sync', href: '/admin/roadmap-sync', icon: Map, badge: 'New' },
         { name: 'Mentor Operations', href: '/mentor', icon: ShieldAlert },
       ]
     },
@@ -108,8 +103,8 @@ export default function Sidebar() {
   const navigationGroups = userRole === 'ADMIN'
     ? adminGroups
     : userRole === 'MENTOR'
-    ? mentorGroups
-    : learnerGroups;
+      ? mentorGroups
+      : learnerGroups;
 
   const handleSignOut = async () => {
     logoutUser();

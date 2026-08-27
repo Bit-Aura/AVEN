@@ -370,7 +370,8 @@ export const usePathStore = create<PathState>()((set, get) => ({
       const nodes: Node[] = allSkills.map((skillId: string, idx: number) => {
         const isCompleted = res.plan?.completed_skills?.includes(skillId) || (!remainingSkills.includes(skillId) && allSkills.indexOf(skillId) < allSkills.indexOf(activeId));
         const isActive = skillId === activeId;
-        const formattedName = skillId.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+        const cleanId = skillId.replace(/^[a-z0-9_-]+::/, '');
+        const formattedName = cleanId.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
         
         return {
           id: skillId,
