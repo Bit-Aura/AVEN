@@ -1201,13 +1201,29 @@ async def pivot_career_role(
 @app.get("/api/v1/placement/companies")
 async def get_placement_companies():
     """
-    Returns the dynamic list of company profiles tracked for placement drives.
+    Returns trending company suggestions for placement drives.
     """
-    from app.services.placement_engine import COMPANY_PROFILES
-    return [
-        {"id": key, "name": val["name"], "role": val.get("role", "Software Engineer")}
-        for key, val in COMPANY_PROFILES.items()
+    from app.services.placement_engine import DYNAMIC_COMPANY_CACHE
+    base_suggestions = [
+        {"id": "openai", "name": "OpenAI", "role": "Software Engineer, Backend / Platform"},
+        {"id": "anthropic", "name": "Anthropic", "role": "Full Stack / AI Infrastructure Engineer"},
+        {"id": "google", "name": "Google", "role": "Software Engineer (L4/L5)"},
+        {"id": "meta", "name": "Meta", "role": "Production Engineer / Backend"},
+        {"id": "microsoft", "name": "Microsoft", "role": "Software Development Engineer"},
+        {"id": "amazon", "name": "Amazon", "role": "SDE II - AWS Platform"},
+        {"id": "netflix", "name": "Netflix", "role": "Senior Software Engineer"},
+        {"id": "stripe", "name": "Stripe", "role": "Backend Infrastructure Engineer"},
+        {"id": "tesla", "name": "Tesla", "role": "Software Engineer - Autopilot & Core Apps"},
+        {"id": "nvidia", "name": "Nvidia", "role": "Systems Software Engineer"}
     ]
+    # Add any recently synthesized dynamic companies from cache
+    seen = {c["id"] for c in base_suggestions}
+    for key, val in DYNAMIC_COMPANY_CACHE.items():
+        comp_id = key.split("_")[0]
+        if comp_id not in seen:
+            base_suggestions.append({"id": comp_id, "name": val["name"], "role": "Software Engineer"})
+            seen.add(comp_id)
+    return base_suggestions
 
 @app.post("/api/v1/placement/plan", response_model=PlacementPlanReport)
 async def generate_placement_sprint_plan(
