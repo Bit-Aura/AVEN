@@ -181,7 +181,7 @@ export default function DayOneSimulatorPage() {
   const profileId = usePathStore((state) => state.profileId) || 1;
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  const [activeTab, setActiveTab] = useState<'requirements' | 'chat' | 'code' | 'review'>('requirements');
+  const [activeTab, setActiveTab] = useState<'requirements' | 'chat' | 'review' | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   
   // Stakeholder Chat State
@@ -364,31 +364,31 @@ export default function DayOneSimulatorPage() {
   };
 
   const columns = [
-    { title: 'Backlog', status: 'BACKLOG', color: 'border-slate-800 bg-slate-900/40 text-slate-400' },
-    { title: 'To Do', status: 'TODO', color: 'border-blue-900/50 bg-blue-950/10 text-blue-400' },
-    { title: 'In Progress', status: 'IN_PROGRESS', color: 'border-amber-900/50 bg-amber-950/10 text-amber-400' },
-    { title: 'Under Review', status: 'UNDER_REVIEW', color: 'border-purple-900/50 bg-purple-950/10 text-purple-400' },
-    { title: 'Merged', status: 'MERGED', color: 'border-emerald-950 bg-emerald-950/10 text-emerald-400' }
+    { title: 'Backlog', status: 'BACKLOG', color: 'border-[#141413]/20 bg-[#faf9f5] text-[#3d3d3a]' },
+    { title: 'To Do', status: 'TODO', color: 'border-[#141413]/20 bg-[#faf9f5] text-[#3d3d3a]' },
+    { title: 'In Progress', status: 'IN_PROGRESS', color: 'border-[#141413]/20 bg-[#faf9f5] text-[#141413] font-black' },
+    { title: 'Under Review', status: 'UNDER_REVIEW', color: 'border-[#141413]/20 bg-[#faf9f5] text-[#3d3d3a]' },
+    { title: 'Merged', status: 'MERGED', color: 'border-[#141413]/20 bg-[#faf9f5] text-[#3d3d3a]' }
   ];
 
   const currentLang = selectedTicket ? getLanguageForTicket(selectedTicket) : { language: 'python', extension: 'py', label: 'Python' };
   const currentPR = selectedTicket ? prResult[selectedTicket.id] : null;
 
   return (
-    <div className="flex flex-col gap-6 min-h-screen text-slate-200">
+    <div className="flex flex-col gap-6 min-h-screen pb-24 text-[#141413]">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-surface p-6 rounded-2xl border border-border shadow-md">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#faf9f5] p-6 rounded-xl border border-[#d6d3c4] shadow-md">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-            <GitPullRequest className="text-indigo-500" /> Day-One Simulator Workspace
+          <h1 className="text-2xl font-extrabold text-[#141413] tracking-tight flex items-center gap-2">
+            <GitPullRequest className="text-[#141413]" /> Day-One Simulator Workspace
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-[#3d3d3a] mt-1">
             Pick up project tickets, gather requirements from stakeholders with RAG context, and submit PRs for code reviews.
           </p>
         </div>
         <button 
           onClick={fetchTickets}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl border border-slate-700 transition font-semibold text-xs shadow-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-[#e8e6dc] hover:bg-[#d6d3c4] text-[#141413] rounded-xl border border-[#141413]/20 transition font-black uppercase tracking-widest text-xs shadow-sm"
         >
           <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} /> Refresh Board
         </button>
@@ -398,10 +398,10 @@ export default function DayOneSimulatorPage() {
         {/* Kanban Board Container (Left Column) */}
         <div className="xl:col-span-2 flex flex-col gap-4">
           {isLoading ? (
-            <div className="flex justify-center items-center py-20 bg-surface/50 border border-border rounded-2xl h-96">
+            <div className="flex justify-center items-center py-20 bg-[#faf9f5]/50 border border-[#d6d3c4] rounded-xl h-96">
               <div className="flex flex-col items-center gap-3">
-                <RefreshCw className="animate-spin text-indigo-500" size={32} />
-                <span className="text-sm text-slate-400">Loading simulator dashboard...</span>
+                <RefreshCw className="animate-spin text-[#141413]" size={32} />
+                <span className="text-sm text-[#3d3d3a]">Loading simulator dashboard...</span>
               </div>
             </div>
           ) : (
@@ -410,14 +410,14 @@ export default function DayOneSimulatorPage() {
                 const colTickets = tickets.filter(t => t.status === col.status);
                 return (
                   <div key={col.status} className="flex flex-col gap-3 min-h-[450px]">
-                    <div className={`px-3 py-2 rounded-lg border border-dashed flex justify-between items-center ${col.color}`}>
+                    <div className={`px-3 py-2 rounded border border-dashed flex justify-between items-center ${col.color}`}>
                       <span className="font-bold text-xs uppercase tracking-wider">{col.title}</span>
                       <span className="font-extrabold text-xs">{colTickets.length}</span>
                     </div>
                     
                     <div className="flex flex-col gap-2 overflow-y-auto max-h-[500px] pr-1">
                       {colTickets.length === 0 ? (
-                        <div className="text-[10px] text-slate-600 text-center py-8 border border-dashed border-slate-800/40 rounded-xl">
+                        <div className="text-[10px] text-[#3d3d3a] text-center py-8 border border-dashed border-[#141413]/20 rounded-xl">
                           No tickets
                         </div>
                       ) : (
@@ -429,25 +429,31 @@ export default function DayOneSimulatorPage() {
                               onClick={() => setSelectedTicket(t)}
                               className={`p-3.5 rounded-xl border transition-all duration-200 cursor-pointer ${
                                 isSelected 
-                                  ? 'bg-indigo-950/40 border-indigo-500/80 shadow-glow-indigo' 
-                                  : 'bg-surface hover:bg-surface-secondary border-border/80'
+                                  ? 'bg-[#e8e6dc] border-[#141413]/20 shadow-sm' 
+                                  : 'bg-[#faf9f5] hover:bg-[#e8e6dc] border-[#d6d3c4]/80'
                               }`}
                             >
                               <div className="flex justify-between items-start gap-2 mb-2">
-                                <span className="text-[10px] font-bold text-slate-500 font-mono bg-slate-800/80 px-1.5 py-0.5 rounded">
+                                <span className={`text-[10px] font-bold font-mono px-1.5 py-0.5 rounded ${
+                                  isSelected ? 'bg-[#faf9f5] text-[#3d3d3a] border border-[#141413]/10' : 'bg-[#e8e6dc] text-[#3d3d3a]'
+                                }`}>
                                   {t.id}
                                 </span>
                                 <span className={`w-2 h-2 rounded-full ${
                                   t.status === 'MERGED' ? 'bg-emerald-400' :
                                   t.status === 'UNDER_REVIEW' ? 'bg-purple-400' :
-                                  t.status === 'IN_PROGRESS' ? 'bg-amber-400' : 'bg-slate-400'
+                                  t.status === 'IN_PROGRESS' ? 'bg-amber-400' : 'bg-[#d6d3c4]'
                                 }`} />
                               </div>
-                              <h3 className="font-bold text-xs text-white line-clamp-2 leading-snug">
+                              <h3 className={`font-bold text-xs line-clamp-2 leading-snug ${
+                                isSelected ? 'text-[#141413]' : 'text-[#141413]'
+                              }`}>
                                 {t.title}
                               </h3>
                               <div className="mt-3 flex flex-wrap gap-1">
-                                <span className="text-[9px] px-1.5 py-0.5 bg-slate-800 text-indigo-400 font-bold rounded">
+                                <span className={`text-[9px] px-1.5 py-0.5 font-bold rounded ${
+                                  isSelected ? 'bg-[#faf9f5] text-[#141413] border border-[#141413]/10' : 'bg-[#e8e6dc] text-[#141413]'
+                                }`}>
                                   {t.skill_id}
                                 </span>
                               </div>
@@ -464,111 +470,89 @@ export default function DayOneSimulatorPage() {
         </div>
 
         {/* Workspace IDE & Details Pane (Right Column) */}
-        <div className="xl:col-span-1 bg-surface border border-border rounded-2xl shadow-lg flex flex-col overflow-hidden min-h-[620px]">
+        <div className="xl:col-span-1 bg-[#faf9f5] border border-[#d6d3c4] rounded-xl shadow-lg flex flex-col overflow-hidden min-h-[620px]">
           {selectedTicket ? (
             <>
-              {/* Header Title */}
-              <div className="p-4 border-b border-border bg-surface-secondary flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-indigo-400 font-mono">{selectedTicket.id}</span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
-                      selectedTicket.status === 'MERGED' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                      selectedTicket.status === 'UNDER_REVIEW' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' :
-                      selectedTicket.status === 'IN_PROGRESS' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                      'bg-slate-800 text-slate-400 border border-slate-700'
-                    }`}>
-                      {selectedTicket.status}
-                    </span>
-                  </div>
-                  <h2 className="font-extrabold text-sm text-white leading-tight">{selectedTicket.title}</h2>
+              <div className="p-8 flex flex-col items-center justify-center h-full">
+                <div className="mb-10 flex flex-col items-center text-center gap-3">
+                  <span className={`text-[10px] px-3 py-1 rounded font-black uppercase tracking-widest ${
+                    selectedTicket.status === 'MERGED' ? 'bg-[#3d3d3a] text-[#faf9f5] border border-[#141413]' :
+                    selectedTicket.status === 'UNDER_REVIEW' ? 'bg-[#e8e6dc] text-[#141413] border border-[#141413]/20' :
+                    selectedTicket.status === 'IN_PROGRESS' ? 'bg-[#141413] text-[#faf9f5] border border-[#141413]' :
+                    'bg-[#e8e6dc] text-[#3d3d3a] border border-[#141413]/20'
+                  }`}>
+                    {selectedTicket.status}
+                  </span>
+                  <h2 className="text-2xl font-black text-[#141413] leading-tight max-w-md">{selectedTicket.title}</h2>
+                  <p className="text-sm text-[#3d3d3a] max-w-sm leading-relaxed">{selectedTicket.description.slice(0, 100)}...</p>
                 </div>
-                
-                {activeTab === 'code' && (
-                  <button
-                    onClick={() => setIsFullscreen(true)}
-                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1.5 text-xs font-semibold shrink-0"
-                    title="Fullscreen IDE Editor"
-                  >
-                    <Maximize2 size={14} /> Fullscreen
+
+                <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+                  <button onClick={() => setActiveTab('requirements')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-[#e8e6dc] hover:bg-[#d6d3c4] hover:shadow-lg text-[#141413] rounded-3xl border border-[#141413]/20 shadow-md transition-all group">
+                    <CheckSquare size={36} className="group-hover:scale-110 transition-transform" />
+                    <span className="font-black uppercase tracking-widest text-xs">Task Specs</span>
                   </button>
-                )}
+                  <button onClick={() => setActiveTab('chat')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-[#e8e6dc] hover:bg-[#d6d3c4] hover:shadow-lg text-[#141413] rounded-3xl border border-[#141413]/20 shadow-md transition-all group">
+                    <MessageSquare size={36} className="group-hover:scale-110 transition-transform" />
+                    <span className="font-black uppercase tracking-widest text-xs">Slack Chat</span>
+                  </button>
+                  <button onClick={() => setIsFullscreen(true)} className="aspect-square flex flex-col items-center justify-center gap-4 bg-[#e8e6dc] hover:bg-[#d6d3c4] hover:shadow-lg text-[#141413] rounded-3xl border border-[#141413]/20 shadow-md transition-all group">
+                    <Code2 size={36} className="group-hover:scale-110 transition-transform" />
+                    <span className="font-black uppercase tracking-widest text-xs">IDE Editor</span>
+                  </button>
+                  <button onClick={() => setActiveTab('review')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-[#e8e6dc] hover:bg-[#d6d3c4] hover:shadow-lg text-[#141413] rounded-3xl border border-[#141413]/20 shadow-md transition-all group relative">
+                    <GitPullRequest size={36} className="group-hover:scale-110 transition-transform" />
+                    <span className="font-black uppercase tracking-widest text-xs">PR Review</span>
+                    {currentPR && (
+                      <span className={`absolute top-4 right-4 text-[9px] px-2 py-0.5 rounded font-black tracking-widest ${
+                        currentPR.approved ? 'bg-[#141413] text-[#faf9f5]' : 'bg-[#faf9f5] text-[#141413] border border-[#141413]'
+                      }`}>
+                        {currentPR.approved ? '✓' : '!'}
+                      </span>
+                    )}
+                  </button>
+                </div>
               </div>
 
-              {/* Workspace Navigation Tabs */}
-              <div className="flex border-b border-border bg-slate-950/20 text-xs">
-                <button
-                  onClick={() => setActiveTab('requirements')}
-                  className={`flex-1 py-3 text-center border-b-2 font-semibold transition ${
-                    activeTab === 'requirements' 
-                      ? 'border-indigo-500 text-white bg-indigo-500/5' 
-                      : 'border-transparent text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Task Specs
-                </button>
-                <button
-                  onClick={() => setActiveTab('chat')}
-                  className={`flex-1 py-3 text-center border-b-2 font-semibold transition ${
-                    activeTab === 'chat' 
-                      ? 'border-indigo-500 text-white bg-indigo-500/5' 
-                      : 'border-transparent text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Slack Chat
-                </button>
-                <button
-                  onClick={() => setActiveTab('code')}
-                  className={`flex-1 py-3 text-center border-b-2 font-semibold transition relative ${
-                    activeTab === 'code' 
-                      ? 'border-indigo-500 text-white bg-indigo-500/5' 
-                      : 'border-transparent text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  IDE Editor
-                  {currentPR && !currentPR.approved && (
-                    <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-                  )}
-                </button>
-                <button
-                  onClick={() => setActiveTab('review')}
-                  className={`flex-1 py-3 text-center border-b-2 font-semibold transition relative ${
-                    activeTab === 'review' 
-                      ? 'border-indigo-500 text-white bg-indigo-500/5' 
-                      : 'border-transparent text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  PR Review
-                  {currentPR && (
-                    <span className={`ml-1 text-[9px] px-1 py-0.2 rounded font-bold ${
-                      currentPR.approved ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-                    }`}>
-                      {currentPR.approved ? '✓' : '!'}
-                    </span>
-                  )}
-                </button>
-              </div>
-
-              {/* Tab Content Panels */}
-              <div className="flex-1 p-4 overflow-y-auto max-h-[500px]">
+      {/* Centered Modals for Tools */}
+      {(activeTab === 'requirements' || activeTab === 'chat' || activeTab === 'review') && selectedTicket && (
+        <div className="fixed inset-0 z-[100] bg-[#141413]/80 backdrop-blur-sm p-4 md:p-6 flex items-center justify-center animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-[#faf9f5] rounded-3xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-[#141413]/20">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-[#141413]/20 bg-[#e8e6dc]">
+              <h3 className="font-black uppercase tracking-widest text-[#141413] text-sm flex items-center gap-2">
+                {activeTab === 'requirements' && <><CheckSquare size={16} /> Task Specifications</>}
+                {activeTab === 'chat' && <><MessageSquare size={16} /> Stakeholder Slack Chat</>}
+                {activeTab === 'review' && <><GitPullRequest size={16} /> Pull Request Review</>}
+              </h3>
+              <button 
+                onClick={() => setActiveTab(null)} 
+                className="p-2 bg-[#d6d3c4] hover:bg-[#141413] hover:text-[#faf9f5] rounded-xl text-[#141413] transition shadow-sm"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6">
                 {/* Requirements Tab */}
                 {activeTab === 'requirements' && (
-                  <div className="flex flex-col gap-4 text-xs">
+                  <div className="flex flex-col gap-6 text-xs p-2">
                     <div>
-                      <h4 className="font-bold text-slate-400 mb-1.5 uppercase tracking-wider text-[10px]">Description</h4>
-                      <p className="text-slate-300 leading-relaxed bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+                      <h4 className="font-black text-[#3d3d3a] mb-2.5 uppercase tracking-widest text-[10px]">Description</h4>
+                      <p className="text-[#3d3d3a] leading-relaxed bg-[#e8e6dc] p-4 rounded-xl border border-[#141413]/20 shadow-sm">
                         {selectedTicket.description}
                       </p>
                     </div>
 
                     <div>
-                      <h4 className="font-bold text-slate-400 mb-1.5 uppercase tracking-wider text-[10px]">Affected Workspace Files</h4>
-                      <div className="flex flex-col gap-1.5">
+                      <h4 className="font-black text-[#3d3d3a] mb-2.5 uppercase tracking-widest text-[10px]">Affected Workspace Files</h4>
+                      <div className="flex flex-col gap-2">
                         {selectedTicket.affected_files.map((file, idx) => (
-                          <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-slate-900 border border-slate-800 text-indigo-400 font-mono text-[11px]">
-                            <FolderCode size={14} />
+                          <div key={idx} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#faf9f5] border border-[#141413]/20 text-[#141413] font-mono text-[11px] shadow-sm">
+                            <FolderCode size={16} />
                             {file}
-                            <span className="ml-auto text-[10px] text-slate-500 uppercase font-sans font-bold">
+                            <span className="ml-auto text-[10px] text-[#3d3d3a] uppercase font-sans font-black tracking-widest">
                               {currentLang.label}
                             </span>
                           </div>
@@ -577,12 +561,12 @@ export default function DayOneSimulatorPage() {
                     </div>
 
                     <div>
-                      <h4 className="font-bold text-slate-400 mb-1.5 uppercase tracking-wider text-[10px]">Acceptance Criteria</h4>
-                      <div className="flex flex-col gap-2">
+                      <h4 className="font-black text-[#3d3d3a] mb-2.5 uppercase tracking-widest text-[10px]">Acceptance Criteria</h4>
+                      <div className="flex flex-col gap-2.5">
                         {selectedTicket.acceptance_criteria.map((item, idx) => (
-                          <div key={idx} className="flex items-start gap-2 bg-slate-900/40 p-2.5 rounded-xl border border-slate-800/40">
-                            <CheckSquare className="text-indigo-500 shrink-0 mt-0.5" size={14} />
-                            <span className="text-slate-300 leading-tight">{item}</span>
+                          <div key={idx} className="flex items-start gap-3 bg-[#faf9f5] p-4 rounded-xl border border-[#141413]/20 shadow-sm">
+                            <CheckSquare className="text-[#141413] shrink-0 mt-0.5" size={16} />
+                            <span className="text-[#3d3d3a] leading-relaxed text-[11px]">{item}</span>
                           </div>
                         ))}
                       </div>
@@ -594,23 +578,23 @@ export default function DayOneSimulatorPage() {
                 {activeTab === 'chat' && (
                   <div className="flex flex-col h-[440px]">
                     {/* Persona Toggle */}
-                    <div className="flex justify-between items-center bg-slate-900 p-2 rounded-xl border border-slate-800 mb-2.5 text-xs">
-                      <span className="text-slate-400 font-semibold px-2 flex items-center gap-1.5">
-                        <Users size={14} className="text-indigo-400" /> Stakeholder Persona:
+                    <div className="flex justify-between items-center bg-[#faf9f5] p-2 rounded-xl border border-[#141413]/20 mb-2.5 text-xs">
+                      <span className="text-[#3d3d3a] font-black uppercase tracking-widest px-2 flex items-center gap-1.5">
+                        <Users size={14} className="text-[#141413]" /> Stakeholder Persona:
                       </span>
                       <div className="flex gap-1">
                         <button
                           onClick={() => setPersona('pm')}
-                          className={`px-3 py-1 rounded-lg font-bold transition text-xs ${
-                            persona === 'pm' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
+                          className={`px-3 py-1 rounded font-bold transition text-xs ${
+                            persona === 'pm' ? 'bg-[#3d3d3a] text-[#faf9f5] shadow-md' : 'text-[#3d3d3a] hover:text-[#141413]'
                           }`}
                         >
                           Product Manager
                         </button>
                         <button
                           onClick={() => setPersona('client')}
-                          className={`px-3 py-1 rounded-lg font-bold transition text-xs ${
-                            persona === 'client' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
+                          className={`px-3 py-1 rounded font-bold transition text-xs ${
+                            persona === 'client' ? 'bg-[#3d3d3a] text-[#faf9f5] shadow-md' : 'text-[#3d3d3a] hover:text-[#141413]'
                           }`}
                         >
                           Non-Tech Client
@@ -622,27 +606,27 @@ export default function DayOneSimulatorPage() {
                     <div className="flex flex-wrap gap-1.5 mb-2.5">
                       <button
                         onClick={() => sendChatMessage("What is the core objective of this ticket?")}
-                        className="text-[10px] px-2 py-1 bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-slate-800 rounded-lg transition"
+                        className="text-[10px] px-2 py-1 bg-[#faf9f5] hover:bg-[#e8e6dc] text-[#141413] border border-[#141413]/20 rounded transition"
                       >
                         🎯 Core Goal?
                       </button>
                       <button
                         onClick={() => sendChatMessage("Are there any edge cases or validation rules I should handle?")}
-                        className="text-[10px] px-2 py-1 bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-slate-800 rounded-lg transition"
+                        className="text-[10px] px-2 py-1 bg-[#faf9f5] hover:bg-[#e8e6dc] text-[#141413] border border-[#141413]/20 rounded transition"
                       >
                         ⚠️ Edge Cases?
                       </button>
                       <button
                         onClick={() => sendChatMessage(persona === 'client' ? "Why is this feature important for the business?" : "What schema constraints should I follow?")}
-                        className="text-[10px] px-2 py-1 bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-slate-800 rounded-lg transition"
+                        className="text-[10px] px-2 py-1 bg-[#faf9f5] hover:bg-[#e8e6dc] text-[#141413] border border-[#141413]/20 rounded transition"
                       >
                         {persona === 'client' ? '💡 Business Value?' : '📐 Schema Rules?'}
                       </button>
                     </div>
 
                     {/* Messages Container */}
-                    <div className="flex-1 overflow-y-auto flex flex-col gap-2.5 p-3 bg-slate-950/60 rounded-xl border border-slate-900 mb-2.5 text-xs">
-                      <div className="p-2.5 bg-indigo-950/30 border border-indigo-900/40 rounded-xl text-indigo-300 text-center leading-relaxed text-[11px]">
+                    <div className="flex-1 overflow-y-auto flex flex-col gap-2.5 p-3 bg-[#e8e6dc] rounded-xl border border-slate-900 mb-2.5 text-xs">
+                      <div className="p-2.5 bg-[#e8e6dc] border border-[#d6d3c4] rounded-xl text-[#141413] text-center leading-relaxed text-[11px]">
                         Slack channel for ticket <strong>#{selectedTicket.id}</strong> ({selectedTicket.title}). Ask {persona === 'pm' ? 'Alex (PM)' : 'Morgan (Client)'} anything!
                       </div>
                       
@@ -651,8 +635,8 @@ export default function DayOneSimulatorPage() {
                           key={index}
                           className={`flex flex-col max-w-[85%] rounded-xl p-3 leading-normal ${
                             msg.sender === 'user'
-                              ? 'self-end bg-indigo-600 text-white rounded-tr-none shadow-md'
-                              : 'self-start bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700/80'
+                              ? 'self-end bg-[#3d3d3a] text-[#faf9f5] rounded-tr-none shadow-md'
+                              : 'self-start bg-[#faf9f5] text-[#141413] rounded-tl-none border border-[#141413]/20/80'
                           }`}
                         >
                           <span className="text-[10px] font-bold opacity-80 uppercase tracking-wider mb-1 flex items-center gap-1">
@@ -662,8 +646,8 @@ export default function DayOneSimulatorPage() {
                         </div>
                       ))}
                       {isSendingChat && (
-                        <div className="self-start bg-slate-800/80 text-slate-400 rounded-xl p-3 rounded-tl-none border border-slate-700 italic flex items-center gap-2">
-                          <RefreshCw size={12} className="animate-spin text-indigo-400" />
+                        <div className="self-start bg-[#e8e6dc] text-[#3d3d3a] rounded-xl p-3 rounded-tl-none border border-[#141413]/20 italic flex items-center gap-2">
+                          <RefreshCw size={12} className="animate-spin text-[#141413]" />
                           {persona === 'pm' ? 'Product Manager' : 'Client'} is typing...
                         </div>
                       )}
@@ -678,12 +662,12 @@ export default function DayOneSimulatorPage() {
                         onChange={(e) => setChatInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && sendChatMessage()}
                         placeholder={`Ask the ${persona === 'pm' ? 'Product Manager (Alex)' : 'Client (Morgan)'}...`}
-                        className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition"
+                        className="flex-1 bg-[#faf9f5] border border-[#141413]/20 rounded-xl px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#141413] transition"
                       />
                       <button
                         onClick={() => sendChatMessage()}
                         disabled={isSendingChat || !chatInput.trim()}
-                        className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white p-2.5 rounded-xl transition flex items-center justify-center shrink-0 shadow-md"
+                        className="bg-[#3d3d3a] hover:bg-[#141413] disabled:opacity-50 text-[#faf9f5] p-2.5 rounded-xl transition flex items-center justify-center shrink-0 shadow-md"
                       >
                         <Send size={14} />
                       </button>
@@ -691,83 +675,14 @@ export default function DayOneSimulatorPage() {
                   </div>
                 )}
 
-                {/* IDE Code Editor Tab */}
-                {activeTab === 'code' && (
-                  <div className="flex flex-col gap-3">
-                    {currentPR && !currentPR.approved && (
-                      <div className="p-3 bg-red-950/30 border border-red-500/40 rounded-xl flex items-center justify-between text-xs text-red-300">
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle size={15} className="text-red-400 shrink-0" />
-                          <span>PR Rejected: {currentPR.comments.length} changes requested.</span>
-                        </div>
-                        <button
-                          onClick={() => setIsFullscreen(true)}
-                          className="px-2.5 py-1 bg-red-900/50 hover:bg-red-800/60 text-white rounded-lg text-[11px] font-semibold transition flex items-center gap-1"
-                        >
-                          Fix in Fullscreen <ChevronRight size={12} />
-                        </button>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono bg-slate-950 px-3 py-2 rounded-t-xl border border-b-0 border-slate-800">
-                      <div className="flex items-center gap-2">
-                        <FileCode size={14} className="text-indigo-400" />
-                        <span className="text-white font-bold">{selectedTicket.affected_files[0] || 'solution.py'}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] px-2 py-0.5 bg-slate-900 border border-slate-800 rounded text-indigo-400 font-bold uppercase">
-                          {currentLang.label}
-                        </span>
-                        <button
-                          onClick={() => setCodeContent(getStarterCodeForTicket(selectedTicket))}
-                          className="text-[10px] text-slate-500 hover:text-slate-300 underline"
-                          title="Reset to boilerplate"
-                        >
-                          Reset
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Monaco Editor Container */}
-                    <div className="h-72 bg-slate-950 rounded-b-xl border border-slate-800 overflow-hidden shadow-inner">
-                      <Editor
-                        height="100%"
-                        language={currentLang.language}
-                        value={codeContent}
-                        onMount={(ed) => { editorRef.current = ed; }}
-                        onChange={(val) => setCodeContent(val || '')}
-                        theme="vs-dark"
-                        options={{
-                          fontSize: 12,
-                          fontFamily: 'JetBrains Mono, Menlo, Monaco, "Courier New", monospace',
-                          minimap: { enabled: false },
-                          scrollBeyondLastLine: false,
-                          automaticLayout: true,
-                          tabSize: 4,
-                          lineNumbers: 'on',
-                          padding: { top: 8, bottom: 8 }
-                        }}
-                      />
-                    </div>
-
-                    <button
-                      onClick={submitPullRequest}
-                      disabled={isSubmittingPr}
-                      className="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
-                    >
-                      <GitPullRequest size={14} />
-                      {isSubmittingPr ? 'Reviewing Pull Request...' : 'Submit Pull Request (Open PR)'}
-                    </button>
-                  </div>
-                )}
 
                 {/* PR Review Details Tab */}
                 {activeTab === 'review' && (
                   <div className="flex flex-col gap-4 text-xs">
                     {isSubmittingPr ? (
                       <div className="flex flex-col items-center gap-3 py-16">
-                        <RefreshCw className="animate-spin text-indigo-500" size={32} />
-                        <p className="text-slate-400 text-center font-medium">
+                        <RefreshCw className="animate-spin text-[#141413]" size={32} />
+                        <p className="text-[#3d3d3a] text-center font-medium">
                           Running automated static analysis & invoking AI Senior Tech Lead review...
                         </p>
                       </div>
@@ -775,59 +690,60 @@ export default function DayOneSimulatorPage() {
                       <div className="flex flex-col gap-4">
                         {/* Approval Status Header */}
                         {currentPR.approved ? (
-                          <div className="flex items-center gap-3 p-4 bg-emerald-950/20 border border-emerald-500/30 rounded-xl text-emerald-400">
-                            <CheckCircle2 className="shrink-0 text-emerald-400" size={20} />
+                          <div className="flex items-center gap-3 p-4 bg-[#faf9f5] border border-[#141413]/20 rounded-xl text-[#141413]">
+                            <CheckCircle2 className="shrink-0 text-[#141413]" size={20} />
                             <div>
-                              <h4 className="font-bold text-white text-xs">PR Approved & Merged!</h4>
-                              <p className="text-[11px] text-emerald-400/90 mt-0.5">Telemetry analyzed. BKT mastery progress updated and roadmap advanced.</p>
+                              <h4 className="font-bold text-[#141413] text-xs">PR Approved & Merged!</h4>
+                              <p className="text-[11px] text-[#3d3d3a] mt-0.5">Telemetry analyzed. BKT mastery progress updated and roadmap advanced.</p>
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-3 p-4 bg-red-950/20 border border-red-500/30 rounded-xl text-red-400">
-                            <AlertCircle className="shrink-0 text-red-400" size={20} />
+                          <div className="flex items-center gap-3 p-4 bg-[#e8e6dc] border border-[#141413] rounded-xl text-[#141413]">
+                            <AlertCircle className="shrink-0 text-[#141413]" size={20} />
                             <div>
-                              <h4 className="font-bold text-white text-xs">PR Changes Requested (Blockers Found)</h4>
-                              <p className="text-[11px] text-red-400/90 mt-0.5">Please address the issues highlighted in the line comments below.</p>
+                              <h4 className="font-bold text-[#141413] text-xs">PR Changes Requested (Blockers Found)</h4>
+                              <p className="text-[11px] text-[#3d3d3a] mt-0.5">Please address the issues highlighted in the line comments below.</p>
                             </div>
                           </div>
                         )}
 
                         {/* General Feedback */}
                         <div>
-                          <h4 className="font-bold text-slate-400 mb-1.5 uppercase tracking-wider text-[10px]">General Feedback</h4>
-                          <p className="bg-slate-900 border border-slate-800 p-3.5 rounded-xl leading-relaxed text-slate-300">
+                          <h4 className="font-bold text-[#3d3d3a] mb-1.5 uppercase tracking-wider text-[10px]">General Feedback</h4>
+                          <p className="bg-[#faf9f5] border border-[#141413]/20 p-3.5 rounded-xl leading-relaxed text-[#3d3d3a]">
                             {currentPR.general_feedback}
                           </p>
                         </div>
 
                         {/* Line Annotations */}
                         <div>
-                          <h4 className="font-bold text-slate-400 mb-2.5 uppercase tracking-wider text-[10px]">Line-by-Line Code Review</h4>
+                          <h4 className="font-bold text-[#3d3d3a] mb-2.5 uppercase tracking-wider text-[10px]">Line-by-Line Code Review</h4>
                           <div className="flex flex-col gap-2.5">
                             {currentPR.comments.map((comment, idx) => (
                               <div 
                                 key={idx} 
                                 onClick={() => {
-                                  setActiveTab('code');
+                                  setActiveTab(null);
+                                  setIsFullscreen(true);
                                   setTimeout(() => jumpToLine(comment.line_number, false), 100);
                                 }}
-                                className="border border-slate-800 hover:border-slate-700 bg-slate-900/50 hover:bg-slate-900/80 rounded-xl p-3.5 flex flex-col gap-1.5 transition cursor-pointer"
+                                className="border border-[#141413]/20 hover:border-[#141413]/20 bg-[#faf9f5] hover:bg-[#e8e6dc] rounded-xl p-3.5 flex flex-col gap-1.5 transition cursor-pointer"
                                 title="Click to jump to line in IDE"
                               >
                                 <div className="flex justify-between items-center">
-                                  <span className="text-[10px] font-mono text-indigo-400 flex items-center gap-1.5">
+                                  <span className="text-[10px] font-mono text-[#141413] flex items-center gap-1.5">
                                     <FileCode size={12} />
                                     {comment.file_path} : Line {comment.line_number}
                                   </span>
                                   <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${
-                                    comment.severity === 'BLOCKER' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                                    comment.severity === 'SUGGESTION' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                                    'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                    comment.severity === 'BLOCKER' ? 'bg-[#faf9f5] text-[#141413] border border-[#141413]' :
+                                    comment.severity === 'SUGGESTION' ? 'bg-[#faf9f5] text-[#141413] border border-[#141413]' :
+                                    'bg-[#faf9f5] text-[#141413] border border-[#141413]'
                                   }`}>
                                     {comment.severity}
                                   </span>
                                 </div>
-                                <p className="text-slate-300 leading-normal">{comment.comment}</p>
+                                <p className="text-[#3d3d3a] leading-normal">{comment.comment}</p>
                               </div>
                             ))}
                           </div>
@@ -836,14 +752,11 @@ export default function DayOneSimulatorPage() {
                         {!currentPR.approved && (
                           <div className="flex gap-2">
                             <button
-                              onClick={() => setActiveTab('code')}
-                              className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 border border-slate-700"
-                            >
-                              <Code2 size={14} /> Back to IDE Editor
-                            </button>
-                            <button
-                              onClick={() => setIsFullscreen(true)}
-                              className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 shadow-md"
+                              onClick={() => {
+                                setActiveTab(null);
+                                setIsFullscreen(true);
+                              }}
+                              className="flex-1 py-2.5 bg-[#3d3d3a] hover:bg-[#141413] text-[#faf9f5] rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 shadow-md"
                             >
                               <Maximize2 size={14} /> Fix in Fullscreen
                             </button>
@@ -851,21 +764,24 @@ export default function DayOneSimulatorPage() {
                         )}
                       </div>
                     ) : (
-                      <div className="text-center py-16 text-slate-500 flex flex-col items-center gap-2">
-                        <Code2 size={32} className="text-slate-600" />
+                      <div className="text-center py-16 text-[#3d3d3a] flex flex-col items-center gap-2">
+                        <Code2 size={32} className="text-[#3d3d3a]" />
                         <p>No active PR submissions. Head to the IDE Editor tab to write code and open a PR.</p>
                       </div>
                     )}
                   </div>
                 )}
-              </div>
+            </div>
+          </div>
+        </div>
+      )}
             </>
           ) : (
-            <div className="flex-1 flex flex-col justify-center items-center p-8 text-center text-slate-500 gap-2 h-96">
-              <Briefcase size={36} className="text-slate-600" />
-              <p className="font-bold text-sm">Select a ticket from the board</p>
-              <p className="text-xs max-w-xs leading-relaxed">
-                Click any ticket in the Kanban board cols to review requirements, consult stakeholders, and write code.
+            <div className="flex-1 flex flex-col justify-center items-center p-8 text-center text-[#3d3d3a] gap-4 h-full">
+              <Briefcase size={48} className="text-[#3d3d3a] opacity-50" />
+              <p className="font-black text-lg uppercase tracking-widest text-[#141413]">Select a ticket</p>
+              <p className="text-sm max-w-xs leading-relaxed text-[#3d3d3a]">
+                Click any ticket in the Kanban board to view the control hub, consult stakeholders, and write code.
               </p>
             </div>
           )}
@@ -874,23 +790,23 @@ export default function DayOneSimulatorPage() {
 
       {/* Floating Fullscreen Mode Modal with Side-by-Side PR Review Inspector */}
       {isFullscreen && selectedTicket && (
-        <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md p-6 flex flex-col animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-[#faf9f5]/95 backdrop-blur-md p-6 flex flex-col animate-in fade-in duration-200">
           {/* Fullscreen Header Bar */}
-          <div className="flex justify-between items-center bg-slate-900 border border-slate-800 px-6 py-3.5 rounded-2xl shadow-xl mb-4 shrink-0">
+          <div className="flex justify-between items-center bg-[#faf9f5] border border-[#141413]/20 px-6 py-3.5 rounded-xl shadow-xl mb-4 shrink-0">
             <div className="flex items-center gap-3">
-              <span className="font-mono text-xs font-bold text-indigo-400 bg-indigo-950/60 px-2.5 py-1 rounded-lg border border-indigo-800/40">
+              <span className="font-mono text-xs font-bold text-[#141413] bg-[#e8e6dc] px-2.5 py-1 rounded border border-indigo-800/40">
                 {selectedTicket.id}
               </span>
-              <span className="font-bold text-sm text-white">{selectedTicket.title}</span>
-              <span className="text-xs text-slate-400 font-mono bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 flex items-center gap-1.5">
-                <FileCode size={13} className="text-indigo-400" />
+              <span className="font-bold text-sm text-[#141413]">{selectedTicket.title}</span>
+              <span className="text-xs text-[#3d3d3a] font-mono bg-[#e8e6dc] px-2.5 py-1 rounded border border-[#141413]/20 flex items-center gap-1.5">
+                <FileCode size={13} className="text-[#141413]" />
                 {selectedTicket.affected_files[0]} ({currentLang.label})
               </span>
               {currentPR && (
-                <span className={`text-xs px-2.5 py-1 rounded-lg font-bold flex items-center gap-1.5 ${
+                <span className={`text-xs px-2.5 py-1 rounded font-bold flex items-center gap-1.5 ${
                   currentPR.approved 
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                    : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                    ? 'bg-[#faf9f5] text-[#141413] border border-[#141413]' 
+                    : 'bg-[#faf9f5] text-[#141413] border border-[#141413]'
                 }`}>
                   {currentPR.approved ? <CheckCircle2 size={13} /> : <AlertTriangle size={13} />}
                   {currentPR.approved ? 'PR Merged' : `${currentPR.comments.length} Changes Requested`}
@@ -901,10 +817,10 @@ export default function DayOneSimulatorPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowSideReviewPanel(!showSideReviewPanel)}
-                className={`px-3 py-2 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 ${
+                className={`px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest border transition flex items-center gap-1.5 ${
                   showSideReviewPanel 
-                    ? 'bg-indigo-600/20 border-indigo-500/40 text-indigo-300' 
-                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
+                    ? 'bg-[#e8e6dc] border-[#141413] text-[#141413]' 
+                    : 'bg-[#e8e6dc] border-[#141413]/20 text-[#3d3d3a] hover:text-[#141413]'
                 }`}
                 title="Toggle PR Review Side Panel"
               >
@@ -915,7 +831,7 @@ export default function DayOneSimulatorPage() {
               <button
                 onClick={submitPullRequest}
                 disabled={isSubmittingPr}
-                className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-indigo-950 disabled:opacity-50"
+                className="px-5 py-2.5 bg-[#3d3d3a] hover:bg-[#141413] text-[#faf9f5] rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-sm disabled:opacity-50"
               >
                 <GitPullRequest size={14} />
                 {isSubmittingPr ? 'Submitting...' : 'Submit Pull Request (Open PR)'}
@@ -923,7 +839,7 @@ export default function DayOneSimulatorPage() {
 
               <button
                 onClick={() => setIsFullscreen(false)}
-                className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition"
+                className="p-2.5 rounded-xl bg-[#e8e6dc] hover:bg-[#d6d3c4] text-[#3d3d3a] hover:text-[#141413] transition"
                 title="Exit Fullscreen"
               >
                 <Minimize2 size={16} />
@@ -934,36 +850,36 @@ export default function DayOneSimulatorPage() {
           {/* Fullscreen Body Grid: Specs Drawer (Left) | Monaco Editor (Center) | PR Code Review Inspector (Right) */}
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 overflow-hidden">
             {/* Left Specs Drawer (3 cols) */}
-            <div className="lg:col-span-3 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 overflow-y-auto text-xs flex flex-col gap-4 shadow-xl">
+            <div className="lg:col-span-3 bg-[#faf9f5] border border-[#141413]/20 rounded-xl p-5 overflow-y-auto text-xs flex flex-col gap-4 shadow-xl">
               <div>
-                <h4 className="font-bold text-slate-400 uppercase tracking-wider text-[10px] mb-2 flex items-center gap-1.5">
-                  <CheckSquare size={13} className="text-indigo-400" /> Acceptance Criteria
+                <h4 className="font-bold text-[#3d3d3a] uppercase tracking-wider text-[10px] mb-2 flex items-center gap-1.5">
+                  <CheckSquare size={13} className="text-[#141413]" /> Acceptance Criteria
                 </h4>
                 <div className="flex flex-col gap-2">
                   {selectedTicket.acceptance_criteria.map((c, i) => (
-                    <div key={i} className="flex items-start gap-2 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800/60">
-                      <CheckSquare className="text-indigo-400 shrink-0 mt-0.5" size={14} />
-                      <span className="text-slate-300 leading-snug">{c}</span>
+                    <div key={i} className="flex items-start gap-2 bg-[#faf9f5] p-2.5 rounded-xl border border-[#141413]/20">
+                      <CheckSquare className="text-[#141413] shrink-0 mt-0.5" size={14} />
+                      <span className="text-[#3d3d3a] leading-snug">{c}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div>
-                <h4 className="font-bold text-slate-400 uppercase tracking-wider text-[10px] mb-2 flex items-center gap-1.5">
-                  <FolderCode size={13} className="text-indigo-400" /> Task Description
+                <h4 className="font-bold text-[#3d3d3a] uppercase tracking-wider text-[10px] mb-2 flex items-center gap-1.5">
+                  <FolderCode size={13} className="text-[#141413]" /> Task Description
                 </h4>
-                <p className="text-slate-300 leading-relaxed bg-slate-950/70 p-3 rounded-xl border border-slate-800/60">
+                <p className="text-[#3d3d3a] leading-relaxed bg-[#faf9f5] p-3 rounded-xl border border-[#141413]/20">
                   {selectedTicket.description}
                 </p>
               </div>
             </div>
 
             {/* Center Monaco Editor (6 cols if right panel shown, 9 cols if hidden) */}
-            <div className={`${showSideReviewPanel ? 'lg:col-span-6' : 'lg:col-span-9'} bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300`}>
-              <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 text-[11px] text-slate-400 font-mono">
+            <div className={`${showSideReviewPanel ? 'lg:col-span-6' : 'lg:col-span-9'} bg-[#faf9f5] border border-[#141413]/20 rounded-xl overflow-hidden shadow-2xl flex flex-col transition-all duration-300`}>
+              <div className="flex items-center justify-between px-4 py-2 bg-[#faf9f5] border-b border-[#141413]/20 text-[11px] text-[#3d3d3a] font-mono">
                 <span>{selectedTicket.affected_files[0]}</span>
-                <span className="text-[10px] text-indigo-400 font-bold uppercase">{currentLang.label}</span>
+                <span className="text-[10px] text-[#141413] font-bold uppercase">{currentLang.label}</span>
               </div>
               <div className="flex-1">
                 <Editor
@@ -990,10 +906,10 @@ export default function DayOneSimulatorPage() {
 
             {/* Right PR Code Review & Change Request Panel (3 cols) */}
             {showSideReviewPanel && (
-              <div className="lg:col-span-3 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 overflow-y-auto text-xs flex flex-col gap-4 shadow-xl animate-in slide-in-from-right-4 duration-200">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <h3 className="font-extrabold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
-                    <GitPullRequest size={14} className="text-indigo-400" /> PR Code Review
+              <div className="lg:col-span-3 bg-[#faf9f5] border border-[#141413]/20 rounded-xl p-5 overflow-y-auto text-xs flex flex-col gap-4 shadow-xl animate-in slide-in-from-right-4 duration-200">
+                <div className="flex items-center justify-between border-b border-[#141413]/20 pb-3">
+                  <h3 className="font-extrabold text-[#141413] text-xs uppercase tracking-wider flex items-center gap-1.5">
+                    <GitPullRequest size={14} className="text-[#141413]" /> PR Code Review
                   </h3>
                   {currentPR && (
                     <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
@@ -1006,15 +922,15 @@ export default function DayOneSimulatorPage() {
 
                 {isSubmittingPr ? (
                   <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-                    <RefreshCw className="animate-spin text-indigo-500" size={28} />
-                    <p className="text-slate-400 text-xs">Analyzing code against acceptance criteria...</p>
+                    <RefreshCw className="animate-spin text-[#141413]" size={28} />
+                    <p className="text-[#3d3d3a] text-xs">Analyzing code against acceptance criteria...</p>
                   </div>
                 ) : currentPR ? (
                   <div className="flex flex-col gap-4">
                     {/* General Feedback Box */}
                     <div>
-                      <h4 className="font-bold text-slate-400 mb-1.5 uppercase tracking-wider text-[10px]">Feedback Summary</h4>
-                      <p className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl leading-relaxed text-slate-300 text-[11px]">
+                      <h4 className="font-bold text-[#3d3d3a] mb-1.5 uppercase tracking-wider text-[10px]">Feedback Summary</h4>
+                      <p className="bg-[#faf9f5]/80 border border-[#141413]/20 p-3 rounded-xl leading-relaxed text-[#3d3d3a] text-[11px]">
                         {currentPR.general_feedback}
                       </p>
                     </div>
@@ -1022,10 +938,10 @@ export default function DayOneSimulatorPage() {
                     {/* Line-by-Line Changes to Fix */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <h4 className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">
+                        <h4 className="font-bold text-[#3d3d3a] uppercase tracking-wider text-[10px]">
                           Line Changes to Fix ({currentPR.comments.length})
                         </h4>
-                        <span className="text-[10px] text-slate-500">Click to jump to line</span>
+                        <span className="text-[10px] text-[#3d3d3a]">Click to jump to line</span>
                       </div>
 
                       <div className="flex flex-col gap-2.5">
@@ -1035,15 +951,15 @@ export default function DayOneSimulatorPage() {
                             onClick={() => jumpToLine(comment.line_number, true)}
                             className={`border rounded-xl p-3 flex flex-col gap-1.5 transition cursor-pointer ${
                               comment.severity === 'BLOCKER' 
-                                ? 'bg-red-950/20 border-red-500/40 hover:bg-red-950/40 hover:border-red-500/70 shadow-sm' 
+                                ? 'bg-[#e8e6dc] border border-[#141413]/20 hover:bg-red-950/40 hover:border-red-500/70 shadow-sm' 
                                 : comment.severity === 'SUGGESTION'
-                                ? 'bg-amber-950/20 border-amber-500/40 hover:bg-amber-950/40 hover:border-amber-500/70 shadow-sm'
-                                : 'bg-slate-950/80 border-slate-800 hover:border-slate-700'
+                                ? 'bg-[#e8e6dc] border border-[#141413]/20 hover:bg-amber-950/40 hover:border-amber-500/70 shadow-sm'
+                                : 'bg-[#faf9f5]/80 border-[#141413]/20 hover:border-[#141413]/20'
                             }`}
                             title={`Jump to line ${comment.line_number} in editor`}
                           >
                             <div className="flex justify-between items-center">
-                              <span className="text-[10px] font-mono text-indigo-300 font-bold flex items-center gap-1">
+                              <span className="text-[10px] font-mono text-[#141413] font-bold flex items-center gap-1">
                                 <FileCode size={12} /> Line {comment.line_number}
                               </span>
                               <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${
@@ -1054,17 +970,17 @@ export default function DayOneSimulatorPage() {
                                 {comment.severity}
                               </span>
                             </div>
-                            <p className="text-slate-300 leading-snug text-[11px]">{comment.comment}</p>
+                            <p className="text-[#3d3d3a] leading-snug text-[11px]">{comment.comment}</p>
                           </div>
                         ))}
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-3 py-16 text-center text-slate-500">
-                    <Code2 size={32} className="text-slate-600" />
+                  <div className="flex flex-col items-center justify-center gap-3 py-16 text-center text-[#3d3d3a]">
+                    <Code2 size={32} className="text-[#3d3d3a]" />
                     <p className="text-xs">No PR submitted yet.</p>
-                    <p className="text-[11px] text-slate-600 max-w-[200px]">
+                    <p className="text-[11px] text-[#3d3d3a] max-w-[200px]">
                       Click &quot;Submit Pull Request&quot; above to run static analysis and get line annotations here.
                     </p>
                   </div>
