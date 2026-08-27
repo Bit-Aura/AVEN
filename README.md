@@ -1,65 +1,275 @@
-# Career PathFinder
+# AVEN — Autonomous Career Pathfinder & Deterministic Skill Graph Engine
 
-An AI-powered personalized learning path recommender where a deterministic skill graph does the planning, a short diagnostic conversation replaces standard quizzes, and the AI explains decisions based strictly on ground-truth data.
+<div align="center">
 
-## Monorepo Architecture
+```
+   █████╗ ██╗   ██╗███████╗███╗   ██╗
+  ██╔══██╗██║   ██║██╔════╝████╗  ██║
+  ███████║██║   ██║█████╗  ██╔██╗ ██║
+  ██╔══██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║
+  ██║  ██║ ╚████╔╝ ███████╗██║ ╚████║
+  ╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝
+```
 
-This project is organized as a monorepo containing:
-- **Backend (`apps/api`)**: FastAPI application, async SQLAlchemy 2.0, PostgreSQL 16 with `pgvector`, official `neo4j` driver, NetworkX for graph traversal, and direct Anthropic SDK calls wrapped in a typed `AIProvider` gateway.
-- **Frontend (`apps/web`)**: Next.js 15 (App Router) + TypeScript + Tailwind CSS + Drizzle ORM + Clerk Auth + React Flow (`@xyflow/react`) for skill-graph prerequisite map visualization, TanStack Query, and Zustand.
-- **Shared Types (`packages/shared-types`)**: OpenAPI-generated TypeScript types shared across the stack to keep API schemas and client models synchronized.
-- **Graph (`graph/`)**: Cypher scripts defining uniqueness constraints and schemas for skill graph nodes and prerequisite relationships.
-- **Scripts (`scripts/`)**: Automated type-generation pipelines.
+**Production-Grade AI Learning Architecture Powered by Deterministic Neo4j Skill Graphs, Bayesian Knowledge Tracing (BKT), and Real-Time ATS Scraping**
 
----
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178c6.svg?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.0_App_Router-black.svg?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776ab.svg?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Neo4j](https://img.shields.io/badge/Neo4j-5.20_Graph_DB-008cc1.svg?style=flat-square&logo=neo4j&logoColor=white)](https://neo4j.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16_+_pgvector-4169e1.svg?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
-## Technical Stack & Infrastructure
-
-- **Transactional DB**: PostgreSQL 16 + `pgvector` (with SQLAlchemy 2.0 Async in FastAPI and Drizzle ORM in Next.js)
-- **Graph DB**: Neo4j Community Edition 5.20.0 (Cypher queries & NetworkX traversal)
-- **Authentication**: Clerk Auth with Next.js edge middleware (`src/middleware.ts`)
-- **AI Gateway**: Protocol-based integration of Anthropic SDK (with a functional mock provider for tests)
-- **Frontend Architecture**: Next.js 15 App Router organized into route groups:
-  - `(auth)`: Sign-in / Sign-up with Clerk
-  - `(onboarding)`: Conversational Diagnostic onboarding (`/diagnostic`)
-  - `(dashboard)`: Dedicated views for `/learner`, `/learner/graph`, `/learner/portfolio`, `/mentor`, and `/admin`
-  - Internal Next.js Route Handlers: `/api/chat`, `/api/assessment/submit`
-- **Visualization**: React Flow (xyflow) for interactive directed acyclic graphs (DAGs)
+</div>
 
 ---
 
-## Core Runtime Pipeline
+## 🌟 Executive Overview
 
-1. **Intent Parsing**: User natural-language goal $\rightarrow$ validated `GoalIntent` (Pydantic schema).
-2. **Semantic Mapping**: Embed and match user-input skills to database nodes using `pgvector` cosine similarity.
-3. **Graph Traversal**: Retrieve subgraphs from Neo4j, build in NetworkX, and perform a deterministic topological sort of unmet prerequisites.
-4. **Resource Retrieval & Ranking**: Match resources against constraints (time budget, modality) and rank them.
-5. **Grounded Explanation**: Generate natural language reasons explaining recommendations using a strict `DecisionTrace` (no hallucination).
-6. **Dashboard Rendering**: Present path milestones in the frontend with React Flow and modular learner components.
+**AVEN** is an end-to-end, enterprise-ready career engineering platform designed to eliminate the hallucination and generic advice inherent in traditional AI tutoring. 
+
+Instead of treating Large Language Models as unconstrained planners, **AVEN** decouples cognitive reasoning from execution:
+1. **Deterministic Skill DAG (Neo4j)** enforces mathematically strict prerequisite sequences, topological sorts, and domain pathways.
+2. **Bayesian Knowledge Tracing (BKT)** dynamically tracks mastery probabilities $P(L_t)$ across every micro-concept based on live coding attempts, diagnostic conversations, and checkpoint assessments.
+3. **Multi-Source ATS Scraping Pipeline** continuously harvests live job postings from Greenhouse, Ashby, Lever, Amazon, and Google, synthesizing real-time interview requirements into actionable learning sprints.
+4. **Grounded AI Generation** operates purely on strict `DecisionTrace` vectors from the graph, guaranteeing 100% grounded explanations without fabrication.
 
 ---
 
-## Local Dev Setup
+## 🏛️ System Architecture
 
-### 1. Configure Environment Variables
-Copy `.env.example` to `.env` and fill in the required keys:
+```mermaid
+flowchart TB
+    subgraph ClientLayer["Frontend Layer (Next.js 15 App Router + React Flow)"]
+        UI_Learner["Learner Workspace (/learner)"]
+        UI_Simulator["Day-One Simulator (/learner/simulator)"]
+        UI_WarRoom["Placement War Room (/war-room)"]
+        UI_Radar["Market Demand Radar (/market-radar)"]
+        UI_Mentor["Mentor Connect & 360° Intel (/mentor)"]
+        UI_Interview["AI Mock Interview (/learner/interview)"]
+    end
+
+    subgraph APILayer["Backend Engine (FastAPI Async)"]
+        Router_Auth["Auth & RBAC Router (/api/v1/auth)"]
+        Router_Path["Path & Graph Router (/api/v1/path)"]
+        Router_Sim["Simulator & PR Review (/api/v1/simulator)"]
+        Router_Place["Placement & War Room (/api/v1/placement)"]
+        Router_Scraper["Live ATS Scraper (/api/v1/scraper)"]
+        Router_Mentor["Mentor Connect & Triage (/api/v1/mentor-connect)"]
+        Router_Interview["AI Voice Interview (/api/v1/interview)"]
+    end
+
+    subgraph DataLayer["Data & Knowledge Stores"]
+        Neo4j[("Neo4j 5.20 Graph Database\n(Skill DAGs, Competency Nodes, Prereqs)")]
+        Postgres[("PostgreSQL 16 + pgvector\n(User Profiles, BKT States, Attempts, Resumes)")]
+        SQLite[("Local Cache DB\n(Dynamic Company Profiles, Telemetry)")]
+    end
+
+    subgraph ExternalServices["External APIs & AI Services"]
+        LLM["AI Gateway (Ollama / Anthropic Claude / DeepSeek)"]
+        ATS["Live ATS Endpoints (Ashby, Greenhouse, Lever, Amazon, Google)"]
+        Jitsi["Jitsi Meet Server (Embedded Video Rooms)"]
+    end
+
+    ClientLayer --> APILayer
+    APILayer --> DataLayer
+    APILayer --> ExternalServices
+    Router_Scraper --> ATS
+    Router_Place --> Neo4j
+    Router_Sim --> LLM
+    Router_Mentor --> Jitsi
+```
+
+---
+
+## 🚀 Core Features & Flagship Innovations
+
+### 1. 💼 Day-One Corporate Simulator
+* **Interactive 5-Column Kanban Board**: Manages real-world engineering sprints across `Backlog`, `To Do`, `In Progress`, `PR In Review`, and `Done`.
+* **Stakeholder Chatbot with RAG Memory**: Multi-turn, ticket-aware conversational Slack chat simulating:
+  * **Product Manager**: Clarifies business objectives, edge cases, scope, and user personas.
+  * **Non-Technical Client**: Explains domain problems in layman's terms with dynamic AI retrieval from the ticket specifications.
+* **Monaco IDE Editor**: Full-featured VS-Dark code editor with automatic multi-language detection (`Python`, `SQL`, `TypeScript`, `Bash`), auto-indentation, and syntax validation.
+* **Floating 3-Pane Fullscreen Mode**:
+  * **Left Pane**: Ticket specifications, acceptance criteria, and schema requirements.
+  * **Center Pane**: Full-height Monaco Code Editor with live line jumper.
+  * **Right Pane**: Interactive PR Code Review inspector showing Senior Dev feedback, blocker badges (`BLOCKER`, `SUGGESTION`, `LINT`), and one-click jump-to-line links.
+* **Automated Acceptance PR Evaluation**: Parses submitted code against deterministic acceptance criteria, rejecting non-compliant code with line-by-line feedback and updating learner BKT mastery upon approval.
+
+---
+
+### 2. ⚔️ Dynamic Placement War Room & Sprint Planner
+* **Zero Hardcoding**: Dynamically synthesizes real-world hiring profiles for **any** tech company or startup entered by the learner.
+* **Domain-Aware Curriculum Synthesis**: Automatically detects active career domains (e.g. *Backend Software Engineer*, *Full-Stack*, *AI/ML*, *DevOps*) from the database and matches the company's real-world tech stack with ground-truth Neo4j skill nodes.
+* **Balanced Sprint Generation**: Distributes target competencies evenly across the timeline (e.g. 6-week sprints) ensuring no weeks are left blank or without concrete challenge gates.
+* **Stress Index & Feasibility Engine**: Computes weekly study pace requirements, market demand pressure, and historical pass rates to calculate an overall preparation stress percentage.
+
+---
+
+### 3. 📡 Market Demand Radar (Live ATS ETL Scraping Engine)
+Asynchronous, multi-adapter data ingestion pipeline in `apps/api/app/scraper/`:
+
+| Source Adapter | Target Platform | Live Endpoint Integration |
+|---|---|---|
+| `sources/ashby.py` | **Ashby API** | `https://api.ashbyhq.com/posting-api/job-board/{board}` (e.g., OpenAI, Linear, Ramp, Sentry) |
+| `sources/greenhouse.py` | **Greenhouse API** | `https://boards-api.greenhouse.io/v1/boards/{token}/jobs` (e.g., Stripe, Figma, Cloudflare) |
+| `sources/lever.py` | **Lever API** | `https://api.lever.co/v0/postings/{slug}` (e.g., Palantir, Netflix) |
+| `sources/amazon.py` | **Amazon Jobs API** | `https://www.amazon.jobs/en/search.json` |
+| `sources/google.py` | **Google Careers API** | `https://careers.google.com/api/v3/search/` |
+
+* **Normalization & Extraction**: Automatically strips raw HTML tags, formats geographic locations, standardizes employment types, and extracts core skill keywords via NLP regex pipelines.
+* **Deduplication Engine**: In-memory similarity deduplication to remove repeated cross-team job postings.
+* **Live Profile Match Scoring**: Computes the real-time match percentage between active job requirements and the student's verified BKT knowledge state.
+
+---
+
+### 4. 🧑‍🏫 Mentor Connect & Learner 360° Knowledge Inspector
+* **First-Come-First-Served (FCFS) Escalation Queue**: Learners stuck on difficult skills can request 1-on-1 sessions, complete with reason, skill ID, and requested duration.
+* **Algorithmic Mentor Triage Queue**: Sorts learners by breakthrough leverage:
+  $$\text{Triage Score} = \text{Readiness} \times (1 + \text{Urgency}) \times \text{Proximity Bonus}$$
+* **Embedded Jitsi Video Meeting Rooms**: Direct browser-based WebRTC video conferencing with room auto-provisioning and post-session takeaway logging.
+* **Standalone Learner 360° Intelligence Center (`/mentor/learner-intel`)**:
+  * **Real Database Discovery**: Automatically lists all real enrolled students without mock or dummy fallbacks.
+  * **Visual Skill Graph Matrix**: Real-time display of all syllabus nodes with exact BKT mastery percentages ($P(L)$), status pills (`MASTERED`, `IN PROGRESS`, `LAGGING`), and dependency prerequisites.
+  * **Frontier Node Spotlight**: Pinpoints the exact active bottleneck node in the graph where the student is blocked.
+  * **Executive Coaching Brief**: AI + Graph synthesized summary diagnosing learning blockers, root-cause deficiencies, and 3 curated coaching talking points.
+  * **Diagnostic Activity Log**: Full chronological timeline of Prove-It assessment scores, sandbox code submissions, and mock interview reports.
+
+---
+
+### 5. 🎙️ AI Voice Mock Interviewer
+* **Resume Parsing Engine**: Upload PDF/DOCX resumes with automated OCR text extraction and skill verification.
+* **Real-Time Speech Recognition**: Browser-native 16kHz audio stream processing with downsampling and live transcription.
+* **Multi-Turn Interview Phases**: Walks the candidate through *Technical Fundamentals*, *System Design*, *Coding Trade-Offs*, and *Behavioral Questions*.
+* **Comprehensive Evaluation Matrix**: Generates rubrics on Technical Knowledge, Communication Clarity, Resume Honesty, and detected skill gaps.
+
+---
+
+### 6. 🛡️ Role-Based Access Control (RBAC) & Authentication
+* **Strict Role Routing**: Instant separation between `LEARNER`, `MENTOR`, and `ADMIN` personas.
+* **Diagnostic Exemption for Mentors & Admins**: Mentors and platform administrators automatically bypass cold-start diagnostics and are routed directly to operational control centers.
+* **IDOR Protection**: Session endpoints enforce cryptographic user ownership and mentor assignment verification on every state mutation.
+
+---
+
+## 🧮 Mathematical & Algorithmic Formulations
+
+### 1. Bayesian Knowledge Tracing (BKT)
+For each skill node $k$ and interaction attempt $t$, the probability of mastery $P(L_t)$ is updated via standard Bayesian inference:
+
+$$P(L_{t-1} \mid \text{Correct}) = \frac{P(L_{t-1}) \cdot (1 - P(S))}{P(L_{t-1}) \cdot (1 - P(S)) + (1 - P(L_{t-1})) \cdot P(G)}$$
+
+$$P(L_{t-1} \mid \text{Incorrect}) = \frac{P(L_{t-1}) \cdot P(S)}{P(L_{t-1}) \cdot P(S) + (1 - P(L_{t-1})) \cdot (1 - P(G))}$$
+
+$$P(L_t) = P(L_{t-1} \mid \text{Obs}) + (1 - P(L_{t-1} \mid \text{Obs})) \cdot P(T)$$
+
+Where:
+* $P(L_0) = 0.10$ (Prior Mastery)
+* $P(T) = 0.15$ (Transition Probability)
+* $P(G) = 0.20$ (Guess Probability)
+* $P(S) = 0.10$ (Slip Probability)
+
+---
+
+### 2. Algorithmic Mentor Triage Scoring
+$$\text{Priority} = \text{Readiness} \cdot \left(1 + \max\left(0, 1 - \frac{D_{\text{needed}}}{D_{\text{available}}}\right)\right) \cdot \text{ProximityBonus}$$
+
+Where:
+$$\text{ProximityBonus} = \begin{cases} 1.5 & \text{if } 0.80 \le \text{Readiness} \le 0.95 \text{ (Breakthrough Zone)} \\ 1.0 & \text{otherwise} \end{cases}$$
+
+---
+
+## 📁 Monorepo Structure
+
+```
+AVEN/
+├── apps/
+│   ├── api/                          # FastAPI Backend Application
+│   │   ├── app/
+│   │   │   ├── core/                 # Config, DB connections, Auth & Security
+│   │   │   ├── infrastructure/       # Neo4j Client, AI Gateway (Ollama/Claude)
+│   │   │   ├── models/               # SQLAlchemy 2.0 Domain Entities
+│   │   │   ├── routers/              # REST Endpoints
+│   │   │   │   ├── auth.py           # Authentication & Session Sync
+│   │   │   │   ├── path.py           # Skill DAG & Path Versioning
+│   │   │   │   ├── simulator.py      # Simulator Kanban, Chat & PR Reviews
+│   │   │   │   ├── placement.py      # War Room & Sprint Plan Generators
+│   │   │   │   ├── mentor_connect.py # Mentor FCFS Queue & 360° Intel
+│   │   │   │   ├── scraper.py        # ATS Scraping REST Endpoints
+│   │   │   │   └── interview.py      # AI Mock Interview Engine
+│   │   │   ├── scraper/              # Multi-Source ATS ETL Pipeline
+│   │   │   │   ├── sources/          # Ashby, Greenhouse, Lever, Amazon, Google
+│   │   │   │   ├── deduplicator.py   # In-Memory Job Deduplication
+│   │   │   │   ├── normalizer.py     # HTML Cleaners & Formatters
+│   │   │   │   └── pipeline.py       # Main Scraping Pipeline Orchestrator
+│   │   │   ├── services/             # Core Business Logic (PlacementEngine, etc.)
+│   │   │   └── main.py               # Application Factory & Middleware
+│   │   ├── pyproject.toml            # Poetry / Pip Dependency Configuration
+│   │   └── tests/                    # Pytest Backend Test Suite
+│   │
+│   └── web/                          # Next.js 15 App Router Frontend
+│       ├── src/
+│       │   ├── app/                  # App Router Structure
+│       │   │   ├── (auth)/           # Sign-In & Sign-Up Routes
+│       │   │   ├── (onboarding)/     # Conversational Diagnostic (/diagnostic)
+│       │   │   └── (dashboard)/      # Protected Role Dashboards
+│       │   │       ├── learner/      # Learning Path, Graph, Portfolio, Simulator
+│       │   │       │   ├── simulator/# Day-One Simulator Workspace
+│       │   │       │   └── interview/# AI Voice Mock Interview
+│       │   │       ├── mentor/       # Mentor Connect & Operations
+│       │   │       │   ├── learner-intel/ # Standalone 360° Intel Center
+│       │   │       │   └── sessions/ # Assigned 1-on-1 Sessions
+│       │   │       ├── war-room/     # Placement Season War Room
+│       │   │       └── market-radar/ # Live Market Demand Radar
+│       │   ├── components/           # Modular React & Tailwind Component Library
+│       │   │   ├── assessment/       # Prove-It Quizzes & Challenges
+│       │   │   ├── auth/             # RoleGuard & Permission Shields
+│       │   │   ├── layout/           # Sidebar, Navbar, PresenceBar
+│       │   │   └── mentor/           # Jitsi Meeting Modals & Schedulers
+│       │   ├── store/                # Zustand State Stores (usePathStore, etc.)
+│       │   ├── api/                  # Typed Client API Connectors
+│       │   └── lib/                  # Speech Recognition & Clerk Safety Wrappers
+│       └── package.json              # Node Dependencies & Scripts
+│
+├── graph/                            # Neo4j Seed Scripts & Cypher Schemas
+├── docker-compose.yml                # Multi-Container Orchestration
+└── README.md                         # Comprehensive System Documentation
+```
+
+---
+
+## 🛠️ Local Installation & Development Setup
+
+### 1. Prerequisites
+* **Node.js**: `v20.0.0` or higher
+* **Python**: `v3.11.0` or higher
+* **Docker & Docker Compose**: For containerized databases (PostgreSQL + Neo4j)
+
+---
+
+### 2. Environment Configuration
+Copy the sample environment file and configure your keys:
 ```bash
 cp .env.example .env
 ```
 
-### 2. Launch Services via Docker Compose
-Start PostgreSQL, Neo4j, FastAPI API, and Next.js frontend services:
-```bash
-docker-compose up --build
-```
-- **FastAPI API**: `http://localhost:8000` (docs available at `/docs`)
-- **Next.js Frontend**: `http://localhost:8080` (or `http://localhost:3000` locally via `npm run dev`)
-- **Neo4j Browser**: `http://localhost:7474` (Bolt port at `7687`)
+Key environment variables:
+```env
+# Backend Database & Ports
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/pathfinder
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=pathfinder_secret
 
-### 3. Apply Initial Database Migrations
-Once the database container is healthy, run the migrations:
-```bash
-docker-compose exec api alembic upgrade head
+# AI Gateway (Local Ollama or Cloud Provider)
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=deepseek-r1:latest
+
+# Frontend Config
+NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
 ```
 
 ### 4. Run Natively (Windows / PowerShell)
@@ -88,62 +298,83 @@ npm run dev
 
 ---
 
-## Shared Type Generation Pipeline
-
-If backend Pydantic models or FastAPI endpoints change, regenerate the shared TypeScript models for the frontend:
+### 3. Launch Databases via Docker Compose
+Start PostgreSQL 16 (with `pgvector`) and Neo4j 5.20:
 ```bash
-./scripts/generate-types.sh
+docker compose up db neo4j -d
 ```
-This script boots up the API, extracts the OpenAPI schema, and generates a unified typed definition at `packages/shared-types/index.d.ts`.
+
+* **PostgreSQL**: `localhost:5432`
+* **Neo4j Browser**: `http://localhost:7474` (Bolt: `localhost:7687`)
 
 ---
 
-## Running Tests
-
-To run the backend test suite locally on the host:
-1. Initialize a Python virtual environment and activate it:
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
-2. Install dependencies:
-   ```bash
-   pip install fastapi pydantic pydantic-settings sqlalchemy asyncpg pgvector alembic instructor anthropic networkx neo4j uvicorn pytest pytest-asyncio
-   ```
-3. Run the tests:
-   ```bash
-   PYTHONPATH=apps/api pytest apps/api
-   ```
-
-To run the frontend test suite:
+### 4. Setup and Run the FastAPI Backend
 ```bash
-cd apps/web && npm test
+# Navigate to API directory
+cd apps/api
+
+# Create & activate Python virtual environment
+python -m venv .venv
+# On Windows:
+.venv\Scripts\activate
+# On Linux/macOS:
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run migrations & seed skill graph
+python -m app.services.seeder
+
+# Start API server with auto-reload
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+API Documentation will be live at `http://localhost:8000/docs`.
+
+---
+
+### 5. Setup and Run the Next.js Frontend
+```bash
+# Navigate to Web directory
+cd apps/web
+
+# Install npm dependencies
+npm install
+
+# Start Next.js development server
+npm run dev
+```
+Open `http://localhost:3000` in your browser.
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+### Run Backend Unit & Integration Tests
+```bash
+cd apps/api
+pytest -v
+```
+
+### Run Frontend TypeScript Compilation & Unit Tests
+```bash
+cd apps/web
+npx tsc --noEmit
+npm test
 ```
 
 ---
 
-## Built Features & Component Library
+## 👥 Roles & Access Permissions
 
-- **Dashboard & Skill Graph (Frontend)**: Highly interactive, visually stunning React Flow graph for displaying the learning path, powered by strict Zustand state management and fully testable architecture. (See `docs/Feature_Dashboard_Skill_Graph.md`)
-- **Goal Chat UI (Frontend)**: An immersive, beautifully styled natural-language input interface that seamlessly captures the user's initial goal and conditionally transitions into the dashboard. (See `docs/Feature_Goal_Chat.md`)
-- **Cold-Start Diagnostic UI (Frontend)**: A sleek, bounded conversational UI (`/diagnostic`) that effectively estimates a learner's baseline skills right after onboarding, preventing the "cold-start" problem without relying on boring forms. (See `docs/Feature_Diagnostic_Chat.md`)
-- **What-If-Skip Simulation UI (Frontend)**: Empowers learners to negotiate their path by previewing the downstream consequences of skipping a milestone, complete with immersive visual graph feedback. (See `docs/Feature_What_If_Skip.md`)
-- **Prove-It Assessment & Micro-Assessment Gates**: Seamlessly integrated quiz and challenge interfaces (`MicroAssessmentModal.tsx`, `ProveItAssessment.tsx`) that allow confident learners to prove their skills and update BKT mastery probabilities. (See `docs/Feature_Prove_It_Gates.md`)
-- **Trust Panel & Readiness Vector UI**: Eliminates the "black box" by showing the learner exactly why the AI generated their path, visualizing their progress toward their ultimate goal. (`TrustPanel.tsx`, `ReadinessBar.tsx`) (See `docs/Feature_Trust_Panel.md`)
-- **Live Multi-Cursor/Presence & Cohort Rings**: Collaboration bars and cohort challenge rings (`PresenceBar.tsx`, `CohortRing.tsx`, `PeerPresenceBadge.tsx`) showing active peer motivation and study rings. (See `docs/Feature_Presence_UI.md`)
-- **Context-Aware IDE Sidecar**: A simulated inline Monaco/VS Code environment (`IdeSidecar.tsx`) that allows learners to write code and solve node challenges directly in the browser. (See `docs/Feature_IDE_Sidecar.md`)
-- **Offline-First Resilience UI**: A smart queueing system and animated banner (`OfflineSyncBanner.tsx`) that captures node completions when offline, syncing them seamlessly when reconnected. (See `docs/Feature_Offline_Resilience_UI.md`)
-- **AI Coach "Help Me" Overlay**: A context-aware chat drawer (`AiCoachDrawer.tsx`) attached to learning nodes, offering socratic tutoring and assistance. (See `docs/Feature_AI_Coach.md`)
-- **Gamification HUD & Micro-Celebration**: Floating dashboard widget (`GamificationHud.tsx`) tracking daily streaks and XP with micro-animations and full-screen celebrations (`MicroCelebration.tsx`). (See `docs/Feature_Gamification_HUD.md`, `docs/Feature_Micro_Celebration.md`)
-- **Time-Travel History / Undo**: A snapshot state engine allowing users to instantly undo milestone completions via a sleek toast UI (`UndoToast.tsx`). (See `docs/Feature_Time_Travel.md`)
-- **Command Palette**: Global keyboard-driven interface (`CommandPalette.tsx` via `Cmd/Ctrl+K`) for quickly triggering IDE (`Cmd+I`), AI Coach (`Cmd+H`), or Focus Mode (`Cmd+F`). (See `docs/Feature_Command_Palette.md`)
-- **Focus Mode Toggle**: Cognitive-load reduction feature that uses CSS dimming and spotlighting on the active learning node. (See `docs/Feature_Focus_Mode.md`)
-- **Shareable Proof Cards**: Verified competency credentials (`ProofCard.tsx`) displaying confidence scores, evidence tags, and AI narratives in a glassmorphic card. (See `docs/Feature_Proof_Cards.md`)
-- **Learner-Steerable Autonomy Sliders**: Visual sliders (`AutonomySliders.tsx`, `RankingSliders.tsx`) allowing users to dynamically adjust speed vs. depth, free vs. paid, and video vs. project-based constraints. (See `docs/Feature_Ranking_Sliders.md`)
-- **Skill Staleness & Ebbinghaus Decay Warning**: Proactive UI badges (`StalenessWarning.tsx`) that alert learners when a previously mastered skill requires a refresher.
-- **Real-Time Job Opportunity Alerts**: Reactive notification cards (`OpportunityAlert.tsx`) triggered by market surges scraped by the background pipeline.
-- **Job Data Collection & Scraping Pipeline (Backend)**: Asynchronous ETL pipeline (`apps/api/app/scraper/`) extracting live job postings from ATS platforms (e.g., Greenhouse), with HTML normalization, job-type classification, location/date formatting, and deduplication. (See `docs/Feature_Job_Scraping_Pipeline.md`)
-- **Day-One Simulator Workspace**: A comprehensive corporate simulation environment featuring a live 5-column Kanban board, Slack-like chats with PM and Client personas, an in-browser IDE editor, and a code review system with inline feedback that automatically triggers BKT updates and path replans.
-- **Platform Admin & Resource Curation Engine**: Secure role-based management panel protecting endpoints, curating resource CRUD submissions, auditing user/mentor status workflows, and checking real-time infra health pings. (See `docs/Feature_Platform_Admin.md`)
-- **Fully Integrated Innovations**: All advanced core innovations—including SDT Debugging Diagnostics (keystroke telemetry), live What-If-Skip date-delta simulation, 2x2 Confidence-Competence Calibration Matrix, Career Alternatives Panel, and Roadmap Sanity Checker—are fully implemented across backend services and frontend components.
-- **Full-Stack SaaS Integration**: True dynamic component wiring between the Next.js Zustand stores (via typed Axios hooks) and the FastAPI backend, eliminating hardcoded dummy arrays and ensuring a seamless, responsive production-grade user experience.
+| Role | Access URL | Capabilities |
+|---|---|---|
+| **Learner** | `/learner` | Personalized Skill DAG, Prove-It assessments, Day-One Simulator, AI Voice Mock Interview, War Room sprint planner. |
+| **Mentor** | `/mentor` | FCFS escalation queue, Jitsi video session provisioning, Learner 360° Diagnostic Explorer (`/mentor/learner-intel`), and assigned session manager (`/mentor/sessions`). |
+| **Admin** | `/admin` | Resource curation CRUD, user audit logs, system telemetry, and platform-wide database oversight. |
+
+---
+
+## 📜 License
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

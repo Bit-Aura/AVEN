@@ -145,11 +145,98 @@ class RoadmapIngestionService:
     # =========================================================================
     # Stage C: Normalize into Canonical Skill Records
     # =========================================================================
-    def normalize_roadmap_nodes(self, slug: str, clean_nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def build_nodes_from_raw_detail(self, raw_nodes: List[Dict[str, Any]], raw_edges: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Fallback parser: constructs hierarchical topic/subtopic clean_nodes tree
+        directly from raw Parse.bot detail nodes and edges.
+        """
+        if not raw_nodes:
+            return []
+
+        topic_nodes = []
+        subtopic_nodes = []
+
+        for n in raw_nodes:
+            t = n.get("type", "")
+            data = n.get("data", {})
+            label = (data.get("label") or data.get("title") or "").strip()
+
+            if not label or label.endswith("node") or t in ("paragraph", "legend", "horizontal", "vertical", "button", "linksgroup", "section"):
+                continue
+
+            node_obj = {
+                "id": n.get("id") or slugify_label(label),
+                "label": label,
+                "type": "topic" if t == "topic" else "subtopic",
+                "resources": []
+            }
+
+            if t == "topic":
+                topic_nodes.append(node_obj)
+            else:
+                subtopic_nodes.append(node_obj)
+
+        if not topic_nodes and subtopic_nodes:
+            # Group subtopics into chunks of ~5 per topic category
+            topic_groups = []
+            chunk_size = 5
+            for i in range(0, len(subtopic_nodes), chunk_size):
+                chunk = subtopic_nodes[i:i + chunk_size]
+                group_title = chunk[0]["label"] if chunk else f"Module {i // chunk_size + 1}"
+                topic_groups.append({
+                    "id": f"topic_group_{i // chunk_size + 1}",
+                    "label": f"Module {i // chunk_size + 1}: {group_title}",
+                    "type": "topic",
+                    "depth": 1,
+                    "children": chunk
+                })
+            return topic_groups
+
+        # Map edges to connect subtopics to parent topics
+        parent_map = {e.get("target"): e.get("source") for e in raw_edges if e.get("target") and e.get("source")}
+        topic_dict = {t["id"]: {**t, "depth": 1, "children": []} for t in topic_nodes}
+
+        unparented = []
+        for st in subtopic_nodes:
+            st["depth"] = 2
+            p_id = parent_map.get(st["id"])
+            if p_id and p_id in topic_dict:
+                topic_dict[p_id]["children"].append(st)
+            else:
+                unparented.append(st)
+
+        if unparented and topic_dict:
+            first_topic = list(topic_dict.values())[0]
+            first_topic["children"].extend(unparented)
+        elif unparented and not topic_dict:
+            topic_dict["core"] = {
+                "id": "core_module",
+                "label": "Core Curriculum",
+                "type": "topic",
+                "depth": 1,
+                "children": unparented
+            }
+
+        return list(topic_dict.values())
+
+    def normalize_roadmap_nodes(
+        self,
+        slug: str,
+        clean_nodes: List[Dict[str, Any]],
+        raw_nodes: Optional[List[Dict[str, Any]]] = None,
+        raw_edges: Optional[List[Dict[str, Any]]] = None
+    ) -> List[Dict[str, Any]]:
         """
         Normalizes hierarchical topic tree into canonical skill dictionary objects.
+        If clean_nodes is sparse (<= 2 topics) and raw_nodes has rich data, extracts from raw_nodes.
         ID format: {slug}::{slugified_label}
         """
+        # If clean_nodes is sparse but raw_nodes exists, attempt extraction
+        if (not clean_nodes or len(clean_nodes) <= 2) and raw_nodes:
+            extracted = self.build_nodes_from_raw_detail(raw_nodes, raw_edges or [])
+            if len(extracted) > len(clean_nodes):
+                clean_nodes = extracted
+
         skills: List[Dict[str, Any]] = []
 
         def walk_node(node: Dict[str, Any], depth: int = 1, parent_id: Optional[str] = None):
@@ -209,7 +296,10 @@ class RoadmapIngestionService:
         """
         G = nx.DiGraph()
         skill_id_map = {s["id"]: s for s in skills}
-        ext_to_full_id = {s["external_node_id"]: s["id"] for s in skills}
+        ext_to_full_id = {}
+        for s in skills:
+            ext_to_full_id[s["external_node_id"]] = s["id"]
+            ext_to_full_id[s["id"]] = s["id"]
 
         for s in skills:
             G.add_node(s["id"], name=s["name"])
