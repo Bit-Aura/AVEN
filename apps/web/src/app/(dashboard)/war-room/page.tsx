@@ -126,27 +126,27 @@ export default function PlacementJourney() {
   const burnoutRisk = Math.max(0, Math.round(baseBurnoutRisk * (1 - completionRatio)));
 
   return (
-    <div className="max-w-[1400px] mx-auto pb-12">
+    <div className="max-w-[1400px] mx-auto pb-12 font-sans">
       {/* 4. HIERARCHY & ALIGNMENT: Strict header alignment acting as the anchor point */}
       <motion.div 
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-8"
+        className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-8 pb-6 border-b border-[#141413]/10"
       >
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Flame className="text-brand-400" size={20} />
-            <span className="text-xs font-bold tracking-widest uppercase text-brand-300">Focus Path</span>
+          <div className="flex items-center gap-2 mb-2">
+            <Flame className="text-[#141413]" size={18} />
+            <span className="text-xs font-bold tracking-widest uppercase text-[#3d3d3a]">Focus Path</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-semibold text-white tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-semibold text-[#141413] tracking-tight">
             Your Placement Journey
           </h1>
         </div>
 
         {/* Action Bar (Contrast & Alignment) */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-3 bg-surface/80 border border-border/80 px-4 py-2.5 rounded-2xl">
-            <Building2 size={20} className="text-indigo-400" />
+          <div className="flex items-center gap-3 bg-[#faf9f5] border border-[#141413]/20 focus-within:border-[#141413] px-4 py-2.5 rounded-2xl transition-colors">
+            <Building2 size={20} className="text-[#141413]" />
             <input
               type="text"
               list="company-list"
@@ -158,7 +158,7 @@ export default function PlacementJourney() {
                  }
               }}
               onChange={(e) => setSelectedCompany(e.target.value)}
-              className="bg-transparent text-sm font-medium text-white focus:outline-none placeholder:text-slate-500 w-40"
+              className="bg-transparent text-sm font-medium text-[#141413] focus:outline-none placeholder:text-[#3d3d3a]/50 w-40 tracking-wide"
             />
             <datalist id="company-list">
               {companies.map((comp) => (
@@ -167,8 +167,8 @@ export default function PlacementJourney() {
             </datalist>
           </div>
           
-          <div className="flex items-center gap-3 bg-surface/80 border border-border/80 px-4 py-2.5 rounded-2xl">
-            <Calendar size={20} className="text-brand-400" />
+          <div className="flex items-center gap-3 bg-[#faf9f5] border border-[#141413]/20 focus-within:border-[#141413] px-4 py-2.5 rounded-2xl transition-colors">
+            <Calendar size={20} className="text-[#141413]" />
             <input
               type="date"
               value={interviewDate}
@@ -176,7 +176,7 @@ export default function PlacementJourney() {
                 setInterviewDate(e.target.value);
                 loadPlacementPlan(selectedCompany, e.target.value);
               }}
-              className="bg-transparent text-sm font-medium text-white focus:outline-none cursor-pointer"
+              className="bg-transparent text-sm font-medium text-[#141413] focus:outline-none cursor-pointer tracking-wide"
             />
           </div>
 
@@ -185,9 +185,9 @@ export default function PlacementJourney() {
             whileTap={{ scale: 0.98 }}
             onClick={() => loadPlacementPlan(selectedCompany, interviewDate)}
             disabled={isLoading}
-            className="bg-white text-slate-950 hover:bg-slate-200 text-sm font-bold px-6 py-2.5 rounded-2xl transition-colors flex items-center gap-2 shadow-md"
+            className="bg-[#141413] text-[#faf9f5] hover:bg-[#3d3d3a] text-sm font-bold px-6 py-2.5 rounded-2xl transition-colors flex items-center gap-2 border border-[#141413] shadow-sm disabled:opacity-50"
           >
-            {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Flame size={18} />}
+            {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Flame size={16} />}
             Generate Path
           </motion.button>
         </div>
@@ -205,12 +205,12 @@ export default function PlacementJourney() {
             className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-pulse"
           >
             <div className="lg:col-span-8 space-y-6">
-              <div className="bg-surface/40 border border-border/40 rounded-3xl h-40"></div>
-              <div className="bg-surface/40 border border-border/40 rounded-3xl h-96"></div>
+              <div className="bg-[#e8e6dc] border border-[#141413]/10 h-40 rounded-3xl"></div>
+              <div className="bg-[#e8e6dc] border border-[#141413]/10 h-96 rounded-3xl"></div>
             </div>
             <div className="lg:col-span-4 space-y-6">
-              <div className="bg-surface/40 border border-border/40 rounded-3xl h-56"></div>
-              <div className="bg-surface/40 border border-border/40 rounded-3xl h-80"></div>
+              <div className="bg-[#e8e6dc] border border-[#141413]/10 h-56 rounded-3xl"></div>
+              <div className="bg-[#e8e6dc] border border-[#141413]/10 h-80 rounded-3xl"></div>
             </div>
           </motion.div>
         )}
@@ -220,11 +220,11 @@ export default function PlacementJourney() {
             key="error"
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-12 text-center bg-rose-950/20 border border-rose-500/20 rounded-3xl"
+            className="p-12 text-center bg-[#141413] border border-[#141413] rounded-3xl"
           >
-            <AlertCircle className="text-rose-400 mx-auto mb-3" size={40} />
-            <h3 className="text-lg font-semibold text-rose-200 mb-1">We couldn't map this path</h3>
-            <p className="text-rose-400/80 text-sm max-w-sm mx-auto">{errorMsg}</p>
+            <AlertCircle className="text-[#faf9f5] mx-auto mb-3" size={40} />
+            <h3 className="text-lg font-bold text-[#faf9f5] mb-1">We couldn't map this path</h3>
+            <p className="text-[#e8e6dc] text-sm max-w-sm mx-auto font-medium">{errorMsg}</p>
           </motion.div>
         )}
 
@@ -237,36 +237,34 @@ export default function PlacementJourney() {
             className="grid grid-cols-1 lg:grid-cols-12 gap-6"
           >
             {/* 1. EMPHASIS: Massive Countdown Card */}
-            <motion.div variants={itemVariants} className="lg:col-span-8 bg-gradient-to-br from-surface to-surface-secondary border border-border/60 rounded-3xl p-8 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-8">
-              <div className="absolute -top-32 -right-32 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
-              
+            <motion.div variants={itemVariants} className="lg:col-span-8 bg-[#faf9f5] border border-[#141413]/10 p-8 rounded-3xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-8 shadow-sm">
               <div className="space-y-1 relative z-10">
-                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                  <Clock size={16} className="text-brand-400" />
+                <div className="text-xs font-bold uppercase tracking-widest text-[#3d3d3a] flex items-center gap-2 mb-2">
+                  <Clock size={16} className="text-[#141413]" />
                   <span>Countdown to {plan?.company_name || companies.find(c => c.id === selectedCompany)?.name}</span>
                 </div>
-                {/* 3. CONTRAST: Massive white number against dark bg */}
+                {/* 3. CONTRAST: Massive high-contrast number */}
                 <div className="flex items-baseline gap-3">
-                  <span className="text-7xl font-semibold text-white tracking-tighter">
+                  <span className="text-7xl font-semibold text-[#141413] tracking-tighter">
                     {daysRemaining}
                   </span>
-                  <span className="text-lg font-medium text-slate-500">
+                  <span className="text-lg font-medium text-[#3d3d3a]">
                     Days
                   </span>
                 </div>
                 {targetRole && (
-                  <div className="mt-2 text-sm font-semibold text-brand-300 bg-brand-500/10 border border-brand-500/20 px-3 py-1.5 rounded-lg inline-block">
+                  <div className="mt-4 text-[10px] font-bold uppercase tracking-widest text-[#141413] bg-[#e8e6dc] border border-[#141413]/10 px-3 py-1.5 inline-block rounded-lg">
                     Target: {targetRole}
                   </div>
                 )}
               </div>
 
-              <div className="p-5 rounded-2xl bg-black/30 border border-white/5 backdrop-blur-md relative z-10 w-full md:w-auto text-center md:text-left">
-                <div className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Target Pace</div>
-                <div className="text-2xl font-medium text-white">
-                  {plan?.weekly_study_hours || 14} <span className="text-sm text-slate-500">hrs/week</span>
+              <div className="p-6 bg-[#e8e6dc] border border-[#141413]/10 rounded-2xl relative z-10 w-full md:w-auto text-center md:text-left">
+                <div className="text-xs font-bold uppercase tracking-widest text-[#3d3d3a] mb-2">Target Pace</div>
+                <div className="text-2xl font-semibold text-[#141413]">
+                  {plan?.weekly_study_hours || 14} <span className="text-sm text-[#3d3d3a]">hrs/week</span>
                 </div>
-                <div className={`text-xs font-bold mt-2 flex items-center justify-center md:justify-start gap-1.5 ${isFeasible ? 'text-emerald-400' : 'text-rose-400'}`}>
+                <div className="text-[10px] font-bold uppercase tracking-widest mt-4 flex items-center justify-center md:justify-start gap-1.5 text-[#141413]">
                   {isFeasible ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
                   {isFeasible ? 'Comfortable Timeline' : 'Aggressive Pace Needed'}
                 </div>
@@ -274,35 +272,35 @@ export default function PlacementJourney() {
             </motion.div>
 
             {/* Pacing & Energy Card */}
-            <motion.div variants={itemVariants} className={`lg:col-span-4 p-8 rounded-3xl border space-y-5 flex flex-col justify-center ${
+            <motion.div variants={itemVariants} className={`lg:col-span-4 p-8 border rounded-3xl space-y-6 flex flex-col justify-center shadow-sm ${
               burnoutRisk > 70 
-                ? 'bg-rose-950/20 border-rose-500/20'
-                : 'bg-surface border-border/60'
+                ? 'bg-[#141413] border-[#141413]'
+                : 'bg-[#faf9f5] border-[#141413]/10'
             }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <AlertCircle size={18} className={burnoutRisk > 70 ? 'text-rose-400' : 'text-slate-400'} />
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-300">Pacing & Energy</span>
+                  <AlertCircle size={18} className={burnoutRisk > 70 ? 'text-[#faf9f5]' : 'text-[#141413]'} />
+                  <span className={`text-[10px] font-bold uppercase tracking-widest ${burnoutRisk > 70 ? 'text-[#faf9f5]' : 'text-[#3d3d3a]'}`}>Pacing & Energy</span>
                 </div>
-                <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded-lg ${
-                  burnoutRisk > 70 ? 'bg-rose-500/10 text-rose-400' : 'bg-emerald-500/10 text-emerald-400'
+                <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 border rounded-lg ${
+                  burnoutRisk > 70 ? 'bg-[#faf9f5] text-[#141413] border-[#faf9f5]' : 'bg-[#e8e6dc] text-[#141413] border-[#141413]/10'
                 }`}>
                   {burnoutRisk > 70 ? 'High Friction' : 'Great Momentum'}
                 </span>
               </div>
 
-              <div>
-                <div className="flex justify-between items-baseline mb-2">
-                  <span className="text-3xl font-semibold text-white">{burnoutRisk}%</span>
-                  <span className="text-xs text-slate-500 font-medium">Stress Index</span>
+              <div className="space-y-3">
+                <div className="flex items-end gap-2">
+                  <span className={`text-3xl font-semibold ${burnoutRisk > 70 ? 'text-[#faf9f5]' : 'text-[#141413]'}`}>{burnoutRisk}%</span>
+                  <span className={`text-xs font-medium pb-1 ${burnoutRisk > 70 ? 'text-[#e8e6dc]' : 'text-[#3d3d3a]'}`}>Stress Index</span>
                 </div>
-                <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
+                <div className={`w-full h-2 rounded-full overflow-hidden border ${burnoutRisk > 70 ? 'bg-[#3d3d3a] border-[#faf9f5]/20' : 'bg-[#e8e6dc] border-[#141413]/10'}`}>
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(100, burnoutRisk)}%` }}
                     transition={{ duration: 1, ease: "easeOut" }}
                     className={`h-full ${
-                      burnoutRisk > 70 ? 'bg-gradient-to-r from-amber-400 to-rose-500' : 'bg-emerald-400'
+                      burnoutRisk > 70 ? 'bg-[#faf9f5]' : 'bg-[#141413]'
                     }`}
                   />
                 </div>
@@ -317,7 +315,7 @@ export default function PlacementJourney() {
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={() => setIsBreakAcknowledged(true)}
-                    className="w-full py-2.5 px-4 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-200 font-medium text-xs transition-colors"
+                    className="w-full py-3 px-4 rounded-2xl bg-[#faf9f5] hover:bg-[#e8e6dc] border border-[#faf9f5] text-[#141413] font-medium text-sm transition-colors shadow-sm"
                   >
                     Schedule 24h Rest
                   </motion.button>
@@ -325,7 +323,7 @@ export default function PlacementJourney() {
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="py-2.5 px-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 flex items-center gap-2 font-medium"
+                    className="py-3 px-4 rounded-2xl bg-[#e8e6dc] border border-[#141413]/10 text-xs text-[#141413] flex items-center justify-center gap-2 font-medium shadow-sm"
                   >
                     <CheckCircle2 size={16} />
                     <span>Rest scheduled. Keep it up!</span>
@@ -335,14 +333,14 @@ export default function PlacementJourney() {
             </motion.div>
 
             {/* 5. HIERARCHY: Sprints timeline below emphasis */}
-            <motion.div variants={itemVariants} className="lg:col-span-8 bg-surface border border-border/60 rounded-3xl p-8">
-              <div className="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2 mb-6">
-                <ListChecks size={16} className="text-indigo-400" />
+            <motion.div variants={itemVariants} className="lg:col-span-8 bg-[#faf9f5] border border-[#141413]/10 p-8 rounded-3xl shadow-sm">
+              <div className="text-[10px] font-black uppercase tracking-widest text-[#3d3d3a] flex items-center gap-2 mb-6">
+                <ListChecks size={16} className="text-[#141413]" />
                 <span>Your Milestones ({sprints.length} Weeks)</span>
               </div>
               
-              <div className="space-y-3">
-                {/* 7. REPETITION: Consistent use of rounded-2xl for all inner bento items */}
+              <div className="space-y-4">
+                {/* 7. REPETITION: Consistent use of brutalist boxes for all inner bento items */}
                 {sprints.map((sprint: any, idx: number) => {
                   const isExpanded = expandedSprint === idx;
                   return (
@@ -351,23 +349,31 @@ export default function PlacementJourney() {
                       layout
                       onClick={() => setExpandedSprint(isExpanded ? null : idx)}
                       className={`group cursor-pointer rounded-2xl border transition-all duration-300 overflow-hidden ${
-                        isExpanded ? 'bg-surface-secondary/80 border-brand-500/40 shadow-sm' : 
-                        sprint.is_crunch_week ? 'bg-rose-950/10 border-rose-500/30' : 'bg-black/20 border-border/40 hover:border-border/80'
+                        isExpanded ? 'bg-[#e8e6dc] border-[#141413]' : 
+                        sprint.is_crunch_week ? 'bg-[#faf9f5] border-[#141413] border-2 shadow-sm' : 'bg-[#faf9f5] border-[#141413]/10 hover:border-[#141413]'
                       }`}
                     >
-                      <motion.div layout className="p-4 flex items-center justify-between">
+                      <motion.div layout className="p-5 flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className={`w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center transition-colors ${
-                            isExpanded ? 'bg-brand-500 text-white' : 'bg-surface border border-border text-slate-400 group-hover:text-white group-hover:border-slate-600'
+                          <div className={`w-8 h-8 rounded-full font-black text-[11px] flex items-center justify-center border transition-colors ${
+                            isExpanded ? 'bg-[#141413] text-[#faf9f5] border-[#141413]' : 
+                            sprint.is_crunch_week ? 'bg-[#141413] text-[#faf9f5] border-[#141413]' :
+                            'bg-[#e8e6dc] border-[#141413]/10 text-[#141413] group-hover:bg-[#141413] group-hover:text-[#faf9f5] group-hover:border-[#141413]'
                           }`}>
                             {sprint.week_number}
                           </div>
-                          <span className={`text-sm font-semibold transition-colors ${isExpanded ? 'text-white' : 'text-slate-300 group-hover:text-white'}`}>
+                          <span className={`text-[13px] font-black uppercase tracking-wide transition-colors ${
+                            isExpanded ? 'text-[#141413]' : 
+                            sprint.is_crunch_week ? 'text-[#141413]' :
+                            'text-[#141413]'
+                          }`}>
                             {sprint.week_label || `Week ${sprint.week_number}`}
                           </span>
                         </div>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg ${
-                          sprint.is_crunch_week ? 'bg-rose-500/20 text-rose-300' : 'bg-surface border border-border/50 text-slate-400'
+                        <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border ${
+                          sprint.is_crunch_week ? 'bg-[#141413] text-[#faf9f5] border-[#141413]' : 
+                          isExpanded ? 'bg-[#141413] text-[#faf9f5] border-[#141413]' :
+                          'bg-[#e8e6dc] border-[#141413]/10 text-[#3d3d3a]'
                         }`}>
                           {sprint.focus_area}
                         </span>
@@ -379,9 +385,9 @@ export default function PlacementJourney() {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="px-4 pb-4 pt-0 space-y-2"
+                            className="px-5 pb-5 pt-0 space-y-3"
                           >
-                            <div className="w-full h-px bg-border/40 mb-3 ml-12 max-w-[calc(100%-3rem)]" />
+                            <div className="w-full h-px bg-[#141413]/10 mb-4 ml-12 max-w-[calc(100%-3rem)]" />
                             {sprint.tasks.map((task: any, tIdx: number) => {
                               const isAssessment = task.action_type === 'assessment';
                               const isResource = task.action_type === 'resource';
@@ -390,8 +396,8 @@ export default function PlacementJourney() {
                               if (task.action_type === 'info' || typeof task === 'string') {
                                 const title = typeof task === 'string' ? task : task.title;
                                 return (
-                                  <div key={tIdx} className="text-xs font-medium text-slate-400 flex items-start gap-3 pl-12 py-1">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-600 mt-1.5 shrink-0" />
+                                  <div key={tIdx} className="text-xs font-bold text-[#3d3d3a] flex items-start gap-3 pl-12 py-1">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#141413] mt-1.5 shrink-0" />
                                     <span className="leading-relaxed">{title}</span>
                                   </div>
                                 );
@@ -401,34 +407,33 @@ export default function PlacementJourney() {
 
                               return (
                                 <motion.button 
-                                  whileHover={!isCompleted ? { scale: 1.005, x: 2 } : {}}
+                                  whileHover={!isCompleted ? { scale: 1.01, x: 2 } : {}}
                                   whileTap={!isCompleted ? { scale: 0.99 } : {}}
                                   key={tIdx}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     if (isAssessment && !isCompleted) setActiveAssessment(task.action_payload);
                                   }}
-                                  className={`w-full text-left text-xs flex items-center justify-between p-3 rounded-xl ml-12 max-w-[calc(100%-3rem)] transition-colors ${
-                                    isCompleted ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 opacity-70' :
-                                    isAssessment ? 'bg-brand-500/10 hover:bg-brand-500/20 text-brand-100 border border-brand-500/20' :
-                                    isMock ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-100 border border-rose-500/20' :
-                                    'bg-surface hover:bg-surface-secondary text-slate-300 border border-transparent hover:border-border/50'
+                                  className={`w-full text-left text-xs font-bold flex items-center justify-between p-4 ml-12 rounded-xl max-w-[calc(100%-3rem)] transition-colors border shadow-sm ${
+                                    isCompleted ? 'bg-[#faf9f5] text-[#3d3d3a] border-[#141413]/10 opacity-70' :
+                                    isAssessment ? 'bg-[#faf9f5] hover:bg-[#e8e6dc] text-[#141413] border-[#141413] border-[1.5px]' :
+                                    'bg-[#faf9f5] hover:bg-[#e8e6dc] text-[#141413] border-[#141413]/10 hover:border-[#141413]'
                                   }`}
                                 >
                                   <span className="flex items-center gap-3">
-                                    {isCompleted ? <CheckCircle2 size={16} className="text-emerald-400" /> : (
+                                    {isCompleted ? <CheckCircle2 size={16} className="text-[#141413]" /> : (
                                       <>
-                                        {isAssessment && <PlayCircle size={16} className="text-brand-400" />}
-                                        {isResource && <BookOpen size={16} className="text-indigo-400" />}
-                                        {isMock && <Code2 size={16} className="text-rose-400" />}
+                                        {isAssessment && <PlayCircle size={16} className="text-[#141413]" />}
+                                        {isResource && <BookOpen size={16} className="text-[#141413]" />}
+                                        {isMock && <Code2 size={16} className="text-[#141413]" />}
                                       </>
                                     )}
-                                    <span className={`font-semibold ${isCompleted ? 'line-through text-emerald-500/70' : ''}`}>{task.title}</span>
+                                    <span className={`font-black tracking-wide ${isCompleted ? 'line-through opacity-50' : ''}`}>{task.title}</span>
                                   </span>
                                   {isCompleted ? (
-                                    <span className="text-[9px] uppercase tracking-widest font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md">Done</span>
+                                    <span className="text-[9px] uppercase tracking-widest font-black border border-[#141413]/20 text-[#141413] px-2 py-0.5 rounded-md bg-[#e8e6dc]">Done</span>
                                   ) : (
-                                    isAssessment && <span className="text-[9px] uppercase tracking-widest font-bold bg-brand-500 text-white px-2 py-0.5 rounded-md shadow-sm">Challenge</span>
+                                    isAssessment && <span className="text-[9px] uppercase tracking-widest font-black bg-[#faf9f5] text-[#141413] border border-[#141413] px-2 py-0.5 rounded-md shadow-sm">Challenge</span>
                                   )}
                                 </motion.button>
                               );
@@ -444,26 +449,25 @@ export default function PlacementJourney() {
 
             {/* Opportunities Horizon Card */}
             {plan?.market_signals && plan.market_signals.length > 0 && (
-              <motion.div variants={itemVariants} className="lg:col-span-4 p-8 rounded-3xl bg-surface border border-border/60 flex flex-col max-h-[600px]">
+              <motion.div variants={itemVariants} className="lg:col-span-4 p-8 bg-[#faf9f5] border border-[#141413]/10 rounded-3xl flex flex-col max-h-[600px] shadow-sm">
                 <div className="flex items-center gap-2 mb-6">
-                  <Flame size={16} className="text-amber-400" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-300">Market Signals</span>
+                  <Flame size={16} className="text-[#141413]" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#3d3d3a]">Market Signals</span>
                 </div>
                 
-                <p className="text-xs font-medium text-slate-400 leading-relaxed mb-4">
+                <p className="text-[11px] font-bold text-[#3d3d3a] uppercase tracking-widest leading-relaxed mb-6">
                   Tailored based on {plan.market_signals.length} active roles currently open at {plan.company_name}.
                 </p>
                 
                 {/* 5. WHITE SPACE: Using internal scroll with fading edges to maintain compact bento structure */}
-                <div className="space-y-3 overflow-y-auto pr-2 custom-scrollbar flex-1">
+                <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1">
                   {plan.market_signals.map((signal: any, idx: number) => (
-                    <motion.div 
-                      whileHover={{ scale: 1.01 }}
+                    <div 
                       key={idx} 
-                      className="group p-4 bg-black/20 hover:bg-surface-secondary border border-border/40 hover:border-border rounded-2xl transition-colors relative"
+                      className="p-5 bg-[#e8e6dc] border border-[#141413]/10 rounded-2xl relative"
                     >
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="text-sm font-semibold text-slate-200 leading-tight group-hover:text-white transition-colors">
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <div className="text-[13px] font-black uppercase tracking-wide text-[#141413] leading-tight">
                           {signal.job_title}
                         </div>
                         {signal.url && (
@@ -471,7 +475,7 @@ export default function PlacementJourney() {
                             href={signal.url} 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            className="text-slate-500 hover:text-brand-400 bg-surface border border-border/50 hover:border-brand-500/30 p-1.5 rounded-lg transition-all flex-shrink-0 shadow-sm"
+                            className="text-[#3d3d3a] hover:text-[#faf9f5] hover:bg-[#141413] bg-[#faf9f5] border border-[#141413]/20 p-2 rounded-lg transition-all flex-shrink-0 shadow-sm"
                             title="View full job posting"
                           >
                             <ExternalLink size={14} />
@@ -479,17 +483,17 @@ export default function PlacementJourney() {
                         )}
                       </div>
                       
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-2">
                         {signal.extracted_skills.map((skill: string, sIdx: number) => (
                           <span 
                             key={sIdx} 
-                            className="text-[10px] font-bold tracking-wide uppercase text-slate-400 bg-surface border border-border/40 px-2 py-0.5 rounded-md"
+                            className="text-[9px] font-black tracking-widest uppercase text-[#3d3d3a] bg-[#faf9f5] border border-[#141413]/10 px-2.5 py-1 rounded-md"
                           >
                             {skill}
                           </span>
                         ))}
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </motion.div>
@@ -504,17 +508,17 @@ export default function PlacementJourney() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-[#faf9f5]/80 backdrop-blur-sm flex items-center justify-center p-4"
           >
             <motion.div 
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-surface border border-border rounded-3xl relative shadow-2xl"
+              className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#faf9f5] border border-[#141413]/20 rounded-3xl relative shadow-xl"
             >
               <button 
                 onClick={() => setActiveAssessment(null)}
-                className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-surface-secondary text-slate-400 hover:text-white hover:bg-slate-700 transition-colors z-10"
+                className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-[#e8e6dc] border border-[#141413]/10 text-[#3d3d3a] hover:text-[#faf9f5] hover:bg-[#141413] transition-colors z-10 font-black"
               >
                 ✕
               </button>

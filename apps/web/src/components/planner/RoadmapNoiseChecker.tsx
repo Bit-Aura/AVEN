@@ -11,6 +11,8 @@ import {
   ShieldCheck,
   TrendDown,
   TrendUp,
+  ArrowUpRight,
+  ArrowDownRight,
   Buildings
 } from '@phosphor-icons/react';
 import { checkRoadmapSanity } from '../../api/client';
@@ -71,21 +73,21 @@ export default function RoadmapNoiseChecker() {
   };
 
   return (
-    <motion.div layout className="w-full max-w-4xl mx-auto flex flex-col gap-12 items-center relative font-sans mb-24">
+    <motion.div layout className="w-full max-w-4xl flex flex-col gap-12 items-center relative font-sans mb-24">
       
       {/* TOP PANE: The Input Terminal */}
       <motion.div 
         layout 
         className="w-full flex flex-col gap-4"
       >
-        <motion.div layout className="flex items-center justify-between pb-2 border-b border-slate-700">
+        <motion.div layout className="flex items-center justify-between pb-2 border-b border-[#141413]/10">
           <div className="flex items-center gap-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#3d3d3a]">
               Target Curriculum
             </label>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Presets:</span>
+            <span className="text-[10px] font-black text-[#141413] uppercase tracking-widest">Presets:</span>
             {SAMPLE_ROADMAPS.map((sample, idx) => (
               <button
                 key={idx}
@@ -94,7 +96,7 @@ export default function RoadmapNoiseChecker() {
                   setAdviceText(sample.text);
                   setReport(null);
                 }}
-                className="px-2 py-0.5 border border-slate-700 text-[10px] font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-all uppercase tracking-widest"
+                className="px-2 py-0.5 border border-[#141413]/10 text-[10px] font-black text-[#3d3d3a] hover:text-[#141413] hover:bg-[#e8e6dc] transition-all uppercase tracking-widest"
               >
                 {idx + 1}
               </button>
@@ -103,14 +105,14 @@ export default function RoadmapNoiseChecker() {
         </motion.div>
 
         {/* Textarea Container with Integrated Button and X-Ray */}
-        <motion.div layout className="relative w-full overflow-hidden border border-slate-700 group focus-within:border-slate-500 transition-colors bg-[#0b0f19]">
+        <motion.div layout className="relative w-full overflow-hidden border border-[#141413]/20 focus-within:border-[#141413] transition-colors bg-[#faf9f5]">
           
           <textarea
             value={adviceText}
             onChange={(e) => setAdviceText(e.target.value)}
             disabled={isLoading}
             placeholder="Paste syllabus, transcript, or roadmap..."
-            className="w-full h-[300px] bg-transparent p-6 pb-24 text-sm font-mono text-slate-300 placeholder:text-slate-600 focus:outline-none resize-none leading-relaxed"
+            className="w-full h-[300px] bg-transparent p-6 pb-24 text-sm font-mono text-[#141413] placeholder:text-[#3d3d3a]/50 focus:outline-none resize-none leading-relaxed"
           />
 
           {/* X-Ray Scanner Animation */}
@@ -121,7 +123,7 @@ export default function RoadmapNoiseChecker() {
                 animate={{ top: '110%', opacity: [0, 1, 1, 0] }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.5, ease: "linear", repeat: Infinity }}
-                className="absolute left-0 right-0 h-8 bg-gradient-to-b from-transparent to-indigo-500/10 border-b border-indigo-400/50 pointer-events-none z-10"
+                className="absolute left-0 right-0 h-8 bg-gradient-to-b from-transparent to-[#141413]/5 border-b border-[#141413]/20 pointer-events-none z-10"
               />
             )}
           </AnimatePresence>
@@ -133,8 +135,7 @@ export default function RoadmapNoiseChecker() {
               whileTap={{ scale: 0.98 }}
               onClick={() => handleAnalyze()}
               disabled={isLoading || adviceText.length < 10}
-              className="flex items-center gap-2 px-6 py-3 bg-white text-slate-950 disabled:bg-slate-800 disabled:text-slate-500 font-bold text-[11px] uppercase tracking-widest transition-all disabled:opacity-50 border border-white disabled:border-slate-700 shadow-sm"
-              style={{ color: isLoading || adviceText.length < 10 ? undefined : '#0f172a' }} // Hardcode color to fix tailwind override issue
+              className="flex items-center gap-2 px-6 py-3 bg-[#141413] text-[#faf9f5] disabled:bg-[#e8e6dc] disabled:text-[#3d3d3a] font-black text-[11px] uppercase tracking-widest transition-all disabled:opacity-50 border border-[#141413] shadow-sm"
             >
               {isLoading ? (
                 <>
@@ -154,7 +155,7 @@ export default function RoadmapNoiseChecker() {
         {error && (
           <motion.div 
             initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-            className="p-4 border border-rose-500/30 bg-rose-500/10 text-rose-400 text-xs font-mono flex items-center gap-2 mt-2"
+            className="p-4 border border-[#141413]/20 bg-[#e8e6dc] text-[#141413] text-xs font-mono flex items-center gap-2 mt-2"
           >
             <WarningCircle weight="fill" size={16} />
             <span>{error}</span>
@@ -173,8 +174,8 @@ export default function RoadmapNoiseChecker() {
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="w-full flex flex-col gap-6"
           >
-            <motion.div layout className="flex items-center gap-2 pb-2 border-b border-slate-700">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            <motion.div layout className="flex items-center gap-2 pb-2 border-b border-[#141413]/10">
+              <label className="text-[10px] font-black uppercase tracking-widest text-[#3d3d3a]">
                 Diagnostic Output
               </label>
             </motion.div>
@@ -186,36 +187,36 @@ export default function RoadmapNoiseChecker() {
               className="w-full flex flex-col gap-8"
             >
               {/* Verdict Header (Anti-Slop: Pure typography, no background box) */}
-              <motion.div variants={itemVariants} className="flex flex-col gap-2 pb-6 border-b border-slate-800">
-                <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500 flex items-center gap-2">
+              <motion.div variants={itemVariants} className="flex flex-col gap-2 pb-6 border-b border-[#141413]/10">
+                <div className="text-[10px] font-mono uppercase tracking-widest text-[#3d3d3a] flex items-center gap-2">
                   <span>System Verdict</span>
                   <div className={`h-1.5 w-1.5 rounded-full ${
                     report.overall_rating === 'TRUSTWORTHY' || report.overall_rating === 'MOSTLY_OK'
-                      ? 'bg-emerald-500'
-                      : 'bg-rose-500'
+                      ? 'bg-[#141413]'
+                      : 'bg-[#3d3d3a]'
                   }`} />
                 </div>
-                <div className="text-3xl font-light text-white tracking-tight">
+                <div className="text-3xl font-black text-[#141413] tracking-tight">
                   {report.overall_rating.replace(/_/g, ' ')}
                 </div>
-                <p className="text-[15px] text-slate-300 leading-relaxed max-w-2xl mt-3 font-medium">
+                <p className="text-[15px] text-[#3d3d3a] leading-relaxed max-w-2xl mt-3 font-medium">
                   {report.summary}
                 </p>
               </motion.div>
 
               {/* Data Bar (Anti-Slop: Horizontal structural table, not 3 isolated cards) */}
-              <motion.div variants={itemVariants} className="flex border border-slate-700 bg-slate-900/50">
-                <div className="flex-1 p-5 border-r border-slate-700 flex flex-col gap-1">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500">Valid</span>
-                  <span className="text-2xl font-light text-white">{report.aligned_count}</span>
+              <motion.div variants={itemVariants} className="flex border border-[#141413]/20 bg-[#faf9f5]">
+                <div className="flex-1 p-5 border-r border-[#141413]/20 flex flex-col gap-1">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#3d3d3a]">Valid</span>
+                  <span className="text-2xl font-black text-[#141413]">{report.aligned_count}</span>
                 </div>
-                <div className="flex-1 p-5 border-r border-slate-700 flex flex-col gap-1">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500">Fluff</span>
-                  <span className="text-2xl font-light text-white">{report.harmless_extra_count}</span>
+                <div className="flex-1 p-5 border-r border-[#141413]/20 flex flex-col gap-1">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#3d3d3a]">Fluff</span>
+                  <span className="text-2xl font-black text-[#141413]">{report.harmless_extra_count}</span>
                 </div>
                 <div className="flex-1 p-5 flex flex-col gap-1">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-rose-500/70">Violations</span>
-                  <span className={`text-2xl font-light ${report.misleading_count > 0 ? 'text-rose-400' : 'text-white'}`}>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#3d3d3a]">Violations</span>
+                  <span className={`text-2xl font-black text-[#141413]`}>
                     {report.misleading_count}
                   </span>
                 </div>
@@ -224,7 +225,7 @@ export default function RoadmapNoiseChecker() {
               {/* Line-by-Line Breakdown (Anti-Slop: Clean list with hairlines, no pill boxes) */}
               {report.verdicts && report.verdicts.length > 0 && (
                 <motion.div variants={itemVariants} className="flex flex-col">
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-3 border-b border-slate-700">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-[#3d3d3a] pb-3 border-b border-[#141413]/10">
                     Detailed Analysis
                   </div>
                   
@@ -236,19 +237,19 @@ export default function RoadmapNoiseChecker() {
                       return (
                         <div 
                           key={idx}
-                          className="py-8 border-b border-slate-800/50 last:border-0 flex flex-col gap-4"
+                          className="py-8 border-b border-[#141413]/10 last:border-0 flex flex-col gap-4"
                         >
                           {/* Header: Skill Name & Verdict & Trend */}
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <h4 className="text-[17px] font-semibold text-slate-100">
+                              <h4 className="text-[17px] font-black text-[#141413]">
                                 {v.matched_skill_name || v.extracted_mention}
                               </h4>
                               
-                              <span className={`text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-sm border ${
-                                isAligned ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10' : 
-                                isMisleading ? 'text-rose-400 border-rose-500/20 bg-rose-500/10' : 
-                                'text-amber-400 border-amber-500/20 bg-amber-500/10'
+                              <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-sm border ${
+                                isAligned ? 'text-[#141413] border-[#141413]/20 bg-[#e8e6dc]' : 
+                                isMisleading ? 'text-[#faf9f5] border-[#141413] bg-[#141413]' : 
+                                'text-[#3d3d3a] border-[#141413]/10 bg-[#e8e6dc]'
                               }`}>
                                 {isAligned ? 'VALIDATED' : isMisleading ? 'VIOLATION' : 'MARKET FLUFF'}
                               </span>
@@ -256,13 +257,13 @@ export default function RoadmapNoiseChecker() {
 
                             {/* Trend Indicator */}
                             {v.trend_direction && (
-                              <div className={`flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest ${
-                                v.trend_direction === 'UP' ? 'text-emerald-400' : 
-                                v.trend_direction === 'DOWN' ? 'text-rose-400' : 
-                                'text-slate-500'
+                              <div className={`flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest ${
+                                v.trend_direction === 'UP' ? 'text-[#141413]' : 
+                                v.trend_direction === 'DOWN' ? 'text-[#3d3d3a]' : 
+                                'text-[#3d3d3a]'
                               }`}>
-                                {v.trend_direction === 'UP' && <TrendUp weight="bold" size={16} />}
-                                {v.trend_direction === 'DOWN' && <TrendDown weight="bold" size={16} />}
+                                {v.trend_direction === 'UP' && <ArrowUpRight weight="bold" size={16} />}
+                                {v.trend_direction === 'DOWN' && <ArrowDownRight weight="bold" size={16} />}
                                 {v.trend_direction === 'STABLE' && <span>—</span>}
                                 <span>{v.trend_direction}</span>
                               </div>
@@ -271,12 +272,12 @@ export default function RoadmapNoiseChecker() {
                           
                           {/* Content: Analysis and Context */}
                           <div className="flex flex-col gap-3 mt-1">
-                            <p className="text-[15px] text-slate-300 leading-relaxed font-normal">
+                            <p className="text-[15px] text-[#141413] font-medium leading-relaxed">
                               {v.reason}
                             </p>
                             
                             {v.market_context && (
-                              <p className="text-[15px] text-slate-400 leading-relaxed font-normal">
+                              <p className="text-[15px] text-[#3d3d3a] font-medium leading-relaxed">
                                 {v.market_context}
                               </p>
                             )}
@@ -285,12 +286,12 @@ export default function RoadmapNoiseChecker() {
                           {/* Footer: Top Companies */}
                           {v.top_companies && v.top_companies.length > 0 && (
                             <div className="flex items-center gap-3 mt-3">
-                              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                              <span className="text-[10px] font-black uppercase tracking-widest text-[#3d3d3a]">
                                 Hiring for this:
                               </span>
                               <div className="flex items-center gap-2 flex-wrap">
                                 {v.top_companies.map((comp: string, i: number) => (
-                                  <span key={i} className="px-3 py-1 bg-slate-800 text-slate-300 text-[11px] font-semibold rounded-md">
+                                  <span key={i} className="px-3 py-1 bg-[#e8e6dc] text-[#141413] text-[11px] font-black uppercase tracking-widest rounded-md border border-[#141413]/10">
                                     {comp}
                                   </span>
                                 ))}
