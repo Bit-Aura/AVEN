@@ -47,6 +47,10 @@ async def lifespan(app: FastAPI):
                 await conn.execute(text("ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)"))
             except Exception:
                 pass
+            try:
+                await conn.execute(text("ALTER TABLE learner_profiles ADD COLUMN last_known_weekly_hours FLOAT DEFAULT 10.0"))
+            except Exception:
+                pass
         
         async with async_session() as session:
             # 1. Seed Default Admin (admin@aven.com / Aven@123) -> ADMIN
@@ -150,6 +154,10 @@ app.include_router(mentor_router)
 # Include Mentor Connect Router
 from app.routers.mentor_connect import router as mentor_connect_router
 app.include_router(mentor_connect_router)
+
+# Include AI Mock Interview Router
+from app.routers.interview import router as interview_router
+app.include_router(interview_router)
 
 # Enable CORS for frontend connections
 app.add_middleware(

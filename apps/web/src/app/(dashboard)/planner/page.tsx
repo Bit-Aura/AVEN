@@ -1,7 +1,7 @@
 'use client';
 
-import RoadmapNoiseChecker from '../../../components/planner/RoadmapNoiseChecker';
-import { Target } from '@phosphor-icons/react/dist/ssr';
+import RoadmapNoiseChecker from '@/components/planner/RoadmapNoiseChecker';
+import { Target } from '@phosphor-icons/react';
 
 export default function AuditorDashboard() {
   return (

@@ -58,7 +58,7 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
 };
 
 // --- Intelligence Engine Simulators ---
@@ -314,7 +314,7 @@ export default function MarketRadarPage() {
 
                 <AnimatePresence>
                   {showAdvanced && (
-                    <motion.div initial={{ height: 0, opacity: 0, mt: 0 }} animate={{ height: 'auto', opacity: 1, mt: 16 }} exit={{ height: 0, opacity: 0, mt: 0 }} className="w-full max-w-2xl overflow-hidden">
+                    <motion.div initial={{ height: 0, opacity: 0, marginTop: 0 }} animate={{ height: 'auto', opacity: 1, marginTop: 16 }} exit={{ height: 0, opacity: 0, marginTop: 0 }} className="w-full max-w-2xl overflow-hidden">
                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 rounded-[2rem] bg-surface/80 backdrop-blur-xl border border-border shadow-2xl">
                         <div className="space-y-1.5">
                           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Platform</label>

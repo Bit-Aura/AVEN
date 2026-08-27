@@ -12,7 +12,7 @@ import {
   TrendDown,
   TrendUp,
   Buildings
-} from '@phosphor-icons/react/dist/ssr';
+} from '@phosphor-icons/react';
 import { checkRoadmapSanity } from '../../api/client';
 import { usePathStore } from '../../store/usePathStore';
 
@@ -67,7 +67,7 @@ export default function RoadmapNoiseChecker() {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 10 },
-    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+    show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } }
   };
 
   return (
