@@ -1,5 +1,8 @@
 # Agent Rules for AVEN / PathFinder
 
+> **CRITICAL DIRECTIVE FOR ALL AI AGENTS:** 
+> Before executing any task, writing any code, or answering any questions about this repository, you MUST read the `context.md` file in its entirety. `context.md` is your brain. If you do not read it, you will hallucinate context. Rely on `context.md` for the current state of the application.
+
 ## Code Quality & Workflow Rules
 1. **Code Quality is Paramount**: Write clean, modular, and maintainable code. Code quality is very important.
 2. **Documentation per Feature**: A markdown documentation file must be created for each new feature. Documentation must be completely honest but positive—avoid critical/flagging language and stick to praising the implemented capabilities.
