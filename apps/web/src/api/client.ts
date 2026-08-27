@@ -77,9 +77,10 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
     }
   }
 
-  const authHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
+  const authHeaders: Record<string, string> = {};
+  if (!(options.body instanceof FormData)) {
+    authHeaders['Content-Type'] = 'application/json';
+  }
 
   if (authToken) {
     authHeaders['Authorization'] = `Bearer ${authToken}`;
@@ -897,6 +898,233 @@ export const evaluateCodeSolution = async (
   return await fetchApi('/ide/evaluate', {
     method: 'POST',
     body: JSON.stringify(payload)
+  });
+};
+
+// --- AI Mock Interview & Resume API Types & Methods ---
+
+export interface ResumeProjectClaim {
+  name: string;
+  technologies: string[];
+  summary: string;
+  claimed_responsibilities: string[];
+}
+
+export interface ResumeWorkExperienceClaim {
+  company: string;
+  role: string;
+  duration?: string | null;
+  highlights: string[];
+}
+
+export interface ResumeEducationClaim {
+  institution: string;
+  degree?: string | null;
+  year?: string | null;
+}
+
+export interface ResumeParsedData {
+  summary: string;
+  technical_skills: string[];
+  projects: ResumeProjectClaim[];
+  work_experience: ResumeWorkExperienceClaim[];
+  education: ResumeEducationClaim[];
+  certifications: string[];
+  claimed_roles: string[];
+}
+
+export interface ResumeRecord {
+  id: number;
+  profile_id: number;
+  original_filename: string;
+  content_type: string;
+  raw_text: string;
+  parsed_data?: ResumeParsedData | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MockInterviewTurnData {
+  id: number;
+  turn_index: number;
+  category: string;
+  question_text: string;
+  expected_rubrics?: string[];
+  learner_answer?: string | null;
+  input_mode: string;
+  answer_score?: number | null;
+  evaluation_data?: any;
+  detected_gap_data?: any;
+  created_at: string;
+}
+
+export interface CanonicalSkillGap {
+  canonical_skill_id?: string | null;
+  canonical_skill_name: string;
+  similarity: number;
+  description: string;
+  confidence: number;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH';
+  evidence?: string;
+}
+
+export interface ResumeVerificationItem {
+  claim: string;
+  status: 'SUPPORTED' | 'PARTIALLY_SUPPORTED' | 'UNSUPPORTED' | 'NOT_APPLICABLE';
+  evidence: string;
+}
+
+export interface InterviewReportSummary {
+  overall_score: number;
+  technical_score: number;
+  communication_score: number;
+  resume_verification_score: number;
+  confidence_score: number;
+  verified_strengths: string[];
+  development_areas: string[];
+  canonical_skill_gaps: CanonicalSkillGap[];
+  resume_verification_matrix: ResumeVerificationItem[];
+  updated_bkt_skills?: Record<string, number>;
+  path_version_id?: string | null;
+  path_changed_nodes?: string[] | null;
+  summary: string;
+}
+
+export interface MockInterviewSessionSummary {
+  id: number;
+  profile_id: number;
+  target_role: string;
+  interview_type: string;
+  status: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED';
+  current_phase: string;
+  current_turn_index: number;
+  overall_score?: number | null;
+  technical_score?: number | null;
+  communication_score?: number | null;
+  resume_verification_score?: number | null;
+  confidence_score?: number | null;
+  created_at: string;
+  completed_at?: string | null;
+}
+
+export interface MockInterviewSessionDetail extends MockInterviewSessionSummary {
+  resume_id?: number | null;
+  context_snapshot?: any;
+  feedback_summary?: InterviewReportSummary | null;
+  turns: MockInterviewTurnData[];
+}
+
+export interface StartInterviewParams {
+  target_role?: string;
+  interview_type?: string;
+  resume_id?: number | null;
+}
+
+export interface StartInterviewResponse {
+  session_id: number;
+  status: string;
+  target_role: string;
+  current_phase: string;
+  turn_index: number;
+  question: {
+    id: number;
+    turn_index: number;
+    category: string;
+    question_text: string;
+    should_speak: boolean;
+  };
+}
+
+export interface AnswerTurnResponse {
+  session_id: number;
+  status: string;
+  current_phase?: string;
+  turn_index: number;
+  evaluation?: any;
+  next_action: string;
+  next_question?: {
+    id: number;
+    turn_index: number;
+    category: string;
+    question_text: string;
+    should_speak: boolean;
+  } | null;
+  report_summary?: InterviewReportSummary | null;
+  should_speak: boolean;
+}
+
+export const uploadResume = async (file: File): Promise<ResumeRecord> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return await fetchApi('/interview/resume/upload', {
+    method: 'POST',
+    body: formData,
+  });
+};
+
+export const getMyResume = async (): Promise<ResumeRecord> => {
+  return await fetchApi('/interview/resume');
+};
+
+export const deleteMyResume = async (): Promise<void> => {
+  return await fetchApi('/interview/resume', {
+    method: 'DELETE',
+  });
+};
+
+export const startInterviewSession = async (
+  params: StartInterviewParams
+): Promise<StartInterviewResponse> => {
+  return await fetchApi('/interview/sessions', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+};
+
+export const listMyInterviewSessions = async (): Promise<MockInterviewSessionSummary[]> => {
+  return await fetchApi('/interview/sessions');
+};
+
+export const getInterviewSession = async (
+  sessionId: number
+): Promise<MockInterviewSessionDetail> => {
+  return await fetchApi(`/interview/sessions/${sessionId}`);
+};
+
+export const submitInterviewAnswer = async (
+  sessionId: number,
+  answer: string,
+  inputMode: string = 'VOICE'
+): Promise<AnswerTurnResponse> => {
+  return await fetchApi(`/interview/sessions/${sessionId}/answer`, {
+    method: 'POST',
+    body: JSON.stringify({
+      learner_answer: answer,
+      input_mode: inputMode,
+    }),
+  });
+};
+
+export const completeInterviewSession = async (
+  sessionId: number
+): Promise<{ session_id: number; status: string; report: InterviewReportSummary }> => {
+  return await fetchApi(`/interview/sessions/${sessionId}/complete`, {
+    method: 'POST',
+  });
+};
+
+export const getInterviewReport = async (
+  sessionId: number
+): Promise<InterviewReportSummary> => {
+  return await fetchApi(`/interview/sessions/${sessionId}/report`);
+};
+
+export const transcribeAudio = async (audioBlob: Blob): Promise<{ text: string }> => {
+  const formData = new FormData();
+  formData.append('file', audioBlob, 'recording.webm');
+  return await fetchApi('/interview/transcribe-audio', {
+    method: 'POST',
+    body: formData,
   });
 };
 

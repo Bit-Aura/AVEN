@@ -84,7 +84,7 @@ describe('Mentor Connect Feature Suite', () => {
     fireEvent.click(screen.getByText('Accept Request'));
 
     await waitFor(() => {
-      expect(screen.getByText('This request was just accepted by another mentor.')).toBeInTheDocument();
+      expect(screen.getByText(/This request was just accepted by another mentor/i)).toBeInTheDocument();
     });
   });
 

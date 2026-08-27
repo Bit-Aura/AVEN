@@ -60,6 +60,8 @@ class LearnerProfile(Base):
     interventions: Mapped[List["MentorIntervention"]] = relationship(back_populates="profile")
     ai_escalations: Mapped[List["AiCoachEscalation"]] = relationship(back_populates="profile")
     mentor_session_requests: Mapped[List["MentorSessionRequest"]] = relationship(back_populates="profile")
+    resumes: Mapped[List["LearnerResume"]] = relationship(back_populates="profile", cascade="all, delete-orphan")
+    interview_sessions: Mapped[List["MockInterviewSession"]] = relationship(back_populates="profile", cascade="all, delete-orphan")
 
 class Goal(Base):
     __tablename__ = "goals"
@@ -341,6 +343,66 @@ class MentorSessionRequest(Base):
     
     profile: Mapped["LearnerProfile"] = relationship(back_populates="mentor_session_requests")
     mentor: Mapped[Optional["User"]] = relationship(back_populates="mentored_sessions")
+
+class LearnerResume(Base):
+    __tablename__ = "learner_resumes"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id", ondelete="CASCADE"), index=True)
+    original_filename: Mapped[str] = mapped_column(String(255))
+    content_type: Mapped[str] = mapped_column(String(100))
+    storage_path: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    raw_text: Mapped[str] = mapped_column(Text)
+    parsed_data: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="resumes")
+    interview_sessions: Mapped[List["MockInterviewSession"]] = relationship(back_populates="resume")
+
+class MockInterviewSession(Base):
+    __tablename__ = "mock_interview_sessions"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("learner_profiles.id", ondelete="CASCADE"), index=True)
+    resume_id: Mapped[Optional[int]] = mapped_column(ForeignKey("learner_resumes.id", ondelete="SET NULL"), nullable=True, index=True)
+    target_role: Mapped[str] = mapped_column(String(255))
+    interview_type: Mapped[str] = mapped_column(String(50), default="COMPREHENSIVE") # COMPREHENSIVE, TECHNICAL, SYSTEM_DESIGN, BEHAVIORAL
+    status: Mapped[str] = mapped_column(String(50), default="IN_PROGRESS", index=True) # IN_PROGRESS, COMPLETED, CANCELLED
+    current_phase: Mapped[str] = mapped_column(String(50), default="INTRODUCTION")
+    current_turn_index: Mapped[int] = mapped_column(Integer, default=0)
+    context_snapshot: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    overall_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    technical_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    communication_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    resume_verification_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    confidence_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    feedback_summary: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    
+    profile: Mapped["LearnerProfile"] = relationship(back_populates="interview_sessions")
+    resume: Mapped[Optional["LearnerResume"]] = relationship(back_populates="interview_sessions")
+    turns: Mapped[List["MockInterviewTurn"]] = relationship(back_populates="session", cascade="all, delete-orphan", order_by="MockInterviewTurn.turn_index")
+
+class MockInterviewTurn(Base):
+    __tablename__ = "mock_interview_turns"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    session_id: Mapped[int] = mapped_column(ForeignKey("mock_interview_sessions.id", ondelete="CASCADE"), index=True)
+    turn_index: Mapped[int] = mapped_column(Integer)
+    category: Mapped[str] = mapped_column(String(50), default="TECHNICAL_FUNDAMENTALS")
+    question_text: Mapped[str] = mapped_column(Text)
+    expected_rubrics: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    learner_answer: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    input_mode: Mapped[str] = mapped_column(String(20), default="TEXT") # VOICE, TEXT
+    evaluation_data: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    answer_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    detected_gap_data: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    session: Mapped["MockInterviewSession"] = relationship(back_populates="turns")
 
 
 

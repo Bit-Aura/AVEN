@@ -17,6 +17,7 @@ import {
   Calendar,
   LogOut,
   UserCheck,
+  Mic,
 } from 'lucide-react';
 import { useClerk } from '@clerk/nextjs';
 import { usePathStore } from '../../store/usePathStore';
@@ -49,6 +50,7 @@ export default function Sidebar() {
       title: 'Core Engine',
       items: [
         { name: 'Learning Path', href: '/learner', icon: Compass, badge: 'Live' },
+        { name: 'AI Mock Interview', href: '/learner/interview', icon: Mic, badge: 'Voice' },
         { name: '1-on-1 Mentorship', href: '/learner/mentor', icon: Users },
         { name: 'Day-One Simulator', href: '/learner/simulator', icon: BrainCircuit, badge: 'Job' },
         { name: 'Skill Graph', href: '/learner/graph', icon: Network },

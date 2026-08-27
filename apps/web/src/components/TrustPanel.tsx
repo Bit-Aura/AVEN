@@ -12,6 +12,8 @@ export default function TrustPanel() {
   const nodes = usePathStore((state) => state.nodes);
   const readinessScore = usePathStore((state) => state.readinessScore);
   const targetRole = usePathStore((state) => state.targetRole);
+  const pathExplanation = usePathStore((state) => state.pathExplanation);
+  const activePathPlan = usePathStore((state) => state.activePathPlan);
 
   if (!isTrustPanelOpen) return null;
 
@@ -89,20 +91,20 @@ export default function TrustPanel() {
               <span>Grounded Decision Trace</span>
             </div>
             <div className="p-4 rounded-xl bg-surface-secondary/40 border border-border text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
-              {usePathStore.getState().pathExplanation || 
-                (usePathStore.getState().activePathPlan?.decision_trace?.explanation || 
+              {pathExplanation || 
+                (activePathPlan?.decision_trace?.explanation || 
                 "PathFinder computes prerequisite paths deterministically through Neo4j topological sorting. Active focus is placed strictly on the nearest unmastered node to maximize velocity.")}
             </div>
           </div>
 
           {/* Time Budget Reality Check */}
-          {usePathStore.getState().activePathPlan?.decision_trace?.time_budget_warning && (
+          {activePathPlan?.decision_trace?.time_budget_warning && (
             <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs mt-4">
               <div className="font-bold flex items-center gap-1.5 mb-1 text-amber-400 uppercase tracking-wider">
                 <AlertTriangle size={13} />
                 Time Budget Warning
               </div>
-              <p>The projected time to complete this path ({usePathStore.getState().activePathPlan?.decision_trace?.estimated_hours} hrs) exceeds your requested timeline. Consider negotiating scope or increasing weekly hours.</p>
+              <p>The projected time to complete this path ({activePathPlan?.decision_trace?.estimated_hours} hrs) exceeds your requested timeline. Consider negotiating scope or increasing weekly hours.</p>
             </div>
           )}
 
