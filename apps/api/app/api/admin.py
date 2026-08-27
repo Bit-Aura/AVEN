@@ -1049,8 +1049,12 @@ async def preview_roadmap_slug(
     clean_nodes = cache_row.clean_nodes_json or []
     raw_detail = cache_row.raw_detail_json or {}
     raw_edges = raw_detail.get("edges", [])
+    if not raw_edges:
+        from app.infrastructure.roadmap_client import FIXTURE_EDGES
+        raw_edges = FIXTURE_EDGES.get(slug, [])
 
-    skills = roadmap_ingestion_service.normalize_roadmap_nodes(slug, clean_nodes)
+    raw_nodes = raw_detail.get("nodes", [])
+    skills = roadmap_ingestion_service.normalize_roadmap_nodes(slug, clean_nodes, raw_nodes=raw_nodes, raw_edges=raw_edges)
     edges, cycles = roadmap_ingestion_service.resolve_edges_and_validate_dag(slug, skills, raw_edges)
 
     skill_previews = [
@@ -1097,8 +1101,12 @@ async def learner_roadmap_graph(
     clean_nodes = cache_row.clean_nodes_json or []
     raw_detail = cache_row.raw_detail_json or {}
     raw_edges = raw_detail.get("edges", [])
+    if not raw_edges:
+        from app.infrastructure.roadmap_client import FIXTURE_EDGES
+        raw_edges = FIXTURE_EDGES.get(slug, [])
 
-    skills = roadmap_ingestion_service.normalize_roadmap_nodes(slug, clean_nodes)
+    raw_nodes = raw_detail.get("nodes", [])
+    skills = roadmap_ingestion_service.normalize_roadmap_nodes(slug, clean_nodes, raw_nodes=raw_nodes, raw_edges=raw_edges)
     edges, cycles = roadmap_ingestion_service.resolve_edges_and_validate_dag(slug, skills, raw_edges)
 
     skill_previews = [
