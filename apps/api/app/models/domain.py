@@ -161,6 +161,8 @@ class Resource(Base):
     status: Mapped[str] = mapped_column(String(50), default="APPROVED") # PENDING, APPROVED, REJECTED
     rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(384))
+    source_roadmap_slug: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    source_node_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
@@ -207,7 +209,45 @@ class SkillRecord(Base):
     bkt_p_t: Mapped[float] = mapped_column(Float, default=0.20)
     bkt_p_s: Mapped[float] = mapped_column(Float, default=0.10)
     bkt_p_g: Mapped[float] = mapped_column(Float, default=0.20)
+    source: Mapped[str] = mapped_column(String(50), default="roadmap_sh", index=True) # manual, roadmap_sh
+    roadmap_slug: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    external_node_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    deprecated: Mapped[bool] = mapped_column(Boolean, default=False)
     embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(384))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+class RoadmapCache(Base):
+    __tablename__ = "roadmap_cache"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    raw_detail_json: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    clean_nodes_json: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    topics_json: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    source_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    credits_spent: Mapped[int] = mapped_column(Integer, default=0)
+
+class RoadmapIngestionConflict(Base):
+    __tablename__ = "roadmap_ingestion_conflicts"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    conflict_type: Mapped[str] = mapped_column(String(50), index=True) # edge_mismatch, cycle_detected, unmapped_market_skill, partial_ingestion
+    payload: Mapped[Any] = mapped_column(JSON)
+    resolved: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+class RoleRoadmapMapping(Base):
+    __tablename__ = "role_roadmap_mappings"
+    __table_args__ = (
+        UniqueConstraint("role_id", "roadmap_slug", name="uq_role_roadmap_mapping"),
+    )
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    role_id: Mapped[str] = mapped_column(String(100), index=True)
+    roadmap_slug: Mapped[str] = mapped_column(String(255), index=True)
+    priority_order: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 class CodingSandboxSubmission(Base):

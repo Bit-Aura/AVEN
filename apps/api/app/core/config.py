@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     ANTIGRAVITY_PROXY_URL: str = "http://localhost:3001/v1"
     ANTIGRAVITY_MODEL: str = "gemini-3.6-flash-medium"
 
+    # roadmap.sh API Key for Canonical Topology Ingestion
+    ROADMAP_SH_API_KEY: str = ""
+
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
 
 settings = Settings()

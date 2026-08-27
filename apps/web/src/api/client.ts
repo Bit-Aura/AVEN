@@ -88,7 +88,7 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
   if (storedEmail) {
     authHeaders['X-User-Email'] = storedEmail;
   } else {
-    authHeaders['X-User-Email'] = 'demo@pathfinder.dev';
+    authHeaders['X-User-Email'] = endpoint.startsWith('/admin') ? 'admin@aven.com' : 'demo@pathfinder.dev';
   }
   if (storedClerkId) {
     authHeaders['X-Clerk-User-Id'] = storedClerkId;
@@ -1126,5 +1126,50 @@ export const transcribeAudio = async (audioBlob: Blob): Promise<{ text: string }
     method: 'POST',
     body: formData,
   });
+};
+
+// =============================================================================
+// ROADMAP.SH CANONICAL TOPOLOGY ADMIN CONTRACTS
+// =============================================================================
+
+export const getAvailableRoadmaps = async () => {
+  return await fetchApi('/admin/roadmaps/available');
+};
+
+export const triggerRoadmapSync = async (slug: string, force = true) => {
+  return await fetchApi(`/admin/roadmaps/sync/${slug}?force=${force}`, {
+    method: 'POST'
+  });
+};
+
+export const getRoadmapConflicts = async (resolved?: boolean) => {
+  const query = resolved !== undefined ? `?resolved=${resolved}` : '';
+  return await fetchApi(`/admin/roadmaps/conflicts${query}`);
+};
+
+export const resolveRoadmapConflict = async (conflictId: number) => {
+  return await fetchApi(`/admin/roadmaps/conflicts/${conflictId}`, {
+    method: 'PATCH'
+  });
+};
+
+export const getRoadmapRoleMappings = async () => {
+  return await fetchApi('/admin/roadmap-role-mapping');
+};
+
+export const updateRoadmapRoleMapping = async (payload: { role_id: string; roadmap_slugs: string[] }) => {
+  return await fetchApi('/admin/roadmap-role-mapping', {
+    method: 'PATCH',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const previewRoadmapSlug = async (slug: string) => {
+  return await fetchApi(`/admin/roadmaps/${slug}/preview`);
+};
+
+// Learner-accessible roadmap graph (no admin required)
+export const learnerRoadmapGraph = async (slug: string) => {
+  return await fetchApi(`/learner/roadmaps/${slug}/graph`);
 };
 

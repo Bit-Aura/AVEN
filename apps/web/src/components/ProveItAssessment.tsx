@@ -3,17 +3,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathStore } from '../store/usePathStore';
-import { 
-  TerminalWindow, 
-  Play, 
-  CheckCircle, 
-  XCircle, 
-  CodeBlock,
-  SpinnerGap,
+import {
+  Terminal,
+  Play,
+  CheckCircle2,
+  XCircle,
+  Code2,
+  Loader2,
   X,
-  FileCode,
-  PaperPlaneRight
-} from '@phosphor-icons/react';
+  FileCode2,
+  Send
+} from 'lucide-react';
 
 interface ProveItAssessmentProps {
   milestoneId: string;
@@ -37,7 +37,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
   const fetchAssessment = usePathStore((state) => state.fetchAssessment);
   const currentAssessment = usePathStore((state) => state.currentAssessment);
   const isFetchingAssessment = usePathStore((state) => state.isFetchingAssessment);
-  
+
   const [selectedOpt, setSelectedOpt] = useState<string | null>(null);
 
   // IDE State
@@ -46,7 +46,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationPhase, setEvaluationPhase] = useState<'idle' | 'running' | 'success' | 'failed'>('idle');
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
-  
+
   // Ref for syncing scroll between textarea and highlighted background
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLPreElement>(null);
@@ -64,9 +64,9 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
     }
   }, [milestoneId, fetchAssessment]);
 
-  const isCodingChallenge = currentAssessment && 
-    (currentAssessment.options.length === 1 || 
-     currentAssessment.options.some((opt: string) => opt.toLowerCase().includes('code')));
+  const isCodingChallenge = currentAssessment &&
+    (currentAssessment.options.length === 1 ||
+      currentAssessment.options.some((opt: string) => opt.toLowerCase().includes('code')));
 
   const handleMultipleChoiceSubmit = () => {
     if (selectedOpt) {
@@ -90,7 +90,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
     ];
 
     for (let i = 0; i < delays.length; i++) {
-      await new Promise(r => setTimeout(r, delays[i] - (i > 0 ? delays[i-1] : 0)));
+      await new Promise(r => setTimeout(r, delays[i] - (i > 0 ? delays[i - 1] : 0)));
       setTerminalLogs(prev => [...prev, logs[i]]);
     }
 
@@ -105,7 +105,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
   };
 
   const lines = code.split('\n').length;
-  
+
   // Format the problem statement to look professional if it's just a raw string
   const formatProblemStatement = (text: string) => {
     return (
@@ -137,7 +137,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
       <div className="flex justify-between items-center px-4 py-3 border-b border-slate-800 bg-[#161b22]">
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded bg-brand-500/10 flex items-center justify-center">
-            <CodeBlock weight="duotone" className="text-brand-400" size={16} />
+            <Code2 className="text-brand-400" size={16} />
           </div>
           <div>
             <h3 className="text-slate-200 font-semibold text-[13px] leading-tight">
@@ -146,10 +146,10 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
           </div>
         </div>
       </div>
-      
+
       {isFetchingAssessment ? (
         <div className="flex-1 flex justify-center items-center">
-          <SpinnerGap weight="bold" size={32} className="animate-spin text-brand-500" />
+          <Loader2 size={32} className="animate-spin text-brand-500" />
         </div>
       ) : currentAssessment ? (
         isCodingChallenge ? (
@@ -158,7 +158,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
           // ==============================
           <div className="flex flex-col flex-1 overflow-hidden">
             <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
-              
+
               {/* Left Panel: Problem Statement */}
               <div className="w-full lg:w-[40%] border-r border-slate-800 bg-[#0d1117] flex flex-col overflow-hidden">
                 <div className="px-5 py-2.5 bg-[#161b22] border-b border-slate-800 flex items-center gap-2">
@@ -172,38 +172,38 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
 
               {/* Right Panel: Code Editor + Terminal */}
               <div className="w-full lg:w-[60%] flex flex-col bg-[#0d1117] relative">
-                
+
                 {/* File Tabs & Actions */}
                 <div className="flex items-center justify-between bg-[#161b22] border-b border-slate-800 pl-0 pr-4">
                   <div className="flex items-center">
                     <div className="px-4 py-2.5 bg-[#0d1117] border-t-2 border-brand-500 border-r border-r-slate-800 flex items-center gap-2">
-                      <FileCode weight="fill" className="text-amber-400" size={14} />
+                      <FileCode2 className="text-amber-400" size={14} />
                       <span className="text-[12px] font-mono text-slate-300">solution.py</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 py-1">
-                    <button 
+                    <button
                       onClick={handleRunTests}
                       disabled={isEvaluating}
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold rounded transition-colors disabled:opacity-50"
                     >
-                      {isEvaluating ? <SpinnerGap weight="bold" className="animate-spin" /> : <Play weight="fill" />}
+                      {isEvaluating ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} className="fill-current" />}
                       Run Code
                     </button>
                     {evaluationPhase === 'success' && (
-                      <motion.button 
+                      <motion.button
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         onClick={handleSubmitSolution}
                         className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded transition-colors shadow-lg shadow-emerald-900/20"
                       >
-                        <PaperPlaneRight weight="fill" />
+                        <Send size={14} />
                         Submit
                       </motion.button>
                     )}
                   </div>
                 </div>
-                
+
                 {/* Editor Area */}
                 <div className="flex-1 flex overflow-hidden relative group">
                   {/* Blended Line Numbers */}
@@ -214,7 +214,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
                       </div>
                     ))}
                   </div>
-                  
+
                   {/* Transparent Textarea overlaying Syntax Highlighted Div */}
                   <div className="flex-1 relative overflow-hidden bg-[#0d1117]">
                     <pre
@@ -239,12 +239,12 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
                 <div className="h-48 border-t border-slate-800 bg-[#010409] flex flex-col">
                   <div className="px-4 py-2 border-b border-slate-800 flex items-center justify-between bg-[#0d1117]">
                     <div className="flex items-center gap-2">
-                      <TerminalWindow weight="bold" className="text-slate-400" size={14} />
+                      <Terminal className="text-slate-400" size={14} />
                       <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">Test Results</span>
                     </div>
                     {evaluationPhase === 'success' && (
                       <span className="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1">
-                        <CheckCircle weight="fill" /> Accepted
+                        <CheckCircle2 size={14} className="fill-emerald-400/20" /> Accepted
                       </span>
                     )}
                   </div>
@@ -254,7 +254,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
                     )}
                     <AnimatePresence>
                       {terminalLogs.map((log, idx) => (
-                        <motion.div 
+                        <motion.div
                           key={idx}
                           initial={{ opacity: 0, x: -5 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -283,20 +283,18 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
               </p>
               <div className="space-y-3">
                 {currentAssessment.options.map((opt: string, i: number) => (
-                  <motion.button 
+                  <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     key={i}
                     onClick={() => setSelectedOpt(opt)}
-                    className={`w-full text-left p-5 rounded-2xl border transition-all flex items-center gap-4 ${
-                      selectedOpt === opt 
-                        ? 'border-brand-500 bg-brand-500/10 text-white' 
-                        : 'border-slate-800 bg-[#161b22] hover:bg-slate-800 text-slate-300 hover:text-white'
-                    }`}
+                    className={`w-full text-left p-5 rounded-2xl border transition-all flex items-center gap-4 ${selectedOpt === opt
+                      ? 'border-brand-500 bg-brand-500/10 text-white'
+                      : 'border-slate-800 bg-[#161b22] hover:bg-slate-800 text-slate-300 hover:text-white'
+                      }`}
                   >
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold border shrink-0 ${
-                      selectedOpt === opt ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-600 text-slate-500'
-                    }`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold border shrink-0 ${selectedOpt === opt ? 'border-brand-500 bg-brand-500 text-white' : 'border-slate-600 text-slate-500'
+                      }`}>
                       {String.fromCharCode(65 + i)}
                     </div>
                     <span className="leading-relaxed text-[13px]">{opt}</span>
@@ -304,7 +302,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
                 ))}
               </div>
               <div className="mt-10 flex justify-end">
-                <motion.button 
+                <motion.button
                   whileHover={selectedOpt ? { scale: 1.02 } : {}}
                   whileTap={selectedOpt ? { scale: 0.98 } : {}}
                   onClick={handleMultipleChoiceSubmit}

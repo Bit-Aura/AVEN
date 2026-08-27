@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Compass, 
-  Network, 
-  Radar, 
-  Award, 
-  Layers, 
-  Flame, 
-  ShieldAlert, 
+import {
+  Compass,
+  Network,
+  Radar,
+  Award,
+  Layers,
+  Flame,
+  ShieldAlert,
   ShieldCheck,
   BrainCircuit,
   Users,
@@ -18,6 +18,7 @@ import {
   LogOut,
   UserCheck,
   Mic,
+  Map,
 } from 'lucide-react';
 import { useClerk } from '@clerk/nextjs';
 import { usePathStore } from '../../store/usePathStore';
@@ -89,6 +90,7 @@ export default function Sidebar() {
       title: 'Administration',
       items: [
         { name: 'Platform Admin', href: '/admin', icon: ShieldCheck, badge: 'Master' },
+        { name: 'Roadmap Topology Sync', href: '/admin/roadmap-sync', icon: Map, badge: 'New' },
         { name: 'Mentor Operations', href: '/mentor', icon: ShieldAlert },
       ]
     },
@@ -105,8 +107,8 @@ export default function Sidebar() {
   const navigationGroups = userRole === 'ADMIN'
     ? adminGroups
     : userRole === 'MENTOR'
-    ? mentorGroups
-    : learnerGroups;
+      ? mentorGroups
+      : learnerGroups;
 
   const handleSignOut = async () => {
     logoutUser();
@@ -170,9 +172,9 @@ export default function Sidebar() {
               <span className="font-bold text-emerald-400">{readinessScore}%</span>
             </div>
             <div className="w-full h-1.5 bg-surface rounded-full mt-1.5 overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-700" 
-                style={{ width: `${Math.max(readinessScore, 5)}%` }} 
+              <div
+                className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-700"
+                style={{ width: `${Math.max(readinessScore, 5)}%` }}
               />
             </div>
           </>
@@ -199,31 +201,29 @@ export default function Sidebar() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
-                      isActive 
-                        ? 'bg-brand-500/10 text-brand-400' 
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-surface-secondary/50'
-                    }`}
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${isActive
+                      ? 'bg-brand-500/10 text-brand-400'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-surface-secondary/50'
+                      }`}
                   >
                     <div className="flex items-center gap-3">
-                      <item.icon 
-                        size={16} 
-                        className={isActive ? 'text-brand-400' : 'text-slate-500 group-hover:text-slate-400'} 
+                      <item.icon
+                        size={16}
+                        className={isActive ? 'text-brand-400' : 'text-slate-500 group-hover:text-slate-400'}
                       />
                       <span>{item.name}</span>
                     </div>
                     {item.badge && (
-                      <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded ${
-                        isActive 
-                          ? 'bg-brand-500/20 text-brand-300' 
-                          : item.badge === 'Live' 
+                      <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded ${isActive
+                        ? 'bg-brand-500/20 text-brand-300'
+                        : item.badge === 'Live'
                           ? 'bg-rose-500/20 text-rose-400'
                           : item.badge === 'Sprint'
-                          ? 'bg-white/20 text-white' 
-                          : item.badge === 'Master'
-                          ? 'bg-rose-500/20 text-rose-400'
-                          : 'bg-surface-tertiary text-slate-400'
-                      }`}>
+                            ? 'bg-white/20 text-white'
+                            : item.badge === 'Master'
+                              ? 'bg-rose-500/20 text-rose-400'
+                              : 'bg-surface-tertiary text-slate-400'
+                        }`}>
                         {item.badge}
                       </span>
                     )}

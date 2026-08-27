@@ -55,6 +55,12 @@ def run():
             )
             """)
             
+            # learner_profiles
+            cur.execute('PRAGMA table_info(learner_profiles)')
+            lp_cols = [r[1] for r in cur.fetchall()]
+            if lp_cols and 'last_known_weekly_hours' not in lp_cols:
+                cur.execute("ALTER TABLE learner_profiles ADD COLUMN last_known_weekly_hours FLOAT DEFAULT 10.0")
+            
             conn.commit()
             conn.close()
             print(f"Successfully migrated {db_path}")

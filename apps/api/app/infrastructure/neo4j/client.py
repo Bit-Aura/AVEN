@@ -5,14 +5,19 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+_MOCK_NODES: Dict[str, Any] = {}
+_MOCK_EDGES: List[Dict[str, str]] = []
+
 class MockNeo4jDriver:
     def close(self):
         pass
     class _MockSession:
         def __enter__(self): return self
         def __exit__(self, *args): pass
-        def execute_write(self, fn): return []
+        def execute_write(self, fn): 
+            return fn(self)
         def run(self, query, parameters=None):
+            parameters = parameters or {}
             class MockRecord:
                 def __init__(self, data):
                     self._data = data
@@ -21,8 +26,30 @@ class MockNeo4jDriver:
                 def data(self):
                     return self._data
 
-            if "RETURN s.id" in query:
-                # Return all 15 curated skills
+            if "UNWIND $skills AS s" in query:
+                skills = parameters.get("skills", [])
+                for s in skills:
+                    _MOCK_NODES[s["id"]] = s
+                return []
+            elif "UNWIND $edges AS e" in query:
+                edges = parameters.get("edges", [])
+                for e in edges:
+                    _MOCK_EDGES.append(e)
+                return []
+            elif "RETURN s.id" in query:
+                if _MOCK_NODES:
+                    return [
+                        MockRecord({
+                            "id": s["id"],
+                            "name": s["name"],
+                            "description": s.get("description", ""),
+                            "bkt_p_l0": s.get("bkt_p_l0", 0.15),
+                            "bkt_p_t": s.get("bkt_p_t", 0.20),
+                            "bkt_p_s": s.get("bkt_p_s", 0.10),
+                            "bkt_p_g": s.get("bkt_p_g", 0.20)
+                        })
+                        for s in _MOCK_NODES.values()
+                    ]
                 from app.services.seeder import SKILLS_SEED
                 return [
                     MockRecord({
@@ -37,7 +64,18 @@ class MockNeo4jDriver:
                     for s in SKILLS_SEED
                 ]
             elif "RETURN pre.name" in query:
-                # Return all prerequisite edges
+                if _MOCK_EDGES:
+                    id_to_name = {s["id"]: s["name"] for s in _MOCK_NODES.values()}
+                    records = []
+                    for e in _MOCK_EDGES:
+                        pre_id = e.get("pre_id")
+                        skill_id = e.get("skill_id")
+                        if pre_id in id_to_name and skill_id in id_to_name:
+                            records.append(MockRecord({
+                                "pre_name": id_to_name[pre_id],
+                                "skill_name": id_to_name[skill_id]
+                            }))
+                    return records
                 from app.services.seeder import SKILLS_SEED
                 id_to_name = {s["id"]: s["name"] for s in SKILLS_SEED}
                 edges = []
@@ -63,7 +101,8 @@ class Neo4jClient:
             try:
                 driver = GraphDatabase.driver(
                     settings.NEO4J_URI,
-                    auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD)
+                    auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD),
+                    connection_timeout=2.0
                 )
                 driver.verify_connectivity()
                 self._driver = driver

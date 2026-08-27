@@ -124,6 +124,14 @@ async def lifespan(app: FastAPI):
                     mentor_user.password_hash = hash_password("Aven@123")
                 
             await session.commit()
+
+            # 5. Seed Neo4j & Postgres skills topology via seed_all
+            try:
+                from app.services.seeder import seed_all
+                await seed_all(session, neo4j_client)
+            except Exception as seed_err:
+                logger.warning(f"[Startup] Skill seeding encountered warning: {seed_err}")
+
             logger.info("[Startup] Successfully initialized database tables and seeded canonical demo roles (LEARNER, MENTOR, ADMIN).")
     except Exception as e:
         logger.warning(f"[Startup] Database table initialization warning: {e}")
@@ -133,6 +141,25 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     lifespan=lifespan
+)
+
+# Enable CORS for frontend connections
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3002",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ],
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Include Authentication Router
@@ -182,6 +209,9 @@ app.add_middleware(
 # Import and include routers
 from app.routers.admin import router as admin_router
 app.include_router(admin_router)
+
+from app.routers.admin import router as legacy_admin_router
+app.include_router(legacy_admin_router)
 
 # Instantiate AI Provider via factory (Antigravity Proxy > Anthropic > Mock)
 ai_provider = create_ai_provider()

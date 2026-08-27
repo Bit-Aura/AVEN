@@ -26,7 +26,10 @@ import {
   Sparkles,
   ArrowRight,
   Shield,
-  HelpCircle
+  HelpCircle,
+  Map,
+  Zap,
+  ShieldAlert
 } from 'lucide-react';
 import {
   getAdminOverview,
@@ -43,6 +46,12 @@ import {
   deleteAdminResource,
   approveResource,
   rejectResource,
+  getAvailableRoadmaps,
+  triggerRoadmapSync,
+  getRoadmapConflicts,
+  resolveRoadmapConflict,
+  getRoadmapRoleMappings,
+  updateRoadmapRoleMapping,
   AdminOverviewResponse,
   AdminSystemResponse,
   AdminUserItem,
@@ -51,7 +60,7 @@ import {
   ResourceCreateInput
 } from '../../../api/client';
 
-type TabType = 'overview' | 'users' | 'mentors' | 'resources' | 'system';
+type TabType = 'overview' | 'users' | 'mentors' | 'resources' | 'system' | 'roadmap_sync';
 
 export default function PlatformAdminDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -451,6 +460,18 @@ export default function PlatformAdminDashboard() {
         >
           <Server size={15} />
           <span>System Status</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('roadmap_sync')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === 'roadmap_sync'
+              ? 'bg-indigo-600 text-white shadow-glow-indigo'
+              : 'text-slate-400 hover:text-white hover:bg-surface'
+          }`}
+        >
+          <Map size={15} />
+          <span>Roadmap Topology Sync</span>
         </button>
       </div>
 
@@ -1095,6 +1116,15 @@ export default function PlatformAdminDashboard() {
       )}
 
       {/* ========================================================================= */}
+      {/* TAB 6: ROADMAP TOPOLOGY SYNC */}
+      {/* ========================================================================= */}
+      {activeTab === 'roadmap_sync' && (
+        <div className="space-y-8">
+          <RoadmapSyncTabContent showNotification={showNotification} />
+        </div>
+      )}
+
+      {/* ========================================================================= */}
       {/* MODAL: ADD RESOURCE */}
       {/* ========================================================================= */}
       {isAddResourceModalOpen && (
@@ -1335,6 +1365,244 @@ export default function PlatformAdminDashboard() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function RoadmapSyncTabContent({ showNotification }: { showNotification: (msg: string, type?: 'success' | 'error') => void }) {
+  const [roadmaps, setRoadmaps] = useState<any[]>([]);
+  const [conflicts, setConflicts] = useState<any[]>([]);
+  const [mappings, setMappings] = useState<Record<string, string[]>>({});
+  const [loading, setLoading] = useState(true);
+  const [syncingSlug, setSyncingSlug] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState('backend_swe');
+  const [roleSlugsInput, setRoleSlugsInput] = useState('');
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [dataAvail, dataConf, dataMap] = await Promise.all([
+        getAvailableRoadmaps(),
+        getRoadmapConflicts(),
+        getRoadmapRoleMappings()
+      ]);
+
+      setRoadmaps(dataAvail.roadmaps || []);
+      setConflicts(dataConf.conflicts || []);
+      setMappings(dataMap.mappings || {});
+      if (dataMap.mappings && dataMap.mappings['backend_swe']) {
+        setRoleSlugsInput(dataMap.mappings['backend_swe'].join(', '));
+      }
+    } catch (e: any) {
+      console.error('Error loading roadmap admin data:', e);
+      showNotification(e.message || 'Failed to fetch roadmap data.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSyncNow = async (slug: string, force = true) => {
+    setSyncingSlug(slug);
+    try {
+      const data = await triggerRoadmapSync(slug, force);
+      showNotification(`Successfully synced '${slug}': ${data.skills_upserted} skills, ${data.edges_upserted} edges upserted into Neo4j & Postgres.`);
+      fetchData();
+    } catch (e: any) {
+      showNotification(`Failed to sync '${slug}': ${e.message || 'Unknown error'}`, 'error');
+    } finally {
+      setSyncingSlug(null);
+    }
+  };
+
+  const handleResolveConflict = async (id: number) => {
+    try {
+      await resolveRoadmapConflict(id);
+      setConflicts(prev => prev.map(c => c.id === id ? { ...c, resolved: true } : c));
+      showNotification(`Conflict #${id} marked as resolved.`);
+    } catch (e: any) {
+      showNotification(`Error resolving conflict: ${e.message || 'Unknown error'}`, 'error');
+    }
+  };
+
+  const handleSaveRoleMapping = async () => {
+    try {
+      const slugs = roleSlugsInput.split(',').map(s => s.trim()).filter(Boolean);
+      await updateRoadmapRoleMapping({ role_id: selectedRole, roadmap_slugs: slugs });
+      showNotification(`Updated roadmap mappings for ${selectedRole}.`);
+      setMappings(prev => ({ ...prev, [selectedRole]: slugs }));
+    } catch (e: any) {
+      showNotification(`Error updating role mapping: ${e.message || 'Unknown error'}`, 'error');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Role to Roadmap Mapping Card */}
+      <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass space-y-4">
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <div className="flex items-center gap-2">
+            <Layers className="text-indigo-400" size={18} />
+            <h2 className="text-base font-bold text-white">Role → Composite Subgraph Mapping</h2>
+          </div>
+          <span className="text-xs text-slate-400">Configure which roadmap.sh slugs build each career track</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Target Role</label>
+            <select
+              value={selectedRole}
+              onChange={(e) => {
+                const role = e.target.value;
+                setSelectedRole(role);
+                setRoleSlugsInput((mappings[role] || []).join(', '));
+              }}
+              className="w-full bg-slate-900 border border-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+            >
+              <option value="backend_swe">Backend Software Engineer (backend_swe)</option>
+              <option value="frontend_swe">Frontend Software Engineer (frontend_swe)</option>
+              <option value="devops_platform">DevOps & Platform Engineer (devops_platform)</option>
+              <option value="mlops_engineer">MLOps Engineer (mlops_engineer)</option>
+              <option value="data_engineer">Data Engineer (data_engineer)</option>
+            </select>
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Mapped roadmap.sh Slugs (comma separated)</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={roleSlugsInput}
+                onChange={(e) => setRoleSlugsInput(e.target.value)}
+                placeholder="backend, python, sql, system-design"
+                className="flex-1 bg-slate-900 border border-border rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+              />
+              <button
+                onClick={handleSaveRoleMapping}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0"
+              >
+                Save Mapping
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Catalog Table */}
+      <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass space-y-4">
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <div className="flex items-center gap-2">
+            <Database className="text-emerald-400" size={18} />
+            <h2 className="text-base font-bold text-white">roadmap.sh Catalog & Ingestion Control</h2>
+          </div>
+          <span className="text-xs text-slate-400">{roadmaps.length} Roadmaps Available</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-border text-slate-400 uppercase tracking-wider font-semibold">
+                <th className="py-3 px-4">Slug</th>
+                <th className="py-3 px-4">Title</th>
+                <th className="py-3 px-4">Cache Status</th>
+                <th className="py-3 px-4">Last Synced</th>
+                <th className="py-3 px-4 text-center">Credits Spent</th>
+                <th className="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/60">
+              {roadmaps.map((r) => (
+                <tr key={r.slug} className="hover:bg-slate-800/30 transition">
+                  <td className="py-3.5 px-4 font-mono font-bold text-indigo-300">{r.slug}</td>
+                  <td className="py-3.5 px-4 text-white font-medium">{r.title}</td>
+                  <td className="py-3.5 px-4">
+                    {r.cached ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <CheckCircle2 size={12} /> Cached
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-500/10 text-slate-400 border border-slate-500/20">
+                        Uncached
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-3.5 px-4 text-slate-400">
+                    {r.fetched_at ? new Date(r.fetched_at).toLocaleString() : 'Never'}
+                  </td>
+                  <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-300">
+                    {r.credits_spent}
+                  </td>
+                  <td className="py-3.5 px-4 text-right">
+                    <button
+                      onClick={() => handleSyncNow(r.slug, true)}
+                      disabled={syncingSlug === r.slug}
+                      className="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 px-3.5 py-1.5 rounded-lg text-[11px] font-bold transition inline-flex items-center gap-1.5"
+                    >
+                      <RefreshCw size={12} className={syncingSlug === r.slug ? 'animate-spin' : ''} />
+                      <span>{syncingSlug === r.slug ? 'Syncing...' : 'Sync Now'}</span>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Ingestion Conflicts Queue */}
+      <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass space-y-4">
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="text-amber-400" size={18} />
+            <h2 className="text-base font-bold text-white">Ingestion Conflicts & DAG Verification Queue</h2>
+          </div>
+          <span className="text-xs text-slate-400">{conflicts.filter(c => !c.resolved).length} Active Alerts</span>
+        </div>
+
+        {conflicts.length === 0 ? (
+          <div className="p-6 text-center text-xs text-slate-400">
+            No ingestion conflicts or cycle alerts found. All roadmaps are valid DAGs.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {conflicts.map((c) => (
+              <div
+                key={c.id}
+                className={`p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs ${
+                  c.resolved
+                    ? 'bg-slate-900/40 border-border/40 text-slate-400'
+                    : 'bg-amber-950/20 border-amber-500/30 text-amber-200'
+                }`}
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 font-bold">
+                    <AlertCircle size={14} className={c.resolved ? 'text-slate-500' : 'text-amber-400'} />
+                    <span className="uppercase tracking-wider font-mono">{c.conflict_type}</span>
+                    {c.slug && <span className="text-indigo-400">({c.slug})</span>}
+                  </div>
+                  <pre className="text-[11px] font-mono bg-slate-950/80 p-2 rounded border border-border/50 text-slate-300 max-h-24 overflow-y-auto">
+                    {JSON.stringify(c.payload, null, 2)}
+                  </pre>
+                  <div className="text-[10px] text-slate-400">Logged: {new Date(c.created_at).toLocaleString()}</div>
+                </div>
+
+                {!c.resolved && (
+                  <button
+                    onClick={() => handleResolveConflict(c.id)}
+                    className="bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 px-3.5 py-1.5 rounded-lg font-bold transition shrink-0 self-start md:self-center"
+                  >
+                    Mark Resolved
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

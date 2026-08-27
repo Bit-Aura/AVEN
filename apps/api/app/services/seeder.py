@@ -442,5 +442,14 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
         db.add(item)
         
     await db.commit()
+
+    # 5. Ingest Canonical Skill Topology from roadmap.sh
+    logger.info("Starting canonical roadmap.sh topology ingestion...")
+    try:
+        from app.services.roadmap_ingestion import roadmap_ingestion_service
+        await roadmap_ingestion_service.sync_roadmap_slug("backend", db, force=False)
+    except Exception as e:
+        logger.warning(f"roadmap.sh topology sync in seeder encountered error: {e}")
+
     logger.info("PostgreSQL seeding completed successfully.")
 
