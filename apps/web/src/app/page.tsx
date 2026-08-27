@@ -108,13 +108,13 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center gap-4 mt-10 animate-fade-rise-delay-2">
               <Link
                 href="/diagnostic"
-                className="liquid-glass rounded-full px-10 py-4 text-base text-white hover:scale-[1.03] cursor-pointer transition-transform"
+                className="liquid-glass rounded-full px-10 py-4 text-base text-white hover:scale-[1.03] active:scale-95 cursor-pointer transition-transform"
               >
                 Launch Cold-Start Diagnostic
               </Link>
               <Link
                 href="/learner"
-                className="liquid-glass rounded-full px-10 py-4 text-base text-white hover:scale-[1.03] cursor-pointer transition-transform"
+                className="liquid-glass rounded-full px-10 py-4 text-base text-white hover:scale-[1.03] active:scale-95 cursor-pointer transition-transform"
               >
                 Explore Active Dashboard
               </Link>
@@ -238,7 +238,7 @@ export default function LandingPage() {
               
               <Link
                 href="/diagnostic"
-                className="mt-10 flex items-center gap-2 px-10 py-4 rounded-full liquid-glass text-white font-bold text-base shadow-[0_0_30px_rgba(59,130,246,0.3)] transition-transform hover:scale-[1.03]"
+                className="mt-10 flex items-center gap-2 px-10 py-4 rounded-full liquid-glass text-white font-bold text-base shadow-[0_0_30px_rgba(59,130,246,0.3)] transition-transform hover:scale-[1.03] active:scale-95"
               >
                 <span>Get Started Free</span>
                 <ArrowRight size={18} />

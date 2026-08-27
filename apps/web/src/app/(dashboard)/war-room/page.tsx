@@ -37,6 +37,7 @@ const itemVariants = {
 export default function PlacementJourney() {
   const profileId = usePathStore((state) => state.profileId);
   const [selectedCompany, setSelectedCompany] = useState('google');
+  const [targetRole, setTargetRole] = useState<string | null>(null);
   const [interviewDate, setInterviewDate] = useState(
     new Date(Date.now() + 42 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   );
@@ -54,11 +55,27 @@ export default function PlacementJourney() {
   const activeId = profileId || 1;
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const target = params.get('target');
+    const role = params.get('role');
+
+    if (role) setTargetRole(role);
+
     import('../../../api/client').then(({ fetchPlacementCompanies }) => {
       fetchPlacementCompanies().then(comps => {
         setCompanies(comps);
-        if (comps.length > 0 && !selectedCompany) {
-          setSelectedCompany(comps[0].name);
+        
+        if (target) {
+          // Deep-linked from Market Radar: immediately set and generate
+          setSelectedCompany(target);
+          loadPlacementPlan(target, interviewDate);
+          // Clean the URL so refresh doesn't re-trigger unintentionally
+          window.history.replaceState({}, '', '/war-room');
+        } else {
+          // Standard load
+          const defaultComp = comps.length > 0 ? comps[0].name : 'google';
+          if (!selectedCompany) setSelectedCompany(defaultComp);
+          if (!plan && !isLoading) loadPlacementPlan(defaultComp, interviewDate);
         }
       }).catch(e => console.error("Failed to load companies", e));
     });
@@ -237,6 +254,11 @@ export default function PlacementJourney() {
                     Days
                   </span>
                 </div>
+                {targetRole && (
+                  <div className="mt-2 text-sm font-semibold text-brand-300 bg-brand-500/10 border border-brand-500/20 px-3 py-1.5 rounded-lg inline-block">
+                    Target: {targetRole}
+                  </div>
+                )}
               </div>
 
               <div className="p-5 rounded-2xl bg-black/30 border border-white/5 backdrop-blur-md relative z-10 w-full md:w-auto text-center md:text-left">
