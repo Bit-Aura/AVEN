@@ -1112,6 +1112,153 @@ async def learner_roadmap_graph(
             roadmap_slug=s["roadmap_slug"],
             external_node_id=s["external_node_id"]
         )
+            RoadmapItemSchema(
+                slug=slug,
+                title=item.get("title", slug.replace("-", " ").title()),
+                updatedAt=item.get("updatedAt"),
+                cached=c_row is not None,
+                fetched_at=c_row.fetched_at if c_row else None,
+                credits_spent=c_row.credits_spent if c_row else 0
+            )
+        )
+
+    return RoadmapAvailableResponse(roadmaps=items, total=len(items))
+
+
+@router.post("/admin/roadmaps/sync/{slug}", response_model=RoadmapSyncResponse)
+async def trigger_roadmap_sync(
+    slug: str,
+    force: bool = Query(False, description="Force remote fetch bypassing cache"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin)
+):
+    """
+    Manually triggers Stage B-F ingestion pipeline for one roadmap slug.
+    """
+    res = await roadmap_ingestion_service.sync_roadmap_slug(slug, db, force=force)
+    return RoadmapSyncResponse(**res)
+
+
+@router.get("/admin/roadmaps/conflicts", response_model=RoadmapConflictsListResponse)
+async def get_roadmap_conflicts(
+    resolved: Optional[bool] = Query(None, description="Filter by resolution status"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin)
+):
+    """
+    Surfaces roadmap topology conflicts (cycles, edge mismatches, unmapped market skills).
+    """
+    stmt = select(RoadmapIngestionConflict).order_by(RoadmapIngestionConflict.created_at.desc())
+    if resolved is not None:
+        stmt = stmt.where(RoadmapIngestionConflict.resolved == resolved)
+
+    conflicts = (await db.execute(stmt)).scalars().all()
+    items = [
+        RoadmapConflictItemSchema(
+            id=c.id,
+            slug=c.slug,
+            conflict_type=c.conflict_type,
+            payload=c.payload or {},
+            resolved=c.resolved,
+            created_at=c.created_at
+        )
+        for c in conflicts
+    ]
+    return RoadmapConflictsListResponse(conflicts=items, total=len(items))
+
+
+@router.patch("/admin/roadmaps/conflicts/{conflict_id}")
+async def resolve_roadmap_conflict(
+    conflict_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin)
+):
+    """
+    Marks an ingestion conflict item as resolved.
+    """
+    stmt = select(RoadmapIngestionConflict).where(RoadmapIngestionConflict.id == conflict_id)
+    conflict = (await db.execute(stmt)).scalars().first()
+    if not conflict:
+        raise HTTPException(status_code=404, detail="Conflict record not found.")
+
+    conflict.resolved = True
+    await db.commit()
+    return {"status": "success", "message": f"Conflict {conflict_id} marked as resolved."}
+
+
+@router.get("/admin/roadmap-role-mapping", response_model=RoleRoadmapMappingsListResponse)
+async def get_role_roadmap_mappings(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin)
+):
+    """
+    Retrieves current role-to-roadmap composite mappings.
+    """
+    roles = ["backend_swe", "frontend_swe", "devops_platform", "mlops_engineer", "data_engineer"]
+    mappings: Dict[str, List[str]] = {}
+
+    for r in roles:
+        slugs = await roadmap_ingestion_service.get_role_roadmap_slugs(r, db)
+        mappings[r] = slugs
+
+    return RoleRoadmapMappingsListResponse(mappings=mappings)
+
+
+@router.patch("/admin/roadmap-role-mapping")
+async def update_role_roadmap_mapping(
+    payload: RoleRoadmapMappingUpdateInput,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin)
+):
+    """
+    Updates the roadmap slugs backing a specific role.
+    """
+    # Delete existing mapping rows for this role
+    await db.execute(delete(RoleRoadmapMapping).where(RoleRoadmapMapping.role_id == payload.role_id))
+    await db.flush()
+
+    # Insert new mapping rows
+    for idx, slug in enumerate(payload.roadmap_slugs):
+        mapping_row = RoleRoadmapMapping(
+            role_id=payload.role_id,
+            roadmap_slug=slug,
+            priority_order=idx
+        )
+        db.add(mapping_row)
+
+    await db.commit()
+    return {"status": "success", "role_id": payload.role_id, "roadmap_slugs": payload.roadmap_slugs}
+
+
+@router.get("/admin/roadmaps/{slug}/preview", response_model=RoadmapPreviewResponse)
+async def preview_roadmap_slug(
+    slug: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_active_user)
+):
+    """
+    Returns normalized Skill nodes and Candidate edges for the given roadmap slug.
+    Open to any authenticated user (learner or admin) for read-only graph rendering.
+    """
+    cache_row = await roadmap_ingestion_service.fetch_and_cache_roadmap(slug, db, force=False)
+    clean_nodes = cache_row.clean_nodes_json or []
+    raw_detail = cache_row.raw_detail_json or {}
+    raw_edges = raw_detail.get("edges", [])
+
+    skills = roadmap_ingestion_service.normalize_roadmap_nodes(slug, clean_nodes)
+    edges, cycles = roadmap_ingestion_service.resolve_edges_and_validate_dag(slug, skills, raw_edges)
+
+    skill_previews = [
+        NormalizedSkillPreview(
+            id=s["id"],
+            name=s["name"],
+            description=s["description"],
+            difficulty=s["difficulty"],
+            est_hours=s["est_hours"],
+            source=s["source"],
+            roadmap_slug=s["roadmap_slug"],
+            external_node_id=s["external_node_id"]
+        )
         for s in skills
     ]
 
@@ -1129,3 +1276,119 @@ async def learner_roadmap_graph(
         total_skills=len(skill_previews),
         total_edges=len(edge_previews)
     )
+
+
+@router.get("/learner/roadmaps/{slug}/graph", response_model=RoadmapPreviewResponse)
+async def learner_roadmap_graph(
+    slug: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_active_user)
+):
+    """
+    Learner-accessible alias: returns the canonical Skill node flowchart and edges
+    for a roadmap slug without requiring admin privileges.
+    """
+    cache_row = await roadmap_ingestion_service.fetch_and_cache_roadmap(slug, db, force=False)
+    clean_nodes = cache_row.clean_nodes_json or []
+    raw_detail = cache_row.raw_detail_json or {}
+    raw_edges = raw_detail.get("edges", [])
+
+    skills = roadmap_ingestion_service.normalize_roadmap_nodes(slug, clean_nodes)
+    edges, cycles = roadmap_ingestion_service.resolve_edges_and_validate_dag(slug, skills, raw_edges)
+
+    skill_previews = [
+        NormalizedSkillPreview(
+            id=s["id"],
+            name=s["name"],
+            description=s["description"],
+            difficulty=s["difficulty"],
+            est_hours=s["est_hours"],
+            source=s["source"],
+            roadmap_slug=s["roadmap_slug"],
+            external_node_id=s["external_node_id"]
+        )
+        for s in skills
+    ]
+
+    edge_previews = [
+        CandidateEdgePreview(source_id=u, target_id=v, type="PREREQUISITE_OF")
+        for u, v in edges
+    ]
+
+    return RoadmapPreviewResponse(
+        slug=slug,
+        skills=skill_previews,
+        edges=edge_previews,
+        is_dag=len(cycles) == 0,
+        cycles=cycles,
+        total_skills=len(skill_previews),
+        total_edges=len(edge_previews)
+    )
+
+
+@router.get("/learner/roadmaps/{slug}/topology")
+async def learner_roadmap_topology(
+    slug: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_active_user)
+):
+    """
+    Returns the raw Parse.bot node topology with original x,y positions and types
+    for exact visual replication of the roadmap.sh flowchart layout.
+    No credits spent — reads from cache only.
+    """
+    cache_row = await roadmap_ingestion_service.fetch_and_cache_roadmap(slug, db, force=False)
+    raw_detail = cache_row.raw_detail_json or {}
+
+    raw_nodes = raw_detail.get("nodes", [])
+    raw_edges = raw_detail.get("edges", [])
+
+    # Normalise each node into a consistent shape the frontend can use directly
+    nodes_out = []
+    for n in raw_nodes:
+        # Parse.bot returns ReactFlow-compatible structure
+        node_id = n.get("id", "")
+        position = n.get("position", {}) or {}
+        data = n.get("data", {}) or {}
+        node_type = n.get("type", "topic")
+
+        # Label can be in data.label or data.title or fallback
+        label = (
+            data.get("label")
+            or data.get("title")
+            or data.get("text")
+            or node_id.replace("_", " ").title()
+        )
+
+        nodes_out.append({
+            "id": node_id,
+            "label": label,
+            "type": node_type,          # e.g. "topic", "subtopic", "section"
+            "x": position.get("x", 0),
+            "y": position.get("y", 0),
+            "width": n.get("width") or n.get("measured", {}).get("width") or 200,
+            "height": n.get("height") or n.get("measured", {}).get("height") or 40,
+            "style": n.get("style") or {},
+            "data": data,
+        })
+
+    # Edges: normalise to { id, source, target, type }
+    edges_out = []
+    for e in raw_edges:
+        edges_out.append({
+            "id": e.get("id", f"{e.get('source','')}-{e.get('target','')}"),
+            "source": e.get("source", ""),
+            "target": e.get("target", ""),
+            "type": e.get("type", ""),
+            "label": e.get("label", ""),
+            "style": e.get("style") or {},
+        })
+
+    return {
+        "slug": slug,
+        "title": raw_detail.get("title", slug.replace("-", " ").title()),
+        "nodes": nodes_out,
+        "edges": edges_out,
+        "total_nodes": len(nodes_out),
+        "total_edges": len(edges_out),
+    }

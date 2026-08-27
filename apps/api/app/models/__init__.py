@@ -25,6 +25,9 @@ from .domain import (
     LearnerResume,
     MockInterviewSession,
     MockInterviewTurn,
+    RoadmapCache,
+    RoadmapIngestionConflict,
+    RoleRoadmapMapping,
 )
 
 __all__ = [
@@ -54,4 +57,7 @@ __all__ = [
     "LearnerResume",
     "MockInterviewSession",
     "MockInterviewTurn",
+    "RoadmapCache",
+    "RoadmapIngestionConflict",
+    "RoleRoadmapMapping",
 ]
