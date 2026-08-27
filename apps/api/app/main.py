@@ -184,6 +184,7 @@ class GoalInput(BaseModel):
     user_email: str = Field(default="demo@pathfinder.dev", description="Demo user email")
     goal_text: str = Field(..., description="Stated goal, e.g. 'I want to become a backend engineer'")
     preferred_modality: str = Field(default="project", description="video, text, or project")
+    weekly_hours: float = Field(default=10.0, description="Hours per week they can commit to learning")
 
 class DiagnosticSubmitInput(BaseModel):
     session_id: int
@@ -298,7 +299,11 @@ async def parse_and_initiate_goal(
         description=data.preferred_modality,
         embedding=None
     )
+    # We store weekly_hours temporarily in goal's context if we had a JSON field, but let's store it in Profile
+    profile.current_context = intent.get("target_goal", data.goal_text)
+    profile.last_known_weekly_hours = data.weekly_hours
     db.add(goal)
+    db.add(profile)
     await db.flush()
     
     # 4. Initiate diagnostic session (Cold-Start Diagnostic)
@@ -306,11 +311,24 @@ async def parse_and_initiate_goal(
     db.add(session)
     await db.flush()
     
-    # Generate first question
-    first_turn_data = await ai_provider.conduct_diagnostic(
-        context=intent.get("target_goal", data.goal_text),
-        history=[]
-    )
+    # Generate first question from question bank
+    stmt = select(AssessmentItem)
+    items = (await db.execute(stmt)).scalars().all()
+    if not items:
+        first_turn_data = {
+            "question_id": "q_1",
+            "question_text": "Do you have prior experience with web app APIs?",
+            "options": ["Yes", "No"],
+            "target_skill": "http_fundamentals"
+        }
+    else:
+        content = json.loads(items[0].content)
+        first_turn_data = {
+            "question_id": f"q_{items[0].id}",
+            "question_text": content.get("question"),
+            "options": content.get("options", []),
+            "target_skill": content.get("target_skill")
+        }
     
     turn = DiagnosticTurn(
         session_id=session.id,
@@ -358,12 +376,23 @@ async def submit_diagnostic_answer(
         session.status = "completed"
         db.add(session)
         
-        # Seed initial readiness estimates based on diagnostic answers (mocking BKT priors)
-        # In a real demo, if they answered correctly we seed 0.8, else 0.15
         from app.services.path_planner import update_bkt_score
-        # For demo purposes, mark Python Basics as mastered
-        await update_bkt_score(session.profile_id, "python_basics", is_correct=True, db=db)
-        await update_bkt_score(session.profile_id, "sql_basics", is_correct=False, db=db)
+        
+        # Grade the history of answers against the question bank
+        stmt_assessments = select(AssessmentItem)
+        items = (await db.execute(stmt_assessments)).scalars().all()
+        for t in turns:
+            prompt_data = json.loads(t.prompt)
+            target_skill = prompt_data.get("target_skill")
+            if target_skill and t.response:
+                # find correct answer
+                is_correct = False
+                for item in items:
+                    content = json.loads(item.content)
+                    if content.get("target_skill") == target_skill:
+                        is_correct = (content.get("correct_answer") == t.response)
+                        break
+                await update_bkt_score(session.profile_id, target_skill, is_correct=is_correct, db=db)
         
         # Trigger initial path generation
         path_version = await generate_or_replan_path(
@@ -385,12 +414,30 @@ async def submit_diagnostic_answer(
             "path": formatted_path
         }
     else:
-        # Generate next question
+        # Generate next question from question bank (avoiding repeats)
         history = [{"question": json.loads(t.prompt), "answer": t.response} for t in turns]
-        next_turn_data = await ai_provider.conduct_diagnostic(
-            context="Backend Software Engineer Goal",
-            history=history
-        )
+        asked_skills = [h["question"].get("target_skill") for h in history if "target_skill" in h["question"]]
+        
+        stmt = select(AssessmentItem)
+        items = (await db.execute(stmt)).scalars().all()
+        
+        next_turn_data = {
+            "question_id": "q_fallback",
+            "question_text": "Do you have prior experience with web app APIs?",
+            "options": ["Yes", "No"],
+            "target_skill": "http_fundamentals"
+        }
+        for item in items:
+            content = json.loads(item.content)
+            target = content.get("target_skill")
+            if target and target not in asked_skills:
+                next_turn_data = {
+                    "question_id": f"q_{item.id}",
+                    "question_text": content.get("question"),
+                    "options": content.get("options", []),
+                    "target_skill": target
+                }
+                break
         
         next_turn = DiagnosticTurn(
             session_id=session.id,

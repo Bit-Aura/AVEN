@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathStore } from '../store/usePathStore';
-import { ShieldCheck, X, Sparkles, CheckCircle2, Lock, ArrowRight, Activity } from 'lucide-react';
+import { ShieldCheck, X, Sparkles, CheckCircle2, Lock, ArrowRight, Activity, AlertTriangle } from 'lucide-react';
 
 export default function TrustPanel() {
   // All hooks MUST be called at top before any conditional returns
@@ -88,10 +88,23 @@ export default function TrustPanel() {
               <Sparkles size={13} className="text-indigo-400" />
               <span>Grounded Decision Trace</span>
             </div>
-            <div className="p-4 rounded-xl bg-surface-secondary/40 border border-border text-xs text-slate-300 leading-relaxed">
-              PathFinder computes prerequisite paths deterministically through Neo4j topological sorting. Active focus is placed strictly on the nearest unmastered node to maximize velocity.
+            <div className="p-4 rounded-xl bg-surface-secondary/40 border border-border text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
+              {usePathStore.getState().pathExplanation || 
+                (usePathStore.getState().activePathPlan?.decision_trace?.explanation || 
+                "PathFinder computes prerequisite paths deterministically through Neo4j topological sorting. Active focus is placed strictly on the nearest unmastered node to maximize velocity.")}
             </div>
           </div>
+
+          {/* Time Budget Reality Check */}
+          {usePathStore.getState().activePathPlan?.decision_trace?.time_budget_warning && (
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs mt-4">
+              <div className="font-bold flex items-center gap-1.5 mb-1 text-amber-400 uppercase tracking-wider">
+                <AlertTriangle size={13} />
+                Time Budget Warning
+              </div>
+              <p>The projected time to complete this path ({usePathStore.getState().activePathPlan?.decision_trace?.estimated_hours} hrs) exceeds your requested timeline. Consider negotiating scope or increasing weekly hours.</p>
+            </div>
+          )}
 
           {/* Milestone Status Breakdown */}
           <div className="space-y-2.5">

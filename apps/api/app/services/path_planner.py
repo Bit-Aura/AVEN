@@ -407,9 +407,11 @@ async def generate_or_replan_path(
             total_duration_minutes += 60.0 # Default 1 hr if unseeded
 
     estimated_hours = round(total_duration_minutes / 60.0, 1)
-    weekly_study_hours = 10.0 # 10 hours per week average learner commitment
+    weekly_study_hours = profile.last_known_weekly_hours if profile.last_known_weekly_hours and profile.last_known_weekly_hours > 0 else 10.0
     estimated_weeks = round(estimated_hours / weekly_study_hours, 1)
-    time_budget_warning = estimated_hours > 30.0 # Warning if total exceeds target budget
+    # A standard bootcamp is about 12 weeks. If their pace takes more than 24 weeks (6 months) for a short path, warn them.
+    # Alternatively, if they have a very constrained budget (e.g. 5 hours) and 400 hours path.
+    time_budget_warning = estimated_weeks > 24.0
     
     # 8. Save and return new immutable PathVersion
     parent_stmt = select(PathVersion).where(PathVersion.profile_id == profile_id).order_by(PathVersion.created_at.desc())

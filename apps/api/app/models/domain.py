@@ -46,6 +46,7 @@ class LearnerProfile(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
     current_context: Mapped[Optional[str]] = mapped_column(Text)
+    last_known_weekly_hours: Mapped[float] = mapped_column(Float, default=10.0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     
     user: Mapped["User"] = relationship(back_populates="profile")
