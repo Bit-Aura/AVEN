@@ -117,61 +117,43 @@ def generate_proof_card_svg(card: Dict[str, Any]) -> str:
     count = card.get("skills_mastered_count", 0)
 
     svg = f"""<svg width="600" height="340" viewBox="0 0 600 340" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0F172A" />
-      <stop offset="50%" stop-color="#1E293B" />
-      <stop offset="100%" stop-color="#090D16" />
-    </linearGradient>
-    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#38BDF8" />
-      <stop offset="50%" stop-color="#818CF8" />
-      <stop offset="100%" stop-color="#C084FC" />
-    </linearGradient>
-    <filter id="glow" x="-10%" y="-10%" width="120%" height="120%">
-      <feGaussianBlur stdDeviation="12" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
-  </defs>
-
   <!-- Background Card Container -->
-  <rect x="8" y="8" width="584" height="324" rx="20" fill="url(#bgGrad)" stroke="url(#glowGrad)" stroke-width="2.5" />
+  <rect x="8" y="8" width="584" height="324" rx="24" fill="#faf9f5" stroke="#141413" stroke-width="2" stroke-opacity="0.1" />
+  <rect x="20" y="20" width="560" height="300" rx="16" fill="#faf9f5" stroke="#141413" stroke-width="1" stroke-opacity="0.1" />
 
   <!-- Verified Seal Badge Icon -->
   <g transform="translate(480, 32)">
-    <circle cx="28" cy="28" r="26" fill="#1E293B" stroke="#38BDF8" stroke-width="2" />
-    <path d="M20 28L26 34L36 22" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <rect x="0" y="0" width="56" height="56" rx="16" fill="#e8e6dc" stroke="#141413" stroke-width="1" stroke-opacity="0.1" />
+    <path d="M18 28L24 34L38 20" stroke="#141413" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
   </g>
 
   <!-- Header & Brand -->
-  <text x="36" y="48" fill="#38BDF8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">CAREER PATHFINDER</text>
-  <text x="36" y="68" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" letter-spacing="0.5">VERIFIED PROOF OF READINESS</text>
+  <text x="44" y="56" fill="#141413" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" font-weight="900" letter-spacing="1.5">CRYPTOGRAPHIC PROOF</text>
+  <text x="44" y="74" fill="#3d3d3a" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="10" font-weight="800" letter-spacing="1.5">VERIFIABLE CREDENTIAL</text>
 
   <!-- Role Title -->
-  <text x="36" y="125" fill="#F8FAFC" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800">{role}</text>
+  <text x="44" y="125" fill="#141413" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="28" font-weight="900" letter-spacing="-0.5">{role}</text>
 
   <!-- Metrics Grid -->
   <!-- Readiness Score Box -->
-  <rect x="36" y="150" width="160" height="70" rx="12" fill="#0F172A" stroke="#334155" stroke-width="1.2" />
-  <text x="52" y="175" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11">READINESS INDEX</text>
-  <text x="52" y="206" fill="#38BDF8" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="800">{score_pct}</text>
+  <rect x="44" y="150" width="160" height="70" rx="12" fill="#e8e6dc" stroke="#141413" stroke-width="1" stroke-opacity="0.1" />
+  <text x="124" y="175" text-anchor="middle" fill="#3d3d3a" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="900" letter-spacing="1.5">READINESS</text>
+  <text x="124" y="206" text-anchor="middle" fill="#141413" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="26" font-weight="900" letter-spacing="-1">{score_pct}</text>
 
   <!-- Mastered Skills Box -->
-  <rect x="212" y="150" width="160" height="70" rx="12" fill="#0F172A" stroke="#334155" stroke-width="1.2" />
-  <text x="228" y="175" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11">VERIFIED GATES</text>
-  <text x="228" y="206" fill="#818CF8" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="800">{count} Skills</text>
+  <rect x="220" y="150" width="160" height="70" rx="12" fill="#e8e6dc" stroke="#141413" stroke-width="1" stroke-opacity="0.1" />
+  <text x="300" y="175" text-anchor="middle" fill="#3d3d3a" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="900" letter-spacing="1.5">VERIFIED SKILLS</text>
+  <text x="300" y="206" text-anchor="middle" fill="#141413" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="26" font-weight="900" letter-spacing="-1">{count}</text>
 
   <!-- Status Box -->
-  <rect x="388" y="150" width="176" height="70" rx="12" fill="#0F172A" stroke="#334155" stroke-width="1.2" />
-  <text x="404" y="175" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11">VERIFICATION STATUS</text>
-  <text x="404" y="206" fill="#34D399" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="18" font-weight="700">AUTHENTIC</text>
-
-  <!-- Divider line -->
-  <line x1="36" y1="245" x2="564" y2="245" stroke="#334155" stroke-width="1" />
+  <rect x="396" y="150" width="160" height="70" rx="12" fill="#141413" stroke="#141413" stroke-width="1" />
+  <text x="476" y="175" text-anchor="middle" fill="#faf9f5" fill-opacity="0.7" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="900" letter-spacing="1.5">VERIFICATION</text>
+  <text x="476" y="206" text-anchor="middle" fill="#faf9f5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="900" letter-spacing="0.5">AUTHENTIC</text>
 
   <!-- Cryptographic Signature and Verification Metadata -->
-  <text x="36" y="272" fill="#64748B" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="11">ID: {cred_id} | DATE: {date_str}</text>
-  <text x="36" y="292" fill="#64748B" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="10">HMAC-SHA256 SIG: {sig_short}</text>
-  <text x="420" y="282" fill="#38BDF8" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600">PATHFINDER VERIFIED</text>
+  <rect x="44" y="245" width="512" height="50" rx="12" fill="#3d3d3a" stroke="#141413" stroke-width="1" stroke-opacity="0.2" />
+  <text x="60" y="265" fill="#faf9f5" fill-opacity="0.7" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="9" font-weight="800">ID: {cred_id} | DATE: {date_str}</text>
+  <text x="60" y="282" fill="#faf9f5" font-family="-apple-system, BlinkMacSystemFont, monospace" font-size="10" font-weight="800">SIG: {sig_short}</text>
+  <text x="430" y="275" fill="#faf9f5" fill-opacity="0.5" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="900" letter-spacing="1.5">EIKG CORE</text>
 </svg>"""
     return svg
