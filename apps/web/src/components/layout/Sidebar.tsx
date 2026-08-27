@@ -14,9 +14,10 @@ import {
   BrainCircuit,
   Users,
   Inbox,
-  Calendar,
   LogOut,
   UserCheck,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { useClerk } from '@clerk/nextjs';
 import { usePathStore } from '../../store/usePathStore';
@@ -27,6 +28,8 @@ export default function Sidebar() {
   const pathname = usePathname();
   const targetRole = usePathStore((state) => state.targetRole);
   const readinessScore = usePathStore((state) => state.readinessScore);
+  const isSidebarOpen = usePathStore((state) => state.isSidebarOpen);
+  const toggleSidebar = usePathStore((state) => state.toggleSidebar);
   const { user, isLoaded } = useSafeUser();
 
   let clerkInstance: any = null;
@@ -132,95 +135,113 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-surface border-r border-border flex flex-col shrink-0 min-h-screen select-none">
-      {/* Brand Header */}
-      <div className="h-16 px-6 border-b border-border flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-glow-indigo">
-          <BrainCircuit className="text-white" size={20} />
-        </div>
-        <div>
-          <span className="font-extrabold text-white tracking-tight text-lg">PathFinder</span>
-          <span className="ml-1.5 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-            AVEN
-          </span>
-        </div>
+    <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} transition-all duration-300 ease-in-out bg-[#3d3d3a] flex flex-col shrink-0 min-h-screen select-none`}>
+      <div className={`h-16 border-b border-[#141413]/20 flex items-center ${isSidebarOpen ? 'px-4 justify-between' : 'px-0 justify-center cursor-pointer hover:bg-[#faf9f5]/10 transition-colors'}`} onClick={!isSidebarOpen ? toggleSidebar : undefined}>
+        {isSidebarOpen ? (
+          <div className="flex items-center gap-2 overflow-hidden">
+            <div className="w-8 h-8 shrink-0 rounded bg-[#faf9f5] flex items-center justify-center border border-[#faf9f5]">
+              <BrainCircuit className="text-[#141413]" size={18} />
+            </div>
+            <div className="flex items-center overflow-hidden">
+              <span className="font-black text-[#faf9f5] uppercase tracking-wider text-sm truncate">PathFinder</span>
+              <span className="ml-1.5 shrink-0 text-[9px] uppercase font-black px-1 py-0.5 rounded bg-[#3d3d3a] text-[#faf9f5] border border-[#3d3d3a]">
+                AVEN
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="w-8 h-8 rounded bg-[#faf9f5] flex items-center justify-center border border-[#faf9f5]">
+            <BrainCircuit className="text-[#141413]" size={18} />
+          </div>
+        )}
+        
+        {isSidebarOpen && (
+          <button 
+            onClick={toggleSidebar}
+            className="w-8 h-8 shrink-0 rounded flex items-center justify-center text-[#faf9f5]/70 hover:text-[#faf9f5] hover:bg-[#faf9f5]/10 transition-colors ml-1"
+            title="Collapse Sidebar"
+          >
+            <ChevronLeft size={20} />
+          </button>
+        )}
       </div>
 
       {/* Target Role Context Banner (For Learners) or Role Identity Banner (Mentors/Admins) */}
-      <div className="p-4 mx-3 my-3 rounded-xl bg-surface-secondary/50 border border-border/80">
+      {isSidebarOpen && (
+        <div className="p-4 mx-3 my-3 rounded bg-[#e8e6dc] border border-[#d6d3c4]">
         <div className="flex items-center justify-between">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          <div className="text-[10px] font-black text-[#3d3d3a]/80 uppercase tracking-wider">
             {userRole === 'ADMIN' ? 'Platform Control' : userRole === 'MENTOR' ? 'Mentor Mode' : 'Target Role'}
           </div>
           <span
-            className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)] flex items-center gap-1"
+            className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-[#3d3d3a] text-[#faf9f5] border border-[#3d3d3a] flex items-center gap-1"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#faf9f5] animate-pulse" />
             {userRole === 'ADMIN' ? 'Administrator' : userRole === 'MENTOR' ? 'Mentor' : 'Learner'}
           </span>
         </div>
 
         {userRole === 'LEARNER' ? (
           <>
-            <div className="text-sm font-bold text-white truncate mt-1">{targetRole}</div>
+            <div className="text-sm font-black text-[#141413] uppercase tracking-tight truncate mt-1">{targetRole}</div>
             <div className="mt-2.5 flex items-center justify-between text-xs">
-              <span className="text-slate-400">Readiness</span>
-              <span className="font-bold text-emerald-400">{readinessScore}%</span>
+              <span className="text-[10px] text-[#3d3d3a]/80 uppercase font-bold tracking-widest">Readiness</span>
+              <span className="font-black text-[#141413]">{readinessScore}%</span>
             </div>
-            <div className="w-full h-1.5 bg-surface rounded-full mt-1.5 overflow-hidden">
+            <div className="w-full h-2 bg-[#d6d3c4] rounded mt-2 border border-[#d6d3c4] overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-700" 
+                className="h-full bg-[#3d3d3a] transition-all duration-700" 
                 style={{ width: `${Math.max(readinessScore, 5)}%` }} 
               />
             </div>
           </>
         ) : (
-          <div className="text-xs font-semibold text-slate-300 mt-1">
+          <div className="text-xs font-bold text-[#3d3d3a]/80 mt-1">
             {userRole === 'ADMIN'
               ? 'Full platform administration, user & mentor governance active.'
               : 'Assigned 1-on-1 human guidance & session operations active.'}
           </div>
         )}
       </div>
+      )}
 
       {/* Navigation Links */}
-      <nav className="flex-1 px-3 space-y-6 overflow-y-auto pt-2">
+      <nav className={`flex-1 overflow-y-auto pt-2 ${isSidebarOpen ? 'px-3' : 'px-2'}`}>
         {navigationGroups.map((group) => (
-          <div key={group.title}>
-            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">
-              {group.title}
-            </div>
-            <div className="space-y-1">
+          <div key={group.title} className={isSidebarOpen ? '' : 'flex flex-col items-center'}>
+            {isSidebarOpen ? (
+              <div className="px-3 text-[10px] font-black uppercase tracking-widest text-[#87867f] mb-3 mt-4">
+                {group.title}
+              </div>
+            ) : (
+              <div className="h-px w-8 bg-[#87867f]/30 my-4" />
+            )}
+            <div className={`space-y-1 ${isSidebarOpen ? '' : 'w-full flex flex-col items-center'}`}>
               {group.items.map((item) => {
-                const isActive = pathname === item.href || (item.href !== '/mentor' && item.href !== '/admin' && pathname.startsWith(item.href + '/'));
+                const isActive = pathname === item.href || (item.href !== '/learner' && item.href !== '/mentor' && item.href !== '/admin' && pathname.startsWith(item.href + '/'));
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
+                    title={isSidebarOpen ? undefined : item.name}
+                    className={`flex items-center ${isSidebarOpen ? 'px-3' : 'justify-center w-12'} py-2.5 rounded text-xs font-bold uppercase tracking-widest transition-all group ${
                       isActive 
-                        ? 'bg-brand-500/10 text-brand-400' 
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-surface-secondary/50'
+                        ? 'bg-[#e8e6dc] text-[#141413]' 
+                        : 'text-[#faf9f5]/70 hover:text-[#141413] hover:bg-[#e8e6dc]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <item.icon 
-                        size={16} 
-                        className={isActive ? 'text-brand-400' : 'text-slate-500 group-hover:text-slate-400'} 
+                        size={isSidebarOpen ? 16 : 20} 
+                        className={isActive ? 'text-[#141413]' : 'text-[#faf9f5]/70 group-hover:text-[#141413]'} 
                       />
-                      <span>{item.name}</span>
+                      {isSidebarOpen && <span>{item.name}</span>}
                     </div>
-                    {item.badge && (
-                      <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded ${
+                    {isSidebarOpen && item.badge && (
+                      <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded font-black ml-3 transition-colors ${
                         isActive 
-                          ? 'bg-brand-500/20 text-brand-300' 
-                          : item.badge === 'Live' 
-                          ? 'bg-rose-500/20 text-rose-400'
-                          : item.badge === 'Sprint'
-                          ? 'bg-white/20 text-white' 
-                          : item.badge === 'Master'
-                          ? 'bg-rose-500/20 text-rose-400'
-                          : 'bg-surface-tertiary text-slate-400'
+                          ? 'bg-[#3d3d3a] text-[#faf9f5] border border-[#3d3d3a]' 
+                          : 'bg-[#faf9f5]/10 text-[#faf9f5] border border-[#faf9f5]/20 group-hover:bg-[#3d3d3a] group-hover:text-[#faf9f5] group-hover:border-[#3d3d3a]'
                       }`}>
                         {item.badge}
                       </span>
@@ -234,29 +255,31 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom Profile & Sign Out Bar */}
-      <div className="p-4 border-t border-border bg-surface-secondary/20 flex items-center justify-between">
-        <div className="flex items-center gap-2.5 overflow-hidden">
+      <div className={`p-4 border-t border-[#141413]/20 bg-[#3d3d3a] flex ${isSidebarOpen ? 'items-center justify-between' : 'flex-col items-center gap-4'}`}>
+        <div className={`flex items-center gap-2.5 overflow-hidden ${!isSidebarOpen && 'justify-center'}`}>
           {isLoaded && user ? (
-            <SafeUserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 rounded-full" } }} />
+            <SafeUserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 rounded" } }} />
           ) : (
-            <div className="w-8 h-8 shrink-0 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-xs">
+            <div className="w-8 h-8 shrink-0 rounded bg-[#e8e6dc] flex items-center justify-center font-black text-[#141413] text-xs border border-[#e8e6dc]">
               {userInitials}
             </div>
           )}
-          <div className="overflow-hidden">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-white truncate max-w-[90px]">{userName}</span>
-              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-500/40 shadow-[0_0_8px_rgba(245,158,11,0.25)] shrink-0">
-                {userRole === 'ADMIN' ? 'Admin' : userRole === 'MENTOR' ? 'Mentor' : 'Learner'}
-              </span>
+          {isSidebarOpen && (
+            <div className="overflow-hidden">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black uppercase text-[#faf9f5] truncate max-w-[90px]">{userName}</span>
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-[#faf9f5]/10 text-[#faf9f5] border border-[#faf9f5]/20 shrink-0">
+                  {userRole === 'ADMIN' ? 'Admin' : userRole === 'MENTOR' ? 'Mentor' : 'Learner'}
+                </span>
+              </div>
+              <div className="text-[10px] font-bold text-[#faf9f5]/70 truncate">{userEmail}</div>
             </div>
-            <div className="text-[10px] text-slate-400 truncate">{userEmail}</div>
-          </div>
+          )}
         </div>
 
         <button
           onClick={handleSignOut}
-          className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+          className={`p-2 rounded text-[#faf9f5]/70 hover:text-[#141413] hover:bg-[#e8e6dc] transition-colors ${!isSidebarOpen && 'w-full flex justify-center'}`}
           title="Sign Out"
         >
           <LogOut size={15} />

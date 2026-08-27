@@ -64,6 +64,7 @@ interface PathState {
   simulatedConsequence: string | null;
   isTakingAssessment: boolean;
   isTrustPanelOpen: boolean;
+  isSidebarOpen: boolean;
   activeIdeNodeId: string | null;
   activeCoachNodeId: string | null;
   isOffline: boolean;
@@ -106,6 +107,7 @@ interface PathState {
   bypassMilestone: (nodeId: string, answer: string) => Promise<void>;
   completeMilestoneViaIde: (nodeId: string) => void;
   toggleTrustPanel: () => void;
+  toggleSidebar: () => void;
   openIde: (nodeId: string) => void;
   closeIde: () => void;
   openCoach: (nodeId: string) => void;
@@ -209,6 +211,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
   simulatedConsequence: null,
   isTakingAssessment: false,
   isTrustPanelOpen: false,
+  isSidebarOpen: true,
   activeIdeNodeId: null,
   activeCoachNodeId: null,
   isOffline: false,
@@ -586,6 +589,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
   }),
 
   toggleTrustPanel: () => set((state) => ({ isTrustPanelOpen: !state.isTrustPanelOpen })),
+  toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
   openIde: (nodeId) => set({ activeIdeNodeId: nodeId }),
   closeIde: () => set({ activeIdeNodeId: null }),
   openCoach: (nodeId) => set({ activeCoachNodeId: nodeId, coachMessages: [{ role: 'ai', text: `Hi! I'm your AI Coach. How can I assist you with "${nodeId.replace(/_/g, ' ')}"?` }] }),

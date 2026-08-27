@@ -1,17 +1,39 @@
 'use client';
 
-import { useState } from 'react';
-import { usePathStore } from '../../store/usePathStore';
-import { Target, TrendingUp, AlertCircle, ShieldAlert } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Target, X } from 'lucide-react';
 
-export default function CalibrationModal({ skillId, onComplete }: { skillId: string, onComplete: (confidence: number) => void }) {
+export default function CalibrationModal({ 
+  skillId, 
+  onComplete,
+  onClose
+}: { 
+  skillId: string; 
+  onComplete: (confidence: number) => void;
+  onClose: () => void;
+}) {
   const [confidence, setConfidence] = useState(50);
-  
-  return (
-    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-in fade-in">
-      <div className="bg-slate-900 border border-slate-700 shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95">
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in">
+      <div className="bg-slate-900 border border-slate-700 shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 relative">
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors z-10"
+        >
+          <X size={20} />
+        </button>
+
         <div className="p-6 border-b border-slate-800 bg-slate-950/50">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 pr-8">
             <Target className="text-indigo-400" size={24} />
             <h2 className="text-xl font-bold text-white">Pre-Assessment Calibration</h2>
           </div>
@@ -56,6 +78,7 @@ export default function CalibrationModal({ skillId, onComplete }: { skillId: str
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

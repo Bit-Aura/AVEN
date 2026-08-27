@@ -66,15 +66,15 @@ export default function LearnerMentorSessions() {
   return (
     <div className="space-y-6">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-surface border border-border shadow-glass">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-[#e8e6dc] border border-[#d6d3c4] rounded-xl">
         <div>
-          <div className="flex items-center gap-2">
-            <Users className="text-brand-400" size={18} />
-            <h2 className="text-base font-bold text-white tracking-tight">
+          <div className="flex items-center gap-3">
+            <Users className="text-[#141413]" size={20} />
+            <h2 className="text-lg font-black text-[#141413] tracking-tight uppercase">
               My 1-on-1 Mentor Sessions
             </h2>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[#3d3d3a] font-medium mt-1">
             Request expert guidance, join live Jitsi video meetings, and review post-session takeaways
           </p>
         </div>
@@ -83,23 +83,23 @@ export default function LearnerMentorSessions() {
           <button
             onClick={loadRequests}
             disabled={isLoading}
-            className="p-2 rounded-xl bg-surface-secondary border border-border text-slate-400 hover:text-white transition-colors"
+            className="p-2.5 rounded text-[#3d3d3a] hover:bg-[#d6d3c4] hover:text-[#141413] transition-colors"
             title="Refresh Sessions"
           >
-            <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+            <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={() => setIsRequestModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-glow-indigo transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#3d3d3a] hover:bg-[#141413] text-[#faf9f5] font-bold text-xs shadow-md transition-all uppercase tracking-widest border border-[#141413]"
           >
-            <Plus size={14} />
+            <Plus size={16} />
             <span>Request Mentor Session</span>
           </button>
         </div>
       </div>
 
       {errorMsg && (
-        <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
           <AlertCircle size={15} />
           <span>{errorMsg}</span>
         </div>
@@ -107,24 +107,24 @@ export default function LearnerMentorSessions() {
 
       {/* Sessions Grid / List */}
       {isLoading ? (
-        <div className="p-12 text-center bg-surface border border-border rounded-2xl">
-          <Loader2 className="animate-spin text-brand-400 mx-auto" size={28} />
-          <p className="text-xs text-slate-400 mt-2">Loading your mentor sessions...</p>
+        <div className="p-12 text-center bg-[#faf9f5] border border-[#d6d3c4] rounded-xl">
+          <Loader2 className="animate-spin text-[#141413] mx-auto" size={28} />
+          <p className="text-xs text-[#3d3d3a] mt-3 font-bold uppercase tracking-widest">Loading your mentor sessions...</p>
         </div>
       ) : requests.length === 0 ? (
-        <div className="p-12 text-center bg-surface border border-border rounded-2xl space-y-3">
-          <Users className="text-slate-500 mx-auto" size={32} />
+        <div className="p-12 text-center bg-[#faf9f5] border border-[#d6d3c4] rounded-xl space-y-4">
+          <Users className="text-[#3d3d3a] mx-auto" size={36} />
           <div>
-            <h3 className="text-sm font-bold text-white">No Mentor Sessions Requested Yet</h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+            <h3 className="text-base font-black text-[#141413] uppercase tracking-tight">No Mentor Sessions Requested Yet</h3>
+            <p className="text-sm text-[#3d3d3a] mt-2 max-w-lg mx-auto font-medium leading-relaxed">
               Whenever you feel stuck on a coding challenge, architecture problem, or interview topic, request a 1-on-1 human mentor session.
             </p>
           </div>
           <button
             onClick={() => setIsRequestModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-glow-indigo transition-all mt-2"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#3d3d3a] hover:bg-[#141413] text-[#faf9f5] font-bold text-xs shadow-md transition-all mt-4 uppercase tracking-widest border border-[#141413]"
           >
-            <Plus size={14} />
+            <Plus size={16} />
             <span>Request Your First Session</span>
           </button>
         </div>
@@ -140,57 +140,57 @@ export default function LearnerMentorSessions() {
             return (
               <div
                 key={session.id}
-                className="p-5 rounded-2xl bg-surface border border-border hover:border-border/80 transition-all shadow-glass flex flex-col justify-between space-y-4"
+                className="p-6 rounded-xl bg-[#faf9f5] border border-[#141413]/20 hover:border-[#141413]/40 transition-all flex flex-col justify-between space-y-4"
               >
                 <div>
                   {/* Status Badge & Duration */}
-                  <div className="flex items-center justify-between pb-2 border-b border-border/50">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#d6d3c4]">
                     <span
-                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
+                      className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${
                         isCompleted
-                          ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+                          ? 'bg-[#141413] text-[#faf9f5] border-[#141413]'
                           : isScheduled
-                          ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 animate-pulse'
+                          ? 'bg-[#3d3d3a] text-[#faf9f5] border-[#3d3d3a] animate-pulse'
                           : isAccepted
-                          ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+                          ? 'bg-[#e8e6dc] text-[#141413] border-[#141413]'
                           : isOpen
-                          ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30'
-                          : 'bg-slate-700/30 text-slate-400 border border-slate-700/50'
+                          ? 'bg-[#faf9f5] text-[#141413] border-[#141413] border-dashed'
+                          : 'bg-[#e8e6dc] text-[#3d3d3a] border-[#d6d3c4]'
                       }`}
                     >
                       {session.status}
                     </span>
 
-                    <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
-                      <Clock size={12} className="text-slate-400" />
-                      <span>{session.duration_minutes} mins</span>
+                    <div className="flex items-center gap-1.5 text-xs text-[#3d3d3a] font-bold">
+                      <Clock size={14} />
+                      <span>{session.duration_minutes} MINS</span>
                     </div>
                   </div>
 
                   {/* Title & Reason */}
-                  <div className="mt-3">
-                    <h3 className="text-sm font-bold text-white line-clamp-1">{session.title}</h3>
+                  <div className="mt-4">
+                    <h3 className="text-base font-black text-[#141413] uppercase tracking-tight line-clamp-1">{session.title}</h3>
                     {session.skill_id && (
-                      <span className="inline-block mt-1 px-2 py-0.5 rounded bg-surface-secondary text-slate-300 text-[10px] font-mono border border-border">
-                        Skill: {session.skill_id}
+                      <span className="inline-block mt-1.5 px-2 py-0.5 bg-[#e8e6dc] text-[#141413] text-[10px] font-bold uppercase tracking-widest border border-[#d6d3c4]">
+                        SKILL: {session.skill_id}
                       </span>
                     )}
-                    <p className="text-xs text-slate-300 mt-2 leading-relaxed line-clamp-2">
+                    <p className="text-sm text-[#3d3d3a] mt-3 leading-relaxed line-clamp-2 font-medium">
                       {session.description}
                     </p>
                   </div>
 
                   {/* Mentor Assigned Info */}
                   {session.mentor_name && (
-                    <div className="mt-3 p-2.5 rounded-xl bg-surface-secondary/70 border border-border flex items-center justify-between text-xs">
+                    <div className="mt-4 p-3 rounded-lg bg-[#e8e6dc] border border-[#d6d3c4] flex items-center justify-between text-xs">
                       <div>
-                        <div className="text-[10px] text-slate-400">Assigned Mentor:</div>
-                        <div className="font-semibold text-white">{session.mentor_name}</div>
+                        <div className="text-[10px] text-[#3d3d3a] font-bold uppercase tracking-widest">Assigned Mentor</div>
+                        <div className="font-black text-[#141413] mt-0.5">{session.mentor_name}</div>
                       </div>
                       {session.scheduled_at && (
                         <div className="text-right">
-                          <div className="text-[10px] text-slate-400">Scheduled:</div>
-                          <div className="font-semibold text-indigo-300 font-mono text-[11px]">
+                          <div className="text-[10px] text-[#3d3d3a] font-bold uppercase tracking-widest">Scheduled</div>
+                          <div className="font-black text-[#141413] mt-0.5">
                             {new Date(session.scheduled_at).toLocaleString([], {
                               month: 'short',
                               day: 'numeric',
@@ -205,25 +205,25 @@ export default function LearnerMentorSessions() {
 
                   {/* Completed Takeaways */}
                   {isCompleted && (session.mentor_notes || session.recommendations) && (
-                    <div className="mt-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-xs space-y-2">
+                    <div className="mt-4 p-4 rounded-lg bg-[#faf9f5] border border-[#141413] text-xs space-y-3">
                       {session.mentor_notes && (
                         <div>
-                          <div className="text-[10px] font-bold text-emerald-400 uppercase flex items-center gap-1">
-                            <FileText size={11} />
+                          <div className="text-[10px] font-black text-[#141413] uppercase tracking-widest flex items-center gap-1.5">
+                            <FileText size={12} />
                             <span>Mentor Takeaways</span>
                           </div>
-                          <p className="text-slate-300 text-[11px] mt-0.5 leading-relaxed">
+                          <p className="text-[#3d3d3a] text-xs mt-1 font-medium leading-relaxed">
                             {session.mentor_notes}
                           </p>
                         </div>
                       )}
                       {session.recommendations && (
                         <div>
-                          <div className="text-[10px] font-bold text-amber-400 uppercase flex items-center gap-1">
-                            <Lightbulb size={11} />
+                          <div className="text-[10px] font-black text-[#141413] uppercase tracking-widest flex items-center gap-1.5">
+                            <Lightbulb size={12} />
                             <span>Action Items</span>
                           </div>
-                          <p className="text-slate-300 text-[11px] mt-0.5 leading-relaxed">
+                          <p className="text-[#3d3d3a] text-xs mt-1 font-medium leading-relaxed">
                             {session.recommendations}
                           </p>
                         </div>
@@ -233,15 +233,15 @@ export default function LearnerMentorSessions() {
                 </div>
 
                 {/* Card Actions Footer */}
-                <div className="pt-3 border-t border-border flex items-center justify-between">
+                <div className="pt-4 border-t border-[#d6d3c4] flex items-center justify-between">
                   {isOpen && (
                     <>
-                      <span className="text-[11px] text-slate-400 italic">
-                        Waiting for mentor to accept...
+                      <span className="text-[10px] font-bold text-[#3d3d3a] uppercase tracking-widest italic">
+                        Waiting for mentor...
                       </span>
                       <button
                         onClick={() => handleCancel(session.id)}
-                        className="px-3 py-1 rounded-lg text-rose-400 hover:bg-rose-500/10 text-xs font-semibold transition-colors"
+                        className="px-3 py-1.5 rounded bg-[#faf9f5] border border-[#d6d3c4] text-[#141413] hover:border-red-500 hover:text-red-500 text-[10px] font-black uppercase tracking-widest transition-colors"
                       >
                         Cancel Request
                       </button>
@@ -250,12 +250,12 @@ export default function LearnerMentorSessions() {
 
                   {isAccepted && !session.scheduled_at && (
                     <>
-                      <span className="text-[11px] text-amber-300 font-medium">
-                        Mentor accepted! Setting up meeting time...
+                      <span className="text-[10px] font-bold text-[#141413] uppercase tracking-widest">
+                        Setting up meeting...
                       </span>
                       <button
                         onClick={() => handleCancel(session.id)}
-                        className="px-3 py-1 rounded-lg text-rose-400 hover:bg-rose-500/10 text-xs font-semibold transition-colors"
+                        className="px-3 py-1.5 rounded bg-[#faf9f5] border border-[#d6d3c4] text-[#141413] hover:border-red-500 hover:text-red-500 text-[10px] font-black uppercase tracking-widest transition-colors"
                       >
                         Cancel
                       </button>
@@ -264,28 +264,28 @@ export default function LearnerMentorSessions() {
 
                   {isScheduled && (
                     <div className="w-full flex items-center justify-between">
-                      <span className="text-[11px] text-indigo-300 flex items-center gap-1">
-                        <Calendar size={12} />
+                      <span className="text-[10px] font-bold text-[#141413] uppercase tracking-widest flex items-center gap-1.5">
+                        <Calendar size={14} />
                         <span>Ready to meet</span>
                       </span>
                       <button
                         onClick={() => handleJoinMeeting(session)}
-                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-glow-indigo transition-all"
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3d3d3a] hover:bg-[#141413] text-[#faf9f5] font-black text-xs uppercase tracking-widest border border-[#141413] transition-colors"
                       >
-                        <Video size={13} />
+                        <Video size={14} />
                         <span>Join Meeting</span>
                       </button>
                     </div>
                   )}
 
                   {isCompleted && (
-                    <div className="w-full text-right text-[11px] text-slate-500">
-                      Completed on {session.completed_at ? new Date(session.completed_at).toLocaleDateString() : 'N/A'}
+                    <div className="w-full text-right text-[10px] font-bold text-[#3d3d3a] uppercase tracking-widest">
+                      Completed {session.completed_at ? new Date(session.completed_at).toLocaleDateString() : ''}
                     </div>
                   )}
 
                   {isCancelled && (
-                    <div className="w-full text-right text-[11px] text-rose-400/80">
+                    <div className="w-full text-right text-[10px] font-bold text-red-500 uppercase tracking-widest">
                       Cancelled
                     </div>
                   )}

@@ -74,19 +74,19 @@ export default function RequestMentorModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-      <div className="bg-surface border border-border w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#141413]/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+      <div className="bg-[#faf9f5] border border-[#d6d3c4] w-full max-w-lg rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-border bg-surface-secondary/50 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-brand-500/10 border border-brand-500/30 text-brand-400">
+        <div className="px-6 py-4 border-b border-[#d6d3c4] bg-[#e8e6dc] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded bg-[#faf9f5] border border-[#d6d3c4] text-[#141413]">
               <Users size={16} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">
+              <h3 className="text-sm font-black text-[#141413] uppercase tracking-widest">
                 Request 1-on-1 Mentor Session
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] font-bold text-[#3d3d3a] mt-0.5">
                 Connect directly with a human industry mentor on your learning path
               </p>
             </div>
@@ -94,31 +94,31 @@ export default function RequestMentorModal({
 
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-surface transition-colors"
+            className="text-[#3d3d3a] hover:text-[#141413] p-1.5 rounded hover:bg-[#faf9f5] transition-colors"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Modal Body / Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+            <div className="p-3 rounded bg-red-50 border border-red-200 text-red-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
               <AlertCircle size={14} className="shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
+            <div className="p-3 rounded bg-green-50 border border-green-200 text-green-700 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
               <CheckCircle2 size={14} className="shrink-0" />
               <span>{successMsg}</span>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
-              Session Topic / Title <span className="text-rose-400">*</span>
+            <label className="block text-[10px] font-black text-[#141413] uppercase tracking-widest mb-1.5">
+              Session Topic / Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -126,58 +126,58 @@ export default function RequestMentorModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Debugging async queue timeouts & worker concurrency"
-              className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+              className="w-full bg-[#faf9f5] border border-[#d6d3c4] rounded px-3 py-2 text-xs text-[#141413] placeholder-[#a3a198] focus:outline-none focus:border-[#141413] focus:ring-0"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+              <label className="block text-[10px] font-black text-[#141413] uppercase tracking-widest mb-1.5">
                 Related Skill Identifier
               </label>
               <input
                 type="text"
                 value={skillId}
                 onChange={(e) => setSkillId(e.target.value)}
-                placeholder="e.g. async_python, postgres_indexing"
-                className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 font-mono"
+                placeholder="e.g. async_python"
+                className="w-full bg-[#faf9f5] border border-[#d6d3c4] rounded px-3 py-2 text-xs text-[#141413] placeholder-[#a3a198] focus:outline-none focus:border-[#141413] focus:ring-0 font-mono"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+              <label className="block text-[10px] font-black text-[#141413] uppercase tracking-widest mb-1.5">
                 Preferred Duration
               </label>
               <select
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500 cursor-pointer"
+                className="w-full bg-[#faf9f5] border border-[#d6d3c4] rounded px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#141413] focus:ring-0 cursor-pointer"
               >
-                <option value={15}>15 Minutes (Quick Clarification)</option>
-                <option value={30}>30 Minutes (Deep Dive / Code Review)</option>
-                <option value={45}>45 Minutes (Architecture & System Design)</option>
-                <option value={60}>60 Minutes (Full Mock Interview)</option>
+                <option value={15}>15 Minutes</option>
+                <option value={30}>30 Minutes</option>
+                <option value={45}>45 Minutes</option>
+                <option value={60}>60 Minutes</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
-              Why do you need human mentor help? <span className="text-rose-400">*</span>
+            <label className="block text-[10px] font-black text-[#141413] uppercase tracking-widest mb-1.5">
+              Why do you need human mentor help? <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               required
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="e.g. Stuck on deadlock concept despite AI explanations and failing unit tests"
-              className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+              placeholder="e.g. Stuck on deadlock concept..."
+              className="w-full bg-[#faf9f5] border border-[#d6d3c4] rounded px-3 py-2 text-xs text-[#141413] placeholder-[#a3a198] focus:outline-none focus:border-[#141413] focus:ring-0"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
-              Problem Description & What You Tried <span className="text-rose-400">*</span>
+            <label className="block text-[10px] font-black text-[#141413] uppercase tracking-widest mb-1.5">
+              Problem Description & What You Tried <span className="text-red-500">*</span>
             </label>
             <textarea
               required
@@ -185,22 +185,22 @@ export default function RequestMentorModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe the exact code behavior, error messages, and what hypothesis you've tested so far..."
-              className="w-full bg-surface-secondary border border-border rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+              className="w-full bg-[#faf9f5] border border-[#d6d3c4] rounded p-3 text-xs text-[#141413] placeholder-[#a3a198] focus:outline-none focus:border-[#141413] focus:ring-0"
             />
           </div>
 
-          <div className="pt-2 flex justify-end gap-3 border-t border-border">
+          <div className="pt-4 flex justify-end gap-3 border-t border-[#d6d3c4]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-surface border border-border text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+              className="px-4 py-2 rounded bg-[#faf9f5] border border-[#d6d3c4] text-[#141413] hover:border-[#141413] text-[10px] font-black uppercase tracking-widest transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !!successMsg}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white font-bold text-xs shadow-glow-indigo transition-all"
+              className="flex items-center gap-2 px-5 py-2 rounded bg-[#3d3d3a] hover:bg-[#141413] disabled:opacity-50 text-[#faf9f5] font-black text-[10px] uppercase tracking-widest shadow-sm transition-all"
             >
               {isSubmitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
               <span>Submit Request</span>

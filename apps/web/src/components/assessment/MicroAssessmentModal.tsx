@@ -105,7 +105,7 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
   };
 
   if (step === 'calibration') {
-    return <CalibrationModal skillId={skillId} onComplete={handleCalibrationComplete} />;
+    return <CalibrationModal skillId={skillId} onComplete={handleCalibrationComplete} onClose={onClose} />;
   }
 
   // Use API returned quadrant, or fallback to mock logic
@@ -115,8 +115,14 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
   const isMastery = quadrant === 'CALIBRATED_MASTERY' || (status === 'passed' && confidence >= 60);
   const isLearning = quadrant === 'CALIBRATED_NOVICE' || (status === 'failed' && confidence <= 70);
 
-  return (
-    <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  // Wrap in a portal or just ensure z-index since we already fixed it in CalibrationModal?
+  // Actually, let's wrap this in a portal as well.
+  if (typeof document === 'undefined') return null;
+
+  const { createPortal } = require('react-dom');
+
+  return createPortal(
+    <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
       <div className="bg-slate-900 border border-slate-700 shadow-2xl rounded-2xl w-full max-w-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
         
         {step === 'quiz' && (
@@ -255,6 +261,7 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

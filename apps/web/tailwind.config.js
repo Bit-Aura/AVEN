@@ -7,6 +7,11 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Anthropic Sans"', 'sans-serif'],
+        serif: ['"Anthropic Serif"', 'serif'],
+        mono: ['"Anthropic Mono"', '"JetBrains Mono"', 'monospace'],
+      },
       colors: {
         background: "#090d16",
         surface: {
