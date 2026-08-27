@@ -14,6 +14,8 @@ class SimulatorChatInput(BaseModel):
     profile_id: int = Field(..., description="User's profile ID")
     message: str = Field(..., description="User's message to the stakeholder")
     persona: str = Field(default="pm", description="pm | client")
+    chat_history: Optional[List[Dict[str, Any]]] = Field(default=[], description="Prior messages in this chat session")
+    ticket_context: Optional[Dict[str, Any]] = Field(default=None, description="Ticket metadata including title, description, acceptance criteria")
 
 class SimulatorChatResponse(BaseModel):
     persona: str = Field(..., description="The replying persona")
@@ -34,3 +36,5 @@ class SimulatorPRInput(BaseModel):
     profile_id: int = Field(..., description="User's profile ID")
     code_content: str = Field(..., description="The updated code written in the IDE")
     snapshots: List[Dict[str, Any]] = Field(default=[], description="Telemetry sequence collected by the IDE")
+    ticket_context: Optional[Dict[str, Any]] = Field(default=None, description="Ticket metadata including title, description, criteria")
+

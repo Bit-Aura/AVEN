@@ -1307,14 +1307,15 @@ async def get_tickets(
 @app.post("/api/v1/simulator/ticket/{ticket_id}/chat", response_model=SimulatorChatResponse)
 async def chat_with_stakeholder_endpoint(
     ticket_id: str,
-    data: SimulatorChatInput
+    data: SimulatorChatInput,
+    db: AsyncSession = Depends(get_db)
 ):
     """
     [Day-One Simulator] Sends a message to the AI PM or AI Client persona for ticket requirements.
     """
     from app.services.simulator import chat_with_stakeholder
     try:
-        response = await chat_with_stakeholder(ticket_id, data, ai_provider)
+        response = await chat_with_stakeholder(ticket_id, data, ai_provider, db=db)
         return response
     except Exception as e:
         logger.exception("Failed to chat with stakeholder")
