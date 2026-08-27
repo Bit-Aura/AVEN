@@ -347,6 +347,10 @@ export const generatePlacementPlan = async (payload: any) => {
   });
 };
 
+export const fetchPlacementCompanies = async () => {
+  return await fetchApi('/placement/companies');
+};
+
 export const generateMentorTriage = async (payload: any) => {
   return await fetchApi('/placement/triage', {
     method: 'POST',

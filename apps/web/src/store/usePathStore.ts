@@ -371,7 +371,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
         
         return {
           id: skillId,
-          position: { x: 250, y: idx * 120 + 50 },
+          position: { x: 250 + Math.sin(idx * Math.PI / 2) * 200, y: idx * 160 + 50 },
           data: { 
             label: formattedName,
             status: isCompleted ? 'completed' : isActive ? 'active' : 'locked',
@@ -387,8 +387,9 @@ export const usePathStore = create<PathState>()((set, get) => ({
           id: `e-${allSkills[i]}-${allSkills[i+1]}`,
           source: allSkills[i],
           target: allSkills[i+1],
+          type: 'smoothstep',
           animated: allSkills[i] === activeId,
-          style: { stroke: allSkills[i] === activeId ? '#6366f1' : '#334155', strokeWidth: 2 }
+          style: { stroke: allSkills[i] === activeId ? '#818cf8' : '#334155', strokeWidth: allSkills[i] === activeId ? 3 : 2 }
         });
       }
 
@@ -419,7 +420,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
       ];
       const nodes: Node[] = fallbackSkills.map((skillId, idx) => ({
         id: skillId,
-        position: { x: 250, y: idx * 120 + 50 },
+        position: { x: 250 + Math.sin(idx * Math.PI / 2) * 200, y: idx * 160 + 50 },
         data: {
           label: skillId.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
           status: idx === 0 ? 'active' : 'locked',
@@ -428,9 +429,9 @@ export const usePathStore = create<PathState>()((set, get) => ({
         type: 'custom'
       }));
       const edges: Edge[] = [
-        { id: 'e-1-2', source: fallbackSkills[0], target: fallbackSkills[1], animated: true, style: { stroke: '#6366f1', strokeWidth: 2 } },
-        { id: 'e-2-3', source: fallbackSkills[1], target: fallbackSkills[2], style: { stroke: '#334155', strokeWidth: 2 } },
-        { id: 'e-3-4', source: fallbackSkills[2], target: fallbackSkills[3], style: { stroke: '#334155', strokeWidth: 2 } },
+        { id: 'e-1-2', source: fallbackSkills[0], target: fallbackSkills[1], type: 'smoothstep', animated: true, style: { stroke: '#818cf8', strokeWidth: 3 } },
+        { id: 'e-2-3', source: fallbackSkills[1], target: fallbackSkills[2], type: 'smoothstep', style: { stroke: '#334155', strokeWidth: 2 } },
+        { id: 'e-3-4', source: fallbackSkills[2], target: fallbackSkills[3], type: 'smoothstep', style: { stroke: '#334155', strokeWidth: 2 } },
       ];
       set({
         nodes,

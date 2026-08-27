@@ -1190,6 +1190,17 @@ async def pivot_career_role(
     }
 
 
+@app.get("/api/v1/placement/companies")
+async def get_placement_companies():
+    """
+    Returns the dynamic list of company profiles tracked for placement drives.
+    """
+    from app.services.placement_engine import COMPANY_PROFILES
+    return [
+        {"id": key, "name": val["name"], "role": val.get("role", "Software Engineer")}
+        for key, val in COMPANY_PROFILES.items()
+    ]
+
 @app.post("/api/v1/placement/plan", response_model=PlacementPlanReport)
 async def generate_placement_sprint_plan(
     data: PlacementDriveInput,

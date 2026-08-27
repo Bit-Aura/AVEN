@@ -14,16 +14,16 @@ export default function SkillNode({ data, id }: { data: any; id: string }) {
   const isCompleted = data.status === 'completed';
   const isSkipped = isSimulatingSkip && activeMilestone?.id === id;
 
-  let containerClass = "px-4 py-3 rounded-xl border transition-all duration-300 min-w-[170px] bg-surface-secondary/80 text-slate-300 border-border shadow-card cursor-pointer hover:border-slate-500";
+  let containerClass = "px-4 py-3 rounded-xl border transition-all duration-300 min-w-[170px] bg-[#1e293b]/80 text-slate-400 border-[#334155] shadow-lg cursor-pointer hover:border-slate-400 opacity-80 scale-95";
   
   if (showHeatmap) {
-    containerClass = "px-4 py-3 rounded-xl border transition-all duration-300 min-w-[170px] bg-rose-950/30 border-rose-500/50 text-rose-200 shadow-glow-rose";
+    containerClass = "px-4 py-3 rounded-xl border transition-all duration-300 min-w-[170px] bg-rose-950/30 border-rose-500/50 text-rose-200 shadow-glow-rose scale-100";
   } else if (isSkipped) {
-    containerClass = "px-4 py-3 rounded-xl border transition-all duration-300 min-w-[170px] bg-slate-900/50 border-slate-700 text-slate-500 opacity-50";
+    containerClass = "px-4 py-3 rounded-xl border transition-all duration-300 min-w-[170px] bg-slate-900/50 border-slate-700 text-slate-600 opacity-40 scale-90";
   } else if (isCompleted) {
-    containerClass = "px-4 py-3 rounded-xl border transition-all duration-300 min-w-[170px] bg-emerald-950/30 border-emerald-500/50 text-emerald-200 shadow-glow-emerald";
+    containerClass = "px-4 py-3 rounded-xl border transition-all duration-300 min-w-[170px] bg-emerald-950/40 border-emerald-500/30 text-emerald-300 shadow-lg scale-95";
   } else if (isCurrentActive) {
-    containerClass = "px-4 py-3 rounded-xl border-2 transition-all duration-300 min-w-[170px] bg-brand-500/10 border-brand-500 text-white shadow-glow-indigo animate-pulse";
+    containerClass = "px-6 py-4 rounded-2xl border-2 transition-all duration-500 min-w-[200px] bg-brand-500/10 border-brand-500 text-white shadow-[0_0_40px_rgba(99,102,241,0.3)] scale-110 z-10 animate-pulse";
   }
 
   return (
