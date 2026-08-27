@@ -435,8 +435,15 @@ export const fetchLearnerSessionRequests = async () => {
   return await fetchApi('/mentor-connect/my-requests');
 };
 
-export const cancelSessionRequest = async (requestId: number) => {
-  return await fetchApi(`/mentor-connect/requests/${requestId}/cancel`, {
+const resolveId = (id: any): number => {
+  if (typeof id === 'object' && id !== null) {
+    return Number(id.id || id.requestId || 0);
+  }
+  return Number(id);
+};
+
+export const cancelSessionRequest = async (requestId: number | any) => {
+  return await fetchApi(`/mentor-connect/requests/${resolveId(requestId)}/cancel`, {
     method: 'POST',
   });
 };
@@ -445,17 +452,17 @@ export const fetchOpenMentorRequests = async () => {
   return await fetchApi('/mentor-connect/open-requests');
 };
 
-export const acceptMentorRequest = async (requestId: number) => {
-  return await fetchApi(`/mentor-connect/requests/${requestId}/accept`, {
+export const acceptMentorRequest = async (requestId: number | any) => {
+  return await fetchApi(`/mentor-connect/requests/${resolveId(requestId)}/accept`, {
     method: 'POST',
   });
 };
 
 export const scheduleMentorSession = async (
-  requestId: number,
+  requestId: number | any,
   payload: { scheduled_at: string; duration_minutes: number }
 ) => {
-  return await fetchApi(`/mentor-connect/requests/${requestId}/schedule`, {
+  return await fetchApi(`/mentor-connect/requests/${resolveId(requestId)}/schedule`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });
@@ -466,24 +473,32 @@ export const fetchMentorAssignedSessions = async (statusFilter?: string) => {
   return await fetchApi(`/mentor-connect/mentor-sessions${query}`);
 };
 
-export const startMentorSession = async (requestId: number) => {
-  return await fetchApi(`/mentor-connect/requests/${requestId}/start`, {
+export const startMentorSession = async (requestId: number | any) => {
+  return await fetchApi(`/mentor-connect/requests/${resolveId(requestId)}/start`, {
     method: 'POST',
   });
 };
 
 export const completeMentorSession = async (
-  requestId: number,
+  requestId: number | any,
   payload: { mentor_notes: string; recommendations?: string }
 ) => {
-  return await fetchApi(`/mentor-connect/requests/${requestId}/complete`, {
+  return await fetchApi(`/mentor-connect/requests/${resolveId(requestId)}/complete`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });
 };
 
-export const fetchSessionDetail = async (requestId: number) => {
-  return await fetchApi(`/mentor-connect/requests/${requestId}`);
+export const fetchSessionDetail = async (requestId: number | any) => {
+  return await fetchApi(`/mentor-connect/requests/${resolveId(requestId)}`);
+};
+
+export const fetchLearnerIntel = async (profileId: number) => {
+  return await fetchApi(`/mentor-connect/learner-intel/${profileId}`);
+};
+
+export const fetchMentorLearners = async () => {
+  return await fetchApi('/mentor-connect/learners');
 };
 
 export const checkRoadmapSanity = async (payload: any) => {

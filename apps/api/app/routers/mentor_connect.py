@@ -31,6 +31,12 @@ from app.models.domain import (
     LearnerProfile,
     ReadinessSnapshot,
     MentorSessionRequest,
+    Goal,
+    PathVersion,
+    AssessmentAttempt,
+    AssessmentItem,
+    MockInterviewSession,
+    AiCoachEscalation,
 )
 
 logger = logging.getLogger(__name__)
@@ -586,3 +592,355 @@ async def get_session_request_detail(
 
     include_meeting = (is_owner_learner or is_assigned_mentor or is_admin) and (req.status in ("SCHEDULED", "IN_PROGRESS", "COMPLETED"))
     return await _serialize_session_request(req, db, include_meeting_details=include_meeting)
+
+
+# ---------------------------------------------------------------------------
+# Learner 360° Knowledge & Graph Position Intel Endpoint
+# ---------------------------------------------------------------------------
+
+class SkillGraphNodeIntel(BaseModel):
+    id: str
+    name: str
+    description: Optional[str] = None
+    readiness_score: float
+    status: str  # 'MASTERED' | 'IN_PROGRESS' | 'LAGGING' | 'NOT_STARTED'
+    is_frontier: bool = False
+    prerequisites: List[str] = []
+
+class LearnerActivityItem(BaseModel):
+    activity_type: str  # 'ASSESSMENT' | 'INTERVIEW' | 'AI_ESCALATION'
+    title: str
+    score: Optional[float] = None
+    status: str
+    detail: Optional[str] = None
+    timestamp: str
+
+class MentorActionableBrief(BaseModel):
+    executive_summary: str
+    current_blocker: str
+    root_cause_analysis: str
+    suggested_talking_points: List[str]
+    recommended_next_milestone: str
+
+class LearnerDirectoryItem(BaseModel):
+    profile_id: int
+    user_id: int
+    name: str
+    email: str
+    target_role: str
+    readiness_pct: float
+    status: str
+    has_open_request: bool = False
+    open_request_id: Optional[int] = None
+    open_request_title: Optional[str] = None
+    open_request_reason: Optional[str] = None
+
+class LearnerDirectoryResponse(BaseModel):
+    learners: List[LearnerDirectoryItem]
+
+class Learner360IntelResponse(BaseModel):
+    profile_id: int
+    user_id: int
+    name: str
+    email: str
+    weekly_hours: float
+    created_at: str
+    
+    # Goal & Career Target
+    target_role: str
+    goal_description: Optional[str] = None
+    target_timeline_weeks: int
+    
+    # Graph Position & Mastery
+    overall_readiness_pct: float
+    total_skills_count: int
+    mastered_count: int
+    in_progress_count: int
+    lagging_count: int
+    current_frontier_skill: Optional[str] = None
+    
+    # Skill Graph Nodes
+    graph_nodes: List[SkillGraphNodeIntel]
+    
+    # Activity & Diagnostics
+    recent_activities: List[LearnerActivityItem]
+    
+    # Actionable Mentor Brief
+    mentor_brief: MentorActionableBrief
+
+
+@router.get("/learner-intel/{profile_id}", response_model=Learner360IntelResponse)
+async def get_learner_360_intel(
+    profile_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_approved_mentor),
+):
+    """
+    Comprehensive Learner 360° Knowledge & Graph Position Inspector.
+    Provides the mentor with complete visibility into the learner's:
+    1. Active Career Goal & Target Role.
+    2. Exact position and frontier node on the Neo4j Skill Graph.
+    3. Mastered vs. In-Progress vs. Lagging/Stuck skills with BKT scores.
+    4. Assessment attempts, sandbox coding verdicts, and AI mock interview gaps.
+    5. Actionable synthesized mentor briefing for targeted 1-on-1 guidance.
+    """
+    # 1. Fetch Profile & User
+    stmt_prof = (
+        select(LearnerProfile)
+        .where(LearnerProfile.id == profile_id)
+        .options(selectinload(LearnerProfile.user))
+    )
+    profile = (await db.execute(stmt_prof)).scalars().first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Learner profile not found.")
+
+    user = profile.user
+    learner_name = user.name if user and user.name else f"Learner #{profile.id}"
+    learner_email = user.email if user and user.email else f"learner{profile.id}@aven.internal"
+
+    # 2. Fetch Active Goal
+    stmt_goal = select(Goal).where(Goal.profile_id == profile_id).order_by(desc(Goal.created_at))
+    goal = (await db.execute(stmt_goal)).scalars().first()
+    target_role = goal.title if goal and goal.title else "Backend Software Engineer"
+    goal_desc = goal.description if goal else "Master production-grade engineering principles and interview standards."
+
+    # 3. Fetch Readiness Snapshots (BKT scores)
+    stmt_snaps = select(ReadinessSnapshot).where(ReadinessSnapshot.profile_id == profile_id)
+    snapshots = {s.skill_id: s.readiness_score for s in (await db.execute(stmt_snaps)).scalars().all()}
+
+    # 4. Fetch Active PathVersion (DAG nodes)
+    stmt_path = select(PathVersion).where(PathVersion.profile_id == profile_id).order_by(desc(PathVersion.created_at))
+    path_version = (await db.execute(stmt_path)).scalars().first()
+
+    # Build canonical skill list for target role
+    from app.services.seeder import SKILLS_SEED
+    curated_skills = SKILLS_SEED if SKILLS_SEED else []
+    
+    graph_nodes: List[SkillGraphNodeIntel] = []
+    mastered_count = 0
+    in_progress_count = 0
+    lagging_count = 0
+    current_frontier = None
+
+    for skill in curated_skills:
+        s_id = skill["id"]
+        s_name = skill["name"]
+        score = snapshots.get(s_id, 0.0)
+        prereqs = skill.get("prereqs", [])
+
+        # Check prerequisite completion
+        prereqs_met = all(snapshots.get(p, 0.0) >= 0.70 for p in prereqs)
+
+        if score >= 0.70:
+            status_str = "MASTERED"
+            mastered_count += 1
+        elif score >= 0.30:
+            status_str = "IN_PROGRESS"
+            in_progress_count += 1
+            if not current_frontier and prereqs_met:
+                current_frontier = s_id
+        elif score > 0.0:
+            status_str = "LAGGING"
+            lagging_count += 1
+            if not current_frontier and prereqs_met:
+                current_frontier = s_id
+        else:
+            status_str = "NOT_STARTED"
+            if not current_frontier and prereqs_met:
+                current_frontier = s_id
+
+        is_front = (current_frontier == s_id)
+
+        graph_nodes.append(SkillGraphNodeIntel(
+            id=s_id,
+            name=s_name,
+            description=skill.get("description", ""),
+            readiness_score=round(score * 100, 1),
+            status=status_str,
+            is_frontier=is_front,
+            prerequisites=prereqs,
+        ))
+
+    # Overall readiness calculation
+    total_skills = len(graph_nodes) if graph_nodes else 1
+    total_score = sum(snapshots.get(n.id, 0.0) for n in graph_nodes)
+    overall_readiness_pct = round((total_score / total_skills) * 100, 1)
+
+    # 5. Fetch Recent Assessment Attempts
+    stmt_attempts = (
+        select(AssessmentAttempt)
+        .where(AssessmentAttempt.profile_id == profile_id)
+        .options(selectinload(AssessmentAttempt.assessment_item))
+        .order_by(desc(AssessmentAttempt.attempted_at))
+        .limit(6)
+    )
+    attempts = (await db.execute(stmt_attempts)).scalars().all()
+
+    recent_activities: List[LearnerActivityItem] = []
+    for att in attempts:
+        title = att.assessment_item.title if att.assessment_item else "Skill Assessment Checkpoint"
+        recent_activities.append(LearnerActivityItem(
+            activity_type="ASSESSMENT",
+            title=title,
+            score=round(att.score * 100, 1) if att.score is not None else None,
+            status="PASSED" if att.is_correct else "NEEDS_PRACTICE",
+            detail=f"Checkpoint attempt scored {round(att.score * 100, 1) if att.score is not None else 0}%",
+            timestamp=att.attempted_at.isoformat() if att.attempted_at else datetime.now(timezone.utc).isoformat(),
+        ))
+
+    # 6. Fetch Recent Mock Interviews
+    stmt_interviews = (
+        select(MockInterviewSession)
+        .where(MockInterviewSession.profile_id == profile_id)
+        .order_by(desc(MockInterviewSession.created_at))
+        .limit(3)
+    )
+    interviews = (await db.execute(stmt_interviews)).scalars().all()
+    for iv in interviews:
+        recent_activities.append(LearnerActivityItem(
+            activity_type="INTERVIEW",
+            title=f"AI Mock Technical Interview ({iv.target_role})",
+            score=round(iv.overall_score, 1) if iv.overall_score is not None else None,
+            status=iv.status,
+            detail=f"Technical Score: {round(iv.technical_score or 0, 1)}% | Comm: {round(iv.communication_score or 0, 1)}%",
+            timestamp=iv.created_at.isoformat() if iv.created_at else datetime.now(timezone.utc).isoformat(),
+        ))
+
+    # 7. Fetch Recent AI Coach Escalations
+    stmt_escalations = (
+        select(AiCoachEscalation)
+        .where(AiCoachEscalation.profile_id == profile_id)
+        .order_by(desc(AiCoachEscalation.created_at))
+        .limit(3)
+    )
+    escalations = (await db.execute(stmt_escalations)).scalars().all()
+    for esc in escalations:
+        recent_activities.append(LearnerActivityItem(
+            activity_type="AI_ESCALATION",
+            title=f"AI Coach Alert: {esc.reason}",
+            score=None,
+            status=esc.severity,
+            detail=f"Thrash index: {esc.thrash_index or 0.0} | Source: {esc.source}",
+            timestamp=esc.created_at.isoformat() if esc.created_at else datetime.now(timezone.utc).isoformat(),
+        ))
+
+    # 8. Synthesize Actionable Mentor Brief
+    frontier_name = current_frontier.replace("_", " ").title() if current_frontier else "Next Milestone"
+    
+    exec_summary = (
+        f"{learner_name} is pursuing '{target_role}' with {overall_readiness_pct}% overall syllabus mastery. "
+        f"They have mastered {mastered_count}/{total_skills} core graph skills and are currently working through '{frontier_name}'."
+    )
+
+    if lagging_count > 0:
+        current_blocker = f"Stagnating on {lagging_count} concept(s), specifically around '{frontier_name}' and dependent database / concurrency modules."
+        root_cause = "Knowledge gaps identified in prerequisite checkpoints or syntax boundary validation."
+    else:
+        current_blocker = f"Making steady progress; advancing through '{frontier_name}' to reach interview threshold readiness."
+        root_cause = "Need practical architectural guidance and live code review on system edge cases."
+
+    talking_points = [
+        f"Review recent implementation approaches for '{frontier_name}' and clarify core design trade-offs.",
+        f"Walk through concrete examples of error handling and boundary conditions in their code submissions.",
+        f"Check confidence and alignment towards their target role: '{target_role}'.",
+    ]
+
+    mentor_brief = MentorActionableBrief(
+        executive_summary=exec_summary,
+        current_blocker=current_blocker,
+        root_cause_analysis=root_cause,
+        suggested_talking_points=talking_points,
+        recommended_next_milestone=frontier_name,
+    )
+
+    return Learner360IntelResponse(
+        profile_id=profile_id,
+        user_id=user.id if user else profile_id,
+        name=learner_name,
+        email=learner_email,
+        weekly_hours=profile.last_known_weekly_hours or 10.0,
+        created_at=profile.created_at.isoformat() if profile.created_at else datetime.now(timezone.utc).isoformat(),
+        target_role=target_role,
+        goal_description=goal_desc,
+        target_timeline_weeks=6,
+        overall_readiness_pct=overall_readiness_pct,
+        total_skills_count=total_skills,
+        mastered_count=mastered_count,
+        in_progress_count=in_progress_count,
+        lagging_count=lagging_count,
+        current_frontier_skill=current_frontier,
+        graph_nodes=graph_nodes,
+        recent_activities=recent_activities,
+        mentor_brief=mentor_brief,
+    )
+
+
+@router.get("/learners", response_model=LearnerDirectoryResponse)
+async def list_mentor_learners(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_approved_mentor),
+):
+    """
+    Lists all enrolled learners from the database with real names, goals, readiness scores, and active request statuses.
+    """
+    stmt = (
+        select(LearnerProfile)
+        .options(
+            selectinload(LearnerProfile.user),
+            selectinload(LearnerProfile.goals),
+            selectinload(LearnerProfile.mentor_session_requests),
+            selectinload(LearnerProfile.readiness_snapshots),
+        )
+        .order_by(LearnerProfile.id)
+    )
+    profiles = (await db.execute(stmt)).scalars().all()
+
+    items: List[LearnerDirectoryItem] = []
+    for prof in profiles:
+        u = prof.user
+        if not u or normalize_role(u.role) in (UserRole.ADMIN.value, UserRole.MENTOR.value):
+            # Only include actual learners in the learner directory
+            if not u or u.role != "LEARNER":
+                continue
+
+        # Resolve real name
+        if u.name and u.name.strip():
+            display_name = u.name.strip()
+        else:
+            display_name = u.email.split('@')[0].replace('.', ' ').title()
+
+        # Resolve goal
+        target_role = "Software Engineer"
+        if prof.goals and len(prof.goals) > 0:
+            target_role = prof.goals[0].title or target_role
+
+        # Calculate real readiness
+        snaps = prof.readiness_snapshots or []
+        readiness_pct = 0.0
+        if snaps:
+            avg_score = sum(s.readiness_score for s in snaps) / len(snaps)
+            readiness_pct = round(avg_score * 100, 1)
+
+        # Check for open requests
+        reqs = prof.mentor_session_requests or []
+        open_req = next((r for r in reqs if r.status == "OPEN"), None)
+
+        status_str = "ACTIVE"
+        if open_req:
+            status_str = "OPEN_REQUEST"
+
+        items.append(LearnerDirectoryItem(
+            profile_id=prof.id,
+            user_id=u.id,
+            name=display_name,
+            email=u.email,
+            target_role=target_role,
+            readiness_pct=readiness_pct,
+            status=status_str,
+            has_open_request=open_req is not None,
+            open_request_id=open_req.id if open_req else None,
+            open_request_title=open_req.title if open_req else None,
+            open_request_reason=open_req.reason if open_req else None,
+        ))
+
+    return LearnerDirectoryResponse(learners=items)

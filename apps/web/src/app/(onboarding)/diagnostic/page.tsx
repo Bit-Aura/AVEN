@@ -1,16 +1,38 @@
 'use client';
 
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { usePathStore } from '../../../store/usePathStore';
 import GoalChat from '../../../components/GoalChat';
 import DiagnosticChat from '../../../components/DiagnosticChat';
 import Link from 'next/link';
 import { ArrowLeft, Compass } from 'lucide-react';
-import { SafeUserButton } from '../../../lib/clerkSafe';
+import { SafeUserButton, useSafeUser } from '../../../lib/clerkSafe';
 
 export default function DiagnosticPage() {
+  const router = useRouter();
+  const { user, isLoaded } = useSafeUser();
   const nextQuestion = usePathStore((state) => state.nextQuestion);
   const diagnosticComplete = usePathStore((state) => state.diagnosticComplete);
   const userGoal = usePathStore((state) => state.userGoal);
+
+  useEffect(() => {
+    if (!isLoaded || !user) return;
+    const role = (user.role || 'LEARNER').toUpperCase();
+    if (role === 'MENTOR') {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('pathfinder_diagnostic_complete', 'true');
+      }
+      usePathStore.setState({ diagnosticComplete: true });
+      router.replace('/mentor');
+    } else if (role === 'ADMIN') {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('pathfinder_diagnostic_complete', 'true');
+      }
+      usePathStore.setState({ diagnosticComplete: true });
+      router.replace('/admin');
+    }
+  }, [user, isLoaded, router]);
 
   // Show GoalChat if no question is active and diagnostic is not complete
   const showGoalChat = !nextQuestion && !diagnosticComplete && !userGoal;

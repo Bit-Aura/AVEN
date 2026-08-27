@@ -21,7 +21,8 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.domain import ReadinessSnapshot, AssessmentAttempt, LearnerProfile, Goal, PathVersion
+from sqlalchemy.orm import selectinload
+from app.models.domain import ReadinessSnapshot, AssessmentAttempt, LearnerProfile, Goal, PathVersion, User
 from app.infrastructure.neo4j.client import Neo4jClient
 from app.infrastructure.ai.gateway import OllamaAdapter
 from app.core.config import settings
@@ -577,12 +578,39 @@ async def generate_mentor_triage_queue(
     if drive_date_dt:
         days_until_drive = max(0, (drive_date_dt.date() - now.date()).days)
 
+    # Auto-discover profile_ids if none provided
+    target_pids = payload.profile_ids
+    if not target_pids:
+        all_prof_stmt = select(LearnerProfile.id)
+        target_pids = list((await db.execute(all_prof_stmt)).scalars().all())
+
     queue_entries: List[MentorTriageEntry] = []
 
-    for pid in payload.profile_ids:
+    for pid in target_pids:
+        # Fetch profile & user details
+        prof_stmt = select(LearnerProfile).where(LearnerProfile.id == pid).options(selectinload(LearnerProfile.user))
+        prof = (await db.execute(prof_stmt)).scalars().first()
+        user_name = None
+        if prof and prof.user:
+            user_name = prof.user.name or prof.user.email.split('@')[0].replace('.', ' ').title()
+        
+        display_label = user_name if user_name else f"Learner #{pid}"
+
         stmt = select(ReadinessSnapshot).where(ReadinessSnapshot.profile_id == pid)
         snaps = (await db.execute(stmt)).scalars().all()
         if not snaps:
+            # Check if learner has user but 0 snapshots yet
+            if prof:
+                queue_entries.append(MentorTriageEntry(
+                    profile_id=pid,
+                    display_label=display_label,
+                    readiness_pct=0.0,
+                    triage_score=0.1,
+                    breakthrough_zone=False,
+                    gap_skills_count=0,
+                    days_until_next_drive=days_until_drive,
+                    recommended_action="Learner recently enrolled; schedule an onboarding kickoff session.",
+                ))
             continue
 
         mastered = [s for s in snaps if s.readiness_score >= READINESS_THRESHOLD]
@@ -608,7 +636,7 @@ async def generate_mentor_triage_queue(
 
         queue_entries.append(MentorTriageEntry(
             profile_id=pid,
-            display_label=f"Learner #{pid}",
+            display_label=display_label,
             readiness_pct=round(avg_readiness * 100, 1),
             triage_score=triage_score,
             breakthrough_zone=in_breakthrough_zone,

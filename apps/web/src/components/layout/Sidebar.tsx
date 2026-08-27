@@ -72,14 +72,7 @@ export default function Sidebar() {
       title: 'Mentor Operations',
       items: [
         { name: 'Mentor Connect', href: '/mentor', icon: ShieldAlert, badge: 'Live' },
-        { name: '1-on-1 Mentorship Feed', href: '/mentor', icon: Users },
-      ]
-    },
-    {
-      title: 'Learner Explorer',
-      items: [
-        { name: 'Curriculum & Graph', href: '/learner/graph', icon: Network },
-        { name: 'Market Demand Radar', href: '/market-radar', icon: Radar },
+        { name: 'Learner 360° Intel', href: '/mentor/learner-intel', icon: BrainCircuit, badge: '360°' },
       ]
     }
   ];

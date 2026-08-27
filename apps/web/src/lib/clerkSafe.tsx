@@ -81,6 +81,12 @@ export function useSafeUser() {
         }
       }
 
+      if (canonicalRole === 'MENTOR' || canonicalRole === 'ADMIN') {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('pathfinder_diagnostic_complete', 'true');
+        }
+      }
+
       setLocalUser({
         id: clerkUserObj.id,
         clerk_id: clerkUserObj.id,
@@ -99,6 +105,11 @@ export function useSafeUser() {
     const userToUse = storeUser || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('aven_auth_user') || 'null') : null);
     if (userToUse) {
       const canonicalRole = (userToUse.role || 'LEARNER').toUpperCase() as 'LEARNER' | 'MENTOR' | 'ADMIN';
+      if (canonicalRole === 'MENTOR' || canonicalRole === 'ADMIN') {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('pathfinder_diagnostic_complete', 'true');
+        }
+      }
       setLocalUser({
         id: userToUse.id || 'local_user',
         clerk_id: userToUse.clerk_id,
