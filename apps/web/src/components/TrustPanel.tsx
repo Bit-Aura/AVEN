@@ -11,6 +11,8 @@ export default function TrustPanel() {
   const activeMilestone = usePathStore((state) => state.activeMilestone);
   const nodes = usePathStore((state) => state.nodes);
   const readinessScore = usePathStore((state) => state.readinessScore);
+  const pathExplanation = usePathStore((state) => state.pathExplanation);
+  const activePathPlan = usePathStore((state) => state.activePathPlan);
 
   if (!isTrustPanelOpen) return null;
 
@@ -35,7 +37,7 @@ export default function TrustPanel() {
     { name: "Async FastAPI Microservices", status: "locked" }
   ];
 
-  const pathPlan = usePathStore.getState().activePathPlan;
+
 
   return (
     <div className="fixed inset-0 z-[110] flex justify-end font-sans">
@@ -94,20 +96,20 @@ export default function TrustPanel() {
               <span>Grounded Decision Trace</span>
             </div>
             <div className="p-4 rounded-xl bg-[#e8e6dc] border border-[#d6d3c4] text-sm text-[#141413] leading-relaxed whitespace-pre-wrap font-medium">
-              {usePathStore.getState().pathExplanation || 
-                (pathPlan?.decision_trace?.explanation || 
+              {pathExplanation || 
+                (activePathPlan?.decision_trace?.explanation || 
                 "PathFinder computes prerequisite paths deterministically through Neo4j topological sorting. Active focus is placed strictly on the nearest unmastered node to maximize velocity.")}
             </div>
           </div>
 
           {/* Time Budget Reality Check */}
-          {pathPlan?.decision_trace?.time_budget_warning && (
+          {activePathPlan?.decision_trace?.time_budget_warning && (
             <div className="p-4 rounded-xl bg-[#faf9f5] border border-[#141413] text-[#141413] text-sm space-y-2 shadow-sm">
               <div className="font-black flex items-center gap-2 uppercase tracking-widest text-xs">
                 <AlertTriangle size={16} />
                 Time Budget Warning
               </div>
-              <p className="leading-relaxed font-bold">The projected time to complete this path ({pathPlan.decision_trace.estimated_hours} hrs) exceeds your requested timeline. Consider negotiating scope or increasing weekly hours.</p>
+              <p className="leading-relaxed font-bold">The projected time to complete this path ({activePathPlan.decision_trace.estimated_hours} hrs) exceeds your requested timeline. Consider negotiating scope or increasing weekly hours.</p>
             </div>
           )}
 

@@ -27,6 +27,13 @@ const baseMock = {
   nodes: [{id: 'node-1', data: {}}],
   edges: [],
   activeMilestone: { id: 'm1', title: 'Test Node', explanation: 'Why this.', status: 'active' },
+  currentAssessment: {
+    question_text: 'Test Checkpoint Challenge: Implement a solution',
+    options: ['Option A', 'Option B'],
+    target_skill: 'FastAPI'
+  },
+  isFetchingAssessment: false,
+  fetchAssessment: jest.fn(),
   setGraph: jest.fn(),
   setActiveMilestone: jest.fn(),
   setUserGoal: jest.fn(),
@@ -60,6 +67,6 @@ describe('ProveItAssessment Component', () => {
   it('renders assessment form', () => {
     (usePathStore as unknown as jest.Mock).mockImplementation((selector) => selector({ ...baseMock, isTakingAssessment: true }));
     render(<ProveItAssessment milestoneId="m1" />);
-    expect(screen.getAllByText(/Checkpoint/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Knowledge Check/i).length).toBeGreaterThan(0);
   });
 });

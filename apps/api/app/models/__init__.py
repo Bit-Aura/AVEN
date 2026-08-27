@@ -22,6 +22,9 @@ from .domain import (
     MentorIntervention,
     AiCoachEscalation,
     MentorSessionRequest,
+    LearnerResume,
+    MockInterviewSession,
+    MockInterviewTurn,
 )
 
 __all__ = [
@@ -48,4 +51,7 @@ __all__ = [
     "MentorIntervention",
     "AiCoachEscalation",
     "MentorSessionRequest",
+    "LearnerResume",
+    "MockInterviewSession",
+    "MockInterviewTurn",
 ]

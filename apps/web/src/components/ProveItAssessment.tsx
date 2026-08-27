@@ -99,7 +99,8 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
   };
 
   const handleSubmitSolution = () => {
-    bypassMilestone(milestoneId, currentAssessment.options[0]);
+    const opt = currentAssessment?.options?.[0] || 'Passing verification';
+    bypassMilestone(milestoneId, opt);
     onComplete?.();
   };
 

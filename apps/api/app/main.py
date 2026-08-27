@@ -47,6 +47,10 @@ async def lifespan(app: FastAPI):
                 await conn.execute(text("ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)"))
             except Exception:
                 pass
+            try:
+                await conn.execute(text("ALTER TABLE learner_profiles ADD COLUMN last_known_weekly_hours FLOAT DEFAULT 10.0"))
+            except Exception:
+                pass
         
         async with async_session() as session:
             # 1. Seed Default Admin (admin@aven.com / Aven@123) -> ADMIN
@@ -150,6 +154,10 @@ app.include_router(mentor_router)
 # Include Mentor Connect Router
 from app.routers.mentor_connect import router as mentor_connect_router
 app.include_router(mentor_connect_router)
+
+# Include AI Mock Interview Router
+from app.routers.interview import router as interview_router
+app.include_router(interview_router)
 
 # Enable CORS for frontend connections
 app.add_middleware(
@@ -1193,13 +1201,29 @@ async def pivot_career_role(
 @app.get("/api/v1/placement/companies")
 async def get_placement_companies():
     """
-    Returns the dynamic list of company profiles tracked for placement drives.
+    Returns trending company suggestions for placement drives.
     """
-    from app.services.placement_engine import COMPANY_PROFILES
-    return [
-        {"id": key, "name": val["name"], "role": val.get("role", "Software Engineer")}
-        for key, val in COMPANY_PROFILES.items()
+    from app.services.placement_engine import DYNAMIC_COMPANY_CACHE
+    base_suggestions = [
+        {"id": "openai", "name": "OpenAI", "role": "Software Engineer, Backend / Platform"},
+        {"id": "anthropic", "name": "Anthropic", "role": "Full Stack / AI Infrastructure Engineer"},
+        {"id": "google", "name": "Google", "role": "Software Engineer (L4/L5)"},
+        {"id": "meta", "name": "Meta", "role": "Production Engineer / Backend"},
+        {"id": "microsoft", "name": "Microsoft", "role": "Software Development Engineer"},
+        {"id": "amazon", "name": "Amazon", "role": "SDE II - AWS Platform"},
+        {"id": "netflix", "name": "Netflix", "role": "Senior Software Engineer"},
+        {"id": "stripe", "name": "Stripe", "role": "Backend Infrastructure Engineer"},
+        {"id": "tesla", "name": "Tesla", "role": "Software Engineer - Autopilot & Core Apps"},
+        {"id": "nvidia", "name": "Nvidia", "role": "Systems Software Engineer"}
     ]
+    # Add any recently synthesized dynamic companies from cache
+    seen = {c["id"] for c in base_suggestions}
+    for key, val in DYNAMIC_COMPANY_CACHE.items():
+        comp_id = key.split("_")[0]
+        if comp_id not in seen:
+            base_suggestions.append({"id": comp_id, "name": val["name"], "role": "Software Engineer"})
+            seen.add(comp_id)
+    return base_suggestions
 
 @app.post("/api/v1/placement/plan", response_model=PlacementPlanReport)
 async def generate_placement_sprint_plan(
@@ -1307,14 +1331,15 @@ async def get_tickets(
 @app.post("/api/v1/simulator/ticket/{ticket_id}/chat", response_model=SimulatorChatResponse)
 async def chat_with_stakeholder_endpoint(
     ticket_id: str,
-    data: SimulatorChatInput
+    data: SimulatorChatInput,
+    db: AsyncSession = Depends(get_db)
 ):
     """
     [Day-One Simulator] Sends a message to the AI PM or AI Client persona for ticket requirements.
     """
     from app.services.simulator import chat_with_stakeholder
     try:
-        response = await chat_with_stakeholder(ticket_id, data, ai_provider)
+        response = await chat_with_stakeholder(ticket_id, data, ai_provider, db=db)
         return response
     except Exception as e:
         logger.exception("Failed to chat with stakeholder")

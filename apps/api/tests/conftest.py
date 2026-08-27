@@ -14,8 +14,15 @@ def setup_test_database():
     """
     Initialize all database tables from registered SQLAlchemy models for the test session.
     """
+    db_file = "./test_pathfinder.db"
+    if os.path.exists(db_file):
+        try:
+            os.remove(db_file)
+        except Exception:
+            pass
+
     async def _init_tables():
-        import app.models  # Ensures all models (including CodingSandboxSubmission) are registered on Base.metadata
+        import app.models  # Ensures all models (including CodingSandboxSubmission, LearnerResume, MockInterviewSession) are registered on Base.metadata
         from app.core.db import engine
         from app.models.base import Base
         from sqlalchemy import text
