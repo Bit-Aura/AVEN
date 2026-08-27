@@ -1,33 +1,27 @@
 'use client';
 
-import SkillGraph from '../../../components/SkillGraph';
 import RoadmapNoiseChecker from '../../../components/planner/RoadmapNoiseChecker';
-import { Layers } from 'lucide-react';
+import { Target } from '@phosphor-icons/react/dist/ssr';
 
-export default function PlannerDashboard() {
+export default function AuditorDashboard() {
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      <div className="border-b border-border pb-6">
-        <div className="flex items-center gap-2 mb-1">
-          <Layers className="text-brand-400" size={18} />
-          <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Path Architecture</span>
+    <div className="space-y-8 max-w-7xl mx-auto pb-20">
+      <div className="border-b border-white/5 pb-6 flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Target weight="fill" className="text-indigo-400" size={18} />
+            <span className="text-[11px] font-bold uppercase tracking-widest text-indigo-400/80">Curriculum Auditor</span>
+          </div>
+          <h1 className="text-3xl font-bold text-white tracking-tight">
+            Validate External Roadmaps
+          </h1>
+          <p className="text-sm text-slate-400 mt-2 max-w-xl leading-relaxed">
+            Paste any course syllabus, video transcript, or roadmap. We will cross-reference it against live market data and our dependency graph to ensure structural integrity.
+          </p>
         </div>
-        <h1 className="text-3xl font-extrabold text-white tracking-tight">
-          Learning Planner & Dependency Auditor
-        </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Explore graph topologies and audit external curriculum advice for structural sanity
-        </p>
       </div>
 
-      <div className="space-y-8">
-        <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider mb-4">
-            Interactive Path Canvas
-          </h2>
-          <SkillGraph />
-        </div>
-
+      <div className="pt-4">
         <RoadmapNoiseChecker />
       </div>
     </div>

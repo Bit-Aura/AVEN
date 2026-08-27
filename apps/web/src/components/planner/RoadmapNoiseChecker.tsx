@@ -1,20 +1,20 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  AlertCircle, 
-  CheckCircle2, 
-  ChevronDown, 
-  ChevronUp, 
-  Zap, 
-  Loader2, 
-  Sparkles, 
-  FileText, 
-  HelpCircle,
-  TrendingUp,
-  ShieldCheck
-} from 'lucide-react';
+  WarningCircle, 
+  Lightning, 
+  CircleNotch, 
+  FileText,
+  ShieldWarning,
+  ShieldCheck,
+  TrendDown,
+  TrendUp,
+  Buildings
+} from '@phosphor-icons/react/dist/ssr';
 import { checkRoadmapSanity } from '../../api/client';
+import { usePathStore } from '../../store/usePathStore';
 
 const SAMPLE_ROADMAPS = [
   {
@@ -28,9 +28,8 @@ const SAMPLE_ROADMAPS = [
 ];
 
 export default function RoadmapNoiseChecker() {
-  const [isOpen, setIsOpen] = useState(true);
+  const targetRole = usePathStore((state) => state.targetRole);
   const [adviceText, setAdviceText] = useState(SAMPLE_ROADMAPS[0].text);
-  const [sourceLabel, setSourceLabel] = useState('YouTube Tutorial');
   const [report, setReport] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,11 +40,13 @@ export default function RoadmapNoiseChecker() {
 
     setIsLoading(true);
     setError(null);
+    setReport(null); // Clear previous results to re-trigger stagger
 
     try {
       const res = await checkRoadmapSanity({
         advice_text: textToSubmit,
-        source_label: sourceLabel
+        source_label: 'Curriculum Auditor',
+        target_role: targetRole
       });
       setReport(res);
     } catch (e: any) {
@@ -56,172 +57,243 @@ export default function RoadmapNoiseChecker() {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <div className="w-full bg-surface border border-border rounded-2xl overflow-hidden shadow-glass">
-      {/* Header Accordion Bar */}
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full p-6 flex justify-between items-center hover:bg-surface-secondary/50 transition-colors select-none"
+    <motion.div layout className="w-full max-w-4xl mx-auto flex flex-col gap-12 items-center relative font-sans mb-24">
+      
+      {/* TOP PANE: The Input Terminal */}
+      <motion.div 
+        layout 
+        className="w-full flex flex-col gap-4"
       >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center">
-            <Zap className="text-indigo-400" size={18} />
+        <motion.div layout className="flex items-center justify-between pb-2 border-b border-slate-700">
+          <div className="flex items-center gap-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              Target Curriculum
+            </label>
           </div>
-          <div className="text-left">
-            <h3 className="text-sm md:text-base font-extrabold text-white uppercase tracking-wider">
-              Tutor Noise & Roadmap Sanity Filter
-            </h3>
-            <p className="text-xs text-slate-400">
-              Audit external influencer roadmaps against deterministic Neo4j dependencies & live market demand
-            </p>
-          </div>
-        </div>
-        {isOpen ? <ChevronUp className="text-slate-400" size={18} /> : <ChevronDown className="text-slate-400" size={18} />}
-      </button>
-
-      {isOpen && (
-        <div className="p-6 border-t border-border bg-surface-secondary/30 space-y-6">
-          {/* Input Textarea & Presets */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <FileText size={14} className="text-indigo-400" />
-                <span>Paste external advice or course outline:</span>
-              </label>
-              
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] text-slate-500">Sample presets:</span>
-                {SAMPLE_ROADMAPS.map((sample, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      setAdviceText(sample.text);
-                      handleAnalyze(sample.text);
-                    }}
-                    className="px-2.5 py-1 rounded-lg bg-surface border border-border text-[11px] font-semibold text-slate-300 hover:text-white transition-colors"
-                  >
-                    {sample.title}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <textarea
-              value={adviceText}
-              onChange={(e) => setAdviceText(e.target.value)}
-              placeholder="e.g. You must learn Assembly before Python, then jump straight into Kubernetes and Microservices..."
-              className="w-full min-h-[110px] bg-surface border border-border rounded-xl p-4 text-xs md:text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 resize-none transition-all leading-relaxed"
-            />
-
-            <div className="flex justify-end">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Presets:</span>
+            {SAMPLE_ROADMAPS.map((sample, idx) => (
               <button
-                onClick={() => handleAnalyze()}
-                disabled={isLoading || adviceText.length < 10}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:bg-surface-tertiary text-white font-bold text-xs shadow-glow-indigo transition-all disabled:opacity-50"
+                key={idx}
+                type="button"
+                onClick={() => {
+                  setAdviceText(sample.text);
+                  setReport(null);
+                }}
+                className="px-2 py-0.5 border border-slate-700 text-[10px] font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-all uppercase tracking-widest"
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    <span>Analyzing DAG Dependencies...</span>
-                  </>
-                ) : (
-                  <>
-                    <Zap size={14} />
-                    <span>Audit Roadmap Sanity</span>
-                  </>
-                )}
+                {idx + 1}
               </button>
-            </div>
+            ))}
           </div>
+        </motion.div>
 
-          {error && (
-            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-2">
-              <AlertCircle size={16} />
-              <span>{error}</span>
-            </div>
-          )}
+        {/* Textarea Container with Integrated Button and X-Ray */}
+        <motion.div layout className="relative w-full overflow-hidden border border-slate-700 group focus-within:border-slate-500 transition-colors bg-[#0b0f19]">
+          
+          <textarea
+            value={adviceText}
+            onChange={(e) => setAdviceText(e.target.value)}
+            disabled={isLoading}
+            placeholder="Paste syllabus, transcript, or roadmap..."
+            className="w-full h-[300px] bg-transparent p-6 pb-24 text-sm font-mono text-slate-300 placeholder:text-slate-600 focus:outline-none resize-none leading-relaxed"
+          />
 
-          {/* Analysis Report Output */}
-          {report && (
-            <div className="space-y-5 pt-4 border-t border-border animate-in fade-in duration-300">
-              {/* Overall Rating Banner */}
-              <div className={`p-5 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-                report.overall_rating === 'TRUSTWORTHY' || report.overall_rating === 'MOSTLY_OK'
-                  ? 'bg-emerald-500/10 border-emerald-500/30'
-                  : 'bg-rose-500/10 border-rose-500/30'
-              }`}>
-                <div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                    Overall Curriculum Rating
-                  </div>
-                  <div className="text-xl font-extrabold text-white mt-0.5 flex items-center gap-2">
-                    <span>{report.overall_rating.replace(/_/g, ' ')}</span>
-                  </div>
-                  <p className="text-xs text-slate-300 mt-1 max-w-xl">
-                    {report.summary}
-                  </p>
+          {/* X-Ray Scanner Animation */}
+          <AnimatePresence>
+            {isLoading && (
+              <motion.div
+                initial={{ top: '-10%', opacity: 0 }}
+                animate={{ top: '110%', opacity: [0, 1, 1, 0] }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.5, ease: "linear", repeat: Infinity }}
+                className="absolute left-0 right-0 h-8 bg-gradient-to-b from-transparent to-indigo-500/10 border-b border-indigo-400/50 pointer-events-none z-10"
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Floating Action Button (Anti-Slop: Stark, high contrast) */}
+          <div className="absolute bottom-6 right-6 z-20">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleAnalyze()}
+              disabled={isLoading || adviceText.length < 10}
+              className="flex items-center gap-2 px-6 py-3 bg-white text-slate-950 disabled:bg-slate-800 disabled:text-slate-500 font-bold text-[11px] uppercase tracking-widest transition-all disabled:opacity-50 border border-white disabled:border-slate-700 shadow-sm"
+              style={{ color: isLoading || adviceText.length < 10 ? undefined : '#0f172a' }} // Hardcode color to fix tailwind override issue
+            >
+              {isLoading ? (
+                <>
+                  <CircleNotch weight="bold" size={16} className="animate-spin" />
+                  <span>Scanning</span>
+                </>
+              ) : (
+                <>
+                  <Lightning weight="fill" size={16} />
+                  <span>Audit Curriculum</span>
+                </>
+              )}
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {error && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+            className="p-4 border border-rose-500/30 bg-rose-500/10 text-rose-400 text-xs font-mono flex items-center gap-2 mt-2"
+          >
+            <WarningCircle weight="fill" size={16} />
+            <span>{error}</span>
+          </motion.div>
+        )}
+      </motion.div>
+
+      {/* BOTTOM PANE: X-Ray Results */}
+      <AnimatePresence mode="wait">
+        {report && !isLoading && (
+          <motion.div 
+            layout
+            key="results"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="w-full flex flex-col gap-6"
+          >
+            <motion.div layout className="flex items-center gap-2 pb-2 border-b border-slate-700">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Diagnostic Output
+              </label>
+            </motion.div>
+
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              className="w-full flex flex-col gap-8"
+            >
+              {/* Verdict Header (Anti-Slop: Pure typography, no background box) */}
+              <motion.div variants={itemVariants} className="flex flex-col gap-2 pb-6 border-b border-slate-800">
+                <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                  <span>System Verdict</span>
+                  <div className={`h-1.5 w-1.5 rounded-full ${
+                    report.overall_rating === 'TRUSTWORTHY' || report.overall_rating === 'MOSTLY_OK'
+                      ? 'bg-emerald-500'
+                      : 'bg-rose-500'
+                  }`} />
                 </div>
-
-                <div className="flex items-center gap-3 text-xs">
-                  <div className="px-3 py-1.5 rounded-xl bg-surface border border-border text-center">
-                    <span className="block text-emerald-400 font-extrabold text-sm">{report.aligned_count}</span>
-                    <span className="text-[10px] text-slate-400">Aligned</span>
-                  </div>
-                  <div className="px-3 py-1.5 rounded-xl bg-surface border border-border text-center">
-                    <span className="block text-amber-400 font-extrabold text-sm">{report.harmless_extra_count}</span>
-                    <span className="text-[10px] text-slate-400">Extras</span>
-                  </div>
-                  <div className="px-3 py-1.5 rounded-xl bg-surface border border-border text-center">
-                    <span className="block text-rose-400 font-extrabold text-sm">{report.misleading_count}</span>
-                    <span className="text-[10px] text-slate-400">Misleading</span>
-                  </div>
+                <div className="text-3xl font-light text-white tracking-tight">
+                  {report.overall_rating.replace(/_/g, ' ')}
                 </div>
-              </div>
+                <p className="text-[15px] text-slate-300 leading-relaxed max-w-2xl mt-3 font-medium">
+                  {report.summary}
+                </p>
+              </motion.div>
 
-              {/* Individual Verdict Breakdown */}
+              {/* Data Bar (Anti-Slop: Horizontal structural table, not 3 isolated cards) */}
+              <motion.div variants={itemVariants} className="flex border border-slate-700 bg-slate-900/50">
+                <div className="flex-1 p-5 border-r border-slate-700 flex flex-col gap-1">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500">Valid</span>
+                  <span className="text-2xl font-light text-white">{report.aligned_count}</span>
+                </div>
+                <div className="flex-1 p-5 border-r border-slate-700 flex flex-col gap-1">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500">Fluff</span>
+                  <span className="text-2xl font-light text-white">{report.harmless_extra_count}</span>
+                </div>
+                <div className="flex-1 p-5 flex flex-col gap-1">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-rose-500/70">Violations</span>
+                  <span className={`text-2xl font-light ${report.misleading_count > 0 ? 'text-rose-400' : 'text-white'}`}>
+                    {report.misleading_count}
+                  </span>
+                </div>
+              </motion.div>
+
+              {/* Line-by-Line Breakdown (Anti-Slop: Clean list with hairlines, no pill boxes) */}
               {report.verdicts && report.verdicts.length > 0 && (
-                <div className="space-y-2.5">
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Skill-by-Skill Graph & Market Validation
+                <motion.div variants={itemVariants} className="flex flex-col">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 pb-3 border-b border-slate-700">
+                    Detailed Analysis
                   </div>
-                  <div className="grid grid-cols-1 gap-2.5">
+                  
+                  <div className="flex flex-col">
                     {report.verdicts.map((v: any, idx: number) => {
                       const isAligned = v.label === 'ALIGNED';
                       const isMisleading = v.label === 'MISLEADING';
+                      
                       return (
                         <div 
                           key={idx}
-                          className={`p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs ${
-                            isAligned
-                              ? 'bg-emerald-500/5 border-emerald-500/20'
-                              : isMisleading
-                              ? 'bg-rose-500/5 border-rose-500/20'
-                              : 'bg-amber-500/5 border-amber-500/20'
-                          }`}
+                          className="py-8 border-b border-slate-800/50 last:border-0 flex flex-col gap-4"
                         >
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-base">{v.label_emoji}</span>
-                              <span className="font-bold text-white text-sm">
+                          {/* Header: Skill Name & Verdict & Trend */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <h4 className="text-[17px] font-semibold text-slate-100">
                                 {v.matched_skill_name || v.extracted_mention}
-                              </span>
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                                isAligned ? 'bg-emerald-500/20 text-emerald-300' : isMisleading ? 'bg-rose-500/20 text-rose-300' : 'bg-amber-500/20 text-amber-300'
+                              </h4>
+                              
+                              <span className={`text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-sm border ${
+                                isAligned ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10' : 
+                                isMisleading ? 'text-rose-400 border-rose-500/20 bg-rose-500/10' : 
+                                'text-amber-400 border-amber-500/20 bg-amber-500/10'
                               }`}>
-                                {v.label.replace(/_/g, ' ')}
+                                {isAligned ? 'VALIDATED' : isMisleading ? 'VIOLATION' : 'MARKET FLUFF'}
                               </span>
                             </div>
-                            <p className="text-slate-400 text-xs pl-6 leading-relaxed">
+
+                            {/* Trend Indicator */}
+                            {v.trend_direction && (
+                              <div className={`flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest ${
+                                v.trend_direction === 'UP' ? 'text-emerald-400' : 
+                                v.trend_direction === 'DOWN' ? 'text-rose-400' : 
+                                'text-slate-500'
+                              }`}>
+                                {v.trend_direction === 'UP' && <TrendUp weight="bold" size={16} />}
+                                {v.trend_direction === 'DOWN' && <TrendDown weight="bold" size={16} />}
+                                {v.trend_direction === 'STABLE' && <span>—</span>}
+                                <span>{v.trend_direction}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Content: Analysis and Context */}
+                          <div className="flex flex-col gap-3 mt-1">
+                            <p className="text-[15px] text-slate-300 leading-relaxed font-normal">
                               {v.reason}
                             </p>
+                            
+                            {v.market_context && (
+                              <p className="text-[15px] text-slate-400 leading-relaxed font-normal">
+                                {v.market_context}
+                              </p>
+                            )}
                           </div>
 
-                          {v.market_demand_score && (
-                            <div className="text-right shrink-0 pl-6 md:pl-0">
-                              <span className="text-[10px] text-slate-500 uppercase">Demand Score</span>
-                              <div className="font-bold text-slate-200 text-xs">
-                                {Math.round(v.market_demand_score * 100)}%
+                          {/* Footer: Top Companies */}
+                          {v.top_companies && v.top_companies.length > 0 && (
+                            <div className="flex items-center gap-3 mt-3">
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                                Hiring for this:
+                              </span>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {v.top_companies.map((comp: string, i: number) => (
+                                  <span key={i} className="px-3 py-1 bg-slate-800 text-slate-300 text-[11px] font-semibold rounded-md">
+                                    {comp}
+                                  </span>
+                                ))}
                               </div>
                             </div>
                           )}
@@ -229,12 +301,13 @@ export default function RoadmapNoiseChecker() {
                       );
                     })}
                   </div>
-                </div>
+                </motion.div>
               )}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </motion.div>
   );
 }
