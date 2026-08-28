@@ -57,7 +57,7 @@ export default function DiagnosticPage() {
             <Compass size={14} className="text-brand-400" />
             <span>Cold-Start Diagnostic</span>
           </div>
-          <SafeUserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 border border-white/20" } }} />
+          <SafeUserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 border border-white/20" } }} placement="bottom-right" />
         </div>
       </header>
 

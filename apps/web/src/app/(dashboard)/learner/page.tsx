@@ -14,11 +14,16 @@ import {
   BookOpenText,
   CaretRight
 } from '@phosphor-icons/react';
+import { Loader2, Play } from 'lucide-react';
 import Link from 'next/link';
+import { fetchRelevantCourses } from '../../../api/client';
 
 export default function LearnerDashboard() {
   const [isPivotDrawerOpen, setIsPivotDrawerOpen] = useState(false);
   const [activeAssessmentSkill, setActiveAssessmentSkill] = useState<string | null>(null);
+  const [dynamicCourses, setDynamicCourses] = useState<any[]>([]);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(false);
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
   const fetchActivePath = usePathStore((state) => state.fetchActivePath);
   const fetchReadiness = usePathStore((state) => state.fetchReadiness);
@@ -28,10 +33,32 @@ export default function LearnerDashboard() {
   const pathError = usePathStore((state) => state.pathError);
   const nodes = usePathStore((state) => state.nodes);
 
+  const profileId = usePathStore((state) => state.profileId);
+
   useEffect(() => {
     fetchActivePath();
     fetchReadiness();
   }, [fetchActivePath, fetchReadiness]);
+
+  useEffect(() => {
+    const targetProfileId = profileId || 1;
+    if (targetProfileId) {
+      const loadCourses = async () => {
+        setIsLoadingCourses(true);
+        try {
+          const res = await fetchRelevantCourses(targetProfileId, (activeMilestone as any)?.data?.label || (activeMilestone as any)?.label || activeMilestone?.id);
+          if (res && res.courses) {
+            setDynamicCourses(res.courses);
+          }
+        } catch (e) {
+          console.error("Failed to load dynamic courses", e);
+        } finally {
+          setIsLoadingCourses(false);
+        }
+      };
+      loadCourses();
+    }
+  }, [profileId, activeMilestone]);
 
   return (
     <div className="bg-[#faf9f5] text-[#141413] min-h-[calc(100vh-4rem)] -m-6 md:-m-8 p-6 md:p-8">
@@ -182,53 +209,77 @@ export default function LearnerDashboard() {
         {/* Relevant Courses Space (Horizontal Layout) */}
         <div className="space-y-6 pt-4">
           <div className="flex items-center gap-2 pb-2 border-b border-[#d6d3c4]">
-            <BookOpenText size={20} weight="bold" className="text-[#141413]" />
+            <BookOpenText size={20} className="text-[#141413]" />
             <h3 className="text-lg font-bold text-[#141413] tracking-tight">Relevant Courses</h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Advanced Next.js Architecture",
-                description: "Deep dive into React Server Components, streaming, and advanced routing patterns.",
-                provider: "Frontend Masters",
-                duration: "4h 30m"
-              },
-              {
-                title: "RESTful API Design",
-                description: "Master the principles of designing robust, scalable, and maintainable REST APIs.",
-                provider: "Coursera",
-                duration: "6h 15m"
-              }
-            ].map((course, i) => (
-              <div key={i} className="bg-[#e8e6dc] rounded-2xl p-6 flex flex-col">
-                <h4 className="text-xl font-bold text-[#141413] mb-2">{course.title}</h4>
-                <p className="text-sm text-[#3d3d3a] leading-relaxed mb-4">{course.description}</p>
-                
-                <button className="flex items-center gap-1 text-xs font-bold text-[#141413] hover:text-[#87867f] transition-colors self-start mb-8">
-                  <span>Course syllabus</span>
-                  <ArrowRight size={12} weight="bold" />
-                </button>
-
-                <div className="border-t border-[#d6d3c4] pt-4 mb-6 flex flex-col gap-4">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="font-bold text-[#87867f] tracking-widest uppercase text-[10px]">Provider</span>
-                    <span className="text-[#141413]">{course.provider}</span>
+          {isLoadingCourses ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="animate-spin text-[#141413]" size={32} />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {dynamicCourses.map((course, i) => (
+                <div key={i} className="bg-[#e8e6dc] rounded-2xl p-6 flex flex-col border border-[#d6d3c4]">
+                  <div 
+                    className="aspect-video bg-[#3d3d3a] rounded-lg overflow-hidden mb-4 shrink-0 relative group cursor-pointer"
+                    onClick={() => setActiveVideoId(course.videoId)}
+                  >
+                    <img 
+                      src={`https://img.youtube.com/vi/${course.videoId}/maxresdefault.jpg`} 
+                      alt={course.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        // Fallback to hqdefault if maxresdefault is not available
+                        (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${course.videoId}/hqdefault.jpg`;
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                      <div className="w-12 h-12 bg-black/60 rounded-full flex items-center justify-center text-white backdrop-blur-sm group-hover:bg-black/80 group-hover:scale-110 transition-all">
+                        <Play size={24} className="ml-1" fill="currentColor" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="font-bold text-[#87867f] tracking-widest uppercase text-[10px]">Duration</span>
-                    <span className="text-[#141413]">{course.duration}</span>
+                  
+                  <h4 className="text-sm font-black text-[#141413] mb-2 line-clamp-2" title={course.title}>{course.title}</h4>
+                  <p className="text-xs text-[#87867f] leading-relaxed mb-4 line-clamp-3 font-medium">{course.description}</p>
+                  
+                  <div className="border-t border-[#d6d3c4] pt-4 mt-auto flex flex-col gap-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-[#87867f] tracking-widest uppercase text-[9px]">Provider</span>
+                      <span className="text-[#141413] font-bold truncate max-w-[120px]">{course.provider}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-[#87867f] tracking-widest uppercase text-[9px]">Duration</span>
+                      <span className="text-[#141413] font-bold">{course.duration}</span>
+                    </div>
                   </div>
                 </div>
-
-                <button className="w-fit flex items-center justify-center gap-2 py-2.5 px-5 rounded-full bg-[#3d3d3a] hover:opacity-90 text-white font-bold text-xs transition-opacity mt-auto">
-                  <span>Start course</span>
-                  <ArrowRight size={14} weight="bold" />
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* Video Modal */}
+        {activeVideoId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#141413]/90 backdrop-blur-sm p-4 md:p-8" onClick={() => setActiveVideoId(null)}>
+            <div className="w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl relative" onClick={e => e.stopPropagation()}>
+              <button 
+                onClick={() => setActiveVideoId(null)}
+                className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-black/50 text-white rounded-full hover:bg-black transition-colors"
+              >
+                ✕
+              </button>
+              <iframe 
+                src={`https://www.youtube.com/embed/${activeVideoId}?autoplay=1`}
+                title="Course Video"
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen 
+              />
+            </div>
+          </div>
+        )}
 
         {/* Modals & Drawers */}
         <CareerAlternativesDrawer 

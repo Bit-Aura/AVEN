@@ -140,8 +140,11 @@ export function useSafeUser() {
   };
 }
 
-export function SafeUserButton({ appearance }: { appearance?: any }) {
+export function SafeUserButton({ appearance, placement = 'top-left' }: { appearance?: any, placement?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' }) {
+  const popupClasses = placement.includes('top') ? 'bottom-full mb-2' : 'top-full mt-2';
+  const alignClasses = placement.includes('right') ? 'right-0' : 'left-0';
   const { user } = useSafeUser();
+  const [isOpen, setIsOpen] = useState(false);
   let clerkInstance: any = null;
 
   if (isClerkConfigured) {
@@ -151,28 +154,6 @@ export function SafeUserButton({ appearance }: { appearance?: any }) {
       clerkInstance = null;
     }
   }
-
-  const handleSignOut = async () => {
-    logoutUser();
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('last_clerk_user');
-      localStorage.removeItem('pathfinder_profile_id');
-      localStorage.removeItem('pathfinder_diagnostic_complete');
-      localStorage.removeItem('aven_auth_token');
-      localStorage.removeItem('aven_auth_user');
-    }
-    if (clerkInstance?.signOut) {
-      try {
-        await clerkInstance.signOut({ redirectUrl: '/sign-in' });
-        return;
-      } catch (e) {
-        console.error('Clerk sign out error', e);
-      }
-    }
-    if (typeof window !== 'undefined') {
-      window.location.href = '/sign-in';
-    }
-  };
 
   const role = user?.role || 'LEARNER';
   const initials = (user?.fullName || 'DL')
@@ -190,25 +171,55 @@ export function SafeUserButton({ appearance }: { appearance?: any }) {
       : 'from-indigo-500 to-indigo-700';
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="relative flex items-center gap-2">
       {user?.imageUrl ? (
         <button
-          onClick={handleSignOut}
+          onClick={() => setIsOpen(!isOpen)}
           className="w-8 h-8 rounded-full overflow-hidden border border-white/20 select-none shadow-sm hover:opacity-90 transition-all cursor-pointer"
-          title={`${user?.fullName} (${role}) — Click to Sign Out`}
         >
           <img src={user.imageUrl} alt={user.fullName} className="w-full h-full object-cover" />
         </button>
       ) : (
         <button
-          onClick={handleSignOut}
+          onClick={() => setIsOpen(!isOpen)}
           className={`w-8 h-8 rounded-full bg-gradient-to-br ${roleColor} flex items-center justify-center font-bold text-white text-xs border border-white/20 select-none shadow-sm hover:opacity-90 transition-all cursor-pointer`}
-          title={`${user?.fullName} (${role}) — Click to Sign Out`}
         >
           {initials}
         </button>
       )}
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <div className={`absolute ${popupClasses} ${alignClasses} w-64 bg-[#2b2b2a] border border-[#3d3d3a] rounded-lg shadow-xl z-50 p-4 text-[#faf9f5]`}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#87867f]">User Profile</span>
+              <button onClick={() => setIsOpen(false)} className="text-[#87867f] hover:text-[#faf9f5]">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div className="flex items-center gap-3 mb-3 pb-3 border-b border-[#3d3d3a]">
+              {user?.imageUrl ? (
+                <img src={user.imageUrl} alt="Profile" className="w-10 h-10 rounded-full border border-white/20" />
+              ) : (
+                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${roleColor} flex items-center justify-center font-bold text-white text-sm border border-white/20`}>
+                  {initials}
+                </div>
+              )}
+              <div className="overflow-hidden">
+                <div className="text-sm font-black truncate">{user?.fullName}</div>
+                <div className="text-[10px] text-[#87867f] truncate">{user?.primaryEmailAddress?.emailAddress}</div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[#87867f] font-bold">Role</span>
+                <span className={`text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider ${role === 'ADMIN' ? 'bg-rose-500/20 text-rose-400' : role === 'MENTOR' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-indigo-500/20 text-indigo-400'}`}>{role}</span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
-
