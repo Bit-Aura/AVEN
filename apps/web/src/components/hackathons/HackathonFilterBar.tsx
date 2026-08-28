@@ -22,18 +22,18 @@ export default function HackathonFilterBar({
   onSearchChange,
   onFilterChange,
   onClearFilters,
-  sources,
+  sources = [],
   savedCount = 0,
   showOnlySaved = false,
   onToggleShowSaved,
 }: HackathonFilterBarProps) {
-  const activeSource = Array.isArray(filters.source) ? filters.source[0] : filters.source || '';
+  const activeSources = Array.isArray(filters.source) ? filters.source : filters.source ? [filters.source] : [];
   const activeMode = filters.mode || '';
   const activeSort = filters.sort || 'newest';
   const activeStatus = filters.status || '';
 
   const hasActiveFilters = Boolean(
-    searchQuery.trim() || activeSource || activeMode || activeStatus || (activeSort && activeSort !== 'newest') || showOnlySaved
+    searchQuery.trim() || activeSources.length > 0 || activeMode || activeStatus || (activeSort && activeSort !== 'newest') || showOnlySaved
   );
 
   return (
@@ -67,17 +67,17 @@ export default function HackathonFilterBar({
         </div>
       )}
 
-      {/* Main Single-Row Control Bar */}
-      <div className="bg-white border border-[#141413]/10 rounded-2xl p-3.5 flex flex-col md:flex-row items-stretch md:items-center gap-3 shadow-sm">
+      {/* Main Control Stack */}
+      <div className="flex flex-col gap-3">
         {/* Search Field */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#87867f]" size={15} />
+        <div className="relative w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#87867f]" size={14} />
           <input
             type="text"
-            placeholder="Search by topic, skill, or platform (e.g. AI, Python, Devfolio)..."
+            placeholder="Search topics or skills..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-8 py-2.5 bg-[#f5f4ee] border border-[#141413]/10 rounded-xl text-xs text-[#141413] placeholder-[#87867f] font-medium focus:outline-none focus:border-[#141413] transition-colors"
+            className="w-full pl-9 pr-8 py-2.5 bg-white border border-black/10 rounded-lg text-[13px] text-[#141413] placeholder-[#87867f] font-medium focus:outline-none focus:border-[#141413] focus:ring-1 focus:ring-[#141413] transition-all shadow-sm"
           />
           {searchQuery && (
             <button
@@ -90,27 +90,13 @@ export default function HackathonFilterBar({
           )}
         </div>
 
-        {/* Filter Dropdowns Group */}
-        <div className="flex items-center gap-2 flex-wrap md:flex-nowrap">
-          {/* Source Dropdown */}
-          <select
-            value={activeSource}
-            onChange={(e) => onFilterChange({ source: e.target.value || undefined, offset: 0 })}
-            className="bg-[#f5f4ee] border border-[#141413]/10 rounded-xl px-3 py-2.5 text-xs text-[#141413] font-bold focus:outline-none focus:border-[#141413] cursor-pointer"
-          >
-            <option value="">All Platforms</option>
-            {sources.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-
+        {/* Filter Dropdowns Stack */}
+        <div className="grid grid-cols-3 gap-2">
           {/* Format / Mode Dropdown */}
           <select
             value={activeMode}
             onChange={(e) => onFilterChange({ mode: e.target.value || undefined, offset: 0 })}
-            className="bg-[#f5f4ee] border border-[#141413]/10 rounded-xl px-3 py-2.5 text-xs text-[#141413] font-bold focus:outline-none focus:border-[#141413] cursor-pointer"
+            className="w-full bg-white border border-black/5 rounded-lg px-3 py-2 text-[13px] text-[#141413] font-medium focus:outline-none focus:border-black/20 hover:border-black/10 transition-colors shadow-sm cursor-pointer"
           >
             <option value="">All Formats</option>
             <option value="online">Online Sprints</option>
@@ -122,7 +108,7 @@ export default function HackathonFilterBar({
           <select
             value={activeStatus}
             onChange={(e) => onFilterChange({ status: e.target.value || undefined, offset: 0 })}
-            className="bg-[#f5f4ee] border border-[#141413]/10 rounded-xl px-3 py-2.5 text-xs text-[#141413] font-bold focus:outline-none focus:border-[#141413] cursor-pointer"
+            className="w-full bg-white border border-black/5 rounded-lg px-3 py-2 text-[13px] text-[#141413] font-medium focus:outline-none focus:border-black/20 hover:border-black/10 transition-colors shadow-sm cursor-pointer"
           >
             <option value="">All Timelines</option>
             <option value="open">Open now</option>
@@ -134,7 +120,7 @@ export default function HackathonFilterBar({
           <select
             value={activeSort}
             onChange={(e) => onFilterChange({ sort: e.target.value, offset: 0 })}
-            className="bg-[#f5f4ee] border border-[#141413]/10 rounded-xl px-3 py-2.5 text-xs text-[#141413] font-bold focus:outline-none focus:border-[#141413] cursor-pointer"
+            className="w-full bg-white border border-black/5 rounded-lg px-3 py-2 text-[13px] text-[#141413] font-medium focus:outline-none focus:border-black/20 hover:border-black/10 transition-colors shadow-sm cursor-pointer"
           >
             <option value="newest">Sort: Newest</option>
             <option value="deadline_asc">Sort: Closing Soonest</option>
@@ -145,8 +131,8 @@ export default function HackathonFilterBar({
 
       {/* Active Filter Removable Tags */}
       {hasActiveFilters && (
-        <div className="flex items-center gap-2 flex-wrap text-xs text-[#87867f] px-1">
-          <span className="text-[11px] text-[#87867f] uppercase font-black tracking-wider flex items-center gap-1">
+        <div className="flex items-center gap-2 flex-wrap px-1">
+          <span className="text-[11px] text-[#87867f] font-semibold flex items-center gap-1">
             <SlidersHorizontal size={12} />
             Filters:
           </span>
@@ -169,14 +155,14 @@ export default function HackathonFilterBar({
             </span>
           )}
 
-          {activeSource && (
-            <span className="inline-flex items-center gap-1.5 bg-[#e8e6dc] text-[#141413] border border-[#141413]/10 px-2.5 py-0.5 rounded-lg text-xs font-bold">
-              Platform: {sources.find((s) => s.id === activeSource)?.name || activeSource}
-              <button onClick={() => onFilterChange({ source: undefined })} className="hover:text-rose-600">
+          {activeSources.map((src) => (
+            <span key={src} className="inline-flex items-center gap-1.5 bg-[#e8e6dc] text-[#141413] border border-[#141413]/10 px-2.5 py-0.5 rounded-lg text-xs font-bold">
+              {sources.find((s) => s.id === src)?.name || src}
+              <button onClick={() => onFilterChange({ source: activeSources.filter(s => s !== src).length > 0 ? activeSources.filter(s => s !== src) : undefined })} className="hover:text-rose-600">
                 <X size={12} />
               </button>
             </span>
-          )}
+          ))}
 
           {activeMode && (
             <span className="inline-flex items-center gap-1.5 bg-[#e8e6dc] text-[#141413] border border-[#141413]/10 px-2.5 py-0.5 rounded-lg text-xs font-bold capitalize">
@@ -201,7 +187,7 @@ export default function HackathonFilterBar({
               onClearFilters();
               onToggleShowSaved?.(false);
             }}
-            className="text-xs font-bold text-[#141413] hover:underline ml-2 cursor-pointer"
+            className="text-[11px] font-medium text-[#141413] hover:underline ml-1 cursor-pointer"
           >
             Clear all
           </button>

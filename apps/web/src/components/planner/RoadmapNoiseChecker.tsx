@@ -15,7 +15,7 @@ import {
   ArrowDownRight,
   Buildings
 } from '@phosphor-icons/react';
-import { checkRoadmapSanity } from '../../api/client';
+import { sanityCheckRoadmap } from '../../api/client';
 import { usePathStore } from '../../store/usePathStore';
 
 const SAMPLE_ROADMAPS = [
@@ -45,7 +45,7 @@ export default function RoadmapNoiseChecker() {
     setReport(null); // Clear previous results to re-trigger stagger
 
     try {
-      const res = await checkRoadmapSanity({
+      const res = await sanityCheckRoadmap({
         advice_text: textToSubmit,
         source_label: 'Curriculum Auditor',
         target_role: targetRole
