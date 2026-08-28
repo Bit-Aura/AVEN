@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { Node, Edge } from '@xyflow/react';
 
 export interface DiagnosticQuestion {
   question_id: string;
@@ -88,11 +87,11 @@ interface PathState {
   currentAssessment: { question: string; options: string[] } | null;
   isFetchingAssessment: boolean;
   
-  nodes: Node[];
-  edges: Edge[];
+  nodes: any[];
+  edges: any[];
   activeMilestone: Milestone | null;
   setProfileId: (id: number) => void;
-  setGraph: (nodes: Node[], edges: Edge[]) => void;
+  setGraph: (nodes: any[], edges: any[]) => void;
   setActiveMilestone: (milestone: Milestone) => void;
   setUserGoal: (goal: string, email?: string) => Promise<void>;
   completeDiagnostic: (questionId: string, answer: string) => Promise<void>;
@@ -307,7 +306,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
             };
           }
           
-          const nodes: Node[] = path.map((n: any, idx: number) => ({
+          const nodes: any[] = path.map((n: any, idx: number) => ({
             id: n.id,
             position: { x: 250, y: idx * 120 + 50 },
             data: { 
@@ -318,7 +317,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
             type: 'custom'
           }));
           
-          const edges: Edge[] = [];
+          const edges: any[] = [];
           for (let i = 0; i < path.length - 1; i++) {
             edges.push({
               id: `e-${path[i].id}-${path[i+1].id}`,
@@ -367,7 +366,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
       const remainingSkills: string[] = res.plan?.remaining_path || allSkills;
       const activeId = remainingSkills[0] || allSkills[0] || '';
       
-      const nodes: Node[] = allSkills.map((skillId: string, idx: number) => {
+      const nodes: any[] = allSkills.map((skillId: string, idx: number) => {
         const isCompleted = res.plan?.completed_skills?.includes(skillId) || (!remainingSkills.includes(skillId) && allSkills.indexOf(skillId) < allSkills.indexOf(activeId));
         const isActive = skillId === activeId;
         const cleanId = skillId.replace(/^[a-z0-9_-]+::/, '');
@@ -385,7 +384,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
         };
       });
 
-      const edges: Edge[] = [];
+      const edges: any[] = [];
       for (let i = 0; i < allSkills.length - 1; i++) {
         edges.push({
           id: `e-${allSkills[i]}-${allSkills[i+1]}`,
@@ -422,7 +421,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
         "http_methods_rest",
         "fastapi_microservices"
       ];
-      const nodes: Node[] = fallbackSkills.map((skillId, idx) => ({
+      const nodes: any[] = fallbackSkills.map((skillId, idx) => ({
         id: skillId,
         position: { x: 250 + Math.sin(idx * Math.PI / 2) * 200, y: idx * 160 + 50 },
         data: {
@@ -432,7 +431,7 @@ export const usePathStore = create<PathState>()((set, get) => ({
         },
         type: 'custom'
       }));
-      const edges: Edge[] = [
+      const edges: any[] = [
         { id: 'e-1-2', source: fallbackSkills[0], target: fallbackSkills[1], type: 'smoothstep', animated: true, style: { stroke: '#818cf8', strokeWidth: 3 } },
         { id: 'e-2-3', source: fallbackSkills[1], target: fallbackSkills[2], type: 'smoothstep', style: { stroke: '#334155', strokeWidth: 2 } },
         { id: 'e-3-4', source: fallbackSkills[2], target: fallbackSkills[3], type: 'smoothstep', style: { stroke: '#334155', strokeWidth: 2 } },
