@@ -51,6 +51,18 @@ async def lifespan(app: FastAPI):
                 await conn.execute(text("ALTER TABLE learner_profiles ADD COLUMN last_known_weekly_hours FLOAT DEFAULT 10.0"))
             except Exception:
                 pass
+            try:
+                await conn.execute(text("ALTER TABLE hackathon_events ADD COLUMN city VARCHAR(255)"))
+            except Exception:
+                pass
+            try:
+                await conn.execute(text("ALTER TABLE hackathon_events ADD COLUMN state VARCHAR(255)"))
+            except Exception:
+                pass
+            try:
+                await conn.execute(text("ALTER TABLE hackathon_events ADD COLUMN country VARCHAR(255)"))
+            except Exception:
+                pass
         
         async with async_session() as session:
             # 1. Seed Default Admin (admin@aven.com / Aven@123) -> ADMIN
@@ -98,7 +110,22 @@ async def lifespan(app: FastAPI):
                 session.add(admin_user)
                 await session.flush()
                 session.add(LearnerProfile(user_id=admin_user.id, current_context="Platform Administrator"))
-            else:
+
+            # 4. Auto-seed initial hackathon events across all 10 sources if database is low/empty
+            from app.models.domain import HackathonEvent
+            from app.scraper.event_pipeline import EventScrapingPipeline
+            from sqlalchemy import func
+            event_count = (await session.execute(select(func.count(HackathonEvent.id)))).scalar_one()
+            if event_count < 50:
+                logger.info("[Startup] Seeding initial hackathon events feed across all 10 developer platforms...")
+                pipeline = EventScrapingPipeline()
+                for source_key in pipeline.sources.keys():
+                    try:
+                        await pipeline.scrape_source(source_key, "all", db=session)
+                    except Exception as scrape_err:
+                        logger.warning(f"[Startup] Hackathon scrape for '{source_key}' encountered notice: {scrape_err}")
+            
+            if admin_user:
                 admin_user.role = "ADMIN"
                 if not admin_user.password_hash:
                     admin_user.password_hash = hash_password("Aven@123")
@@ -186,6 +213,10 @@ app.include_router(mentor_connect_router)
 from app.routers.interview import router as interview_router
 app.include_router(interview_router)
 
+# Include Hackathons Router
+from app.routers.hackathons import router as hackathons_router
+app.include_router(hackathons_router)
+
 # Enable CORS for frontend connections
 app.add_middleware(
     CORSMiddleware,
@@ -263,6 +294,13 @@ class ScrapeJobsInput(BaseModel):
     board_token: str = Field(..., description="Job board identifier token (e.g. 'canonical', 'stripe')")
     company_name: Optional[str] = Field(default=None, description="Optional company display name")
     limit: Optional[int] = Field(default=None, ge=1, description="Max jobs to return")
+
+class ScrapeEventsInput(BaseModel):
+    source: str = Field(default="devfolio", description="Event source adapter name (e.g. 'devfolio', 'unstop')")
+    board_token: str = Field(default="all", description="Board token, category, or filter query")
+    company_name: Optional[str] = Field(default=None, description="Optional organizer or sponsor display name")
+    limit: Optional[int] = Field(default=None, ge=1, description="Max events to return")
+
 
 # --- Innovation Endpoint Schemas (imported from service modules) ---
 # These are re-exported here so they appear in the OpenAPI schema.
@@ -1066,6 +1104,7 @@ async def scrape_jobs_endpoint(data: ScrapeJobsInput):
         result.total_deduplicated = len(result.jobs)
         
     return result
+
 
 
 

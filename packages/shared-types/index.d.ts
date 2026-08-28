@@ -2200,3 +2200,46 @@ export interface operations {
         };
     };
 }
+
+export interface HackathonEvent {
+  id: number;
+  external_id: string;
+  source: string;
+  title: string;
+  organizer?: string | null;
+  description?: string | null;
+  url?: string | null;
+  location?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  mode?: string | null;
+  prize_pool?: string | null;
+  registration_deadline?: string | null;
+  event_start_date?: string | null;
+  event_end_date?: string | null;
+  skills: string[];
+  cover_image?: string | null;
+  status: 'open' | 'upcoming' | 'closed' | string;
+  scraped_at: string;
+}
+
+export interface HackathonListResponse {
+  events: HackathonEvent[];
+  total: number;
+  page: number;
+  page_size: number;
+  has_next: boolean;
+}
+
+export interface HackathonFilters {
+  page?: number;
+  page_size?: number;
+  source?: string[];
+  mode?: string;
+  city?: string;
+  status?: string;
+  min_prize?: number;
+  sort?: string;
+}
+

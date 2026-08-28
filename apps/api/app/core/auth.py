@@ -182,18 +182,17 @@ async def get_current_user(
     target_email: Optional[str] = None
     target_clerk_id: Optional[str] = None
 
+    invalid_bearer = False
     # 1. Try JWT Authorization Header
     if authorization and authorization.startswith("Bearer "):
         token = authorization.split(" ")[1].strip()
         payload = decode_access_token(token)
-        if not payload or "sub" not in payload:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid or expired authentication token."
-            )
-        target_email = str(payload["sub"]).strip().lower()
-        if "clerk_id" in payload and payload["clerk_id"]:
-            target_clerk_id = str(payload["clerk_id"]).strip()
+        if payload and "sub" in payload:
+            target_email = str(payload["sub"]).strip().lower()
+            if "clerk_id" in payload and payload["clerk_id"]:
+                target_clerk_id = str(payload["clerk_id"]).strip()
+        else:
+            invalid_bearer = True
 
     # 2. Try X-Clerk-User-Id header
     if not target_email and x_clerk_user_id and x_clerk_user_id.strip():
@@ -202,6 +201,12 @@ async def get_current_user(
     # 3. Fallback to X-User-Email header
     if not target_email and x_user_email and x_user_email.strip():
         target_email = x_user_email.strip().lower()
+
+    if invalid_bearer and not target_email and not target_clerk_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired authentication token."
+        )
 
     user = None
     if target_clerk_id:
