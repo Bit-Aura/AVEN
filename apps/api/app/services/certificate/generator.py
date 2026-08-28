@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict
 
+import pymupdf
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.colors import HexColor
 from reportlab.pdfgen import canvas
@@ -160,12 +161,6 @@ def _build_overlay(page_width: float, page_height: float, values: dict[str, str]
     logo_path = r"d:\projects\AVEN\apps\web\public\Logo.png"
     if Path(logo_path).exists():
         # EXACT POSITION 1: Top-Left old logo (xref 18)
-        # Wipe out both the old large logo and the "TENSORIK" text next to it
-        overlay_canvas.setFillColor(HexColor("#FFFFFF"))
-        overlay_canvas.setStrokeColor(HexColor("#FFFFFF"))
-        # Cover x=20 to 380, to wipe out logo and text completely
-        overlay_canvas.rect(20, 555.0, 360, 190, stroke=0, fill=1)
-        
         # Draw new logo small, very small
         draw_rounded_image(overlay_canvas, logo_path, 80, 680, 60)
         
@@ -175,37 +170,10 @@ def _build_overlay(page_width: float, page_height: float, values: dict[str, str]
         # Logo is at x=80, width=60, right edge is 140. 
         overlay_canvas.drawString(160, 695, "AVEN")
         
-        # EXACT POSITION 2: Right-side ribbon logo
-        # Cover the old logo in the ribbon
-        overlay_canvas.setFillColor(HexColor("#E3E5EB")) 
-        overlay_canvas.setStrokeColor(HexColor("#E3E5EB"))
-        overlay_canvas.circle(830.5, 458.0, 80, stroke=0, fill=1)
-        
-        # Cover "WORKSHOP CERTIFICATE" in the ribbon
-        overlay_canvas.rect(760, 595, 140, 65, stroke=0, fill=1)
-        
-        # Cover "Tensorik Technologies... confirmed..." in the ribbon
-        overlay_canvas.rect(660, 80, 360, 50, stroke=0, fill=1)
-        
         # Draw new logo EXACTLY fitting the circle stencil
         # Size = 160 (radius 80). Center is 830.5, 458.0.
         draw_rounded_image(overlay_canvas, logo_path, 830.5 - 80, 458.0 - 80, 160)
 
-    # -------------------------------------------------------------
-    # WIPE OUT OLD TEXTS (White background)
-    # -------------------------------------------------------------
-    overlay_canvas.setFillColor(HexColor("#FFFFFF"))
-    overlay_canvas.setStrokeColor(HexColor("#FFFFFF"))
-    
-    # Cover "an Workshop authorized by..."
-    overlay_canvas.rect(95, 260, 500, 35, stroke=0, fill=1)
-    
-    # Cover bottom footer "Issued by..."
-    overlay_canvas.rect(40, 15, 1000, 50, stroke=0, fill=1)
-    
-    # Cover signature image and text
-    overlay_canvas.rect(90, 80, 250, 110, stroke=0, fill=1)
-    
     # -------------------------------------------------------------
     # DRAW NEW DYNAMIC TEXTS
     # -------------------------------------------------------------
@@ -214,13 +182,6 @@ def _build_overlay(page_width: float, page_height: float, values: dict[str, str]
     # "a Course authorized by AVEN"
     overlay_canvas.setFont("IBM_Plex_Regular", 16)
     overlay_canvas.drawString(101, 275, "a Course authorized by AVEN")
-    
-    # Bottom footer text
-    footer_text1 = "Issued by AVEN as recognition of successful course participation and topic completion. This certificate acknowledges learning engagement"
-    footer_text2 = "and practical exposure but does not replace formal academic credentials or institutional certification."
-    overlay_canvas.setFont("IBM_Plex_Regular", 10)
-    overlay_canvas.drawCentredString(535, 42, footer_text1)
-    overlay_canvas.drawCentredString(535, 28, footer_text2)
     
     # Ribbon text (WORKSHOP CERTIFICATE -> COURSE CERTIFICATE)
     overlay_canvas.setFillColor(HexColor("#333333"))
@@ -239,7 +200,7 @@ def _build_overlay(page_width: float, page_height: float, values: dict[str, str]
     overlay_canvas.setFillColor(HexColor("#2C3E50")) # Ink color
     # The signature itself
     overlay_canvas.setFont("Times-Italic", 28)
-    overlay_canvas.drawString(101, 160, "P R Surya")
+    overlay_canvas.drawString(101, 168, "P R Surya")
     
     # Signature labels
     overlay_canvas.setFont("IBM_Plex_Regular", 10)
@@ -277,7 +238,39 @@ def generate_certificate(full_name: str, course_name: str, profile_id: str) -> b
         "verify_url": verify_url,
     }
 
-    reader = PdfReader(template_path)
+    # Clean the template by removing static texts completely using PyMuPDF redaction
+    # This leaves the background vector graphics and patterns completely intact
+    doc = pymupdf.open(template_path)
+    page_mu = doc[0]
+    
+    # Define exact redaction boxes based on PyMuPDF coordinate geometry (top-left origin)
+    redact_boxes = [
+        pymupdf.Rect(20, 80, 360, 270),  # top left logo and text
+        pymupdf.Rect(50, 520, 600, 570), # an Workshop authorized...
+        pymupdf.Rect(50, 770, 1000, 810), # footer Issued by...
+        pymupdf.Rect(95, 640, 280, 740), # signature and signature text
+        pymupdf.Rect(660, 705, 1010, 740), # Tensorik confirmed...
+        pymupdf.Rect(765, 175, 895, 225), # WORKSHOP CERTIFICATE
+        pymupdf.Rect(750, 290, 910, 450) # Right-side ribbon logo
+    ]
+    for b in redact_boxes:
+        page_mu.add_redact_annot(b, cross_out=False, fill=None)
+    
+    # Delete the old top-left logo (xref 18) and old signature (xref 19) explicitly
+    # This prevents us from having to use images=2 which would destroy the background image
+    try:
+        page_mu.delete_image(18)
+        page_mu.delete_image(19)
+    except Exception:
+        pass
+        
+    # graphics=0 prevents erasing vector patterns, images=0 prevents erasing the background image
+    page_mu.apply_redactions(images=0, graphics=0)
+    
+    cleaned_pdf_bytes = doc.tobytes()
+    doc.close()
+
+    reader = PdfReader(io.BytesIO(cleaned_pdf_bytes))
     page = reader.pages[0]
     width = float(page.mediabox.width)
     height = float(page.mediabox.height)
