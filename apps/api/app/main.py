@@ -2,7 +2,7 @@ import logging
 import json
 from typing import Dict, Any, List, Optional
 from datetime import datetime
-from fastapi import FastAPI, Depends, HTTPException, Body
+from fastapi import FastAPI, Depends, HTTPException, Body, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -251,6 +251,11 @@ class SliderWeightsInput(BaseModel):
 
 class CareerPivotInput(BaseModel):
     profile_id: int
+    role_id: str
+
+class CertificateRequest(BaseModel):
+    profile_id: int
+    course_name: str
     role_id: str
 
 class ScrapeJobsInput(BaseModel):
@@ -1136,6 +1141,35 @@ async def evaluate_calibration_check(data: CalibrationInput):
         raise HTTPException(status_code=500, detail=f"Calibration check failed: {e}")
 
 
+@app.get("/api/v1/learner/courses")
+async def get_relevant_courses(
+    profile_id: int,
+    active_milestone: Optional[str] = None,
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        from app.services.courses import fetch_dynamic_courses
+        from app.models.domain import LearnerProfile
+        from sqlalchemy import select
+        
+        result = await db.execute(select(LearnerProfile).where(LearnerProfile.id == profile_id))
+        profile = result.scalars().first()
+        
+        if not profile:
+            raise HTTPException(status_code=404, detail="Profile not found")
+            
+        courses = await fetch_dynamic_courses(
+            target_role=profile.current_context or "Software Engineer", 
+            active_milestone=active_milestone,
+            limit=8
+        )
+        
+        return {"status": "success", "courses": courses}
+    except Exception as e:
+        import traceback
+        return {"error": str(e), "traceback": traceback.format_exc()}
+
+
 @app.get("/api/v1/career/alternatives/{profile_id}", response_model=CareerAlternativesReport)
 async def get_career_alternatives(
     profile_id: int,
@@ -1357,6 +1391,23 @@ async def get_tickets(
     except Exception as e:
         logger.exception("Failed to fetch simulator tickets")
         raise HTTPException(status_code=500, detail=f"Failed to fetch tickets: {e}")
+
+@app.post("/api/v1/certificates/issue")
+async def issue_certificate(data: CertificateRequest, db: AsyncSession = Depends(get_db)):
+    """
+    Generate and return a personalized PDF certificate for a completed course/milestone.
+    """
+    from app.services.certificate.generator import generate_certificate
+    try:
+        pdf_bytes = generate_certificate(
+            full_name=f"AVEN Learner #{data.profile_id}",
+            course_name=data.course_name,
+            profile_id=str(data.profile_id)
+        )
+        return Response(content=pdf_bytes, media_type="application/pdf")
+    except Exception as e:
+        logger.exception("Failed to generate certificate")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/simulator/ticket/{ticket_id}/chat", response_model=SimulatorChatResponse)
 async def chat_with_stakeholder_endpoint(

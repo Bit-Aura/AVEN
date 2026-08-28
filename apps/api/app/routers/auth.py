@@ -67,6 +67,14 @@ class ClerkSyncResponse(BaseModel):
     user: UserAuthItem
     profile_id: int
 
+class ProfileUpdateRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=255)
+    email: EmailStr
+
+class PasswordUpdateRequest(BaseModel):
+    current_password: str = Field(..., min_length=1)
+    new_password: str = Field(..., min_length=6, max_length=128)
+
 
 # ---------------------------------------------------------------------------
 # Endpoints
@@ -222,6 +230,63 @@ async def get_current_authenticated_user(
         role=normalize_role(current_user.role),
         is_active=current_user.is_active,
     )
+
+
+@router.put("/me", response_model=UserAuthItem)
+async def update_current_user_profile(
+    payload: ProfileUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_active_user),
+):
+    """
+    Updates the authenticated user's name and email.
+    """
+    clean_email = str(payload.email).strip().lower()
+    
+    # Check if email is being changed and is already taken
+    if clean_email != current_user.email:
+        stmt = select(User).where(User.email == clean_email)
+        existing_user = (await db.execute(stmt)).scalars().first()
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="An account with this email address already exists."
+            )
+        current_user.email = clean_email
+    
+    current_user.name = payload.name.strip()
+    await db.commit()
+    await db.refresh(current_user)
+    
+    return UserAuthItem(
+        id=current_user.id,
+        clerk_id=current_user.clerk_id,
+        email=current_user.email,
+        name=current_user.name,
+        role=normalize_role(current_user.role),
+        is_active=current_user.is_active,
+    )
+
+
+@router.put("/password")
+async def update_current_user_password(
+    payload: PasswordUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_active_user),
+):
+    """
+    Updates the authenticated user's password.
+    """
+    if not current_user.password_hash or not verify_password(payload.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect current password."
+        )
+        
+    current_user.password_hash = hash_password(payload.new_password)
+    await db.commit()
+    
+    return {"message": "Password updated successfully"}
 
 
 @router.post("/sync", response_model=ClerkSyncResponse)
