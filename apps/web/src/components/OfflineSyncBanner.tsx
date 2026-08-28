@@ -47,14 +47,14 @@ export default function OfflineSyncBanner() {
       )}
 
       {!isOffline && isSyncing && (
-        <div className="bg-blue-600 text-white px-4 py-3 flex items-center justify-center gap-3 font-medium shadow-[0_-4px_15px_rgba(37,99,235,0.3)]">
+        <div className="bg-blue-600 text-aven-text px-4 py-3 flex items-center justify-center gap-3 font-medium shadow-[0_-4px_15px_rgba(37,99,235,0.3)]">
           <RefreshCw size={18} className="animate-spin" />
           <span>Connection restored. Syncing your progress...</span>
         </div>
       )}
 
       {!isOffline && !isSyncing && showSuccess && (
-        <div className="bg-emerald-600 text-white px-4 py-3 flex items-center justify-center gap-3 font-medium shadow-[0_-4px_15px_rgba(5,150,105,0.3)]">
+        <div className="bg-emerald-600 text-aven-text px-4 py-3 flex items-center justify-center gap-3 font-medium shadow-[0_-4px_15px_rgba(5,150,105,0.3)]">
           <CheckCircle2 size={18} />
           <span>All offline progress successfully synced!</span>
         </div>

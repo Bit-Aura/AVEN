@@ -640,11 +640,11 @@ function GraphInner() {
           
           <div className="flex items-center bg-aven-surface p-1 rounded-lg border border-aven-border">
             <button onClick={() => setViewMode('graph')}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'graph' ? 'bg-aven-text-subtle text-white' : 'text-aven-text-muted hover:text-aven-text'}`}>
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'graph' ? 'bg-aven-text-subtle text-aven-text' : 'text-aven-text-muted hover:text-aven-text'}`}>
               <Network size={14} /><span>My Graph</span>
             </button>
             <button onClick={() => setViewMode('roadmap')}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'roadmap' ? 'bg-aven-text-subtle text-white' : 'text-aven-text-muted hover:text-aven-text'}`}>
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'roadmap' ? 'bg-aven-text-subtle text-aven-text' : 'text-aven-text-muted hover:text-aven-text'}`}>
               <Map size={14} /><span>Roadmaps</span>
             </button>
           </div>
@@ -658,7 +658,7 @@ function GraphInner() {
                 <button key={r.slug} onClick={() => setSelectedRoadmap(r.slug)}
                   className={`flex items-center px-3 py-1.5 rounded-md text-xs font-bold transition shrink-0 border ${
                     active 
-                      ? 'bg-aven-text-subtle text-white border-aven-text-subtle' 
+                      ? 'bg-aven-text-subtle text-aven-text border-aven-text-subtle' 
                       : 'bg-aven-base text-aven-text-muted border-aven-border hover:border-aven-text-muted hover:text-aven-text'
                   }`}>
                   {r.label}

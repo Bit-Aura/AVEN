@@ -61,15 +61,15 @@ export default function LearnerDashboard() {
   }, [profileId, activeMilestone]);
 
   return (
-    <div className="bg-aven-base text-aven-text min-h-[calc(100vh-4rem)] -m-6 md:-m-8 p-6 md:p-8">
+    <div className="text-aven-text min-h-[calc(100vh-4rem)] -m-6 md:-m-8 p-6 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Top Header */}
         <div className="border-b border-aven-border pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Compass size={16} weight="bold" className="text-aven-text" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-aven-text-muted">Target Role</span>
+              <Compass size={16} weight="bold" className="text-aven-primary" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-aven-text-subtle">Target Role</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-medium text-aven-text tracking-tight">
               {targetRole}
@@ -79,14 +79,14 @@ export default function LearnerDashboard() {
 
         {/* Error Recovery Banner */}
         {pathError && (
-          <div className="p-4 rounded-xl bg-white border border-aven-text flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5 text-xs text-aven-text font-bold">
+          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-between gap-4 backdrop-blur-md">
+            <div className="flex items-center gap-2.5 text-xs text-rose-400 font-bold">
               <Warning size={16} weight="bold" />
               <span>{pathError}</span>
             </div>
             <button
               onClick={() => fetchActivePath()}
-              className="text-xs font-bold text-white bg-aven-text-subtle hover:opacity-90 px-4 py-2 rounded-lg transition-opacity"
+              className="text-xs font-bold text-aven-text bg-rose-500 hover:bg-rose-600 px-4 py-2 rounded-lg transition-colors shadow-glow-rose"
             >
               Retry Fetch
             </button>
@@ -101,13 +101,13 @@ export default function LearnerDashboard() {
 
             {/* Active Learning Milestone */}
             {isLoading && !activeMilestone ? (
-              <div className="bg-aven-surface border border-aven-border rounded-2xl p-8 space-y-6 animate-pulse">
-                <div className="h-4 bg-aven-border rounded-md w-1/4" />
-                <div className="h-10 bg-aven-border rounded-lg w-2/3" />
-                <div className="h-20 bg-aven-border rounded-xl w-full" />
+              <div className="bg-aven-surface border border-aven-border backdrop-blur-md rounded-2xl p-8 space-y-6 animate-pulse">
+                <div className="h-4 bg-aven-base border border-aven-border rounded-md w-1/4" />
+                <div className="h-10 bg-aven-base border border-aven-border rounded-lg w-2/3" />
+                <div className="h-20 bg-aven-base border border-aven-border rounded-xl w-full" />
                 <div className="flex gap-4 pt-4">
-                  <div className="h-10 bg-aven-border rounded-xl w-32" />
-                  <div className="h-10 bg-aven-border rounded-xl w-32" />
+                  <div className="h-10 bg-aven-base border border-aven-border rounded-xl w-32" />
+                  <div className="h-10 bg-aven-base border border-aven-border rounded-xl w-32" />
                 </div>
               </div>
             ) : (
@@ -131,16 +131,16 @@ export default function LearnerDashboard() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between pb-2 border-b border-aven-border">
                     <h3 className="text-sm font-bold text-aven-text flex items-center gap-2">
-                      <Sparkle size={16} weight="bold" className="text-aven-text" />
+                      <Sparkle size={16} weight="bold" className="text-aven-primary" />
                       <span>Your Learning Path</span>
                     </h3>
                     <div className="flex items-center gap-4">
-                      <span className="text-[10px] font-bold text-aven-text-muted uppercase tracking-wider">
+                      <span className="text-[10px] font-bold text-aven-text-subtle uppercase tracking-wider">
                         {completedNodes.length}/{nodes.length} Mastered
                       </span>
                       <Link
                         href="/learner/graph"
-                        className="text-[10px] font-bold uppercase tracking-wider text-aven-text hover:text-aven-text-muted flex items-center gap-1 transition-colors"
+                        className="text-[10px] font-bold uppercase tracking-wider text-aven-primary hover:text-aven-primary flex items-center gap-1 transition-colors"
                       >
                         <span>Explore Full DAG</span>
                         <ArrowRight size={12} weight="bold" />
@@ -148,26 +148,26 @@ export default function LearnerDashboard() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-aven-border border border-aven-border rounded-xl overflow-hidden">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-aven-surface border border-aven-border rounded-xl overflow-hidden shadow-glass">
                     {displayNodes.map((node, idx) => {
                       const isCompleted = node.data?.status === 'completed';
                       const isActive = node.data?.status === 'active';
                       return (
                         <div
                           key={node.id}
-                          className={`p-4 flex items-center justify-between ${isActive ? 'bg-aven-status-active text-aven-text' : 'bg-white text-aven-text'
+                          className={`p-4 flex items-center justify-between backdrop-blur-md ${isActive ? 'bg-aven-primary/10 text-aven-primary border-[0.5px] border-aven-primary/20' : 'bg-aven-surface text-aven-text-subtle'
                             }`}
                         >
                           <div className="flex items-center gap-3">
-                            <span className={`w-5 h-5 rounded-full flex items-center justify-center font-black text-[10px] ${isActive ? 'bg-aven-text text-aven-status-active' : 'bg-aven-surface text-aven-text-muted'
+                            <span className={`w-5 h-5 rounded flex items-center justify-center font-black text-[10px] ${isActive ? 'bg-aven-primary/20 text-aven-primary' : isCompleted ? 'bg-emerald-500/20 text-emerald-400' : 'bg-aven-base border border-aven-border text-aven-text-muted'
                               }`}>
                               {idx + 1}
                             </span>
-                            <span className="text-xs font-black uppercase tracking-tight">
+                            <span className={`text-xs font-black uppercase tracking-tight ${isCompleted ? 'text-aven-text' : isActive ? 'text-aven-primary' : 'text-aven-text-muted'}`}>
                               {node.data?.label as string || node.id}
                             </span>
                           </div>
-                          <span className={`text-[9px] uppercase font-black tracking-widest px-2 py-1 rounded ${isActive ? 'bg-aven-text text-aven-status-active' : isCompleted ? 'bg-aven-surface text-aven-text' : 'bg-aven-base text-aven-text-muted border border-aven-border'
+                          <span className={`text-[9px] uppercase font-black tracking-widest px-2 py-1 rounded ${isActive ? 'bg-aven-primary/20 text-aven-primary border border-aven-primary/30' : isCompleted ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-aven-base border border-aven-border text-aven-text-muted border border-aven-border'
                             }`}>
                             {isCompleted ? 'Mastered' : isActive ? 'Active' : 'Locked'}
                           </span>
@@ -184,17 +184,18 @@ export default function LearnerDashboard() {
           <div className="lg:col-span-1 space-y-6">
 
             {/* Pivot to Career Alternatives */}
-            <div className="bg-aven-surface border border-aven-border rounded-2xl p-6 flex flex-col items-start text-left">
-              <div className="w-8 h-8 rounded-lg bg-aven-text-subtle text-white flex items-center justify-center mb-4">
+            <div className="bg-aven-surface border border-aven-border backdrop-blur-md rounded-2xl p-6 flex flex-col items-start text-left shadow-glass relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-aven-primary/10 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-aven-primary/20" />
+              <div className="w-8 h-8 rounded-lg bg-aven-primary/20 text-aven-primary border border-aven-primary/30 flex items-center justify-center mb-4 z-10">
                 <ArrowsClockwise size={16} weight="bold" />
               </div>
-              <h3 className="text-sm font-bold text-aven-text mb-2">Considering a Career Pivot?</h3>
-              <p className="text-xs text-aven-text-muted mb-6 leading-relaxed">
+              <h3 className="text-sm font-bold text-aven-text mb-2 z-10">Considering a Career Pivot?</h3>
+              <p className="text-xs text-aven-text-subtle mb-6 leading-relaxed z-10">
                 Salvage your mastered skills across adjacent high-demand tech roles.
               </p>
               <button
                 onClick={() => setIsPivotDrawerOpen(true)}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-aven-primary hover:brightness-110 text-aven-base font-black uppercase tracking-widest text-xs transition-all shadow-md"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-aven-base border border-aven-border hover:bg-aven-primary/20 hover:text-aven-primary text-aven-text-subtle font-black uppercase tracking-widest text-[10px] transition-colors border border-aven-border hover:border-aven-primary/30 z-10"
               >
                 <span>Explore Alternatives</span>
               </button>
@@ -204,22 +205,22 @@ export default function LearnerDashboard() {
         </div>
 
         {/* Relevant Courses Space (Horizontal Layout) */}
-        <div className="space-y-6 pt-4">
-          <div className="flex items-center gap-2 pb-2 border-b border-[#d6d3c4]">
-            <BookOpenText size={20} className="text-[#141413]" />
-            <h3 className="text-lg font-bold text-[#141413] tracking-tight">Relevant Courses</h3>
+        <div className="space-y-6 pt-4 relative z-10">
+          <div className="flex items-center gap-2 pb-2 border-b border-aven-border">
+            <BookOpenText size={20} className="text-aven-text-subtle" />
+            <h3 className="text-lg font-bold text-aven-text tracking-tight">Relevant Courses</h3>
           </div>
 
           {isLoadingCourses ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="animate-spin text-[#141413]" size={32} />
+              <Loader2 className="animate-spin text-aven-primary" size={32} />
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {dynamicCourses.map((course, i) => (
-                <div key={i} className="bg-[#e8e6dc] rounded-2xl p-6 flex flex-col border border-[#d6d3c4]">
+                <div key={i} className="bg-aven-surface backdrop-blur-md rounded-2xl p-6 flex flex-col border border-aven-border hover:border-aven-border transition-colors shadow-glass group">
                   <div
-                    className="aspect-video bg-[#3d3d3a] rounded-lg overflow-hidden mb-4 shrink-0 relative group cursor-pointer"
+                    className="aspect-video bg-aven-base border border-aven-border rounded-xl overflow-hidden mb-5 shrink-0 relative cursor-pointer border border-aven-border"
                     onClick={() => setActiveVideoId(course.videoId)}
                   >
                     <img
@@ -232,23 +233,23 @@ export default function LearnerDashboard() {
                       }}
                     />
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                      <div className="w-12 h-12 bg-black/60 rounded-full flex items-center justify-center text-white backdrop-blur-sm group-hover:bg-black/80 group-hover:scale-110 transition-all">
+                      <div className="w-12 h-12 bg-black/60 rounded-full flex items-center justify-center text-aven-text backdrop-blur-sm group-hover:bg-black/80 group-hover:scale-110 transition-all">
                         <Play size={24} className="ml-1" fill="currentColor" />
                       </div>
                     </div>
                   </div>
 
-                  <h4 className="text-sm font-black text-[#141413] mb-2 line-clamp-2" title={course.title}>{course.title}</h4>
-                  <p className="text-xs text-[#87867f] leading-relaxed mb-4 line-clamp-3 font-medium">{course.description}</p>
+                  <h4 className="text-sm font-black text-aven-text mb-2 line-clamp-2 group-hover:text-aven-primary transition-colors" title={course.title}>{course.title}</h4>
+                  <p className="text-xs text-aven-text-subtle leading-relaxed mb-4 line-clamp-3 font-medium">{course.description}</p>
 
-                  <div className="border-t border-[#d6d3c4] pt-4 mt-auto flex flex-col gap-3">
+                  <div className="border-t border-aven-border pt-4 mt-auto flex flex-col gap-3">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="font-bold text-[#87867f] tracking-widest uppercase text-[9px]">Provider</span>
-                      <span className="text-[#141413] font-bold truncate max-w-[120px]">{course.provider}</span>
+                      <span className="font-bold text-aven-text-muted tracking-widest uppercase text-[9px]">Provider</span>
+                      <span className="text-aven-text-subtle font-bold truncate max-w-[120px]">{course.provider}</span>
                     </div>
                     <div className="flex justify-between items-center text-xs">
-                      <span className="font-bold text-[#87867f] tracking-widest uppercase text-[9px]">Duration</span>
-                      <span className="text-[#141413] font-bold">{course.duration}</span>
+                      <span className="font-bold text-aven-text-muted tracking-widest uppercase text-[9px]">Duration</span>
+                      <span className="text-aven-text-subtle font-bold">{course.duration}</span>
                     </div>
                   </div>
                 </div>
@@ -259,11 +260,11 @@ export default function LearnerDashboard() {
 
         {/* Video Modal */}
         {activeVideoId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#141413]/90 backdrop-blur-sm p-4 md:p-8" onClick={() => setActiveVideoId(null)}>
-            <div className="w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl relative" onClick={e => e.stopPropagation()}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-aven-base/90 backdrop-blur-md p-4 md:p-8" onClick={() => setActiveVideoId(null)}>
+            <div className="w-full max-w-5xl aspect-video bg-aven-base rounded-2xl overflow-hidden shadow-[0_0_50px_-12px_rgba(59,130,246,0.25)] border border-aven-border relative" onClick={e => e.stopPropagation()}>
               <button
                 onClick={() => setActiveVideoId(null)}
-                className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-black/50 text-white rounded-full hover:bg-black transition-colors"
+                className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-black/50 text-aven-text rounded-full hover:bg-black transition-colors"
               >
                 ✕
               </button>

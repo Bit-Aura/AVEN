@@ -156,7 +156,7 @@ export default function HackathonDetailPane({ event }: HackathonDetailPaneProps)
         </div>
         <div className="space-y-1.5 flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#141413] text-white">
+            <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#141413] text-aven-text">
               {event.source}
             </span>
           </div>
@@ -248,7 +248,7 @@ export default function HackathonDetailPane({ event }: HackathonDetailPaneProps)
           href={event.url || `https://${domain}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full bg-[#141413] hover:bg-black/80 text-white font-bold text-sm uppercase tracking-wider py-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all hover:shadow-xl hover:-translate-y-0.5"
+          className="w-full bg-[#141413] hover:bg-black/80 text-aven-text font-bold text-sm uppercase tracking-wider py-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all hover:shadow-xl hover:-translate-y-0.5"
         >
           <span>{event.url ? `Apply on ${event.source}` : 'Visit Platform'}</span>
           <ExternalLink size={16} />

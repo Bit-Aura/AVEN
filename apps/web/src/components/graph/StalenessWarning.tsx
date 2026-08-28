@@ -29,8 +29,8 @@ export default function StalenessWarning({ nodeName, daysStale }: { nodeName: st
         <AlertTriangle size={15} />
         <span>Ebbinghaus Decay Warning</span>
       </div>
-      <p className="text-xs text-slate-300 leading-relaxed">
-        Skill <strong className="text-white font-bold">{nodeName}</strong> hasn't been reinforced in {daysStale} days. Retentive strength is estimated below threshold.
+      <p className="text-xs text-aven-text-subtle leading-relaxed">
+        Skill <strong className="text-aven-text font-bold">{nodeName}</strong> hasn't been reinforced in {daysStale} days. Retentive strength is estimated below threshold.
       </p>
       <button 
         onClick={handleStart}

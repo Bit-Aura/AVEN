@@ -29,26 +29,6 @@ export default {
             locked: 'var(--aven-status-locked)',
             mastered: 'var(--aven-status-mastered)'
           }
-        },
-        background: "#090d16",
-        surface: {
-          DEFAULT: "#0f172a",
-          secondary: "#1e293b",
-          tertiary: "#334155",
-          highlight: "#1e293b80"
-        },
-        border: {
-          DEFAULT: "#1e293b",
-          subtle: "#334155",
-          accent: "#6366f1"
-        },
-        brand: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
         }
       },
       boxShadow: {

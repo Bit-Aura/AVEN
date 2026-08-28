@@ -5,16 +5,16 @@ import MockPullRequest from '@/components/simulator/MockPullRequest';
 
 export default function DayOneSimulatorPage() {
   return (
-    <div className="flex flex-col h-screen bg-slate-900 text-slate-100 p-6">
+    <div className="flex flex-col h-screen bg-slate-900 text-aven-text p-6">
       <header className="mb-6">
         <h1 className="text-2xl font-bold text-sky-400">Day-One Simulator</h1>
-        <p className="text-slate-400 text-sm">Welcome to your simulated corporate workspace.</p>
+        <p className="text-aven-text-subtle text-sm">Welcome to your simulated corporate workspace.</p>
       </header>
       
       <div className="flex flex-1 gap-6">
         <div className="w-1/3 flex flex-col gap-6">
           <div className="flex-1 bg-slate-800 rounded-lg p-4 border border-slate-700">
-            <h2 className="text-lg font-semibold mb-4 text-indigo-300">Sprint Board</h2>
+            <h2 className="text-lg font-semibold mb-4 text-aven-primary">Sprint Board</h2>
             <KanbanBoard />
           </div>
         </div>

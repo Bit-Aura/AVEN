@@ -64,14 +64,14 @@ export default function HackathonCard({
       {/* Content */}
       <div className="flex-1 min-w-0 flex flex-col justify-center">
         <h3 className={`font-bold text-[15px] truncate transition-colors ${
-          isActive ? 'text-white' : 'text-[#141413] group-hover:text-amber-600'
+          isActive ? 'text-aven-text' : 'text-[#141413] group-hover:text-amber-600'
         }`}>
           {event.title}
         </h3>
         
         <div className="flex items-center gap-3 mt-1.5">
           <span className={`text-[11px] font-bold uppercase tracking-wider ${
-            isActive ? 'text-white/60' : 'text-[#87867f]'
+            isActive ? 'text-aven-text/60' : 'text-[#87867f]'
           }`}>
             {event.source}
           </span>
@@ -88,7 +88,7 @@ export default function HackathonCard({
           <div className="w-1 h-1 rounded-full bg-black/10" />
           
           <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md ${
-            isActive ? 'text-white bg-white/10' : deadlineInfo.color
+            isActive ? 'text-aven-text bg-white/10' : deadlineInfo.color
           }`}>
             {deadlineInfo.text}
           </span>

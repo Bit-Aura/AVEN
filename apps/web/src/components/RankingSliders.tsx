@@ -31,8 +31,8 @@ export default function RankingSliders() {
     value: number
   ) => (
     <div className="flex flex-col gap-2">
-      <div className="flex justify-between items-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
-        <div className="flex items-center gap-1.5"><IconLeft size={14} className="text-indigo-400" /> {labelLeft}</div>
+      <div className="flex justify-between items-center text-xs font-semibold text-aven-text-subtle uppercase tracking-wider">
+        <div className="flex items-center gap-1.5"><IconLeft size={14} className="text-aven-primary" /> {labelLeft}</div>
         <div className="flex items-center gap-1.5">{labelRight} <IconRight size={14} className="text-emerald-400" /></div>
       </div>
       <input 
@@ -51,15 +51,15 @@ export default function RankingSliders() {
       
       {/* Simulation Overlay */}
       <div className={`absolute inset-0 z-10 bg-slate-950/60 backdrop-blur-[2px] flex items-center justify-center transition-opacity duration-300 ${isSimulating ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <div className="flex items-center gap-2 text-indigo-400 font-semibold bg-slate-900 px-4 py-2 rounded-full border border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+        <div className="flex items-center gap-2 text-aven-primary font-semibold bg-slate-900 px-4 py-2 rounded-full border border-aven-primary/30 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
           <Settings2 size={16} className="animate-spin" />
           <span>Re-ranking Path...</span>
         </div>
       </div>
 
       <div className="flex items-center gap-2 mb-6">
-        <Settings2 className="text-slate-400" size={18} />
-        <h3 className="font-bold text-slate-200">Path Constraints</h3>
+        <Settings2 className="text-aven-text-subtle" size={18} />
+        <h3 className="font-bold text-aven-text">Path Constraints</h3>
       </div>
 
       <div className="flex flex-col gap-6">
@@ -69,7 +69,7 @@ export default function RankingSliders() {
       </div>
 
       <div className="mt-6 pt-4 border-t border-slate-800">
-        <p className="text-xs text-slate-500 leading-relaxed">
+        <p className="text-xs text-aven-text-muted leading-relaxed">
           PathFinder's deterministic engine is live-reranking the resource graph based on your explicit preferences.
         </p>
       </div>

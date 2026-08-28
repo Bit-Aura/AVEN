@@ -62,17 +62,17 @@ export default function SessionScheduleDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-      <div className="bg-surface border border-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="px-6 py-4 border-b border-border bg-surface-secondary/50 flex items-center justify-between">
+      <div className="bg-aven-base border border-aven-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="px-6 py-4 border-b border-aven-border bg-aven-surface flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-brand-500/10 border border-brand-500/30 text-brand-400">
+            <div className="p-2 rounded-xl bg-aven-primary/10 border border-aven-primary/30 text-aven-primary">
               <Calendar size={16} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">
+              <h3 className="text-sm font-bold text-aven-text">
                 Schedule Mentor Session
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-aven-text-subtle">
                 Pick a meeting time and provision a Jitsi video room
               </p>
             </div>
@@ -80,7 +80,7 @@ export default function SessionScheduleDialog({
 
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-surface transition-colors"
+            className="text-aven-text-subtle hover:text-aven-text p-1 rounded-lg hover:bg-aven-base transition-colors"
           >
             <X size={18} />
           </button>
@@ -94,16 +94,16 @@ export default function SessionScheduleDialog({
             </div>
           )}
 
-          <div className="p-3 rounded-xl bg-surface-secondary/50 border border-border text-xs space-y-1">
-            <div className="font-bold text-white">{session.title}</div>
-            <div className="text-[11px] text-slate-400">
-              Learner: <span className="text-slate-200 font-semibold">{session.learner_name}</span>
+          <div className="p-3 rounded-xl bg-aven-surface border border-aven-border text-xs space-y-1">
+            <div className="font-bold text-aven-text">{session.title}</div>
+            <div className="text-[11px] text-aven-text-subtle">
+              Learner: <span className="text-aven-text font-semibold">{session.learner_name}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+              <label className="block text-xs font-bold text-aven-text-subtle uppercase mb-1.5">
                 Meeting Date
               </label>
               <input
@@ -111,12 +111,12 @@ export default function SessionScheduleDialog({
                 required
                 value={scheduledDate}
                 onChange={(e) => setScheduledDate(e.target.value)}
-                className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-aven-surface border border-aven-border rounded-xl px-3.5 py-2 text-xs text-aven-text focus:outline-none focus:border-brand-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+              <label className="block text-xs font-bold text-aven-text-subtle uppercase mb-1.5">
                 Meeting Time
               </label>
               <input
@@ -124,19 +124,19 @@ export default function SessionScheduleDialog({
                 required
                 value={scheduledTime}
                 onChange={(e) => setScheduledTime(e.target.value)}
-                className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-aven-surface border border-aven-border rounded-xl px-3.5 py-2 text-xs text-aven-text focus:outline-none focus:border-brand-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+            <label className="block text-xs font-bold text-aven-text-subtle uppercase mb-1.5">
               Duration
             </label>
             <select
               value={duration}
               onChange={(e) => setDuration(Number(e.target.value))}
-              className="w-full bg-surface-secondary border border-border rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-brand-500 cursor-pointer"
+              className="w-full bg-aven-surface border border-aven-border rounded-xl px-3.5 py-2 text-xs text-aven-text focus:outline-none focus:border-brand-500 cursor-pointer"
             >
               <option value={15}>15 Minutes</option>
               <option value={30}>30 Minutes</option>
@@ -145,23 +145,23 @@ export default function SessionScheduleDialog({
             </select>
           </div>
 
-          <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-[11px] text-indigo-300 flex items-center gap-2">
+          <div className="p-3 rounded-xl bg-aven-primary/10 border border-aven-primary/30 text-[11px] text-aven-primary flex items-center gap-2">
             <Video size={14} className="shrink-0" />
             <span>A secure, embedded Jitsi video room will be provisioned automatically upon scheduling.</span>
           </div>
 
-          <div className="pt-2 flex justify-end gap-3 border-t border-border">
+          <div className="pt-2 flex justify-end gap-3 border-t border-aven-border">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-surface border border-border text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+              className="px-4 py-2 rounded-xl bg-aven-base border border-aven-border text-xs font-semibold text-aven-text-subtle hover:text-aven-text transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white font-bold text-xs shadow-glow-indigo transition-all"
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-aven-text font-bold text-xs shadow-glow-indigo transition-all"
             >
               {isSubmitting ? <Loader2 size={13} className="animate-spin" /> : <Calendar size={13} />}
               <span>Confirm Schedule</span>

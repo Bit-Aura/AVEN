@@ -187,7 +187,7 @@ export default function LiveInterviewRoomPage() {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-4">
         <RefreshCw className="w-10 h-10 animate-spin text-indigo-500" />
-        <p className="text-slate-300 font-semibold text-base">Entering AI Calibration Chamber...</p>
+        <p className="text-aven-text-subtle font-semibold text-base">Entering AI Calibration Chamber...</p>
       </div>
     );
   }
@@ -196,11 +196,11 @@ export default function LiveInterviewRoomPage() {
     return (
       <div className="max-w-2xl mx-auto my-12 p-8 rounded-2xl bg-rose-950/30 border border-rose-500/30 text-center space-y-4">
         <AlertCircle className="w-12 h-12 text-rose-400 mx-auto" />
-        <h2 className="text-xl font-bold text-white">Interview Session Error</h2>
-        <p className="text-sm text-slate-300">{errorMessage}</p>
+        <h2 className="text-xl font-bold text-aven-text">Interview Session Error</h2>
+        <p className="text-sm text-aven-text-subtle">{errorMessage}</p>
         <Link
           href="/learner/interview"
-          className="inline-block px-6 py-2.5 rounded-xl bg-slate-800 text-white text-sm font-semibold hover:bg-slate-700"
+          className="inline-block px-6 py-2.5 rounded-xl bg-slate-800 text-aven-text text-sm font-semibold hover:bg-slate-700"
         >
           Return to Interview Hub
         </Link>
@@ -213,17 +213,17 @@ export default function LiveInterviewRoomPage() {
       {/* Top Session Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+          <div className="w-10 h-10 rounded-xl bg-aven-primary/10 border border-aven-primary/30 flex items-center justify-center text-aven-primary">
             <Bot className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-white flex items-center gap-2">
+            <h1 className="text-sm font-bold text-aven-text flex items-center gap-2">
               {session?.target_role}
-              <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] uppercase font-bold tracking-wider">
+              <span className="px-2 py-0.5 rounded-md bg-aven-primary/20 text-aven-primary text-[10px] uppercase font-bold tracking-wider">
                 {session?.current_phase || 'TECHNICAL'}
               </span>
             </h1>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-aven-text-subtle">
               Turn {(session?.current_turn_index || 0) + 1} of 8 • {session?.interview_type} Mode
             </p>
           </div>
@@ -234,8 +234,8 @@ export default function LiveInterviewRoomPage() {
             onClick={() => setTtsEnabled(!ttsEnabled)}
             className={`p-2.5 rounded-xl border text-xs flex items-center gap-1.5 transition-colors ${
               ttsEnabled
-                ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
-                : 'bg-slate-800/60 border-slate-700 text-slate-400'
+                ? 'bg-aven-primary/10 border-aven-primary/30 text-aven-primary'
+                : 'bg-slate-800/60 border-slate-700 text-aven-text-subtle'
             }`}
             title={ttsEnabled ? 'Disable Spoken AI Audio' : 'Enable Spoken AI Audio'}
           >
@@ -266,10 +266,10 @@ export default function LiveInterviewRoomPage() {
             <div
               className={`relative w-24 h-24 rounded-full border-2 flex items-center justify-center shadow-2xl transition-all duration-300 ${
                 isSpeaking
-                  ? 'border-indigo-400 bg-indigo-950/60 text-indigo-300 shadow-indigo-500/30 scale-105'
+                  ? 'border-indigo-400 bg-indigo-950/60 text-aven-primary shadow-indigo-500/30 scale-105'
                   : isListening
                   ? 'border-cyan-400 bg-cyan-950/60 text-cyan-300 shadow-cyan-500/30 scale-105'
-                  : 'border-slate-700 bg-slate-900 text-slate-400'
+                  : 'border-slate-700 bg-slate-900 text-aven-text-subtle'
               }`}
             >
               <Bot className="w-12 h-12" />
@@ -282,7 +282,7 @@ export default function LiveInterviewRoomPage() {
               {isSpeaking ? (
                 <>
                   <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
-                  <span className="text-indigo-300">AI Interviewer Speaking...</span>
+                  <span className="text-aven-primary">AI Interviewer Speaking...</span>
                 </>
               ) : isTranscribing ? (
                 <>
@@ -302,7 +302,7 @@ export default function LiveInterviewRoomPage() {
               ) : (
                 <>
                   <span className="w-2 h-2 rounded-full bg-slate-500" />
-                  <span className="text-slate-400">Awaiting Verbal Response</span>
+                  <span className="text-aven-text-subtle">Awaiting Verbal Response</span>
                 </>
               )}
             </div>
@@ -336,26 +336,26 @@ export default function LiveInterviewRoomPage() {
         </div>
 
         {/* Current Question Bubble */}
-        <div className="relative rounded-2xl bg-indigo-950/30 border border-indigo-500/30 p-6 backdrop-blur-sm space-y-4">
+        <div className="relative rounded-2xl bg-indigo-950/30 border border-aven-primary/30 p-6 backdrop-blur-sm space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-bold text-xs">
+              <span className="px-2.5 py-0.5 rounded-md bg-aven-primary/20 text-aven-primary font-bold text-xs">
                 Question {((currentTurn?.turn_index || 0) + 1)}
               </span>
-              <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">
+              <span className="text-xs text-aven-text-subtle font-medium uppercase tracking-wider">
                 {currentTurn?.category?.replace('_', ' ')}
               </span>
             </div>
 
             <button
               onClick={handleReplayQuestion}
-              className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors"
+              className="text-xs text-aven-primary hover:text-aven-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-aven-primary/10 border border-indigo-500/20 hover:bg-aven-primary/20 transition-colors"
             >
               <Volume2 className="w-3.5 h-3.5" /> Replay Audio
             </button>
           </div>
 
-          <p className="text-lg sm:text-xl font-semibold text-white leading-relaxed">
+          <p className="text-lg sm:text-xl font-semibold text-aven-text leading-relaxed">
             "{currentTurn?.question_text}"
           </p>
         </div>
@@ -363,14 +363,14 @@ export default function LiveInterviewRoomPage() {
         {/* Learner Speech-To-Text / Text Fallback Input Box */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+            <label className="text-xs font-semibold text-aven-text-subtle uppercase tracking-wider flex items-center gap-1.5">
               <User className="w-3.5 h-3.5 text-cyan-400" /> Your Spoken Answer
             </label>
 
             {transcript && (
               <button
                 onClick={resetTranscript}
-                className="text-xs text-slate-400 hover:text-slate-300"
+                className="text-xs text-aven-text-subtle hover:text-aven-text-subtle"
               >
                 Clear Transcript
               </button>
@@ -398,7 +398,7 @@ export default function LiveInterviewRoomPage() {
                         clearSpeechError();
                         startListening();
                       }}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-[11px] transition-colors border border-slate-700"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-aven-text font-medium text-[11px] transition-colors border border-slate-700"
                     >
                       <Mic className="w-3 h-3 text-cyan-400" /> Try Mic Again
                     </button>
@@ -426,7 +426,7 @@ export default function LiveInterviewRoomPage() {
                   ? 'Listening... Speak clearly into your microphone.'
                   : 'Speak through your microphone or type your answer directly here...'
               }
-              className={`w-full p-4 rounded-2xl bg-slate-950/70 border text-white placeholder-slate-500 text-sm leading-relaxed focus:outline-none transition-all ${
+              className={`w-full p-4 rounded-2xl bg-slate-950/70 border text-aven-text placeholder-slate-500 text-sm leading-relaxed focus:outline-none transition-all ${
                 isListening
                   ? 'border-cyan-500 shadow-lg shadow-cyan-500/10'
                   : 'border-slate-800 focus:border-indigo-500'
@@ -449,7 +449,7 @@ export default function LiveInterviewRoomPage() {
                 isTranscribing
                   ? 'bg-slate-800 text-cyan-300 border border-cyan-500/30 cursor-wait'
                   : isListening
-                  ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-500/25 animate-pulse'
+                  ? 'bg-rose-600 hover:bg-rose-500 text-aven-text shadow-rose-500/25 animate-pulse'
                   : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-cyan-500/25'
               }`}
             >
@@ -471,7 +471,7 @@ export default function LiveInterviewRoomPage() {
             <button
               onClick={handleSubmitAnswer}
               disabled={isSubmitting || (!transcript.trim() && !interimTranscript.trim())}
-              className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
+              className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-aven-text font-bold text-sm shadow-lg shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
             >
               {isSubmitting ? (
                 <>
@@ -490,20 +490,20 @@ export default function LiveInterviewRoomPage() {
       {/* Turn History Accordion */}
       {session && session.turns.length > 1 && (
         <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Previous Turns in this Session</h3>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-aven-text-subtle">Previous Turns in this Session</h3>
           <div className="space-y-3">
             {session.turns
               .filter((t) => t.turn_index < session.current_turn_index && t.learner_answer)
               .map((t) => (
                 <div key={t.id} className="p-3.5 rounded-xl bg-slate-950/40 border border-slate-800 text-xs space-y-2">
-                  <div className="flex items-center justify-between text-slate-400">
-                    <span className="font-semibold text-indigo-300">Turn {t.turn_index + 1} ({t.category})</span>
+                  <div className="flex items-center justify-between text-aven-text-subtle">
+                    <span className="font-semibold text-aven-primary">Turn {t.turn_index + 1} ({t.category})</span>
                     {typeof t.answer_score === 'number' && (
                       <span className="font-bold text-emerald-400">{Math.round(t.answer_score)}%</span>
                     )}
                   </div>
-                  <p className="text-slate-300 font-medium">Q: {t.question_text}</p>
-                  <p className="text-slate-400 italic bg-slate-900/80 p-2 rounded-lg border border-slate-800/60">
+                  <p className="text-aven-text-subtle font-medium">Q: {t.question_text}</p>
+                  <p className="text-aven-text-subtle italic bg-slate-900/80 p-2 rounded-lg border border-slate-800/60">
                     "{t.learner_answer}"
                   </p>
                 </div>

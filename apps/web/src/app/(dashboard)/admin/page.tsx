@@ -327,16 +327,16 @@ export default function PlatformAdminDashboard() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-aven-border pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <ShieldCheck className="text-brand-400" size={20} />
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Platform Governance</span>
+            <ShieldCheck className="text-aven-primary" size={20} />
+            <span className="text-xs font-bold uppercase tracking-widest text-aven-text-subtle">Platform Governance</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl font-extrabold text-aven-text tracking-tight">
             Platform Admin Console
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-aven-text-subtle mt-1">
             Global management for users, mentor applications, learning resources, and platform infrastructure.
           </p>
         </div>
@@ -344,9 +344,9 @@ export default function PlatformAdminDashboard() {
         <div className="flex items-center gap-3">
           <button
             onClick={refreshCurrentView}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface border border-border hover:bg-surface-secondary text-xs font-bold text-slate-200 transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-aven-base border border-aven-border hover:bg-aven-surface text-xs font-bold text-aven-text transition-all shadow-sm"
           >
-            <RefreshCw size={13} className={isLoading ? 'animate-spin text-indigo-400' : ''} />
+            <RefreshCw size={13} className={isLoading ? 'animate-spin text-aven-primary' : ''} />
             <span>Refresh</span>
           </button>
         </div>
@@ -363,7 +363,7 @@ export default function PlatformAdminDashboard() {
             {actionMessage.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
             <span>{actionMessage.text}</span>
           </div>
-          <button onClick={() => setActionMessage(null)} className="text-slate-400 hover:text-white">
+          <button onClick={() => setActionMessage(null)} className="text-aven-text-subtle hover:text-aven-text">
             <X size={14} />
           </button>
         </div>
@@ -378,7 +378,7 @@ export default function PlatformAdminDashboard() {
           </div>
           <button
             onClick={refreshCurrentView}
-            className="px-3 py-1 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 border border-rose-500/50 text-xs font-bold text-white transition-all shrink-0"
+            className="px-3 py-1 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 border border-rose-500/50 text-xs font-bold text-aven-text transition-all shrink-0"
           >
             Retry
           </button>
@@ -386,13 +386,13 @@ export default function PlatformAdminDashboard() {
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-3">
+      <div className="flex flex-wrap items-center gap-2 border-b border-aven-border pb-3">
         <button
           onClick={() => setActiveTab('overview')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'overview'
-              ? 'bg-brand-600 text-white shadow-glow-indigo'
-              : 'text-slate-400 hover:text-white hover:bg-surface'
+              ? 'bg-brand-600 text-aven-text shadow-glow-indigo'
+              : 'text-aven-text-subtle hover:text-aven-text hover:bg-aven-base'
           }`}
         >
           <Activity size={15} />
@@ -403,14 +403,14 @@ export default function PlatformAdminDashboard() {
           onClick={() => setActiveTab('users')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'users'
-              ? 'bg-brand-600 text-white shadow-glow-indigo'
-              : 'text-slate-400 hover:text-white hover:bg-surface'
+              ? 'bg-brand-600 text-aven-text shadow-glow-indigo'
+              : 'text-aven-text-subtle hover:text-aven-text hover:bg-aven-base'
           }`}
         >
           <Users size={15} />
           <span>Users</span>
           {overview && (
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-surface-secondary text-slate-300">
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-aven-surface text-aven-text-subtle">
               {overview.total_users}
             </span>
           )}
@@ -420,8 +420,8 @@ export default function PlatformAdminDashboard() {
           onClick={() => setActiveTab('mentors')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'mentors'
-              ? 'bg-brand-600 text-white shadow-glow-indigo'
-              : 'text-slate-400 hover:text-white hover:bg-surface'
+              ? 'bg-brand-600 text-aven-text shadow-glow-indigo'
+              : 'text-aven-text-subtle hover:text-aven-text hover:bg-aven-base'
           }`}
         >
           <UserCheck size={15} />
@@ -437,8 +437,8 @@ export default function PlatformAdminDashboard() {
           onClick={() => setActiveTab('resources')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'resources'
-              ? 'bg-brand-600 text-white shadow-glow-indigo'
-              : 'text-slate-400 hover:text-white hover:bg-surface'
+              ? 'bg-brand-600 text-aven-text shadow-glow-indigo'
+              : 'text-aven-text-subtle hover:text-aven-text hover:bg-aven-base'
           }`}
         >
           <BookOpen size={15} />
@@ -454,8 +454,8 @@ export default function PlatformAdminDashboard() {
           onClick={() => setActiveTab('system')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'system'
-              ? 'bg-brand-600 text-white shadow-glow-indigo'
-              : 'text-slate-400 hover:text-white hover:bg-surface'
+              ? 'bg-brand-600 text-aven-text shadow-glow-indigo'
+              : 'text-aven-text-subtle hover:text-aven-text hover:bg-aven-base'
           }`}
         >
           <Server size={15} />
@@ -466,8 +466,8 @@ export default function PlatformAdminDashboard() {
           onClick={() => setActiveTab('roadmap_sync')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'roadmap_sync'
-              ? 'bg-indigo-600 text-white shadow-glow-indigo'
-              : 'text-slate-400 hover:text-white hover:bg-surface'
+              ? 'bg-indigo-600 text-aven-text shadow-glow-indigo'
+              : 'text-aven-text-subtle hover:text-aven-text hover:bg-aven-base'
           }`}
         >
           <Map size={15} />
@@ -483,14 +483,14 @@ export default function PlatformAdminDashboard() {
           {/* Key Metrics Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {/* Total Users */}
-            <div className="p-6 rounded-2xl bg-surface border border-border hover:border-brand-500/50 shadow-glass transition-all space-y-2">
-              <div className="flex items-center justify-between text-slate-400">
+            <div className="p-6 rounded-2xl bg-aven-base border border-aven-border hover:border-brand-500/50 shadow-glass transition-all space-y-2">
+              <div className="flex items-center justify-between text-aven-text-subtle">
                 <span className="text-xs font-bold uppercase tracking-wider">Total Platform Users</span>
-                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400">
+                <div className="p-2 rounded-xl bg-aven-primary/10 text-aven-primary">
                   <Users size={18} />
                 </div>
               </div>
-              <div className="text-3xl font-extrabold text-white">
+              <div className="text-3xl font-extrabold text-aven-text">
                 {overview?.total_users ?? '—'}
               </div>
               <div className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
@@ -500,37 +500,37 @@ export default function PlatformAdminDashboard() {
             </div>
 
             {/* Approved Mentors */}
-            <div className="p-6 rounded-2xl bg-surface border border-border hover:border-brand-500/50 shadow-glass transition-all space-y-2">
-              <div className="flex items-center justify-between text-slate-400">
+            <div className="p-6 rounded-2xl bg-aven-base border border-aven-border hover:border-brand-500/50 shadow-glass transition-all space-y-2">
+              <div className="flex items-center justify-between text-aven-text-subtle">
                 <span className="text-xs font-bold uppercase tracking-wider">Approved Mentors</span>
                 <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
                   <UserCheck size={18} />
                 </div>
               </div>
-              <div className="text-3xl font-extrabold text-white">
+              <div className="text-3xl font-extrabold text-aven-text">
                 {overview?.total_mentors ?? '—'}
               </div>
-              <div className="text-[11px] text-slate-400 font-medium">
+              <div className="text-[11px] text-aven-text-subtle font-medium">
                 Verified platform educators
               </div>
             </div>
 
             {/* Pending Mentor Applications */}
-            <div className={`p-6 rounded-2xl bg-surface border shadow-glass transition-all space-y-2 ${
-              (overview?.pending_mentors ?? 0) > 0 ? 'border-amber-500/50 bg-amber-950/10' : 'border-border'
+            <div className={`p-6 rounded-2xl bg-aven-base border shadow-glass transition-all space-y-2 ${
+              (overview?.pending_mentors ?? 0) > 0 ? 'border-amber-500/50 bg-amber-950/10' : 'border-aven-border'
             }`}>
-              <div className="flex items-center justify-between text-slate-400">
+              <div className="flex items-center justify-between text-aven-text-subtle">
                 <span className="text-xs font-bold uppercase tracking-wider">Pending Mentors</span>
                 <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
                   <Clock size={18} />
                 </div>
               </div>
-              <div className="text-3xl font-extrabold text-white">
+              <div className="text-3xl font-extrabold text-aven-text">
                 {overview?.pending_mentors ?? '0'}
               </div>
               <button 
                 onClick={() => { setActiveTab('mentors'); setMentorStatusFilter('PENDING'); }}
-                className="text-[11px] text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1"
+                className="text-[11px] text-aven-primary hover:text-aven-primary font-bold flex items-center gap-1"
               >
                 <span>Review applications</span>
                 <ArrowRight size={12} />
@@ -538,37 +538,37 @@ export default function PlatformAdminDashboard() {
             </div>
 
             {/* Total Resources */}
-            <div className="p-6 rounded-2xl bg-surface border border-border hover:border-brand-500/50 shadow-glass transition-all space-y-2">
-              <div className="flex items-center justify-between text-slate-400">
+            <div className="p-6 rounded-2xl bg-aven-base border border-aven-border hover:border-brand-500/50 shadow-glass transition-all space-y-2">
+              <div className="flex items-center justify-between text-aven-text-subtle">
                 <span className="text-xs font-bold uppercase tracking-wider">Published Resources</span>
                 <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
                   <BookOpen size={18} />
                 </div>
               </div>
-              <div className="text-3xl font-extrabold text-white">
+              <div className="text-3xl font-extrabold text-aven-text">
                 {overview?.total_resources ?? '—'}
               </div>
-              <div className="text-[11px] text-slate-400 font-medium">
+              <div className="text-[11px] text-aven-text-subtle font-medium">
                 Courses, tutorials & projects
               </div>
             </div>
 
             {/* Pending Resource Submissions */}
-            <div className={`p-6 rounded-2xl bg-surface border shadow-glass transition-all space-y-2 ${
-              (overview?.pending_resources ?? 0) > 0 ? 'border-amber-500/50 bg-amber-950/10' : 'border-border'
+            <div className={`p-6 rounded-2xl bg-aven-base border shadow-glass transition-all space-y-2 ${
+              (overview?.pending_resources ?? 0) > 0 ? 'border-amber-500/50 bg-amber-950/10' : 'border-aven-border'
             }`}>
-              <div className="flex items-center justify-between text-slate-400">
+              <div className="flex items-center justify-between text-aven-text-subtle">
                 <span className="text-xs font-bold uppercase tracking-wider">Pending Resources</span>
                 <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
                   <Layers size={18} />
                 </div>
               </div>
-              <div className="text-3xl font-extrabold text-white">
+              <div className="text-3xl font-extrabold text-aven-text">
                 {overview?.pending_resources ?? '0'}
               </div>
               <button 
                 onClick={() => { setActiveTab('resources'); setResourceStatusFilter('PENDING'); }}
-                className="text-[11px] text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1"
+                className="text-[11px] text-aven-primary hover:text-aven-primary font-bold flex items-center gap-1"
               >
                 <span>Review submissions</span>
                 <ArrowRight size={12} />
@@ -576,18 +576,18 @@ export default function PlatformAdminDashboard() {
             </div>
 
             {/* System Status Quick Tile */}
-            <div className="p-6 rounded-2xl bg-surface border border-border hover:border-brand-500/50 shadow-glass transition-all space-y-2">
-              <div className="flex items-center justify-between text-slate-400">
+            <div className="p-6 rounded-2xl bg-aven-base border border-aven-border hover:border-brand-500/50 shadow-glass transition-all space-y-2">
+              <div className="flex items-center justify-between text-aven-text-subtle">
                 <span className="text-xs font-bold uppercase tracking-wider">Infrastructure</span>
                 <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
                   <Server size={18} />
                 </div>
               </div>
-              <div className="text-xl font-extrabold text-white flex items-center gap-2">
+              <div className="text-xl font-extrabold text-aven-text flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="capitalize">{systemStatus?.status || 'Online'}</span>
               </div>
-              <div className="text-[11px] text-slate-400 font-medium">
+              <div className="text-[11px] text-aven-text-subtle font-medium">
                 API & Database connected
               </div>
             </div>
@@ -595,7 +595,7 @@ export default function PlatformAdminDashboard() {
 
           {/* Pending Actions Section */}
           {overview?.pending_actions && overview.pending_actions.length > 0 && (
-            <div className="p-6 rounded-2xl bg-surface border border-amber-500/30 shadow-glass space-y-4">
+            <div className="p-6 rounded-2xl bg-aven-base border border-amber-500/30 shadow-glass space-y-4">
               <div className="flex items-center gap-2 text-amber-300 text-sm font-bold uppercase tracking-wider">
                 <AlertCircle size={17} />
                 <span>Pending Administrative Actions</span>
@@ -605,11 +605,11 @@ export default function PlatformAdminDashboard() {
                 {overview.pending_actions.map((action, idx) => (
                   <div 
                     key={idx}
-                    className="p-4 rounded-xl bg-surface-secondary/60 border border-border flex items-center justify-between gap-4"
+                    className="p-4 rounded-xl bg-aven-surface/60 border border-aven-border flex items-center justify-between gap-4"
                   >
                     <div>
-                      <div className="text-sm font-bold text-white">{action.message}</div>
-                      <div className="text-xs text-slate-400 mt-0.5">Requires platform administrator decision</div>
+                      <div className="text-sm font-bold text-aven-text">{action.message}</div>
+                      <div className="text-xs text-aven-text-subtle mt-0.5">Requires platform administrator decision</div>
                     </div>
                     <button
                       onClick={() => {
@@ -621,7 +621,7 @@ export default function PlatformAdminDashboard() {
                           setResourceStatusFilter('PENDING');
                         }
                       }}
-                      className="px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-glow-indigo transition-all shrink-0"
+                      className="px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-aven-text text-xs font-bold shadow-glow-indigo transition-all shrink-0"
                     >
                       Review
                     </button>
@@ -639,15 +639,15 @@ export default function PlatformAdminDashboard() {
       {activeTab === 'users' && (
         <div className="space-y-6">
           {/* Filter / Search Bar */}
-          <div className="p-4 rounded-2xl bg-surface border border-border flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="p-4 rounded-2xl bg-aven-base border border-aven-border flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="relative w-full md:w-80">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={15} />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-aven-text-muted" size={15} />
               <input
                 type="text"
                 placeholder="Search user by name or email..."
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface-secondary border border-border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-aven-surface border border-aven-border text-xs text-aven-text placeholder-slate-500 focus:outline-none focus:border-brand-500"
               />
             </div>
 
@@ -655,7 +655,7 @@ export default function PlatformAdminDashboard() {
               <select
                 value={userRoleFilter}
                 onChange={(e) => setUserRoleFilter(e.target.value)}
-                className="px-3.5 py-2 rounded-xl bg-surface-secondary border border-border text-xs font-semibold text-slate-300 focus:outline-none focus:border-brand-500"
+                className="px-3.5 py-2 rounded-xl bg-aven-surface border border-aven-border text-xs font-semibold text-aven-text-subtle focus:outline-none focus:border-brand-500"
               >
                 <option value="">All Roles</option>
                 <option value="learner">Learners</option>
@@ -663,18 +663,18 @@ export default function PlatformAdminDashboard() {
                 <option value="admin">Administrators</option>
               </select>
 
-              <span className="text-xs text-slate-400 font-semibold">
+              <span className="text-xs text-aven-text-subtle font-semibold">
                 Total: {userTotal}
               </span>
             </div>
           </div>
 
           {/* Users Table */}
-          <div className="bg-surface border border-border rounded-2xl overflow-hidden shadow-glass">
+          <div className="bg-aven-base border border-aven-border rounded-2xl overflow-hidden shadow-glass">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-surface-secondary/70 text-slate-400 text-[11px] uppercase tracking-wider border-b border-border">
+                  <tr className="bg-aven-surface/70 text-aven-text-subtle text-[11px] uppercase tracking-wider border-b border-aven-border">
                     <th className="p-4 font-bold">User Identity</th>
                     <th className="p-4 font-bold">Role</th>
                     <th className="p-4 font-bold">Account Status</th>
@@ -685,17 +685,17 @@ export default function PlatformAdminDashboard() {
                 <tbody className="divide-y divide-border text-xs">
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-12 text-center text-slate-500">
+                      <td colSpan={5} className="p-12 text-center text-aven-text-muted">
                         No users matched your query.
                       </td>
                     </tr>
                   ) : (
                     users.map((u) => (
-                      <tr key={u.id} className="hover:bg-surface-secondary/40 transition-colors">
+                      <tr key={u.id} className="hover:bg-aven-surface transition-colors">
                         <td className="p-4">
-                          <div className="font-bold text-white">{u.name || 'Unnamed User'}</div>
-                          <div className="text-[11px] text-slate-400 font-mono">{u.email}</div>
-                          <div className="text-[10px] text-slate-500">ID #{u.id} • {u.clerk_id}</div>
+                          <div className="font-bold text-aven-text">{u.name || 'Unnamed User'}</div>
+                          <div className="text-[11px] text-aven-text-subtle font-mono">{u.email}</div>
+                          <div className="text-[10px] text-aven-text-muted">ID #{u.id} • {u.clerk_id}</div>
                         </td>
                         <td className="p-4">
                           <select
@@ -706,7 +706,7 @@ export default function PlatformAdminDashboard() {
                                 ? 'bg-purple-500/10 border-purple-500/30 text-purple-300'
                                 : u.role === 'mentor'
                                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                                : 'bg-surface-secondary border-border text-slate-300'
+                                : 'bg-aven-surface border-aven-border text-aven-text-subtle'
                             }`}
                           >
                             <option value="learner">Learner</option>
@@ -724,7 +724,7 @@ export default function PlatformAdminDashboard() {
                             <span>{u.is_active ? 'Active' : 'Suspended'}</span>
                           </span>
                         </td>
-                        <td className="p-4 text-slate-400">
+                        <td className="p-4 text-aven-text-subtle">
                           {new Date(u.created_at).toLocaleDateString()}
                         </td>
                         <td className="p-4 text-right">
@@ -755,14 +755,14 @@ export default function PlatformAdminDashboard() {
       {activeTab === 'mentors' && (
         <div className="space-y-6">
           {/* Status Sub-filter Bar */}
-          <div className="p-4 rounded-2xl bg-surface border border-border flex items-center justify-between gap-4">
+          <div className="p-4 rounded-2xl bg-aven-base border border-aven-border flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setMentorStatusFilter('PENDING')}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   mentorStatusFilter === 'PENDING'
                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                    : 'text-slate-400 hover:text-white bg-surface-secondary'
+                    : 'text-aven-text-subtle hover:text-aven-text bg-aven-surface'
                 }`}
               >
                 Pending Review
@@ -772,7 +772,7 @@ export default function PlatformAdminDashboard() {
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   mentorStatusFilter === 'APPROVED'
                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'text-slate-400 hover:text-white bg-surface-secondary'
+                    : 'text-aven-text-subtle hover:text-aven-text bg-aven-surface'
                 }`}
               >
                 Approved Mentors
@@ -782,7 +782,7 @@ export default function PlatformAdminDashboard() {
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   mentorStatusFilter === 'REJECTED'
                     ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                    : 'text-slate-400 hover:text-white bg-surface-secondary'
+                    : 'text-aven-text-subtle hover:text-aven-text bg-aven-surface'
                 }`}
               >
                 Rejected
@@ -791,15 +791,15 @@ export default function PlatformAdminDashboard() {
                 onClick={() => setMentorStatusFilter('')}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   mentorStatusFilter === ''
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-slate-400 hover:text-white bg-surface-secondary'
+                    ? 'bg-indigo-600 text-aven-text'
+                    : 'text-aven-text-subtle hover:text-aven-text bg-aven-surface'
                 }`}
               >
                 All Applications
               </button>
             </div>
 
-            <div className="text-xs text-slate-400 font-semibold">
+            <div className="text-xs text-aven-text-subtle font-semibold">
               Showing {mentors.length} applications
             </div>
           </div>
@@ -807,19 +807,19 @@ export default function PlatformAdminDashboard() {
           {/* Mentors Grid / List */}
           <div className="space-y-4">
             {mentors.length === 0 ? (
-              <div className="p-12 text-center bg-surface border border-border rounded-2xl text-slate-500 text-sm">
+              <div className="p-12 text-center bg-aven-base border border-aven-border rounded-2xl text-aven-text-muted text-sm">
                 No mentor applications found for this filter.
               </div>
             ) : (
               mentors.map((m) => (
                 <div
                   key={m.id}
-                  className="p-6 rounded-2xl bg-surface border border-border hover:border-brand-500/40 shadow-glass transition-all space-y-4"
+                  className="p-6 rounded-2xl bg-aven-base border border-aven-border hover:border-brand-500/40 shadow-glass transition-all space-y-4"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2.5">
-                        <h3 className="text-lg font-bold text-white">{m.name}</h3>
+                        <h3 className="text-lg font-bold text-aven-text">{m.name}</h3>
                         <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider border ${
                           m.status === 'APPROVED'
                             ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
@@ -830,7 +830,7 @@ export default function PlatformAdminDashboard() {
                           {m.status}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400">{m.user_email} • Applied on {new Date(m.created_at).toLocaleDateString()}</p>
+                      <p className="text-xs text-aven-text-subtle">{m.user_email} • Applied on {new Date(m.created_at).toLocaleDateString()}</p>
                     </div>
 
                     {/* Action buttons for pending */}
@@ -838,7 +838,7 @@ export default function PlatformAdminDashboard() {
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           onClick={() => handleApproveMentor(m.id, m.name)}
-                          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all"
+                          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-aven-text text-xs font-bold shadow-sm transition-all"
                         >
                           <CheckCircle2 size={14} />
                           <span>Approve</span>
@@ -854,15 +854,15 @@ export default function PlatformAdminDashboard() {
                     )}
                   </div>
 
-                  <div className="space-y-2 pt-2 border-t border-border/80 text-xs">
+                  <div className="space-y-2 pt-2 border-t border-aven-border/80 text-xs">
                     <div>
-                      <span className="font-bold text-slate-400">Domain Expertise: </span>
-                      <span className="text-white font-medium">{m.expertise}</span>
+                      <span className="font-bold text-aven-text-subtle">Domain Expertise: </span>
+                      <span className="text-aven-text font-medium">{m.expertise}</span>
                     </div>
                     {m.bio && (
                       <div>
-                        <span className="font-bold text-slate-400">Statement / Bio: </span>
-                        <span className="text-slate-300">{m.bio}</span>
+                        <span className="font-bold text-aven-text-subtle">Statement / Bio: </span>
+                        <span className="text-aven-text-subtle">{m.bio}</span>
                       </div>
                     )}
                     {m.linkedin_url && (
@@ -871,7 +871,7 @@ export default function PlatformAdminDashboard() {
                           href={m.linkedin_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-indigo-400 hover:text-indigo-300 font-semibold inline-flex items-center gap-1"
+                          className="text-aven-primary hover:text-aven-primary font-semibold inline-flex items-center gap-1"
                         >
                           <span>Professional Profile</span>
                           <ExternalLink size={12} />
@@ -898,23 +898,23 @@ export default function PlatformAdminDashboard() {
       {activeTab === 'resources' && (
         <div className="space-y-6">
           {/* Controls Bar */}
-          <div className="p-4 rounded-2xl bg-surface border border-border flex flex-col lg:flex-row items-center justify-between gap-4">
+          <div className="p-4 rounded-2xl bg-aven-base border border-aven-border flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
               <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={15} />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-aven-text-muted" size={15} />
                 <input
                   type="text"
                   placeholder="Search resources..."
                   value={resourceSearch}
                   onChange={(e) => setResourceSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface-secondary border border-border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-aven-surface border border-aven-border text-xs text-aven-text placeholder-slate-500 focus:outline-none focus:border-brand-500"
                 />
               </div>
 
               <select
                 value={resourceStatusFilter}
                 onChange={(e) => setResourceStatusFilter(e.target.value)}
-                className="px-3.5 py-2 rounded-xl bg-surface-secondary border border-border text-xs font-semibold text-slate-300 focus:outline-none"
+                className="px-3.5 py-2 rounded-xl bg-aven-surface border border-aven-border text-xs font-semibold text-aven-text-subtle focus:outline-none"
               >
                 <option value="">All Statuses</option>
                 <option value="PENDING">Pending Review</option>
@@ -925,7 +925,7 @@ export default function PlatformAdminDashboard() {
               <select
                 value={resourceTypeFilter}
                 onChange={(e) => setResourceTypeFilter(e.target.value)}
-                className="px-3.5 py-2 rounded-xl bg-surface-secondary border border-border text-xs font-semibold text-slate-300 focus:outline-none"
+                className="px-3.5 py-2 rounded-xl bg-aven-surface border border-aven-border text-xs font-semibold text-aven-text-subtle focus:outline-none"
               >
                 <option value="">All Types</option>
                 <option value="course">Course</option>
@@ -939,12 +939,12 @@ export default function PlatformAdminDashboard() {
             </div>
 
             <div className="flex items-center gap-3 w-full lg:w-auto justify-end">
-              <span className="text-xs text-slate-400 font-semibold">
+              <span className="text-xs text-aven-text-subtle font-semibold">
                 Total: {resourceTotal}
               </span>
               <button
                 onClick={() => setIsAddResourceModalOpen(true)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-glow-indigo transition-all"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-aven-text text-xs font-bold shadow-glow-indigo transition-all"
               >
                 <Plus size={15} />
                 <span>Add Resource</span>
@@ -955,23 +955,23 @@ export default function PlatformAdminDashboard() {
           {/* Resource Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {resources.length === 0 ? (
-              <div className="col-span-2 p-12 text-center bg-surface border border-border rounded-2xl text-slate-500 text-sm">
+              <div className="col-span-2 p-12 text-center bg-aven-base border border-aven-border rounded-2xl text-aven-text-muted text-sm">
                 No resources matched your criteria.
               </div>
             ) : (
               resources.map((r) => (
                 <div
                   key={r.id}
-                  className="p-6 rounded-2xl bg-surface border border-border hover:border-brand-500/40 shadow-glass transition-all flex flex-col justify-between space-y-4"
+                  className="p-6 rounded-2xl bg-aven-base border border-aven-border hover:border-brand-500/40 shadow-glass transition-all flex flex-col justify-between space-y-4"
                 >
                   <div className="space-y-2">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-surface-secondary text-indigo-400 border border-border">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-aven-surface text-aven-primary border border-aven-border">
                           {r.resource_type}
                         </span>
                         {r.skill_id && (
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-surface-secondary text-slate-300 border border-border">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-aven-surface text-aven-text-subtle border border-aven-border">
                             {r.skill_id}
                           </span>
                         )}
@@ -988,12 +988,12 @@ export default function PlatformAdminDashboard() {
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-white">{r.title}</h3>
-                    <p className="text-xs text-slate-400 line-clamp-3">{r.content}</p>
+                    <h3 className="text-base font-bold text-aven-text">{r.title}</h3>
+                    <p className="text-xs text-aven-text-subtle line-clamp-3">{r.content}</p>
 
                     {r.submitted_by_email && (
-                      <div className="text-[11px] text-slate-500">
-                        Submitted by: <span className="text-slate-300">{r.submitted_by_email}</span>
+                      <div className="text-[11px] text-aven-text-muted">
+                        Submitted by: <span className="text-aven-text-subtle">{r.submitted_by_email}</span>
                       </div>
                     )}
 
@@ -1006,12 +1006,12 @@ export default function PlatformAdminDashboard() {
                   </div>
 
                   {/* Actions Bar */}
-                  <div className="pt-3 border-t border-border flex items-center justify-between text-xs">
+                  <div className="pt-3 border-t border-aven-border flex items-center justify-between text-xs">
                     <a
                       href={r.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-indigo-400 hover:text-indigo-300 font-bold inline-flex items-center gap-1"
+                      className="text-aven-primary hover:text-aven-primary font-bold inline-flex items-center gap-1"
                     >
                       <span>Open Link</span>
                       <ExternalLink size={12} />
@@ -1022,7 +1022,7 @@ export default function PlatformAdminDashboard() {
                         <>
                           <button
                             onClick={() => handleApproveResource(r.id, r.title)}
-                            className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-colors"
+                            className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-aven-text font-bold transition-colors"
                           >
                             Approve
                           </button>
@@ -1037,14 +1037,14 @@ export default function PlatformAdminDashboard() {
 
                       <button
                         onClick={() => setEditingResource(r)}
-                        className="p-1.5 rounded-lg bg-surface-secondary text-slate-400 hover:text-white transition-colors"
+                        className="p-1.5 rounded-lg bg-aven-surface text-aven-text-subtle hover:text-aven-text transition-colors"
                         title="Edit Resource"
                       >
                         <Edit3 size={13} />
                       </button>
                       <button
                         onClick={() => handleDeleteResource(r.id, r.title)}
-                        className="p-1.5 rounded-lg bg-surface-secondary text-rose-400 hover:text-rose-300 transition-colors"
+                        className="p-1.5 rounded-lg bg-aven-surface text-rose-400 hover:text-rose-300 transition-colors"
                         title="Delete Resource"
                       >
                         <Trash2 size={13} />
@@ -1063,11 +1063,11 @@ export default function PlatformAdminDashboard() {
       {/* ========================================================================= */}
       {activeTab === 'system' && (
         <div className="space-y-6">
-          <div className="p-6 rounded-2xl bg-surface border border-border shadow-glass space-y-6">
+          <div className="p-6 rounded-2xl bg-aven-base border border-aven-border shadow-glass space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-bold text-white">System Infrastructure Health</h2>
-                <p className="text-xs text-slate-400 mt-0.5">Real-time status of backend microservices and databases.</p>
+                <h2 className="text-lg font-bold text-aven-text">System Infrastructure Health</h2>
+                <p className="text-xs text-aven-text-subtle mt-0.5">Real-time status of backend microservices and databases.</p>
               </div>
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
                 {systemStatus?.status.toUpperCase() || 'HEALTHY'}
@@ -1075,40 +1075,40 @@ export default function PlatformAdminDashboard() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-              <div className="p-4 rounded-xl bg-surface-secondary/70 border border-border space-y-1">
-                <div className="text-slate-400 font-semibold flex items-center gap-1.5">
-                  <Server size={14} className="text-indigo-400" />
+              <div className="p-4 rounded-xl bg-aven-surface/70 border border-aven-border space-y-1">
+                <div className="text-aven-text-subtle font-semibold flex items-center gap-1.5">
+                  <Server size={14} className="text-aven-primary" />
                   <span>API Service</span>
                 </div>
-                <div className="text-sm font-extrabold text-white">{systemStatus?.api_status || 'Online'}</div>
-                <div className="text-[10px] text-slate-500">Uptime: {systemStatus?.uptime_seconds || 0}s</div>
+                <div className="text-sm font-extrabold text-aven-text">{systemStatus?.api_status || 'Online'}</div>
+                <div className="text-[10px] text-aven-text-muted">Uptime: {systemStatus?.uptime_seconds || 0}s</div>
               </div>
 
-              <div className="p-4 rounded-xl bg-surface-secondary/70 border border-border space-y-1">
-                <div className="text-slate-400 font-semibold flex items-center gap-1.5">
+              <div className="p-4 rounded-xl bg-aven-surface/70 border border-aven-border space-y-1">
+                <div className="text-aven-text-subtle font-semibold flex items-center gap-1.5">
                   <Database size={14} className="text-emerald-400" />
                   <span>PostgreSQL / SQLite</span>
                 </div>
-                <div className="text-sm font-extrabold text-white capitalize">{systemStatus?.database_status || 'Healthy'}</div>
-                <div className="text-[10px] text-slate-500">Relational Store</div>
+                <div className="text-sm font-extrabold text-aven-text capitalize">{systemStatus?.database_status || 'Healthy'}</div>
+                <div className="text-[10px] text-aven-text-muted">Relational Store</div>
               </div>
 
-              <div className="p-4 rounded-xl bg-surface-secondary/70 border border-border space-y-1">
-                <div className="text-slate-400 font-semibold flex items-center gap-1.5">
+              <div className="p-4 rounded-xl bg-aven-surface/70 border border-aven-border space-y-1">
+                <div className="text-aven-text-subtle font-semibold flex items-center gap-1.5">
                   <Layers size={14} className="text-blue-400" />
                   <span>Neo4j Graph DB</span>
                 </div>
-                <div className="text-sm font-extrabold text-white capitalize">{systemStatus?.graph_db_status || 'Connected'}</div>
-                <div className="text-[10px] text-slate-500">EIKG Skill Graph</div>
+                <div className="text-sm font-extrabold text-aven-text capitalize">{systemStatus?.graph_db_status || 'Connected'}</div>
+                <div className="text-[10px] text-aven-text-muted">EIKG Skill Graph</div>
               </div>
 
-              <div className="p-4 rounded-xl bg-surface-secondary/70 border border-border space-y-1">
-                <div className="text-slate-400 font-semibold flex items-center gap-1.5">
+              <div className="p-4 rounded-xl bg-aven-surface/70 border border-aven-border space-y-1">
+                <div className="text-aven-text-subtle font-semibold flex items-center gap-1.5">
                   <Activity size={14} className="text-amber-400" />
                   <span>Job Scraper Pipeline</span>
                 </div>
-                <div className="text-sm font-extrabold text-white">{systemStatus?.scraper_sources_count || 5} Sources Ready</div>
-                <div className="text-[10px] text-slate-500">Greenhouse, Lever, Ashby, etc.</div>
+                <div className="text-sm font-extrabold text-aven-text">{systemStatus?.scraper_sources_count || 5} Sources Ready</div>
+                <div className="text-[10px] text-aven-text-muted">Greenhouse, Lever, Ashby, etc.</div>
               </div>
             </div>
           </div>
@@ -1129,46 +1129,46 @@ export default function PlatformAdminDashboard() {
       {/* ========================================================================= */}
       {isAddResourceModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-surface border border-border rounded-2xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <h3 className="text-lg font-bold text-white">Add Learning Resource</h3>
-              <button onClick={() => setIsAddResourceModalOpen(false)} className="text-slate-400 hover:text-white">
+          <div className="w-full max-w-lg bg-aven-base border border-aven-border rounded-2xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-aven-border pb-4">
+              <h3 className="text-lg font-bold text-aven-text">Add Learning Resource</h3>
+              <button onClick={() => setIsAddResourceModalOpen(false)} className="text-aven-text-subtle hover:text-aven-text">
                 <X size={18} />
               </button>
             </div>
 
             <form onSubmit={handleCreateResource} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-bold mb-1">Resource Title *</label>
+                <label className="block text-aven-text-subtle font-bold mb-1">Resource Title *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g., Complete Guide to FastAPI Dependency Injection"
                   value={newResourceForm.title}
                   onChange={(e) => setNewResourceForm({ ...newResourceForm, title: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-secondary border border-border text-white focus:outline-none focus:border-brand-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-aven-surface border border-aven-border text-aven-text focus:outline-none focus:border-brand-500"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold mb-1">Description / Content Summary *</label>
+                <label className="block text-aven-text-subtle font-bold mb-1">Description / Content Summary *</label>
                 <textarea
                   required
                   rows={3}
                   placeholder="Detailed summary of concepts taught in this resource..."
                   value={newResourceForm.content}
                   onChange={(e) => setNewResourceForm({ ...newResourceForm, content: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-secondary border border-border text-white focus:outline-none focus:border-brand-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-aven-surface border border-aven-border text-aven-text focus:outline-none focus:border-brand-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Resource Type *</label>
+                  <label className="block text-aven-text-subtle font-bold mb-1">Resource Type *</label>
                   <select
                     value={newResourceForm.resource_type}
                     onChange={(e) => setNewResourceForm({ ...newResourceForm, resource_type: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-secondary border border-border text-white focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-aven-surface border border-aven-border text-aven-text focus:outline-none"
                   >
                     <option value="tutorial">Tutorial</option>
                     <option value="course">Course</option>
@@ -1181,40 +1181,40 @@ export default function PlatformAdminDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Associated Skill ID</label>
+                  <label className="block text-aven-text-subtle font-bold mb-1">Associated Skill ID</label>
                   <input
                     type="text"
                     placeholder="e.g., fastapi_basics"
                     value={newResourceForm.skill_id}
                     onChange={(e) => setNewResourceForm({ ...newResourceForm, skill_id: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-secondary border border-border text-white focus:outline-none focus:border-brand-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-aven-surface border border-aven-border text-aven-text focus:outline-none focus:border-brand-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold mb-1">Direct URL *</label>
+                <label className="block text-aven-text-subtle font-bold mb-1">Direct URL *</label>
                 <input
                   type="url"
                   required
                   placeholder="https://..."
                   value={newResourceForm.url}
                   onChange={(e) => setNewResourceForm({ ...newResourceForm, url: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-secondary border border-border text-white focus:outline-none focus:border-brand-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-aven-surface border border-aven-border text-aven-text focus:outline-none focus:border-brand-500"
                 />
               </div>
 
-              <div className="pt-3 border-t border-border flex items-center justify-end gap-3">
+              <div className="pt-3 border-t border-aven-border flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsAddResourceModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-surface-secondary text-slate-300 hover:text-white font-bold"
+                  className="px-4 py-2 rounded-xl bg-aven-surface text-aven-text-subtle hover:text-aven-text font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold shadow-glow-indigo transition-all"
+                  className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-aven-text font-bold shadow-glow-indigo transition-all"
                 >
                   Create & Publish
                 </button>
@@ -1229,44 +1229,44 @@ export default function PlatformAdminDashboard() {
       {/* ========================================================================= */}
       {editingResource && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-surface border border-border rounded-2xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <h3 className="text-lg font-bold text-white">Edit Resource #{editingResource.id}</h3>
-              <button onClick={() => setEditingResource(null)} className="text-slate-400 hover:text-white">
+          <div className="w-full max-w-lg bg-aven-base border border-aven-border rounded-2xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-aven-border pb-4">
+              <h3 className="text-lg font-bold text-aven-text">Edit Resource #{editingResource.id}</h3>
+              <button onClick={() => setEditingResource(null)} className="text-aven-text-subtle hover:text-aven-text">
                 <X size={18} />
               </button>
             </div>
 
             <form onSubmit={handleUpdateResource} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-bold mb-1">Title</label>
+                <label className="block text-aven-text-subtle font-bold mb-1">Title</label>
                 <input
                   type="text"
                   required
                   value={editingResource.title}
                   onChange={(e) => setEditingResource({ ...editingResource, title: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-secondary border border-border text-white focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-aven-surface border border-aven-border text-aven-text focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold mb-1">Content / Description</label>
+                <label className="block text-aven-text-subtle font-bold mb-1">Content / Description</label>
                 <textarea
                   required
                   rows={3}
                   value={editingResource.content}
                   onChange={(e) => setEditingResource({ ...editingResource, content: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-secondary border border-border text-white focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-aven-surface border border-aven-border text-aven-text focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Type</label>
+                  <label className="block text-aven-text-subtle font-bold mb-1">Type</label>
                   <select
                     value={editingResource.resource_type}
                     onChange={(e) => setEditingResource({ ...editingResource, resource_type: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-secondary border border-border text-white focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-aven-surface border border-aven-border text-aven-text focus:outline-none"
                   >
                     <option value="tutorial">Tutorial</option>
                     <option value="course">Course</option>
@@ -1279,38 +1279,38 @@ export default function PlatformAdminDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Skill ID</label>
+                  <label className="block text-aven-text-subtle font-bold mb-1">Skill ID</label>
                   <input
                     type="text"
                     value={editingResource.skill_id || ''}
                     onChange={(e) => setEditingResource({ ...editingResource, skill_id: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-surface-secondary border border-border text-white focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-aven-surface border border-aven-border text-aven-text focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold mb-1">URL</label>
+                <label className="block text-aven-text-subtle font-bold mb-1">URL</label>
                 <input
                   type="url"
                   required
                   value={editingResource.url}
                   onChange={(e) => setEditingResource({ ...editingResource, url: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-secondary border border-border text-white focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-aven-surface border border-aven-border text-aven-text focus:outline-none"
                 />
               </div>
 
-              <div className="pt-3 border-t border-border flex items-center justify-end gap-3">
+              <div className="pt-3 border-t border-aven-border flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setEditingResource(null)}
-                  className="px-4 py-2 rounded-xl bg-surface-secondary text-slate-300 hover:text-white font-bold"
+                  className="px-4 py-2 rounded-xl bg-aven-surface text-aven-text-subtle hover:text-aven-text font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold shadow-glow-indigo transition-all"
+                  className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-aven-text font-bold shadow-glow-indigo transition-all"
                 >
                   Save Changes
                 </button>
@@ -1325,18 +1325,18 @@ export default function PlatformAdminDashboard() {
       {/* ========================================================================= */}
       {rejectingItem && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-surface border border-border rounded-2xl p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+          <div className="w-full max-w-md bg-aven-base border border-aven-border rounded-2xl p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
             <div className="flex items-center gap-2 text-rose-400 font-bold text-base">
               <XCircle size={18} />
               <span>Reject {rejectingItem.type === 'mentor' ? 'Mentor Application' : 'Resource Submission'}</span>
             </div>
 
-            <p className="text-xs text-slate-300">
-              Are you sure you want to reject <span className="font-bold text-white">{rejectingItem.name}</span>?
+            <p className="text-xs text-aven-text-subtle">
+              Are you sure you want to reject <span className="font-bold text-aven-text">{rejectingItem.name}</span>?
             </p>
 
             <div>
-              <label className="block text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-1">
+              <label className="block text-aven-text-subtle text-[11px] font-bold uppercase tracking-wider mb-1">
                 Optional Reason / Feedback:
               </label>
               <textarea
@@ -1344,20 +1344,20 @@ export default function PlatformAdminDashboard() {
                 placeholder="Explain what was missing or why this submission was rejected..."
                 value={rejectionReasonInput}
                 onChange={(e) => setRejectionReasonInput(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl bg-surface-secondary border border-border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                className="w-full px-3.5 py-2 rounded-xl bg-aven-surface border border-aven-border text-xs text-aven-text placeholder-slate-500 focus:outline-none focus:border-rose-500"
               />
             </div>
 
             <div className="pt-2 flex items-center justify-end gap-3 text-xs">
               <button
                 onClick={() => setRejectingItem(null)}
-                className="px-4 py-2 rounded-xl bg-surface-secondary text-slate-300 hover:text-white font-bold"
+                className="px-4 py-2 rounded-xl bg-aven-surface text-aven-text-subtle hover:text-aven-text font-bold"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmReject}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold transition-all shadow-sm"
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-aven-text font-bold transition-all shadow-sm"
               >
                 Confirm Rejection
               </button>
@@ -1442,18 +1442,18 @@ function RoadmapSyncTabContent({ showNotification }: { showNotification: (msg: s
   return (
     <div className="space-y-6">
       {/* Role to Roadmap Mapping Card */}
-      <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass space-y-4">
-        <div className="flex items-center justify-between border-b border-border pb-3">
+      <div className="bg-aven-base border border-aven-border rounded-2xl p-6 shadow-glass space-y-4">
+        <div className="flex items-center justify-between border-b border-aven-border pb-3">
           <div className="flex items-center gap-2">
-            <Layers className="text-indigo-400" size={18} />
-            <h2 className="text-base font-bold text-white">Role → Composite Subgraph Mapping</h2>
+            <Layers className="text-aven-primary" size={18} />
+            <h2 className="text-base font-bold text-aven-text">Role → Composite Subgraph Mapping</h2>
           </div>
-          <span className="text-xs text-slate-400">Configure which roadmap.sh slugs build each career track</span>
+          <span className="text-xs text-aven-text-subtle">Configure which roadmap.sh slugs build each career track</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Target Role</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-aven-text-subtle mb-2">Target Role</label>
             <select
               value={selectedRole}
               onChange={(e) => {
@@ -1461,7 +1461,7 @@ function RoadmapSyncTabContent({ showNotification }: { showNotification: (msg: s
                 setSelectedRole(role);
                 setRoleSlugsInput((mappings[role] || []).join(', '));
               }}
-              className="w-full bg-slate-900 border border-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-900 border border-aven-border rounded-xl px-3 py-2 text-xs text-aven-text focus:outline-none focus:border-indigo-500"
             >
               <option value="backend_swe">Backend Software Engineer (backend_swe)</option>
               <option value="frontend_swe">Frontend Software Engineer (frontend_swe)</option>
@@ -1472,18 +1472,18 @@ function RoadmapSyncTabContent({ showNotification }: { showNotification: (msg: s
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Mapped roadmap.sh Slugs (comma separated)</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-aven-text-subtle mb-2">Mapped roadmap.sh Slugs (comma separated)</label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={roleSlugsInput}
                 onChange={(e) => setRoleSlugsInput(e.target.value)}
                 placeholder="backend, python, sql, system-design"
-                className="flex-1 bg-slate-900 border border-border rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                className="flex-1 bg-slate-900 border border-aven-border rounded-xl px-3.5 py-2 text-xs text-aven-text focus:outline-none focus:border-indigo-500"
               />
               <button
                 onClick={handleSaveRoleMapping}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0"
+                className="bg-indigo-600 hover:bg-indigo-500 text-aven-text px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0"
               >
                 Save Mapping
               </button>
@@ -1493,19 +1493,19 @@ function RoadmapSyncTabContent({ showNotification }: { showNotification: (msg: s
       </div>
 
       {/* Catalog Table */}
-      <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass space-y-4">
-        <div className="flex items-center justify-between border-b border-border pb-3">
+      <div className="bg-aven-base border border-aven-border rounded-2xl p-6 shadow-glass space-y-4">
+        <div className="flex items-center justify-between border-b border-aven-border pb-3">
           <div className="flex items-center gap-2">
             <Database className="text-emerald-400" size={18} />
-            <h2 className="text-base font-bold text-white">roadmap.sh Catalog & Ingestion Control</h2>
+            <h2 className="text-base font-bold text-aven-text">roadmap.sh Catalog & Ingestion Control</h2>
           </div>
-          <span className="text-xs text-slate-400">{roadmaps.length} Roadmaps Available</span>
+          <span className="text-xs text-aven-text-subtle">{roadmaps.length} Roadmaps Available</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-border text-slate-400 uppercase tracking-wider font-semibold">
+              <tr className="border-b border-aven-border text-aven-text-subtle uppercase tracking-wider font-semibold">
                 <th className="py-3 px-4">Slug</th>
                 <th className="py-3 px-4">Title</th>
                 <th className="py-3 px-4">Cache Status</th>
@@ -1517,30 +1517,30 @@ function RoadmapSyncTabContent({ showNotification }: { showNotification: (msg: s
             <tbody className="divide-y divide-border/60">
               {roadmaps.map((r) => (
                 <tr key={r.slug} className="hover:bg-slate-800/30 transition">
-                  <td className="py-3.5 px-4 font-mono font-bold text-indigo-300">{r.slug}</td>
-                  <td className="py-3.5 px-4 text-white font-medium">{r.title}</td>
+                  <td className="py-3.5 px-4 font-mono font-bold text-aven-primary">{r.slug}</td>
+                  <td className="py-3.5 px-4 text-aven-text font-medium">{r.title}</td>
                   <td className="py-3.5 px-4">
                     {r.cached ? (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         <CheckCircle2 size={12} /> Cached
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-500/10 text-slate-400 border border-slate-500/20">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-500/10 text-aven-text-subtle border border-slate-500/20">
                         Uncached
                       </span>
                     )}
                   </td>
-                  <td className="py-3.5 px-4 text-slate-400">
+                  <td className="py-3.5 px-4 text-aven-text-subtle">
                     {r.fetched_at ? new Date(r.fetched_at).toLocaleString() : 'Never'}
                   </td>
-                  <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-300">
+                  <td className="py-3.5 px-4 text-center font-mono font-semibold text-aven-text-subtle">
                     {r.credits_spent}
                   </td>
                   <td className="py-3.5 px-4 text-right">
                     <button
                       onClick={() => handleSyncNow(r.slug, true)}
                       disabled={syncingSlug === r.slug}
-                      className="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 px-3.5 py-1.5 rounded-lg text-[11px] font-bold transition inline-flex items-center gap-1.5"
+                      className="bg-indigo-600/20 hover:bg-indigo-600 text-aven-primary hover:text-aven-text border border-aven-primary/30 px-3.5 py-1.5 rounded-lg text-[11px] font-bold transition inline-flex items-center gap-1.5"
                     >
                       <RefreshCw size={12} className={syncingSlug === r.slug ? 'animate-spin' : ''} />
                       <span>{syncingSlug === r.slug ? 'Syncing...' : 'Sync Now'}</span>
@@ -1554,17 +1554,17 @@ function RoadmapSyncTabContent({ showNotification }: { showNotification: (msg: s
       </div>
 
       {/* Ingestion Conflicts Queue */}
-      <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass space-y-4">
-        <div className="flex items-center justify-between border-b border-border pb-3">
+      <div className="bg-aven-base border border-aven-border rounded-2xl p-6 shadow-glass space-y-4">
+        <div className="flex items-center justify-between border-b border-aven-border pb-3">
           <div className="flex items-center gap-2">
             <ShieldAlert className="text-amber-400" size={18} />
-            <h2 className="text-base font-bold text-white">Ingestion Conflicts & DAG Verification Queue</h2>
+            <h2 className="text-base font-bold text-aven-text">Ingestion Conflicts & DAG Verification Queue</h2>
           </div>
-          <span className="text-xs text-slate-400">{conflicts.filter(c => !c.resolved).length} Active Alerts</span>
+          <span className="text-xs text-aven-text-subtle">{conflicts.filter(c => !c.resolved).length} Active Alerts</span>
         </div>
 
         {conflicts.length === 0 ? (
-          <div className="p-6 text-center text-xs text-slate-400">
+          <div className="p-6 text-center text-xs text-aven-text-subtle">
             No ingestion conflicts or cycle alerts found. All roadmaps are valid DAGs.
           </div>
         ) : (
@@ -1574,20 +1574,20 @@ function RoadmapSyncTabContent({ showNotification }: { showNotification: (msg: s
                 key={c.id}
                 className={`p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs ${
                   c.resolved
-                    ? 'bg-slate-900/40 border-border/40 text-slate-400'
+                    ? 'bg-slate-900/40 border-aven-border/40 text-aven-text-subtle'
                     : 'bg-amber-950/20 border-amber-500/30 text-amber-200'
                 }`}
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 font-bold">
-                    <AlertCircle size={14} className={c.resolved ? 'text-slate-500' : 'text-amber-400'} />
+                    <AlertCircle size={14} className={c.resolved ? 'text-aven-text-muted' : 'text-amber-400'} />
                     <span className="uppercase tracking-wider font-mono">{c.conflict_type}</span>
-                    {c.slug && <span className="text-indigo-400">({c.slug})</span>}
+                    {c.slug && <span className="text-aven-primary">({c.slug})</span>}
                   </div>
-                  <pre className="text-[11px] font-mono bg-slate-950/80 p-2 rounded border border-border/50 text-slate-300 max-h-24 overflow-y-auto">
+                  <pre className="text-[11px] font-mono bg-slate-950/80 p-2 rounded border border-aven-border text-aven-text-subtle max-h-24 overflow-y-auto">
                     {JSON.stringify(c.payload, null, 2)}
                   </pre>
-                  <div className="text-[10px] text-slate-400">Logged: {new Date(c.created_at).toLocaleString()}</div>
+                  <div className="text-[10px] text-aven-text-subtle">Logged: {new Date(c.created_at).toLocaleString()}</div>
                 </div>
 
                 {!c.resolved && (

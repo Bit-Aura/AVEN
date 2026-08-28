@@ -245,10 +245,10 @@ export default function PlacementJourney() {
                 </div>
                 {/* 3. CONTRAST: Massive high-contrast number */}
                 <div className="flex items-baseline gap-3">
-                  <span className="text-7xl font-semibold text-white tracking-tighter">
+                  <span className="text-7xl font-semibold text-aven-text tracking-tighter">
                     {daysRemaining}
                   </span>
-                  <span className="text-lg font-medium text-white/70">
+                  <span className="text-lg font-medium text-aven-text/70">
                     Days
                   </span>
                 </div>
@@ -260,9 +260,9 @@ export default function PlacementJourney() {
               </div>
 
               <div className="p-6 bg-white/5 border border-white/10 rounded-2xl relative z-10 w-full md:w-auto text-center md:text-left shadow-inner backdrop-blur-sm">
-                <div className="text-xs font-black uppercase tracking-widest text-white/60 mb-2">Target Pace</div>
-                <div className="text-2xl font-semibold text-white">
-                  {plan?.weekly_study_hours || 14} <span className="text-sm font-medium text-white/60">hrs/week</span>
+                <div className="text-xs font-black uppercase tracking-widest text-aven-text/60 mb-2">Target Pace</div>
+                <div className="text-2xl font-semibold text-aven-text">
+                  {plan?.weekly_study_hours || 14} <span className="text-sm font-medium text-aven-text/60">hrs/week</span>
                 </div>
                 <div className={`text-[10px] font-black uppercase tracking-widest mt-4 flex items-center justify-center md:justify-start gap-1.5 ${isFeasible ? 'text-green-400' : 'text-aven-status-locked'}`}>
                   {isFeasible ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}

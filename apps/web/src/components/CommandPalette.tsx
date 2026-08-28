@@ -91,17 +91,17 @@ export default function CommandPalette() {
       <div className="bg-slate-900 border border-slate-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden flex flex-col">
         
         {/* Header / Search Mock */}
-        <div className="flex items-center gap-3 p-4 border-b border-slate-800 text-slate-300">
-          <Terminal size={20} className="text-slate-500" />
+        <div className="flex items-center gap-3 p-4 border-b border-slate-800 text-aven-text-subtle">
+          <Terminal size={20} className="text-aven-text-muted" />
           <input 
             type="text" 
             placeholder="Search commands or skills..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent border-none outline-none w-full text-lg placeholder:text-slate-600"
+            className="bg-transparent border-none outline-none w-full text-lg placeholder:text-aven-text-muted"
             autoFocus
           />
-          <button onClick={closeCommandPalette} className="hover:text-white transition-colors">
+          <button onClick={closeCommandPalette} className="hover:text-aven-text transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -110,7 +110,7 @@ export default function CommandPalette() {
         <div className="p-2 space-y-1 max-h-96 overflow-y-auto">
           {search && filteredNodes.length > 0 && (
             <>
-              <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <div className="px-3 py-2 text-xs font-semibold text-aven-text-muted uppercase tracking-wider">
                 Skills in Path
               </div>
               {filteredNodes.map(node => (
@@ -127,7 +127,7 @@ export default function CommandPalette() {
                   }}
                   className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-800 text-left transition-colors group"
                 >
-                  <div className="flex items-center gap-3 text-slate-300 group-hover:text-white">
+                  <div className="flex items-center gap-3 text-aven-text-subtle group-hover:text-aven-text">
                     <MapPin size={18} className="text-emerald-400" />
                     <span>Jump to: {(node.data?.label as string) || node.id}</span>
                   </div>
@@ -137,7 +137,7 @@ export default function CommandPalette() {
             </>
           )}
 
-          <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <div className="px-3 py-2 text-xs font-semibold text-aven-text-muted uppercase tracking-wider">
             Quick Actions
           </div>
           
@@ -145,11 +145,11 @@ export default function CommandPalette() {
             onClick={() => { if(activeMilestone) { openIde(activeMilestone.id); closeCommandPalette(); } }}
             className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-800 text-left transition-colors group"
           >
-            <div className="flex items-center gap-3 text-slate-300 group-hover:text-white">
-              <Code size={18} className="text-indigo-400" />
+            <div className="flex items-center gap-3 text-aven-text-subtle group-hover:text-aven-text">
+              <Code size={18} className="text-aven-primary" />
               <span>Open IDE for Active Milestone</span>
             </div>
-            <div className="flex items-center gap-1 text-slate-500 text-xs font-mono">
+            <div className="flex items-center gap-1 text-aven-text-muted text-xs font-mono">
               <Command size={12} /> <span>I</span>
             </div>
           </button>
@@ -158,11 +158,11 @@ export default function CommandPalette() {
             onClick={() => { if(activeMilestone) { openCoach(activeMilestone.id); closeCommandPalette(); } }}
             className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-800 text-left transition-colors group"
           >
-            <div className="flex items-center gap-3 text-slate-300 group-hover:text-white">
+            <div className="flex items-center gap-3 text-aven-text-subtle group-hover:text-aven-text">
               <HelpCircle size={18} className="text-pink-400" />
               <span>Ask AI Coach</span>
             </div>
-            <div className="flex items-center gap-1 text-slate-500 text-xs font-mono">
+            <div className="flex items-center gap-1 text-aven-text-muted text-xs font-mono">
               <Command size={12} /> <span>H</span>
             </div>
           </button>
@@ -171,11 +171,11 @@ export default function CommandPalette() {
             onClick={() => { toggleOffline(); closeCommandPalette(); }}
             className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-800 text-left transition-colors group"
           >
-            <div className="flex items-center gap-3 text-slate-300 group-hover:text-white">
+            <div className="flex items-center gap-3 text-aven-text-subtle group-hover:text-aven-text">
               <WifiOff size={18} className="text-orange-400" />
               <span>Toggle Offline Mode</span>
             </div>
-            <div className="flex items-center gap-1 text-slate-500 text-xs font-mono">
+            <div className="flex items-center gap-1 text-aven-text-muted text-xs font-mono">
               <Command size={12} /> <span>O</span>
             </div>
           </button>
@@ -184,11 +184,11 @@ export default function CommandPalette() {
             onClick={() => { toggleFocusMode(); closeCommandPalette(); }}
             className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-800 text-left transition-colors group"
           >
-            <div className="flex items-center gap-3 text-slate-300 group-hover:text-white">
-              <Focus size={18} className="text-indigo-400" />
+            <div className="flex items-center gap-3 text-aven-text-subtle group-hover:text-aven-text">
+              <Focus size={18} className="text-aven-primary" />
               <span>Toggle Focus Mode</span>
             </div>
-            <div className="flex items-center gap-1 text-slate-500 text-xs font-mono">
+            <div className="flex items-center gap-1 text-aven-text-muted text-xs font-mono">
               <Command size={12} /> <span>F</span>
             </div>
           </button>

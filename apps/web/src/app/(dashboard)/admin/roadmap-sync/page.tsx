@@ -104,16 +104,16 @@ export default function RoadmapSyncAdminPage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-aven-border pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Map className="text-indigo-400" size={20} />
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Platform Admin</span>
+            <Map className="text-aven-primary" size={20} />
+            <span className="text-xs font-bold uppercase tracking-widest text-aven-text-subtle">Platform Admin</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl font-extrabold text-aven-text tracking-tight">
             roadmap.sh Skill Graph Ingestion & Topology Control
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-aven-text-subtle mt-1">
             Manage canonical roadmap.sh subgraphs, monitor credit budget usage, and resolve DAG cycle conflicts.
           </p>
         </div>
@@ -121,7 +121,7 @@ export default function RoadmapSyncAdminPage() {
         <button
           onClick={fetchData}
           disabled={loading}
-          className="flex items-center gap-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 px-4 py-2 rounded-xl text-xs font-bold transition"
+          className="flex items-center gap-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-aven-primary border border-aven-primary/30 px-4 py-2 rounded-xl text-xs font-bold transition"
         >
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           <span>Refresh Status</span>
@@ -130,24 +130,24 @@ export default function RoadmapSyncAdminPage() {
 
       {message && (
         <div className="p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/40 text-indigo-200 text-xs font-medium flex items-center gap-2">
-          <Zap size={16} className="text-indigo-400 shrink-0" />
+          <Zap size={16} className="text-aven-primary shrink-0" />
           <span>{message}</span>
         </div>
       )}
 
       {/* Role to Roadmap Composite Mapping Configuration */}
-      <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass space-y-4">
-        <div className="flex items-center justify-between border-b border-border pb-3">
+      <div className="bg-aven-base border border-aven-border rounded-2xl p-6 shadow-glass space-y-4">
+        <div className="flex items-center justify-between border-b border-aven-border pb-3">
           <div className="flex items-center gap-2">
-            <Layers className="text-indigo-400" size={18} />
-            <h2 className="text-base font-bold text-white">Role → Composite Subgraph Mapping</h2>
+            <Layers className="text-aven-primary" size={18} />
+            <h2 className="text-base font-bold text-aven-text">Role → Composite Subgraph Mapping</h2>
           </div>
-          <span className="text-xs text-slate-400">Configures composite roadmap slugs per career track</span>
+          <span className="text-xs text-aven-text-subtle">Configures composite roadmap slugs per career track</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Target Role</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-aven-text-subtle mb-2">Target Role</label>
             <select
               value={selectedRole}
               onChange={(e) => {
@@ -155,7 +155,7 @@ export default function RoadmapSyncAdminPage() {
                 setSelectedRole(role);
                 setRoleSlugsInput((mappings[role] || []).join(', '));
               }}
-              className="w-full bg-slate-900 border border-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-900 border border-aven-border rounded-xl px-3 py-2 text-xs text-aven-text focus:outline-none focus:border-indigo-500"
             >
               <option value="backend_swe">Backend Software Engineer (backend_swe)</option>
               <option value="frontend_swe">Frontend Software Engineer (frontend_swe)</option>
@@ -166,18 +166,18 @@ export default function RoadmapSyncAdminPage() {
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Mapped roadmap.sh Slugs (comma separated)</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-aven-text-subtle mb-2">Mapped roadmap.sh Slugs (comma separated)</label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={roleSlugsInput}
                 onChange={(e) => setRoleSlugsInput(e.target.value)}
                 placeholder="backend, python, sql, system-design"
-                className="flex-1 bg-slate-900 border border-border rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                className="flex-1 bg-slate-900 border border-aven-border rounded-xl px-3.5 py-2 text-xs text-aven-text focus:outline-none focus:border-indigo-500"
               />
               <button
                 onClick={handleSaveRoleMapping}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0"
+                className="bg-indigo-600 hover:bg-indigo-500 text-aven-text px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0"
               >
                 <Check size={14} />
                 <span>Save Mapping</span>
@@ -188,19 +188,19 @@ export default function RoadmapSyncAdminPage() {
       </div>
 
       {/* Available Roadmaps & Ingestion Status Table */}
-      <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass space-y-4">
-        <div className="flex items-center justify-between border-b border-border pb-3">
+      <div className="bg-aven-base border border-aven-border rounded-2xl p-6 shadow-glass space-y-4">
+        <div className="flex items-center justify-between border-b border-aven-border pb-3">
           <div className="flex items-center gap-2">
             <Database className="text-emerald-400" size={18} />
-            <h2 className="text-base font-bold text-white">roadmap.sh Catalog & Ingestion Status</h2>
+            <h2 className="text-base font-bold text-aven-text">roadmap.sh Catalog & Ingestion Status</h2>
           </div>
-          <span className="text-xs text-slate-400">{roadmaps.length} Roadmaps Available</span>
+          <span className="text-xs text-aven-text-subtle">{roadmaps.length} Roadmaps Available</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-border text-slate-400 uppercase tracking-wider font-semibold">
+              <tr className="border-b border-aven-border text-aven-text-subtle uppercase tracking-wider font-semibold">
                 <th className="py-3 px-4">Roadmap Slug</th>
                 <th className="py-3 px-4">Title</th>
                 <th className="py-3 px-4">Cache Status</th>
@@ -212,30 +212,30 @@ export default function RoadmapSyncAdminPage() {
             <tbody className="divide-y divide-border/60">
               {roadmaps.map((r) => (
                 <tr key={r.slug} className="hover:bg-slate-800/30 transition">
-                  <td className="py-3.5 px-4 font-mono font-bold text-indigo-300">{r.slug}</td>
-                  <td className="py-3.5 px-4 text-white font-medium">{r.title}</td>
+                  <td className="py-3.5 px-4 font-mono font-bold text-aven-primary">{r.slug}</td>
+                  <td className="py-3.5 px-4 text-aven-text font-medium">{r.title}</td>
                   <td className="py-3.5 px-4">
                     {r.cached ? (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         <CheckCircle2 size={12} /> Cached
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-500/10 text-slate-400 border border-slate-500/20">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-500/10 text-aven-text-subtle border border-slate-500/20">
                         Uncached
                       </span>
                     )}
                   </td>
-                  <td className="py-3.5 px-4 text-slate-400">
+                  <td className="py-3.5 px-4 text-aven-text-subtle">
                     {r.fetched_at ? new Date(r.fetched_at).toLocaleString() : 'Never'}
                   </td>
-                  <td className="py-3.5 px-4 text-center font-mono font-semibold text-slate-300">
+                  <td className="py-3.5 px-4 text-center font-mono font-semibold text-aven-text-subtle">
                     {r.credits_spent}
                   </td>
                   <td className="py-3.5 px-4 text-right">
                     <button
                       onClick={() => handleSyncNow(r.slug, true)}
                       disabled={syncingSlug === r.slug}
-                      className="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 px-3.5 py-1.5 rounded-lg text-[11px] font-bold transition inline-flex items-center gap-1.5"
+                      className="bg-indigo-600/20 hover:bg-indigo-600 text-aven-primary hover:text-aven-text border border-aven-primary/30 px-3.5 py-1.5 rounded-lg text-[11px] font-bold transition inline-flex items-center gap-1.5"
                     >
                       <RefreshCw size={12} className={syncingSlug === r.slug ? 'animate-spin' : ''} />
                       <span>{syncingSlug === r.slug ? 'Syncing...' : 'Sync Now'}</span>
@@ -249,17 +249,17 @@ export default function RoadmapSyncAdminPage() {
       </div>
 
       {/* Ingestion Conflicts Resolution Queue */}
-      <div className="bg-surface border border-border rounded-2xl p-6 shadow-glass space-y-4">
-        <div className="flex items-center justify-between border-b border-border pb-3">
+      <div className="bg-aven-base border border-aven-border rounded-2xl p-6 shadow-glass space-y-4">
+        <div className="flex items-center justify-between border-b border-aven-border pb-3">
           <div className="flex items-center gap-2">
             <ShieldAlert className="text-amber-400" size={18} />
-            <h2 className="text-base font-bold text-white">Ingestion Conflicts & DAG Verification Queue</h2>
+            <h2 className="text-base font-bold text-aven-text">Ingestion Conflicts & DAG Verification Queue</h2>
           </div>
-          <span className="text-xs text-slate-400">{conflicts.filter(c => !c.resolved).length} Active Alerts</span>
+          <span className="text-xs text-aven-text-subtle">{conflicts.filter(c => !c.resolved).length} Active Alerts</span>
         </div>
 
         {conflicts.length === 0 ? (
-          <div className="p-6 text-center text-xs text-slate-400">
+          <div className="p-6 text-center text-xs text-aven-text-subtle">
             No ingestion conflicts or cycle alerts found. All roadmaps are clean DAGs.
           </div>
         ) : (
@@ -269,20 +269,20 @@ export default function RoadmapSyncAdminPage() {
                 key={c.id}
                 className={`p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs ${
                   c.resolved
-                    ? 'bg-slate-900/40 border-border/40 text-slate-400'
+                    ? 'bg-slate-900/40 border-aven-border/40 text-aven-text-subtle'
                     : 'bg-amber-950/20 border-amber-500/30 text-amber-200'
                 }`}
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 font-bold">
-                    <AlertTriangle size={14} className={c.resolved ? 'text-slate-500' : 'text-amber-400'} />
+                    <AlertTriangle size={14} className={c.resolved ? 'text-aven-text-muted' : 'text-amber-400'} />
                     <span className="uppercase tracking-wider font-mono">{c.conflict_type}</span>
-                    {c.slug && <span className="text-indigo-400">({c.slug})</span>}
+                    {c.slug && <span className="text-aven-primary">({c.slug})</span>}
                   </div>
-                  <pre className="text-[11px] font-mono bg-slate-950/80 p-2 rounded border border-border/50 text-slate-300 max-h-24 overflow-y-auto">
+                  <pre className="text-[11px] font-mono bg-slate-950/80 p-2 rounded border border-aven-border text-aven-text-subtle max-h-24 overflow-y-auto">
                     {JSON.stringify(c.payload, null, 2)}
                   </pre>
-                  <div className="text-[10px] text-slate-400">Logged: {new Date(c.created_at).toLocaleString()}</div>
+                  <div className="text-[10px] text-aven-text-subtle">Logged: {new Date(c.created_at).toLocaleString()}</div>
                 </div>
 
                 {!c.resolved && (

@@ -31,12 +31,12 @@ export default function MockPullRequest() {
       <textarea 
         value={code}
         onChange={e => setCode(e.target.value)}
-        className="w-full h-32 bg-slate-900 border border-slate-700 rounded p-3 text-sm font-mono focus:outline-none focus:border-purple-500 text-slate-300"
+        className="w-full h-32 bg-slate-900 border border-slate-700 rounded p-3 text-sm font-mono focus:outline-none focus:border-purple-500 text-aven-text-subtle"
         placeholder="Paste your code diff here to submit a PR..."
       />
       <div className="flex justify-between items-center">
-        <span className="text-xs text-slate-500">Submit code to get feedback from the AI Senior Developer.</span>
-        <button onClick={handleSubmit} className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+        <span className="text-xs text-aven-text-muted">Submit code to get feedback from the AI Senior Developer.</span>
+        <button onClick={handleSubmit} className="bg-purple-600 hover:bg-purple-500 text-aven-text px-4 py-2 rounded text-sm font-medium transition-colors">
           Create Pull Request
         </button>
       </div>

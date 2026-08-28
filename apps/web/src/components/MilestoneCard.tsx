@@ -21,7 +21,7 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
   return (
     <div className="bg-slate-900 border border-slate-700 p-6 rounded-xl shadow-xl max-w-md w-full transition-all">
       <div className="flex justify-between items-start mb-4">
-        <h2 className="text-xl font-bold text-slate-100">{milestone.title}</h2>
+        <h2 className="text-xl font-bold text-aven-text">{milestone.title}</h2>
         <div className="flex flex-col gap-2 items-end">
           <span className="px-3 py-1 text-xs font-semibold rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
             {milestone.status === 'completed' ? 'Completed' : 'Active'}
@@ -43,7 +43,7 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
           )}
         </div>
       </div>
-      <p className="text-slate-300 text-sm leading-relaxed mb-6">
+      <p className="text-aven-text-subtle text-sm leading-relaxed mb-6">
         {milestone.explanation}
       </p>
       <div className="flex flex-col gap-3">
@@ -65,7 +65,7 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
               </button>
               <button 
                 onClick={() => openCoach(id)}
-                className="flex-1 py-2 px-4 bg-indigo-900/40 text-indigo-300 rounded-lg hover:bg-indigo-800/60 transition-colors font-medium border border-indigo-700/50 flex items-center justify-center gap-2 text-sm"
+                className="flex-1 py-2 px-4 bg-indigo-900/40 text-aven-primary rounded-lg hover:bg-indigo-800/60 transition-colors font-medium border border-indigo-700/50 flex items-center justify-center gap-2 text-sm"
               >
                 🤖 Need Help
               </button>
@@ -75,7 +75,7 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
               className={`w-full font-bold py-2 rounded transition-colors text-sm ${
                 isSimulatingSkip 
                   ? 'bg-rose-500/20 text-rose-400 border border-rose-500/50 hover:bg-rose-500/30' 
-                  : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700 hover:text-slate-300'
+                  : 'bg-slate-800 text-aven-text-subtle border border-slate-700 hover:bg-slate-700 hover:text-aven-text-subtle'
               }`}
             >
               {isSimulatingSkip ? 'Cancel Skip' : 'What if I skip?'}
@@ -93,7 +93,7 @@ export default function MilestoneCard({ milestone }: MilestoneCardProps) {
           <h3 className="text-rose-400 font-bold mb-2 flex items-center gap-2">
             <span className="text-lg">⚠️</span> Simulation Consequence
           </h3>
-          <p className="text-slate-300 text-sm leading-relaxed">
+          <p className="text-aven-text-subtle text-sm leading-relaxed">
             {simulatedConsequence}
           </p>
           <div className="mt-4 flex gap-2 justify-end">

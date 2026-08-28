@@ -63,7 +63,7 @@ export default function InterviewReportPage() {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-4">
         <RefreshCw className="w-10 h-10 animate-spin text-indigo-500" />
-        <p className="text-slate-300 font-semibold text-base">Synthesizing Comprehensive Calibration Report...</p>
+        <p className="text-aven-text-subtle font-semibold text-base">Synthesizing Comprehensive Calibration Report...</p>
       </div>
     );
   }
@@ -72,11 +72,11 @@ export default function InterviewReportPage() {
     return (
       <div className="max-w-2xl mx-auto my-12 p-8 rounded-2xl bg-rose-950/30 border border-rose-500/30 text-center space-y-4">
         <AlertTriangle className="w-12 h-12 text-rose-400 mx-auto" />
-        <h2 className="text-xl font-bold text-white">Report Unavailable</h2>
-        <p className="text-sm text-slate-300">{error || 'No synthesized report data found for this session.'}</p>
+        <h2 className="text-xl font-bold text-aven-text">Report Unavailable</h2>
+        <p className="text-sm text-aven-text-subtle">{error || 'No synthesized report data found for this session.'}</p>
         <Link
           href="/learner/interview"
-          className="inline-block px-6 py-2.5 rounded-xl bg-slate-800 text-white text-sm font-semibold hover:bg-slate-700"
+          className="inline-block px-6 py-2.5 rounded-xl bg-slate-800 text-aven-text text-sm font-semibold hover:bg-slate-700"
         >
           Back to Mock Interview Hub
         </Link>
@@ -98,18 +98,18 @@ export default function InterviewReportPage() {
               <CheckCircle2 className="w-3.5 h-3.5" />
               Interview Calibration Synthesized
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-aven-text tracking-tight">
               {session?.target_role || 'Engineering'} Calibration Report
             </h1>
-            <p className="text-slate-300 text-sm max-w-2xl leading-relaxed">
+            <p className="text-aven-text-subtle text-sm max-w-2xl leading-relaxed">
               Multi-turn evidence synthesis comparing verbal mastery, resume claims, and target role rubrics.
             </p>
           </div>
 
           <div className="flex items-center gap-4 bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shrink-0">
             <div className="text-right">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Overall Score</span>
-              <span className="text-[11px] text-slate-500">Benchmark: 70%</span>
+              <span className="text-xs font-semibold text-aven-text-subtle uppercase tracking-wider block">Overall Score</span>
+              <span className="text-[11px] text-aven-text-muted">Benchmark: 70%</span>
             </div>
             <div className="w-16 h-16 rounded-2xl bg-slate-950 border border-slate-700 flex items-center justify-center font-extrabold text-2xl shadow-inner">
               <span className={scoreColor}>{overallScore}%</span>
@@ -120,19 +120,19 @@ export default function InterviewReportPage() {
         {/* 4 Score Metrics Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
           <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-center space-y-1">
-            <span className="text-xs text-slate-400 font-medium">Technical Depth</span>
-            <p className="text-xl font-bold text-indigo-300">{Math.round(report.technical_score || 0)}%</p>
+            <span className="text-xs text-aven-text-subtle font-medium">Technical Depth</span>
+            <p className="text-xl font-bold text-aven-primary">{Math.round(report.technical_score || 0)}%</p>
           </div>
           <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-center space-y-1">
-            <span className="text-xs text-slate-400 font-medium">Communication Clarity</span>
+            <span className="text-xs text-aven-text-subtle font-medium">Communication Clarity</span>
             <p className="text-xl font-bold text-cyan-300">{Math.round(report.communication_score || 0)}%</p>
           </div>
           <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-center space-y-1">
-            <span className="text-xs text-slate-400 font-medium">Resume Consistency</span>
+            <span className="text-xs text-aven-text-subtle font-medium">Resume Consistency</span>
             <p className="text-xl font-bold text-emerald-300">{Math.round(report.resume_verification_score || 0)}%</p>
           </div>
           <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-center space-y-1">
-            <span className="text-xs text-slate-400 font-medium">AI Confidence</span>
+            <span className="text-xs text-aven-text-subtle font-medium">AI Confidence</span>
             <p className="text-xl font-bold text-purple-300">{Math.round(report.confidence_score || 85)}%</p>
           </div>
         </div>
@@ -145,14 +145,14 @@ export default function InterviewReportPage() {
             <Compass className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-white">Automated Learning Path Calibration</h2>
-            <p className="text-xs text-slate-400">
+            <h2 className="text-base font-bold text-aven-text">Automated Learning Path Calibration</h2>
+            <p className="text-xs text-aven-text-subtle">
               AVEN has recomputed your personalized skill graph based on evidence gathered in this session.
             </p>
           </div>
         </div>
 
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-slate-950/50 p-3.5 rounded-xl border border-slate-800">
+        <p className="text-xs sm:text-sm text-aven-text-subtle leading-relaxed bg-slate-950/50 p-3.5 rounded-xl border border-slate-800">
           {report.summary}
         </p>
 
@@ -165,13 +165,13 @@ export default function InterviewReportPage() {
           </Link>
           <Link
             href="/learner/simulator"
-            className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-2 transition-all"
+            className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-aven-text font-semibold text-xs flex items-center gap-2 transition-all"
           >
             <Code2 className="w-4 h-4" /> Practice in Sandbox
           </Link>
           <Link
             href="/learner/interview"
-            className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-2 transition-all ml-auto"
+            className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-aven-text font-semibold text-xs flex items-center gap-2 transition-all ml-auto"
           >
             Start New Interview
           </Link>
@@ -184,20 +184,20 @@ export default function InterviewReportPage() {
         <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-6 space-y-4 backdrop-blur-sm">
           <div className="flex items-center gap-2.5 border-b border-slate-800 pb-3">
             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-            <h3 className="text-base font-bold text-white">Verified Technical Strengths</h3>
+            <h3 className="text-base font-bold text-aven-text">Verified Technical Strengths</h3>
           </div>
 
           {report.verified_strengths && report.verified_strengths.length > 0 ? (
             <ul className="space-y-2.5">
               {report.verified_strengths.map((str, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-aven-text-subtle leading-relaxed">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shrink-0" />
                   <span>{str}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-xs text-slate-400 italic">No specific strengths identified in this session.</p>
+            <p className="text-xs text-aven-text-subtle italic">No specific strengths identified in this session.</p>
           )}
         </div>
 
@@ -205,7 +205,7 @@ export default function InterviewReportPage() {
         <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-6 space-y-4 backdrop-blur-sm">
           <div className="flex items-center gap-2.5 border-b border-slate-800 pb-3">
             <AlertTriangle className="w-5 h-5 text-amber-400" />
-            <h3 className="text-base font-bold text-white">Identified Gaps (Mapped to Curriculum)</h3>
+            <h3 className="text-base font-bold text-aven-text">Identified Gaps (Mapped to Curriculum)</h3>
           </div>
 
           {report.canonical_skill_gaps && report.canonical_skill_gaps.length > 0 ? (
@@ -213,7 +213,7 @@ export default function InterviewReportPage() {
               {report.canonical_skill_gaps.map((gap, idx) => (
                 <div key={idx} className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-xs space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-indigo-300">
+                    <span className="font-bold text-aven-primary">
                       {gap.canonical_skill_name || 'General Skill'}
                     </span>
                     <span
@@ -226,9 +226,9 @@ export default function InterviewReportPage() {
                       {gap.severity} Severity
                     </span>
                   </div>
-                  <p className="text-slate-300">{gap.description}</p>
+                  <p className="text-aven-text-subtle">{gap.description}</p>
                   {gap.evidence && (
-                    <p className="text-slate-400 italic bg-slate-900/60 p-2 rounded border border-slate-800/80">
+                    <p className="text-aven-text-subtle italic bg-slate-900/60 p-2 rounded border border-slate-800/80">
                       "{gap.evidence}"
                     </p>
                   )}
@@ -236,7 +236,7 @@ export default function InterviewReportPage() {
               ))}
             </div>
           ) : (
-            <p className="text-xs text-slate-400 italic">No critical technical gaps detected.</p>
+            <p className="text-xs text-aven-text-subtle italic">No critical technical gaps detected.</p>
           )}
         </div>
       </div>
@@ -246,14 +246,14 @@ export default function InterviewReportPage() {
         <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-6 space-y-4 backdrop-blur-sm">
           <div className="flex items-center gap-2.5 border-b border-slate-800 pb-3">
             <FileCheck className="w-5 h-5 text-purple-400" />
-            <h3 className="text-base font-bold text-white">Resume Claim Verification Matrix</h3>
+            <h3 className="text-base font-bold text-aven-text">Resume Claim Verification Matrix</h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {report.resume_verification_matrix.map((item, idx) => (
               <div key={idx} className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 text-xs space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">{item.claim}</span>
+                  <span className="font-bold text-aven-text">{item.claim}</span>
                   <span
                     className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
                       item.status === 'SUPPORTED'
@@ -266,7 +266,7 @@ export default function InterviewReportPage() {
                     {item.status.replace('_', ' ')}
                   </span>
                 </div>
-                <p className="text-slate-400 leading-relaxed">{item.evidence}</p>
+                <p className="text-aven-text-subtle leading-relaxed">{item.evidence}</p>
               </div>
             ))}
           </div>

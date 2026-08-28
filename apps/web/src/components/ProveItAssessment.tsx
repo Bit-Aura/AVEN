@@ -112,17 +112,17 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
     return (
       <div className="space-y-6">
         <div>
-          <h3 className="text-white text-lg font-semibold mb-2">Description</h3>
-          <p className="text-slate-300 leading-relaxed text-[13px]">{text}</p>
+          <h3 className="text-aven-text text-lg font-semibold mb-2">Description</h3>
+          <p className="text-aven-text-subtle leading-relaxed text-[13px]">{text}</p>
         </div>
-        <div className="p-4 bg-[#0d1117] border border-white/5 rounded-lg font-mono text-[11px] text-slate-400 space-y-2">
-          <p><span className="text-slate-300 font-bold">Input:</span> data = [1, 2, 3, 4]</p>
-          <p><span className="text-slate-300 font-bold">Output:</span> True</p>
-          <p><span className="text-slate-300 font-bold">Explanation:</span> The sequence satisfies the core constraints of the problem.</p>
+        <div className="p-4 bg-[#0d1117] border border-white/5 rounded-lg font-mono text-[11px] text-aven-text-subtle space-y-2">
+          <p><span className="text-aven-text-subtle font-bold">Input:</span> data = [1, 2, 3, 4]</p>
+          <p><span className="text-aven-text-subtle font-bold">Output:</span> True</p>
+          <p><span className="text-aven-text-subtle font-bold">Explanation:</span> The sequence satisfies the core constraints of the problem.</p>
         </div>
         <div>
-          <h3 className="text-slate-300 text-sm font-semibold mb-2">Constraints</h3>
-          <ul className="list-disc list-inside text-[13px] text-slate-400 space-y-1">
+          <h3 className="text-aven-text-subtle text-sm font-semibold mb-2">Constraints</h3>
+          <ul className="list-disc list-inside text-[13px] text-aven-text-subtle space-y-1">
             <li><code>1 &lt;= len(data) &lt;= 10^5</code></li>
             <li>Elements are purely numeric</li>
             <li>Optimize for space complexity</li>
@@ -349,7 +349,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
 // Simple Book Icon component since we need it in the header
 function BookIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256" className="text-slate-500">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256" className="text-aven-text-muted">
       <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H120V200H40ZM216,200H136V56h80V200Z"></path>
     </svg>
   );

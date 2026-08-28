@@ -149,7 +149,7 @@ export default function HackathonStage({ event }: HackathonStageProps) {
               href={event.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 bg-[#141413] hover:bg-black/80 text-white rounded-2xl font-black text-lg flex items-center gap-3 transition-all hover:-translate-y-1 hover:shadow-xl shadow-black/20"
+              className="px-8 py-4 bg-[#141413] hover:bg-black/80 text-aven-text rounded-2xl font-black text-lg flex items-center gap-3 transition-all hover:-translate-y-1 hover:shadow-xl shadow-black/20"
             >
               Apply Now
               <ExternalLink size={20} />

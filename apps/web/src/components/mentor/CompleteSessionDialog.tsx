@@ -59,17 +59,17 @@ export default function CompleteSessionDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-      <div className="bg-surface border border-border w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="px-6 py-4 border-b border-border bg-surface-secondary/50 flex items-center justify-between">
+      <div className="bg-aven-base border border-aven-border w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="px-6 py-4 border-b border-aven-border bg-aven-surface flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
               <CheckCircle2 size={16} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">
+              <h3 className="text-sm font-bold text-aven-text">
                 Complete Session & Log Takeaways
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-aven-text-subtle">
                 Document guidance and actionable next steps for the learner
               </p>
             </div>
@@ -77,7 +77,7 @@ export default function CompleteSessionDialog({
 
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-surface transition-colors"
+            className="text-aven-text-subtle hover:text-aven-text p-1 rounded-lg hover:bg-aven-base transition-colors"
           >
             <X size={18} />
           </button>
@@ -91,16 +91,16 @@ export default function CompleteSessionDialog({
             </div>
           )}
 
-          <div className="p-3 rounded-xl bg-surface-secondary/50 border border-border text-xs space-y-1">
-            <div className="font-bold text-white">{session.title}</div>
-            <div className="text-[11px] text-slate-400">
-              Learner: <span className="text-slate-200 font-semibold">{session.learner_name}</span>
+          <div className="p-3 rounded-xl bg-aven-surface border border-aven-border text-xs space-y-1">
+            <div className="font-bold text-aven-text">{session.title}</div>
+            <div className="text-[11px] text-aven-text-subtle">
+              Learner: <span className="text-aven-text font-semibold">{session.learner_name}</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5 flex items-center gap-1.5">
-              <FileText size={13} className="text-indigo-400" />
+            <label className="block text-xs font-bold text-aven-text-subtle uppercase mb-1.5 flex items-center gap-1.5">
+              <FileText size={13} className="text-aven-primary" />
               <span>Session Notes & Key Concepts Covered <span className="text-rose-400">*</span></span>
             </label>
             <textarea
@@ -109,12 +109,12 @@ export default function CompleteSessionDialog({
               value={mentorNotes}
               onChange={(e) => setMentorNotes(e.target.value)}
               placeholder="e.g. Reviewed asyncio semaphore locking patterns. Identified mistake in task cancellation logic..."
-              className="w-full bg-surface-secondary border border-border rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+              className="w-full bg-aven-surface border border-aven-border rounded-xl p-3 text-xs text-aven-text placeholder-slate-500 focus:outline-none focus:border-brand-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5 flex items-center gap-1.5">
+            <label className="block text-xs font-bold text-aven-text-subtle uppercase mb-1.5 flex items-center gap-1.5">
               <Lightbulb size={13} className="text-amber-400" />
               <span>Recommendations & Next Steps for Learner</span>
             </label>
@@ -123,22 +123,22 @@ export default function CompleteSessionDialog({
               value={recommendations}
               onChange={(e) => setRecommendations(e.target.value)}
               placeholder="e.g. 1. Re-attempt coding challenge #4. 2. Read official docs on asyncio.gather exception handling."
-              className="w-full bg-surface-secondary border border-border rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+              className="w-full bg-aven-surface border border-aven-border rounded-xl p-3 text-xs text-aven-text placeholder-slate-500 focus:outline-none focus:border-brand-500"
             />
           </div>
 
-          <div className="pt-2 flex justify-end gap-3 border-t border-border">
+          <div className="pt-2 flex justify-end gap-3 border-t border-aven-border">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-surface border border-border text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+              className="px-4 py-2 rounded-xl bg-aven-base border border-aven-border text-xs font-semibold text-aven-text-subtle hover:text-aven-text transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs shadow-glow-emerald transition-all"
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-aven-text font-bold text-xs shadow-glow-emerald transition-all"
             >
               {isSubmitting ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle2 size={13} />}
               <span>Mark Completed & Save</span>

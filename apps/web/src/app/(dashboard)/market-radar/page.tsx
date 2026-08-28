@@ -334,7 +334,7 @@ export default function MarketRadarPage() {
                         <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="e.g. Stripe" className="w-full bg-transparent border-b border-aven-base/20 py-2 text-xs font-bold text-aven-base placeholder:text-aven-base/30 focus:outline-none focus:border-aven-base" />
                       </div>
                     </div>
-                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => handleScrape()} disabled={isLoading || !boardToken.trim()} className="shrink-0 h-full flex items-center justify-center gap-2 py-3 px-8 rounded-xl bg-[#5A59E8] hover:bg-[#4948d3] text-white font-black text-xs transition-all duration-300 disabled:opacity-50">
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => handleScrape()} disabled={isLoading || !boardToken.trim()} className="shrink-0 h-full flex items-center justify-center gap-2 py-3 px-8 rounded-xl bg-[#5A59E8] hover:bg-[#4948d3] text-aven-text font-black text-xs transition-all duration-300 disabled:opacity-50">
                       <Radar size={14} /> Extract
                     </motion.button>
                 </div>
@@ -404,7 +404,7 @@ export default function MarketRadarPage() {
                             <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="e.g. Stripe" className="w-full bg-transparent border-b border-aven-base/20 py-2 text-xs font-bold text-aven-base placeholder:text-aven-base/30 focus:outline-none focus:border-aven-base" />
                           </div>
                         </div>
-                        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => handleScrape()} disabled={isLoading || !boardToken.trim()} className="shrink-0 h-full flex items-center justify-center gap-2 py-3 px-8 rounded-xl bg-[#5A59E8] hover:bg-[#4948d3] text-white font-black text-xs transition-all duration-300 disabled:opacity-50">
+                        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => handleScrape()} disabled={isLoading || !boardToken.trim()} className="shrink-0 h-full flex items-center justify-center gap-2 py-3 px-8 rounded-xl bg-[#5A59E8] hover:bg-[#4948d3] text-aven-text font-black text-xs transition-all duration-300 disabled:opacity-50">
                           <Radar size={14} /> Run Extraction
                         </motion.button>
                     </div>

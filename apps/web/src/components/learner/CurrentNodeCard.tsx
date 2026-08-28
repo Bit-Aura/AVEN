@@ -63,7 +63,7 @@ export default function CurrentNodeCard({
             <span className="w-2 h-2 rounded-full bg-aven-status-active animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-widest text-aven-text-muted">Current Milestone</span>
           </div>
-          <h2 className="text-3xl font-medium text-white tracking-tight mb-4">
+          <h2 className="text-3xl font-medium text-aven-base tracking-tight mb-4">
             {displayTitle}
           </h2>
           <div className="text-sm text-aven-surface max-w-xl leading-relaxed">
@@ -75,7 +75,7 @@ export default function CurrentNodeCard({
           <button
             onClick={handleClaimCertificate}
             disabled={isDownloading}
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#3d3d3a] hover:opacity-90 text-white text-xs font-bold transition-opacity disabled:opacity-50"
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#3d3d3a] hover:opacity-90 text-aven-base text-xs font-bold transition-opacity disabled:opacity-50"
           >
             <Medal size={16} weight="bold" />
             <span>{isDownloading ? 'Generating...' : 'Claim Certificate'}</span>
@@ -89,7 +89,7 @@ export default function CurrentNodeCard({
           </button>
           <button
             onClick={handleAssessmentTrigger}
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-aven-text-subtle hover:brightness-110 text-white text-xs font-black transition-all"
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#2b2b2a] hover:brightness-110 text-aven-base text-xs font-black transition-all"
           >
             <ShieldCheck size={16} weight="bold" />
             <span>Prove It</span>

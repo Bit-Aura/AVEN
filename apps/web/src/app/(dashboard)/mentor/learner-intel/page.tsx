@@ -219,18 +219,18 @@ function LearnerIntelContent() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-16">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-aven-border pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <BrainCircuit className="text-indigo-400" size={18} />
-            <span className="text-xs font-bold uppercase tracking-widest text-indigo-400">
+            <BrainCircuit className="text-aven-primary" size={18} />
+            <span className="text-xs font-bold uppercase tracking-widest text-aven-primary">
               Mentor Intelligence Center
             </span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl font-extrabold text-aven-text tracking-tight">
             Learner 360° Intel & Skill Graph Position
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-aven-text-subtle mt-1">
             Deep diagnostic visibility — inspect learner career goals, exact Neo4j skill graph positions, lagging bottlenecks, and AI briefing before sessions
           </p>
         </div>
@@ -241,7 +241,7 @@ function LearnerIntelContent() {
               loadLearnersDirectory();
               if (selectedProfileId) loadSelectedLearnerIntel(selectedProfileId);
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface border border-border text-xs font-semibold text-slate-300 hover:text-white hover:border-indigo-500/50 transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-aven-base border border-aven-border text-xs font-semibold text-aven-text-subtle hover:text-aven-text hover:border-indigo-500/50 transition"
           >
             <RefreshCw size={13} className={isLoadingDirectory || isLoadingIntel ? 'animate-spin' : ''} />
             <span>Refresh Intel</span>
@@ -262,7 +262,7 @@ function LearnerIntelContent() {
             <CheckCircle2 size={16} />
             <span>{toastMsg.message}</span>
           </div>
-          <button onClick={() => setToastMsg(null)} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setToastMsg(null)} className="text-aven-text-subtle hover:text-aven-text">✕</button>
         </div>
       )}
 
@@ -270,37 +270,37 @@ function LearnerIntelContent() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Learner Selector Directory */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="p-4 bg-surface border border-border rounded-2xl space-y-3 shadow-glass">
+          <div className="p-4 bg-aven-base border border-aven-border rounded-2xl space-y-3 shadow-glass">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <Users size={14} className="text-indigo-400" />
+              <span className="text-xs font-bold uppercase tracking-wider text-aven-text-subtle flex items-center gap-1.5">
+                <Users size={14} className="text-aven-primary" />
                 <span>Active Learners ({filteredLearners.length})</span>
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-aven-primary/20 text-aven-primary font-bold">
                 Live Queue
               </span>
             </div>
 
             {/* Search Input */}
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 text-slate-500" size={14} />
+              <Search className="absolute left-3 top-2.5 text-aven-text-muted" size={14} />
               <input
                 type="text"
                 placeholder="Filter by name, topic, or goal..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-surface-secondary border border-border rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                className="w-full pl-9 pr-3 py-2 bg-aven-surface border border-aven-border rounded-xl text-xs text-aven-text placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
               />
             </div>
 
             {/* Learner Card List */}
             {isLoadingDirectory ? (
               <div className="py-12 text-center">
-                <Loader2 className="animate-spin text-indigo-400 mx-auto" size={24} />
-                <p className="text-xs text-slate-500 mt-2">Loading learners...</p>
+                <Loader2 className="animate-spin text-aven-primary mx-auto" size={24} />
+                <p className="text-xs text-aven-text-muted mt-2">Loading learners...</p>
               </div>
             ) : filteredLearners.length === 0 ? (
-              <div className="py-8 text-center text-slate-500 text-xs">
+              <div className="py-8 text-center text-aven-text-muted text-xs">
                 No matching learners found.
               </div>
             ) : (
@@ -319,13 +319,13 @@ function LearnerIntelContent() {
                       className={`w-full text-left p-3.5 rounded-2xl border transition-all flex flex-col gap-2 ${
                         isSelected
                           ? 'bg-indigo-950/40 border-indigo-500 shadow-glow-indigo'
-                          : 'bg-surface-secondary/60 border-border hover:border-slate-600'
+                          : 'bg-aven-surface/60 border-aven-border hover:border-slate-600'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <div className="font-bold text-white text-sm">{learner.name}</div>
-                          <div className="text-[11px] text-slate-400 truncate max-w-[180px]">
+                          <div className="font-bold text-aven-text text-sm">{learner.name}</div>
+                          <div className="text-[11px] text-aven-text-subtle truncate max-w-[180px]">
                             {learner.target_role}
                           </div>
                         </div>
@@ -341,7 +341,7 @@ function LearnerIntelContent() {
                       </div>
 
                       {learner.active_topic && (
-                        <div className="text-[11px] text-indigo-300 bg-surface/80 px-2 py-1 rounded-lg border border-border/50 truncate">
+                        <div className="text-[11px] text-aven-primary bg-aven-base/80 px-2 py-1 rounded-lg border border-aven-border truncate">
                           💬 {learner.active_topic}
                         </div>
                       )}
@@ -356,33 +356,33 @@ function LearnerIntelContent() {
         {/* Right Column: Comprehensive Learner 360 Canvas */}
         <div className="lg:col-span-8 space-y-5">
           {isLoadingIntel || !learnerIntel ? (
-            <div className="p-20 bg-surface border border-border rounded-3xl text-center space-y-3">
-              <Loader2 className="animate-spin text-indigo-400 mx-auto" size={36} />
-              <h3 className="text-sm font-bold text-white">Synthesizing Learner 360° Knowledge</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <div className="p-20 bg-aven-base border border-aven-border rounded-3xl text-center space-y-3">
+              <Loader2 className="animate-spin text-aven-primary mx-auto" size={36} />
+              <h3 className="text-sm font-bold text-aven-text">Synthesizing Learner 360° Knowledge</h3>
+              <p className="text-xs text-aven-text-subtle max-w-sm mx-auto">
                 Analyzing graph DAG nodes, Bayesian Knowledge Tracing scores, assessment attempts, and AI mock interview gaps...
               </p>
             </div>
           ) : (
             <div className="space-y-5">
               {/* Hero Banner: Identity & Goal Achievement Gauge */}
-              <div className="p-6 bg-surface border border-border rounded-3xl shadow-glass space-y-5">
+              <div className="p-6 bg-aven-base border border-aven-border rounded-3xl shadow-glass space-y-5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-aven-primary/20 text-aven-primary border border-aven-primary/30">
                         Profile #{learnerIntel.profile_id}
                       </span>
-                      <span className="text-xs text-slate-400 font-mono">
+                      <span className="text-xs text-aven-text-subtle font-mono">
                         {learnerIntel.email}
                       </span>
                     </div>
-                    <h2 className="text-2xl font-black text-white flex items-center gap-2">
+                    <h2 className="text-2xl font-black text-aven-text flex items-center gap-2">
                       <span>{learnerIntel.name}</span>
                     </h2>
-                    <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
-                      <Target size={13} className="text-indigo-400" />
-                      <span>Target Role: <strong className="text-white">{learnerIntel.target_role}</strong></span>
+                    <div className="text-xs text-aven-text-subtle mt-1 flex items-center gap-2">
+                      <Target size={13} className="text-aven-primary" />
+                      <span>Target Role: <strong className="text-aven-text">{learnerIntel.target_role}</strong></span>
                       <span>•</span>
                       <span>Pace: {learnerIntel.weekly_hours} hrs/week</span>
                     </div>
@@ -393,7 +393,7 @@ function LearnerIntelContent() {
                     <button
                       onClick={() => handleAccept(activeLearnerCard.request_id)}
                       disabled={acceptingId === activeLearnerCard.request_id}
-                      className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white font-bold text-xs shadow-glow-indigo transition flex items-center gap-2 shrink-0"
+                      className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-aven-text font-bold text-xs shadow-glow-indigo transition flex items-center gap-2 shrink-0"
                     >
                       {acceptingId === activeLearnerCard.request_id ? (
                         <Loader2 size={14} className="animate-spin" />
@@ -406,14 +406,14 @@ function LearnerIntelContent() {
                 </div>
 
                 {/* 4 Metric Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2 border-t border-border">
-                  <div className="p-3.5 bg-surface-secondary/70 rounded-2xl border border-border">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2 border-t border-aven-border">
+                  <div className="p-3.5 bg-aven-surface/70 rounded-2xl border border-aven-border">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-aven-text-subtle mb-1">
                       Syllabus Mastery
                     </div>
                     <div className="flex items-baseline justify-between mb-1.5">
-                      <span className="text-2xl font-black text-white">{learnerIntel.overall_readiness_pct}%</span>
-                      <span className="text-[10px] text-indigo-400 font-bold">Goal: 70%+</span>
+                      <span className="text-2xl font-black text-aven-text">{learnerIntel.overall_readiness_pct}%</span>
+                      <span className="text-[10px] text-aven-primary font-bold">Goal: 70%+</span>
                     </div>
                     <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                       <div
@@ -423,20 +423,20 @@ function LearnerIntelContent() {
                     </div>
                   </div>
 
-                  <div className="p-3.5 bg-surface-secondary/70 rounded-2xl border border-border">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  <div className="p-3.5 bg-aven-surface/70 rounded-2xl border border-aven-border">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-aven-text-subtle mb-1">
                       Active Frontier Node
                     </div>
-                    <div className="text-sm font-extrabold text-indigo-300 truncate">
+                    <div className="text-sm font-extrabold text-aven-primary truncate">
                       {learnerIntel.current_frontier_skill
                         ? learnerIntel.current_frontier_skill.replace('_', ' ').toUpperCase()
                         : 'Advancing Smoothly'}
                     </div>
-                    <div className="text-[10px] text-slate-500 mt-1">Current bottleneck in DAG</div>
+                    <div className="text-[10px] text-aven-text-muted mt-1">Current bottleneck in DAG</div>
                   </div>
 
-                  <div className="p-3.5 bg-surface-secondary/70 rounded-2xl border border-border">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  <div className="p-3.5 bg-aven-surface/70 rounded-2xl border border-aven-border">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-aven-text-subtle mb-1">
                       Mastery Status
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-bold">
@@ -447,26 +447,26 @@ function LearnerIntelContent() {
                     <div className="text-[10px] text-rose-400 mt-1">{learnerIntel.lagging_count} Blocked / Lagging</div>
                   </div>
 
-                  <div className="p-3.5 bg-surface-secondary/70 rounded-2xl border border-border">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  <div className="p-3.5 bg-aven-surface/70 rounded-2xl border border-aven-border">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-aven-text-subtle mb-1">
                       Curriculum Nodes
                     </div>
-                    <div className="text-xl font-extrabold text-white">
+                    <div className="text-xl font-extrabold text-aven-text">
                       {learnerIntel.graph_nodes.length} Skills
                     </div>
-                    <div className="text-[10px] text-slate-400 mt-1">Ground-truth verified</div>
+                    <div className="text-[10px] text-aven-text-subtle mt-1">Ground-truth verified</div>
                   </div>
                 </div>
               </div>
 
               {/* Navigation Tabs */}
-              <div className="flex items-center gap-2 border-b border-border text-xs font-bold">
+              <div className="flex items-center gap-2 border-b border-aven-border text-xs font-bold">
                 <button
                   onClick={() => setActiveTab('graph')}
                   className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition ${
                     activeTab === 'graph'
-                      ? 'border-indigo-500 text-indigo-300'
-                      : 'border-transparent text-slate-400 hover:text-white'
+                      ? 'border-indigo-500 text-aven-primary'
+                      : 'border-transparent text-aven-text-subtle hover:text-aven-text'
                   }`}
                 >
                   <Network size={14} />
@@ -477,8 +477,8 @@ function LearnerIntelContent() {
                   onClick={() => setActiveTab('brief')}
                   className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition ${
                     activeTab === 'brief'
-                      ? 'border-indigo-500 text-indigo-300'
-                      : 'border-transparent text-slate-400 hover:text-white'
+                      ? 'border-indigo-500 text-aven-primary'
+                      : 'border-transparent text-aven-text-subtle hover:text-aven-text'
                   }`}
                 >
                   <Lightbulb size={14} />
@@ -489,8 +489,8 @@ function LearnerIntelContent() {
                   onClick={() => setActiveTab('activity')}
                   className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition ${
                     activeTab === 'activity'
-                      ? 'border-indigo-500 text-indigo-300'
-                      : 'border-transparent text-slate-400 hover:text-white'
+                      ? 'border-indigo-500 text-aven-primary'
+                      : 'border-transparent text-aven-text-subtle hover:text-aven-text'
                   }`}
                 >
                   <Activity size={14} />
@@ -501,9 +501,9 @@ function LearnerIntelContent() {
               {/* TAB 1: Skill Graph Matrix */}
               {activeTab === 'graph' && (
                 <div className="space-y-4">
-                  <div className="p-3.5 bg-indigo-950/20 border border-indigo-500/30 rounded-2xl text-xs text-indigo-300 flex items-center justify-between">
+                  <div className="p-3.5 bg-indigo-950/20 border border-aven-primary/30 rounded-2xl text-xs text-aven-primary flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Compass size={16} className="text-indigo-400 shrink-0" />
+                      <Compass size={16} className="text-aven-primary shrink-0" />
                       <span>
                         <strong>Neo4j Skill DAG Position:</strong> Visual state of every competency required for {learnerIntel.target_role}.
                       </span>
@@ -539,12 +539,12 @@ function LearnerIntelContent() {
                               ? 'bg-rose-950/10 border-rose-500/30'
                               : isInProgress
                               ? 'bg-amber-950/10 border-amber-500/30'
-                              : 'bg-surface border-border'
+                              : 'bg-aven-base border-aven-border'
                           }`}
                         >
                           <div>
                             <div className="flex items-start justify-between gap-2 mb-1">
-                              <span className="font-mono text-[10px] text-slate-500 bg-surface-secondary px-1.5 py-0.5 rounded">
+                              <span className="font-mono text-[10px] text-aven-text-muted bg-aven-surface px-1.5 py-0.5 rounded">
                                 {node.id}
                               </span>
                               <span
@@ -555,22 +555,22 @@ function LearnerIntelContent() {
                                     ? 'bg-rose-500/20 text-rose-400'
                                     : isInProgress
                                     ? 'bg-amber-500/20 text-amber-400'
-                                    : 'bg-surface-secondary text-slate-400'
+                                    : 'bg-aven-surface text-aven-text-subtle'
                                 }`}
                               >
                                 {node.status}
                               </span>
                             </div>
-                            <h4 className="font-bold text-sm text-white">{node.name}</h4>
-                            <p className="text-[11px] text-slate-400 leading-snug mt-1 line-clamp-2">
+                            <h4 className="font-bold text-sm text-aven-text">{node.name}</h4>
+                            <p className="text-[11px] text-aven-text-subtle leading-snug mt-1 line-clamp-2">
                               {node.description || 'Target engineering capability.'}
                             </p>
                           </div>
 
-                          <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
-                            <span className="text-[10px] text-slate-500">Readiness Score:</span>
+                          <div className="pt-2 border-t border-aven-border flex items-center justify-between text-xs">
+                            <span className="text-[10px] text-aven-text-muted">Readiness Score:</span>
                             <span className={`font-mono font-bold ${
-                              isMastered ? 'text-emerald-400' : isLagging ? 'text-rose-400' : 'text-slate-300'
+                              isMastered ? 'text-emerald-400' : isLagging ? 'text-rose-400' : 'text-aven-text-subtle'
                             }`}>
                               {node.readiness_score}%
                             </span>
@@ -586,12 +586,12 @@ function LearnerIntelContent() {
               {activeTab === 'brief' && (
                 <div className="space-y-4">
                   {/* Executive Summary Card */}
-                  <div className="p-5 bg-surface border border-border rounded-2xl space-y-2 shadow-glass">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                  <div className="p-5 bg-aven-base border border-aven-border rounded-2xl space-y-2 shadow-glass">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-aven-primary flex items-center gap-1.5">
                       <Sparkles size={14} />
                       <span>Executive Coaching Brief</span>
                     </div>
-                    <p className="text-sm text-slate-200 leading-relaxed font-medium">
+                    <p className="text-sm text-aven-text leading-relaxed font-medium">
                       {learnerIntel.mentor_brief.executive_summary}
                     </p>
                   </div>
@@ -603,7 +603,7 @@ function LearnerIntelContent() {
                         <AlertTriangle size={14} />
                         <span>Identified Blocker</span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed">
+                      <p className="text-xs text-aven-text-subtle leading-relaxed">
                         {learnerIntel.mentor_brief.current_blocker}
                       </p>
                     </div>
@@ -613,25 +613,25 @@ function LearnerIntelContent() {
                         <HelpCircle size={14} />
                         <span>Root Cause Analysis</span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed">
+                      <p className="text-xs text-aven-text-subtle leading-relaxed">
                         {learnerIntel.mentor_brief.root_cause_analysis}
                       </p>
                     </div>
                   </div>
 
                   {/* Talking Points */}
-                  <div className="p-5 bg-surface border border-border rounded-2xl space-y-3 shadow-glass">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <div className="p-5 bg-aven-base border border-aven-border rounded-2xl space-y-3 shadow-glass">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-aven-text-subtle flex items-center gap-1.5">
                       <Lightbulb size={14} className="text-amber-400" />
                       <span>Curated 1-on-1 Discussion Talking Points</span>
                     </div>
                     <div className="space-y-2">
                       {learnerIntel.mentor_brief.suggested_talking_points.map((tp: string, idx: number) => (
-                        <div key={idx} className="p-3 bg-surface-secondary/70 rounded-xl border border-border flex items-start gap-2.5 text-xs">
-                          <span className="w-5 h-5 rounded-full bg-brand-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                        <div key={idx} className="p-3 bg-aven-surface/70 rounded-xl border border-aven-border flex items-start gap-2.5 text-xs">
+                          <span className="w-5 h-5 rounded-full bg-brand-600 text-aven-text font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                             {idx + 1}
                           </span>
-                          <span className="text-slate-300 leading-relaxed">{tp}</span>
+                          <span className="text-aven-text-subtle leading-relaxed">{tp}</span>
                         </div>
                       ))}
                     </div>
@@ -643,25 +643,25 @@ function LearnerIntelContent() {
               {activeTab === 'activity' && (
                 <div className="space-y-3">
                   {learnerIntel.recent_activities.length === 0 ? (
-                    <div className="p-16 bg-surface border border-border rounded-2xl text-center text-slate-500 text-xs">
+                    <div className="p-16 bg-aven-base border border-aven-border rounded-2xl text-center text-aven-text-muted text-xs">
                       No assessment attempts or interview checkpoints recorded yet.
                     </div>
                   ) : (
                     learnerIntel.recent_activities.map((act: any, aIdx: number) => (
-                      <div key={aIdx} className="p-4 bg-surface border border-border rounded-2xl flex items-center justify-between gap-4 shadow-glass">
+                      <div key={aIdx} className="p-4 bg-aven-base border border-aven-border rounded-2xl flex items-center justify-between gap-4 shadow-glass">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono bg-surface-secondary text-indigo-300 border border-border">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono bg-aven-surface text-aven-primary border border-aven-border">
                               {act.activity_type}
                             </span>
-                            <span className="font-bold text-white text-xs">{act.title}</span>
+                            <span className="font-bold text-aven-text text-xs">{act.title}</span>
                           </div>
-                          <p className="text-[11px] text-slate-400">{act.detail}</p>
+                          <p className="text-[11px] text-aven-text-subtle">{act.detail}</p>
                         </div>
 
                         <div className="text-right shrink-0">
                           {act.score !== null && (
-                            <div className="text-sm font-extrabold text-white font-mono">{act.score}%</div>
+                            <div className="text-sm font-extrabold text-aven-text font-mono">{act.score}%</div>
                           )}
                           <span className={`text-[10px] font-bold uppercase ${
                             act.status === 'PASSED' ? 'text-emerald-400' : 'text-amber-400'
@@ -728,7 +728,7 @@ export default function LearnerIntelPage() {
   return (
     <Suspense fallback={
       <div className="p-20 text-center">
-        <Loader2 className="animate-spin text-indigo-400 mx-auto" size={36} />
+        <Loader2 className="animate-spin text-aven-primary mx-auto" size={36} />
       </div>
     }>
       <LearnerIntelContent />

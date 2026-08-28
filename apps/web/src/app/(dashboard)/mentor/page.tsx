@@ -224,18 +224,18 @@ function MentorConnectDashboardContent() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-16">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-aven-border pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Users className="text-brand-400" size={18} />
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
+            <Users className="text-aven-primary" size={18} />
+            <span className="text-xs font-bold uppercase tracking-widest text-aven-text-subtle">
               Mentor Operations
             </span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl font-extrabold text-aven-text tracking-tight">
             Mentor Connect
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-aven-text-subtle mt-1">
             Human 1-on-1 guidance control center — review learner requests, inspect complete graph progress, and schedule targeted video sessions
           </p>
         </div>
@@ -247,15 +247,15 @@ function MentorConnectDashboardContent() {
               loadTriageQueue();
               loadMySessions();
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface border border-border text-xs font-semibold text-slate-300 hover:text-white hover:border-brand-500/50 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-aven-base border border-aven-border text-xs font-semibold text-aven-text-subtle hover:text-aven-text hover:border-brand-500/50 transition-all"
             title="Refresh"
           >
             <RefreshCw size={13} className={isLoadingOpen || isLoadingMySessions || isLoadingTriage ? 'animate-spin' : ''} />
             <span>Sync</span>
           </button>
-          <div className="flex items-center gap-2 text-xs bg-surface border border-border px-3.5 py-2 rounded-xl">
+          <div className="flex items-center gap-2 text-xs bg-aven-base border border-aven-border px-3.5 py-2 rounded-xl">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-bold text-white">Mentor Queue Active</span>
+            <span className="font-bold text-aven-text">Mentor Queue Active</span>
           </div>
         </div>
       </div>
@@ -268,7 +268,7 @@ function MentorConnectDashboardContent() {
               ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
               : toastMsg.type === 'error'
               ? 'bg-rose-500/10 border-rose-500/30 text-rose-300'
-              : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
+              : 'bg-aven-primary/10 border-aven-primary/30 text-aven-primary'
           }`}
         >
           <div className="flex items-center gap-2.5">
@@ -281,7 +281,7 @@ function MentorConnectDashboardContent() {
           </div>
           <button
             onClick={() => setToastMsg(null)}
-            className="p-1 rounded-lg hover:bg-black/20 text-slate-400 hover:text-white transition-colors"
+            className="p-1 rounded-lg hover:bg-black/20 text-aven-text-subtle hover:text-aven-text transition-colors"
           >
             ✕
           </button>
@@ -290,7 +290,7 @@ function MentorConnectDashboardContent() {
 
       {/* Metric Summary Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-surface border border-amber-500/30 shadow-glass">
+        <div className="p-4 rounded-2xl bg-aven-base border border-amber-500/30 shadow-glass">
           <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
             <AlertTriangle size={14} />
             <span>Triage Candidates</span>
@@ -298,45 +298,45 @@ function MentorConnectDashboardContent() {
           <div className="text-3xl font-black text-amber-400 mt-1">
             {triageQueue.filter(t => t.breakthrough_zone).length}
           </div>
-          <div className="text-[10px] text-slate-400 mt-1">Learners in breakthrough zone</div>
+          <div className="text-[10px] text-aven-text-subtle mt-1">Learners in breakthrough zone</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-surface border border-cyan-500/30 shadow-glass">
+        <div className="p-4 rounded-2xl bg-aven-base border border-cyan-500/30 shadow-glass">
           <div className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
             <Inbox size={14} />
             <span>Open Learner Requests</span>
           </div>
           <div className="text-3xl font-black text-cyan-400 mt-1">{openRequests.length}</div>
-          <div className="text-[10px] text-slate-400 mt-1">Available for first-come acceptance</div>
+          <div className="text-[10px] text-aven-text-subtle mt-1">Available for first-come acceptance</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-surface border border-indigo-500/30 shadow-glass">
-          <div className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+        <div className="p-4 rounded-2xl bg-aven-base border border-aven-primary/30 shadow-glass">
+          <div className="text-[11px] font-bold text-aven-primary uppercase tracking-wider flex items-center gap-1.5">
             <Calendar size={14} />
             <span>My Upcoming Sessions</span>
           </div>
-          <div className="text-3xl font-black text-indigo-400 mt-1">{activeSessions.length}</div>
-          <div className="text-[10px] text-slate-400 mt-1">Accepted & scheduled meetings</div>
+          <div className="text-3xl font-black text-aven-primary mt-1">{activeSessions.length}</div>
+          <div className="text-[10px] text-aven-text-subtle mt-1">Accepted & scheduled meetings</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-surface border border-emerald-500/30 shadow-glass">
+        <div className="p-4 rounded-2xl bg-aven-base border border-emerald-500/30 shadow-glass">
           <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
             <CheckCircle2 size={14} />
             <span>Completed Mentorships</span>
           </div>
           <div className="text-3xl font-black text-emerald-400 mt-1">{completedSessions.length}</div>
-          <div className="text-[10px] text-slate-400 mt-1">Sessions logged with takeaways</div>
+          <div className="text-[10px] text-aven-text-subtle mt-1">Sessions logged with takeaways</div>
         </div>
       </div>
 
       {/* Tabs Bar */}
-      <div className="flex items-center gap-2 border-b border-border text-xs font-bold">
+      <div className="flex items-center gap-2 border-b border-aven-border text-xs font-bold">
         <button
           onClick={() => setActiveTab('triage')}
           className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-all ${
             activeTab === 'triage'
               ? 'border-amber-400 text-amber-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              : 'border-transparent text-aven-text-subtle hover:text-aven-text'
           }`}
         >
           <AlertTriangle size={14} />
@@ -352,8 +352,8 @@ function MentorConnectDashboardContent() {
           onClick={() => setActiveTab('open')}
           className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-all ${
             activeTab === 'open'
-              ? 'border-brand-500 text-brand-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-brand-500 text-aven-primary'
+              : 'border-transparent text-aven-text-subtle hover:text-aven-text'
           }`}
         >
           <Inbox size={14} />
@@ -364,8 +364,8 @@ function MentorConnectDashboardContent() {
           onClick={() => setActiveTab('my_sessions')}
           className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-all ${
             activeTab === 'my_sessions'
-              ? 'border-brand-500 text-brand-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-brand-500 text-aven-primary'
+              : 'border-transparent text-aven-text-subtle hover:text-aven-text'
           }`}
         >
           <Calendar size={14} />
@@ -376,8 +376,8 @@ function MentorConnectDashboardContent() {
           onClick={() => setActiveTab('history')}
           className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-all ${
             activeTab === 'history'
-              ? 'border-brand-500 text-brand-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
+              ? 'border-brand-500 text-aven-primary'
+              : 'border-transparent text-aven-text-subtle hover:text-aven-text'
           }`}
         >
           <CheckCircle2 size={14} />
@@ -389,25 +389,25 @@ function MentorConnectDashboardContent() {
       {activeTab === 'open' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center px-1">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <h2 className="text-sm font-bold text-aven-text uppercase tracking-wider flex items-center gap-2">
               <Sparkles className="text-cyan-400" size={16} />
               <span>Learners Awaiting Mentor Assignment</span>
             </h2>
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-aven-text-subtle font-mono">
               First-Come-First-Served (FCFS)
             </span>
           </div>
 
           {isLoadingOpen ? (
-            <div className="p-16 text-center bg-surface border border-border rounded-2xl">
-              <Loader2 className="animate-spin text-brand-400 mx-auto" size={32} />
-              <p className="text-xs text-slate-400 mt-2">Loading open requests queue...</p>
+            <div className="p-16 text-center bg-aven-base border border-aven-border rounded-2xl">
+              <Loader2 className="animate-spin text-aven-primary mx-auto" size={32} />
+              <p className="text-xs text-aven-text-subtle mt-2">Loading open requests queue...</p>
             </div>
           ) : openRequests.length === 0 ? (
-            <div className="p-16 text-center bg-surface border border-border rounded-2xl space-y-2">
+            <div className="p-16 text-center bg-aven-base border border-aven-border rounded-2xl space-y-2">
               <CheckCircle2 className="text-emerald-400 mx-auto" size={36} />
-              <h3 className="text-sm font-bold text-white">All Caught Up!</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              <h3 className="text-sm font-bold text-aven-text">All Caught Up!</h3>
+              <p className="text-xs text-aven-text-subtle max-w-sm mx-auto">
                 There are currently no open mentor requests. New learner escalation requests will appear here in real time.
               </p>
             </div>
@@ -416,27 +416,27 @@ function MentorConnectDashboardContent() {
               {openRequests.map((req) => (
                 <div
                   key={req.id}
-                  className="p-5 rounded-2xl bg-surface border border-border hover:border-brand-500/40 transition-all shadow-glass flex flex-col justify-between space-y-4"
+                  className="p-5 rounded-2xl bg-aven-base border border-aven-border hover:border-brand-500/40 transition-all shadow-glass flex flex-col justify-between space-y-4"
                 >
                   <div className="space-y-3">
                     {/* Header: Learner & Duration */}
                     <div className="flex items-start justify-between">
                       <div>
-                        <div className="font-bold text-white text-sm">{req.learner_name}</div>
-                        <div className="text-[11px] text-slate-400">
+                        <div className="font-bold text-aven-text text-sm">{req.learner_name}</div>
+                        <div className="text-[11px] text-aven-text-subtle">
                           {req.target_role || 'Software Engineering Track'} • {req.learner_email}
                         </div>
                       </div>
-                      <span className="px-2.5 py-1 rounded-lg bg-surface-secondary text-slate-300 font-mono text-[11px] border border-border flex items-center gap-1">
-                        <Clock size={11} className="text-indigo-400" />
+                      <span className="px-2.5 py-1 rounded-lg bg-aven-surface text-aven-text-subtle font-mono text-[11px] border border-aven-border flex items-center gap-1">
+                        <Clock size={11} className="text-aven-primary" />
                         <span>{req.requested_duration_minutes}m</span>
                       </span>
                     </div>
 
                     {/* Skill Readiness Badge */}
                     {req.skill_id && (
-                      <div className="flex items-center gap-2 p-2 rounded-xl bg-surface-secondary/70 border border-border text-xs">
-                        <span className="font-mono text-slate-300 text-[11px]">{req.skill_id}</span>
+                      <div className="flex items-center gap-2 p-2 rounded-xl bg-aven-surface/70 border border-aven-border text-xs">
+                        <span className="font-mono text-aven-text-subtle text-[11px]">{req.skill_id}</span>
                         {req.skill_readiness_pct !== null && (
                           <span
                             className={`ml-auto font-bold text-[11px] ${
@@ -455,31 +455,31 @@ function MentorConnectDashboardContent() {
 
                     {/* Request Topic & Reason */}
                     <div>
-                      <h3 className="text-sm font-bold text-white">{req.title}</h3>
-                      <div className="text-[11px] text-indigo-300 font-medium mt-1">
+                      <h3 className="text-sm font-bold text-aven-text">{req.title}</h3>
+                      <div className="text-[11px] text-aven-primary font-medium mt-1">
                         Reason: {req.reason}
                       </div>
-                      <p className="text-xs text-slate-300 mt-2 leading-relaxed bg-surface-secondary/40 p-3 rounded-xl border border-border/40">
+                      <p className="text-xs text-aven-text-subtle mt-2 leading-relaxed bg-aven-surface p-3 rounded-xl border border-aven-border/40">
                         {req.description}
                       </p>
                     </div>
                   </div>
 
                   {/* Actions Bar */}
-                  <div className="pt-3 border-t border-border flex items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-aven-border flex items-center justify-between gap-2">
                     <button
                       onClick={() => router.push(`/mentor/learner-intel?profile_id=${req.profile_id || 1}`)}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-secondary hover:bg-slate-700 text-indigo-300 hover:text-white border border-border text-xs font-semibold transition"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-aven-surface hover:bg-slate-700 text-aven-primary hover:text-aven-text border border-aven-border text-xs font-semibold transition"
                       title="Inspect complete learner goal, lagging skills & graph position"
                     >
-                      <BrainCircuit size={13} className="text-indigo-400" />
+                      <BrainCircuit size={13} className="text-aven-primary" />
                       <span>Learner 360° Intel</span>
                     </button>
 
                     <button
                       onClick={() => handleAcceptRequest(req.id)}
                       disabled={acceptingId === req.id}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white font-bold text-xs shadow-glow-indigo transition-all"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-aven-text font-bold text-xs shadow-glow-indigo transition-all"
                     >
                       {acceptingId === req.id ? (
                         <Loader2 size={13} className="animate-spin" />
@@ -500,22 +500,22 @@ function MentorConnectDashboardContent() {
       {activeTab === 'my_sessions' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center px-1">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <Calendar className="text-indigo-400" size={16} />
+            <h2 className="text-sm font-bold text-aven-text uppercase tracking-wider flex items-center gap-2">
+              <Calendar className="text-aven-primary" size={16} />
               <span>Assigned Mentorship Sessions</span>
             </h2>
           </div>
 
           {isLoadingMySessions ? (
-            <div className="p-16 text-center bg-surface border border-border rounded-2xl">
-              <Loader2 className="animate-spin text-brand-400 mx-auto" size={32} />
-              <p className="text-xs text-slate-400 mt-2">Loading your sessions...</p>
+            <div className="p-16 text-center bg-aven-base border border-aven-border rounded-2xl">
+              <Loader2 className="animate-spin text-aven-primary mx-auto" size={32} />
+              <p className="text-xs text-aven-text-subtle mt-2">Loading your sessions...</p>
             </div>
           ) : activeSessions.length === 0 ? (
-            <div className="p-16 text-center bg-surface border border-border rounded-2xl space-y-2">
-              <Calendar className="text-slate-500 mx-auto" size={36} />
-              <h3 className="text-sm font-bold text-white">No Active Sessions</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <div className="p-16 text-center bg-aven-base border border-aven-border rounded-2xl space-y-2">
+              <Calendar className="text-aven-text-muted mx-auto" size={36} />
+              <h3 className="text-sm font-bold text-aven-text">No Active Sessions</h3>
+              <p className="text-xs text-aven-text-subtle max-w-sm mx-auto">
                 You currently have no assigned sessions. Accept open requests from the Open Requests tab to start mentoring.
               </p>
             </div>
@@ -528,19 +528,19 @@ function MentorConnectDashboardContent() {
                 return (
                   <div
                     key={session.id}
-                    className="p-5 rounded-2xl bg-surface border border-border hover:border-border/80 transition-all shadow-glass flex flex-col justify-between space-y-4"
+                    className="p-5 rounded-2xl bg-aven-base border border-aven-border hover:border-aven-border/80 transition-all shadow-glass flex flex-col justify-between space-y-4"
                   >
                     <div className="space-y-3">
                       {/* Header */}
                       <div className="flex items-start justify-between">
                         <div>
-                          <div className="font-bold text-white text-sm">{session.learner_name}</div>
-                          <div className="text-[11px] text-slate-400">{session.learner_email}</div>
+                          <div className="font-bold text-aven-text text-sm">{session.learner_name}</div>
+                          <div className="text-[11px] text-aven-text-subtle">{session.learner_email}</div>
                         </div>
                         <span
                           className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
                             isScheduled
-                              ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                              ? 'bg-aven-primary/20 text-aven-primary border border-indigo-500/40'
                               : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                           }`}
                         >
@@ -550,23 +550,23 @@ function MentorConnectDashboardContent() {
 
                       {/* Title & Description */}
                       <div>
-                        <h3 className="text-sm font-bold text-white">{session.title}</h3>
+                        <h3 className="text-sm font-bold text-aven-text">{session.title}</h3>
                         {session.skill_id && (
-                          <span className="inline-block mt-1 px-2 py-0.5 rounded bg-surface-secondary text-slate-300 text-[10px] font-mono border border-border">
+                          <span className="inline-block mt-1 px-2 py-0.5 rounded bg-aven-surface text-aven-text-subtle text-[10px] font-mono border border-aven-border">
                             {session.skill_id}
                           </span>
                         )}
-                        <p className="text-xs text-slate-300 mt-2 leading-relaxed line-clamp-2">
+                        <p className="text-xs text-aven-text-subtle mt-2 leading-relaxed line-clamp-2">
                           {session.description}
                         </p>
                       </div>
 
                       {/* Schedule info */}
                       {session.scheduled_at ? (
-                        <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-between text-xs">
+                        <div className="p-3 rounded-xl bg-aven-primary/10 border border-aven-primary/30 flex items-center justify-between text-xs">
                           <div>
-                            <div className="text-[10px] text-slate-400">Scheduled Time:</div>
-                            <div className="font-bold text-white font-mono">
+                            <div className="text-[10px] text-aven-text-subtle">Scheduled Time:</div>
+                            <div className="font-bold text-aven-text font-mono">
                               {new Date(session.scheduled_at).toLocaleString([], {
                                 month: 'short',
                                 day: 'numeric',
@@ -576,8 +576,8 @@ function MentorConnectDashboardContent() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-[10px] text-slate-400">Duration:</div>
-                            <div className="font-bold text-slate-200">{session.duration_minutes} mins</div>
+                            <div className="text-[10px] text-aven-text-subtle">Duration:</div>
+                            <div className="font-bold text-aven-text">{session.duration_minutes} mins</div>
                           </div>
                         </div>
                       ) : (
@@ -588,11 +588,11 @@ function MentorConnectDashboardContent() {
                     </div>
 
                     {/* Actions */}
-                    <div className="pt-3 border-t border-border flex items-center justify-between gap-2">
+                    <div className="pt-3 border-t border-aven-border flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => router.push(`/mentor/learner-intel?profile_id=${session.profile_id || 1}`)}
-                          className="px-3 py-1.5 rounded-xl bg-surface-secondary hover:bg-slate-700 text-indigo-300 text-xs font-semibold flex items-center gap-1.5 border border-border transition"
+                          className="px-3 py-1.5 rounded-xl bg-aven-surface hover:bg-slate-700 text-aven-primary text-xs font-semibold flex items-center gap-1.5 border border-aven-border transition"
                         >
                           <BrainCircuit size={13} />
                           <span>360° Intel</span>
@@ -600,7 +600,7 @@ function MentorConnectDashboardContent() {
 
                         <button
                           onClick={() => setSchedulingSession(session)}
-                          className="px-3 py-1.5 rounded-xl bg-surface-secondary hover:bg-surface-tertiary border border-border text-xs font-semibold text-slate-300 transition-colors"
+                          className="px-3 py-1.5 rounded-xl bg-aven-surface hover:bg-aven-base border border-aven-border border border-aven-border text-xs font-semibold text-aven-text-subtle transition-colors"
                         >
                           {session.scheduled_at ? 'Reschedule' : 'Schedule Time'}
                         </button>
@@ -610,7 +610,7 @@ function MentorConnectDashboardContent() {
                         {isScheduled && (
                           <button
                             onClick={() => handleJoinMeeting(session)}
-                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-glow-indigo transition-all"
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-aven-text font-bold text-xs shadow-glow-indigo transition-all"
                           >
                             <Video size={13} />
                             <span>Join Meeting</span>
@@ -637,28 +637,28 @@ function MentorConnectDashboardContent() {
       {activeTab === 'history' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center px-1">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <h2 className="text-sm font-bold text-aven-text uppercase tracking-wider flex items-center gap-2">
               <CheckCircle2 className="text-emerald-400" size={16} />
               <span>Mentorship History & Takeaways</span>
             </h2>
           </div>
 
           {completedSessions.length === 0 ? (
-            <div className="p-16 text-center bg-surface border border-border rounded-2xl space-y-2">
-              <FileText className="text-slate-500 mx-auto" size={36} />
-              <h3 className="text-sm font-bold text-white">No Completed Sessions Yet</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <div className="p-16 text-center bg-aven-base border border-aven-border rounded-2xl space-y-2">
+              <FileText className="text-aven-text-muted mx-auto" size={36} />
+              <h3 className="text-sm font-bold text-aven-text">No Completed Sessions Yet</h3>
+              <p className="text-xs text-aven-text-subtle max-w-sm mx-auto">
                 Completed 1-on-1 mentorship logs, mentor notes, and guidance history will be archived here.
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               {completedSessions.map((session) => (
-                <div key={session.id} className="p-5 rounded-2xl bg-surface border border-border space-y-3">
+                <div key={session.id} className="p-5 rounded-2xl bg-aven-base border border-aven-border space-y-3">
                   <div className="flex justify-between items-start">
                     <div>
-                      <div className="text-sm font-bold text-white">{session.title}</div>
-                      <div className="text-xs text-slate-400">
+                      <div className="text-sm font-bold text-aven-text">{session.title}</div>
+                      <div className="text-xs text-aven-text-subtle">
                         Learner: {session.learner_name} ({session.learner_email})
                       </div>
                     </div>
@@ -668,15 +668,15 @@ function MentorConnectDashboardContent() {
                   </div>
 
                   {session.mentor_notes && (
-                    <div className="p-3 bg-surface-secondary/50 rounded-xl text-xs space-y-1 border border-border">
-                      <div className="font-bold text-slate-300">Mentor Takeaways:</div>
-                      <p className="text-slate-300">{session.mentor_notes}</p>
+                    <div className="p-3 bg-aven-surface rounded-xl text-xs space-y-1 border border-aven-border">
+                      <div className="font-bold text-aven-text-subtle">Mentor Takeaways:</div>
+                      <p className="text-aven-text-subtle">{session.mentor_notes}</p>
                     </div>
                   )}
 
                   {session.recommendations && (
-                    <div className="p-3 bg-brand-500/5 rounded-xl text-xs space-y-1 border border-brand-500/20">
-                      <div className="font-bold text-brand-300">Actionable Roadmap Recommendations:</div>
+                    <div className="p-3 bg-brand-500/5 rounded-xl text-xs space-y-1 border border-aven-primary/20">
+                      <div className="font-bold text-aven-primary">Actionable Roadmap Recommendations:</div>
                       <p className="text-brand-200">{session.recommendations}</p>
                     </div>
                   )}
@@ -691,22 +691,22 @@ function MentorConnectDashboardContent() {
       {activeTab === 'triage' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center px-1">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <h2 className="text-sm font-bold text-aven-text uppercase tracking-wider flex items-center gap-2">
               <AlertTriangle className="text-amber-400" size={16} />
               <span>Algorithmic Mentor Triage Queue (90th Percentile Breakthrough Zone)</span>
             </h2>
           </div>
 
           {isLoadingTriage ? (
-            <div className="p-16 text-center bg-surface border border-border rounded-2xl">
+            <div className="p-16 text-center bg-aven-base border border-aven-border rounded-2xl">
               <Loader2 className="animate-spin text-amber-400 mx-auto" size={32} />
-              <p className="text-xs text-slate-400 mt-2">Running triage ranking algorithm...</p>
+              <p className="text-xs text-aven-text-subtle mt-2">Running triage ranking algorithm...</p>
             </div>
           ) : triageQueue.length === 0 ? (
-            <div className="p-16 text-center bg-surface border border-border rounded-2xl">
+            <div className="p-16 text-center bg-aven-base border border-aven-border rounded-2xl">
               <CheckCircle2 className="text-emerald-400 mx-auto" size={36} />
-              <h3 className="text-sm font-bold text-white mt-2">No High Friction Learners</h3>
-              <p className="text-xs text-slate-400 mt-1">All active learners are progressing smoothly.</p>
+              <h3 className="text-sm font-bold text-aven-text mt-2">No High Friction Learners</h3>
+              <p className="text-xs text-aven-text-subtle mt-1">All active learners are progressing smoothly.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -716,20 +716,20 @@ function MentorConnectDashboardContent() {
                   className={`p-5 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
                     item.breakthrough_zone
                       ? 'bg-amber-950/20 border-amber-500/40 shadow-glow-indigo'
-                      : 'bg-surface border-border'
+                      : 'bg-aven-base border-aven-border'
                   }`}
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-white text-sm">{item.display_label}</span>
+                      <span className="font-bold text-aven-text text-sm">{item.display_label}</span>
                       {item.breakthrough_zone && (
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-black uppercase">
                           Breakthrough Zone (High Leverage)
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-300">{item.recommended_action}</p>
-                    <div className="flex items-center gap-3 text-[11px] text-slate-400 font-mono pt-1">
+                    <p className="text-xs text-aven-text-subtle">{item.recommended_action}</p>
+                    <div className="flex items-center gap-3 text-[11px] text-aven-text-subtle font-mono pt-1">
                       <span>Readiness: {item.readiness_pct}%</span>
                       <span>•</span>
                       <span>Gap Skills: {item.gap_skills_count}</span>
@@ -740,7 +740,7 @@ function MentorConnectDashboardContent() {
 
                   <button
                     onClick={() => router.push(`/mentor/learner-intel?profile_id=${item.profile_id}`)}
-                    className="px-4 py-2 rounded-xl bg-surface-secondary hover:bg-slate-700 text-indigo-300 font-bold text-xs border border-border transition shrink-0 flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl bg-aven-surface hover:bg-slate-700 text-aven-primary font-bold text-xs border border-aven-border transition shrink-0 flex items-center gap-1.5"
                   >
                     <BrainCircuit size={14} />
                     <span>View Graph Intel</span>
@@ -757,25 +757,25 @@ function MentorConnectDashboardContent() {
       {/* ========================================================================= */}
       {inspectingProfileId !== null && (
         <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200">
-          <div className="w-full max-w-5xl max-h-[92vh] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-200">
+          <div className="w-full max-w-5xl max-h-[92vh] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-aven-text">
             {/* Modal Header Bar */}
             <div className="p-6 bg-slate-950/90 border-b border-slate-800 flex items-start justify-between gap-4 shrink-0">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <BrainCircuit className="text-indigo-400" size={18} />
-                  <span className="text-xs font-bold uppercase tracking-widest text-indigo-400">
+                  <BrainCircuit className="text-aven-primary" size={18} />
+                  <span className="text-xs font-bold uppercase tracking-widest text-aven-primary">
                     Learner 360° Diagnostic & Graph Position
                   </span>
                 </div>
                 {learnerIntel ? (
                   <div>
-                    <h2 className="text-xl font-extrabold text-white flex items-center gap-2">
+                    <h2 className="text-xl font-extrabold text-aven-text flex items-center gap-2">
                       <span>{learnerIntel.name}</span>
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-aven-primary/20 text-aven-primary border border-aven-primary/30">
                         {learnerIntel.target_role}
                       </span>
                     </h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-aven-text-subtle mt-0.5">
                       {learnerIntel.email} • Study Pace: {learnerIntel.weekly_hours} hrs/week
                     </p>
                   </div>
@@ -786,7 +786,7 @@ function MentorConnectDashboardContent() {
 
               <button
                 onClick={() => setInspectingProfileId(null)}
-                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
+                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-aven-text-subtle hover:text-aven-text transition"
               >
                 ✕
               </button>
@@ -796,19 +796,19 @@ function MentorConnectDashboardContent() {
             {isLoadingIntel || !learnerIntel ? (
               <div className="flex-1 flex flex-col items-center justify-center py-24 gap-3">
                 <Loader2 className="animate-spin text-indigo-500" size={36} />
-                <p className="text-xs text-slate-400">Querying ground-truth skill graph & BKT mastery state...</p>
+                <p className="text-xs text-aven-text-subtle">Querying ground-truth skill graph & BKT mastery state...</p>
               </div>
             ) : (
               <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Hero Metrics & Goal Progress Bar */}
                 <div className="p-6 bg-slate-950/40 border-b border-slate-800/80 grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
                   <div className="p-3.5 bg-slate-900 rounded-2xl border border-slate-800">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-aven-text-subtle mb-1">
                       Goal Readiness
                     </div>
                     <div className="flex items-baseline justify-between mb-1.5">
-                      <span className="text-2xl font-black text-white">{learnerIntel.overall_readiness_pct}%</span>
-                      <span className="text-[10px] text-indigo-400 font-bold">Target: 70%+</span>
+                      <span className="text-2xl font-black text-aven-text">{learnerIntel.overall_readiness_pct}%</span>
+                      <span className="text-[10px] text-aven-primary font-bold">Target: 70%+</span>
                     </div>
                     <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                       <div
@@ -819,19 +819,19 @@ function MentorConnectDashboardContent() {
                   </div>
 
                   <div className="p-3.5 bg-slate-900 rounded-2xl border border-slate-800">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-aven-text-subtle mb-1">
                       Current Frontier Node
                     </div>
-                    <div className="text-sm font-extrabold text-indigo-300 truncate">
+                    <div className="text-sm font-extrabold text-aven-primary truncate">
                       {learnerIntel.current_frontier_skill
                         ? learnerIntel.current_frontier_skill.replace('_', ' ').toUpperCase()
                         : 'Advancing Smoothly'}
                     </div>
-                    <div className="text-[10px] text-slate-500 mt-1">Active bottleneck in graph</div>
+                    <div className="text-[10px] text-aven-text-muted mt-1">Active bottleneck in graph</div>
                   </div>
 
                   <div className="p-3.5 bg-slate-900 rounded-2xl border border-slate-800">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-aven-text-subtle mb-1">
                       Graph Mastery Split
                     </div>
                     <div className="flex items-center gap-2 text-xs font-bold">
@@ -843,13 +843,13 @@ function MentorConnectDashboardContent() {
                   </div>
 
                   <div className="p-3.5 bg-slate-900 rounded-2xl border border-slate-800">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-aven-text-subtle mb-1">
                       Active Request Context
                     </div>
-                    <div className="text-xs font-bold text-white truncate">
+                    <div className="text-xs font-bold text-aven-text truncate">
                       {inspectingContextRequest ? inspectingContextRequest.title : 'General 1-on-1 Guidance'}
                     </div>
-                    <div className="text-[10px] text-indigo-400 mt-1">
+                    <div className="text-[10px] text-aven-primary mt-1">
                       Reason: {inspectingContextRequest ? inspectingContextRequest.reason : 'Diagnostic review'}
                     </div>
                   </div>
@@ -861,8 +861,8 @@ function MentorConnectDashboardContent() {
                     onClick={() => setIntelTab('graph')}
                     className={`py-3.5 px-4 flex items-center gap-2 border-b-2 transition ${
                       intelTab === 'graph'
-                        ? 'border-indigo-500 text-indigo-300'
-                        : 'border-transparent text-slate-400 hover:text-white'
+                        ? 'border-indigo-500 text-aven-primary'
+                        : 'border-transparent text-aven-text-subtle hover:text-aven-text'
                     }`}
                   >
                     <Network size={14} />
@@ -873,8 +873,8 @@ function MentorConnectDashboardContent() {
                     onClick={() => setIntelTab('brief')}
                     className={`py-3.5 px-4 flex items-center gap-2 border-b-2 transition ${
                       intelTab === 'brief'
-                        ? 'border-indigo-500 text-indigo-300'
-                        : 'border-transparent text-slate-400 hover:text-white'
+                        ? 'border-indigo-500 text-aven-primary'
+                        : 'border-transparent text-aven-text-subtle hover:text-aven-text'
                     }`}
                   >
                     <Lightbulb size={14} />
@@ -885,8 +885,8 @@ function MentorConnectDashboardContent() {
                     onClick={() => setIntelTab('activity')}
                     className={`py-3.5 px-4 flex items-center gap-2 border-b-2 transition ${
                       intelTab === 'activity'
-                        ? 'border-indigo-500 text-indigo-300'
-                        : 'border-transparent text-slate-400 hover:text-white'
+                        ? 'border-indigo-500 text-aven-primary'
+                        : 'border-transparent text-aven-text-subtle hover:text-aven-text'
                     }`}
                   >
                     <Activity size={14} />
@@ -897,9 +897,9 @@ function MentorConnectDashboardContent() {
                 {/* Tab 1: Skill Graph Position & Matrix */}
                 {intelTab === 'graph' && (
                   <div className="flex-1 p-6 overflow-y-auto space-y-4">
-                    <div className="p-3.5 bg-indigo-950/20 border border-indigo-500/30 rounded-2xl text-xs text-indigo-300 flex items-center justify-between">
+                    <div className="p-3.5 bg-indigo-950/20 border border-aven-primary/30 rounded-2xl text-xs text-aven-primary flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Compass size={16} className="text-indigo-400 shrink-0" />
+                        <Compass size={16} className="text-aven-primary shrink-0" />
                         <span>
                           <strong>Ground-Truth Skill Graph:</strong> Evaluated using Bayesian Knowledge Tracing (BKT) probability of mastery $P(L)$.
                         </span>
@@ -940,7 +940,7 @@ function MentorConnectDashboardContent() {
                           >
                             <div>
                               <div className="flex items-start justify-between gap-2 mb-1">
-                                <span className="font-mono text-[10px] text-slate-500 bg-slate-800/80 px-1.5 py-0.5 rounded">
+                                <span className="font-mono text-[10px] text-aven-text-muted bg-slate-800/80 px-1.5 py-0.5 rounded">
                                   {node.id}
                                 </span>
                                 <span
@@ -951,22 +951,22 @@ function MentorConnectDashboardContent() {
                                       ? 'bg-rose-500/20 text-rose-400'
                                       : isInProgress
                                       ? 'bg-amber-500/20 text-amber-400'
-                                      : 'bg-slate-800 text-slate-400'
+                                      : 'bg-slate-800 text-aven-text-subtle'
                                   }`}
                                 >
                                   {node.status}
                                 </span>
                               </div>
-                              <h4 className="font-bold text-sm text-white">{node.name}</h4>
-                              <p className="text-[11px] text-slate-400 leading-snug mt-1 line-clamp-2">
+                              <h4 className="font-bold text-sm text-aven-text">{node.name}</h4>
+                              <p className="text-[11px] text-aven-text-subtle leading-snug mt-1 line-clamp-2">
                                 {node.description || 'Core requirement for target engineering track.'}
                               </p>
                             </div>
 
                             <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                              <span className="text-[10px] text-slate-500">Mastery Score:</span>
+                              <span className="text-[10px] text-aven-text-muted">Mastery Score:</span>
                               <span className={`font-mono font-bold ${
-                                isMastered ? 'text-emerald-400' : isLagging ? 'text-rose-400' : 'text-slate-300'
+                                isMastered ? 'text-emerald-400' : isLagging ? 'text-rose-400' : 'text-aven-text-subtle'
                               }`}>
                                 {node.readiness_score}%
                               </span>
@@ -983,11 +983,11 @@ function MentorConnectDashboardContent() {
                   <div className="flex-1 p-6 overflow-y-auto space-y-5">
                     {/* Executive Summary Card */}
                     <div className="p-5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-2">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-aven-primary flex items-center gap-1.5">
                         <Sparkles size={14} />
                         <span>AI Synthesized Learner Overview</span>
                       </div>
-                      <p className="text-sm text-slate-200 leading-relaxed font-medium">
+                      <p className="text-sm text-aven-text leading-relaxed font-medium">
                         {learnerIntel.mentor_brief.executive_summary}
                       </p>
                     </div>
@@ -999,7 +999,7 @@ function MentorConnectDashboardContent() {
                           <AlertTriangle size={14} />
                           <span>Identified Learning Blocker</span>
                         </div>
-                        <p className="text-xs text-slate-300 leading-relaxed">
+                        <p className="text-xs text-aven-text-subtle leading-relaxed">
                           {learnerIntel.mentor_brief.current_blocker}
                         </p>
                       </div>
@@ -1009,7 +1009,7 @@ function MentorConnectDashboardContent() {
                           <HelpCircle size={14} />
                           <span>Root Cause Analysis</span>
                         </div>
-                        <p className="text-xs text-slate-300 leading-relaxed">
+                        <p className="text-xs text-aven-text-subtle leading-relaxed">
                           {learnerIntel.mentor_brief.root_cause_analysis}
                         </p>
                       </div>
@@ -1017,17 +1017,17 @@ function MentorConnectDashboardContent() {
 
                     {/* Suggested Talking Points for Mentor */}
                     <div className="p-5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-3">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-aven-text-subtle flex items-center gap-1.5">
                         <Lightbulb size={14} className="text-amber-400" />
                         <span>Recommended 1-on-1 Coaching Talking Points</span>
                       </div>
                       <div className="space-y-2">
                         {learnerIntel.mentor_brief.suggested_talking_points.map((tp: string, idx: number) => (
                           <div key={idx} className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-start gap-2.5 text-xs">
-                            <span className="w-5 h-5 rounded-full bg-indigo-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                            <span className="w-5 h-5 rounded-full bg-indigo-600 text-aven-text font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                               {idx + 1}
                             </span>
-                            <span className="text-slate-300 leading-relaxed">{tp}</span>
+                            <span className="text-aven-text-subtle leading-relaxed">{tp}</span>
                           </div>
                         ))}
                       </div>
@@ -1039,7 +1039,7 @@ function MentorConnectDashboardContent() {
                 {intelTab === 'activity' && (
                   <div className="flex-1 p-6 overflow-y-auto space-y-3">
                     {learnerIntel.recent_activities.length === 0 ? (
-                      <div className="py-16 text-center text-slate-500 text-xs">
+                      <div className="py-16 text-center text-aven-text-muted text-xs">
                         No recent assessment activity logged for this learner.
                       </div>
                     ) : (
@@ -1047,17 +1047,17 @@ function MentorConnectDashboardContent() {
                         <div key={aIdx} className="p-4 bg-slate-950/70 border border-slate-800 rounded-2xl flex items-center justify-between gap-4">
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono bg-slate-800 text-indigo-300">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono bg-slate-800 text-aven-primary">
                                 {act.activity_type}
                               </span>
-                              <span className="font-bold text-white text-xs">{act.title}</span>
+                              <span className="font-bold text-aven-text text-xs">{act.title}</span>
                             </div>
-                            <p className="text-[11px] text-slate-400">{act.detail}</p>
+                            <p className="text-[11px] text-aven-text-subtle">{act.detail}</p>
                           </div>
 
                           <div className="text-right shrink-0">
                             {act.score !== null && (
-                              <div className="text-sm font-extrabold text-white font-mono">{act.score}%</div>
+                              <div className="text-sm font-extrabold text-aven-text font-mono">{act.score}%</div>
                             )}
                             <span className={`text-[10px] font-bold uppercase ${
                               act.status === 'PASSED' ? 'text-emerald-400' : 'text-amber-400'
@@ -1073,8 +1073,8 @@ function MentorConnectDashboardContent() {
 
                 {/* Footer Action Bar */}
                 <div className="p-5 bg-slate-950 border-t border-slate-800 flex items-center justify-between gap-3 shrink-0">
-                  <span className="text-xs text-slate-400">
-                    Inspecting Profile ID: <strong className="text-white font-mono">#{learnerIntel.profile_id}</strong>
+                  <span className="text-xs text-aven-text-subtle">
+                    Inspecting Profile ID: <strong className="text-aven-text font-mono">#{learnerIntel.profile_id}</strong>
                   </span>
 
                   <div className="flex items-center gap-3">
@@ -1082,7 +1082,7 @@ function MentorConnectDashboardContent() {
                       <button
                         onClick={() => handleAcceptRequest(inspectingContextRequest.id)}
                         disabled={acceptingId === inspectingContextRequest.id}
-                        className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white font-bold text-xs shadow-glow-indigo transition flex items-center gap-2"
+                        className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-aven-text font-bold text-xs shadow-glow-indigo transition flex items-center gap-2"
                       >
                         <UserCheck size={14} />
                         <span>Accept Request Now</span>
@@ -1091,7 +1091,7 @@ function MentorConnectDashboardContent() {
 
                     <button
                       onClick={() => setInspectingProfileId(null)}
-                      className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition"
+                      className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-aven-text font-semibold text-xs transition"
                     >
                       Close Inspector
                     </button>
@@ -1152,7 +1152,7 @@ export default function MentorConnectDashboard() {
   return (
     <Suspense fallback={
       <div className="p-20 text-center">
-        <Loader2 className="animate-spin text-brand-400 mx-auto" size={32} />
+        <Loader2 className="animate-spin text-aven-primary mx-auto" size={32} />
       </div>
     }>
       <MentorConnectDashboardContent />

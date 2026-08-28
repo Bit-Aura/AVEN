@@ -37,7 +37,7 @@ export default function StakeholderChat() {
           className="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
           placeholder="Ask a clarifying question..." 
         />
-        <button onClick={handleSend} className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+        <button onClick={handleSend} className="bg-emerald-600 hover:bg-emerald-500 text-aven-text px-4 py-2 rounded text-sm font-medium transition-colors">
           Send
         </button>
       </div>

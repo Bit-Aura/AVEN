@@ -84,18 +84,18 @@ export default function MentorSessionsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-16">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-aven-border pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Users className="text-indigo-400" size={18} />
-            <span className="text-xs font-bold uppercase tracking-widest text-indigo-400">
+            <Users className="text-aven-primary" size={18} />
+            <span className="text-xs font-bold uppercase tracking-widest text-aven-primary">
               1-on-1 Guidance
             </span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl font-extrabold text-aven-text tracking-tight">
             Assigned Mentorship Sessions
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-aven-text-subtle mt-1">
             Manage your 1-on-1 video mentorship sessions, schedule meeting times, and log post-session takeaways
           </p>
         </div>
@@ -103,14 +103,14 @@ export default function MentorSessionsPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push('/mentor')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-bold text-white shadow-glow-indigo transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-bold text-aven-text shadow-glow-indigo transition"
           >
             <Plus size={13} />
             <span>Accept New Requests</span>
           </button>
           <button
             onClick={loadSessions}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface border border-border text-xs font-semibold text-slate-300 hover:text-white hover:border-indigo-500/50 transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-aven-base border border-aven-border text-xs font-semibold text-aven-text-subtle hover:text-aven-text hover:border-indigo-500/50 transition"
           >
             <RefreshCw size={13} className={isLoading ? 'animate-spin' : ''} />
             <span>Sync</span>
@@ -131,36 +131,36 @@ export default function MentorSessionsPage() {
             <CheckCircle2 size={16} />
             <span>{toastMsg.message}</span>
           </div>
-          <button onClick={() => setToastMsg(null)} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setToastMsg(null)} className="text-aven-text-subtle hover:text-aven-text">✕</button>
         </div>
       )}
 
       {/* Metrics Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 bg-surface border border-indigo-500/30 rounded-2xl shadow-glass">
-          <div className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+        <div className="p-4 bg-aven-base border border-aven-primary/30 rounded-2xl shadow-glass">
+          <div className="text-[11px] font-bold text-aven-primary uppercase tracking-wider flex items-center gap-1.5">
             <Calendar size={14} />
             <span>Active Sessions</span>
           </div>
-          <div className="text-3xl font-black text-white mt-1">{activeSessions.length}</div>
-          <div className="text-[10px] text-slate-400 mt-0.5">Assigned & in progress</div>
+          <div className="text-3xl font-black text-aven-text mt-1">{activeSessions.length}</div>
+          <div className="text-[10px] text-aven-text-subtle mt-0.5">Assigned & in progress</div>
         </div>
 
-        <div className="p-4 bg-surface border border-emerald-500/30 rounded-2xl shadow-glass">
+        <div className="p-4 bg-aven-base border border-emerald-500/30 rounded-2xl shadow-glass">
           <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
             <CheckCircle2 size={14} />
             <span>Completed Mentorships</span>
           </div>
           <div className="text-3xl font-black text-emerald-400 mt-1">{completedSessions.length}</div>
-          <div className="text-[10px] text-slate-400 mt-0.5">Logged with feedback & notes</div>
+          <div className="text-[10px] text-aven-text-subtle mt-0.5">Logged with feedback & notes</div>
         </div>
 
-        <div className="p-4 bg-surface border border-cyan-500/30 rounded-2xl shadow-glass flex flex-col justify-between">
+        <div className="p-4 bg-aven-base border border-cyan-500/30 rounded-2xl shadow-glass flex flex-col justify-between">
           <div className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
             <BrainCircuit size={14} />
             <span>Learner 360° Diagnostic</span>
           </div>
-          <p className="text-xs text-slate-300 mt-1">
+          <p className="text-xs text-aven-text-subtle mt-1">
             Inspect learner graph positions and BKT mastery states before joining meetings.
           </p>
           <button
@@ -173,13 +173,13 @@ export default function MentorSessionsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-border text-xs font-bold">
+      <div className="flex items-center gap-2 border-b border-aven-border text-xs font-bold">
         <button
           onClick={() => setSessionsTab('upcoming')}
           className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition ${
             sessionsTab === 'upcoming'
-              ? 'border-indigo-500 text-indigo-300'
-              : 'border-transparent text-slate-400 hover:text-white'
+              ? 'border-indigo-500 text-aven-primary'
+              : 'border-transparent text-aven-text-subtle hover:text-aven-text'
           }`}
         >
           <Calendar size={14} />
@@ -190,8 +190,8 @@ export default function MentorSessionsPage() {
           onClick={() => setSessionsTab('completed')}
           className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition ${
             sessionsTab === 'completed'
-              ? 'border-indigo-500 text-indigo-300'
-              : 'border-transparent text-slate-400 hover:text-white'
+              ? 'border-indigo-500 text-aven-primary'
+              : 'border-transparent text-aven-text-subtle hover:text-aven-text'
           }`}
         >
           <CheckCircle2 size={14} />
@@ -203,20 +203,20 @@ export default function MentorSessionsPage() {
       {sessionsTab === 'upcoming' && (
         <div>
           {isLoading ? (
-            <div className="p-16 bg-surface border border-border rounded-3xl text-center">
-              <Loader2 className="animate-spin text-indigo-400 mx-auto" size={32} />
-              <p className="text-xs text-slate-400 mt-2">Loading your sessions...</p>
+            <div className="p-16 bg-aven-base border border-aven-border rounded-3xl text-center">
+              <Loader2 className="animate-spin text-aven-primary mx-auto" size={32} />
+              <p className="text-xs text-aven-text-subtle mt-2">Loading your sessions...</p>
             </div>
           ) : activeSessions.length === 0 ? (
-            <div className="p-16 bg-surface border border-border rounded-3xl text-center space-y-3">
-              <Calendar className="text-slate-500 mx-auto" size={36} />
-              <h3 className="text-sm font-bold text-white">No Active Sessions</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <div className="p-16 bg-aven-base border border-aven-border rounded-3xl text-center space-y-3">
+              <Calendar className="text-aven-text-muted mx-auto" size={36} />
+              <h3 className="text-sm font-bold text-aven-text">No Active Sessions</h3>
+              <p className="text-xs text-aven-text-subtle max-w-sm mx-auto">
                 You currently have no assigned sessions. Accept open student requests from the queue to start mentoring.
               </p>
               <button
                 onClick={() => router.push('/mentor')}
-                className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-bold text-white shadow-glow-indigo transition"
+                className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-bold text-aven-text shadow-glow-indigo transition"
               >
                 Browse Open Requests
               </button>
@@ -229,19 +229,19 @@ export default function MentorSessionsPage() {
                 return (
                   <div
                     key={session.id}
-                    className="p-5 rounded-2xl bg-surface border border-border hover:border-slate-600 transition shadow-glass flex flex-col justify-between space-y-4"
+                    className="p-5 rounded-2xl bg-aven-base border border-aven-border hover:border-slate-600 transition shadow-glass flex flex-col justify-between space-y-4"
                   >
                     <div className="space-y-3">
                       {/* Header */}
                       <div className="flex items-start justify-between">
                         <div>
-                          <div className="font-bold text-white text-sm">{session.learner_name}</div>
-                          <div className="text-[11px] text-slate-400">{session.learner_email}</div>
+                          <div className="font-bold text-aven-text text-sm">{session.learner_name}</div>
+                          <div className="text-[11px] text-aven-text-subtle">{session.learner_email}</div>
                         </div>
                         <span
                           className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
                             isScheduled
-                              ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                              ? 'bg-aven-primary/20 text-aven-primary border border-indigo-500/40'
                               : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                           }`}
                         >
@@ -251,23 +251,23 @@ export default function MentorSessionsPage() {
 
                       {/* Title & Topic */}
                       <div>
-                        <h3 className="text-sm font-bold text-white">{session.title}</h3>
+                        <h3 className="text-sm font-bold text-aven-text">{session.title}</h3>
                         {session.skill_id && (
-                          <span className="inline-block mt-1 px-2 py-0.5 rounded bg-surface-secondary text-slate-300 text-[10px] font-mono border border-border">
+                          <span className="inline-block mt-1 px-2 py-0.5 rounded bg-aven-surface text-aven-text-subtle text-[10px] font-mono border border-aven-border">
                             {session.skill_id}
                           </span>
                         )}
-                        <p className="text-xs text-slate-300 mt-2 leading-relaxed line-clamp-2">
+                        <p className="text-xs text-aven-text-subtle mt-2 leading-relaxed line-clamp-2">
                           {session.description}
                         </p>
                       </div>
 
                       {/* Schedule info */}
                       {session.scheduled_at ? (
-                        <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-between text-xs">
+                        <div className="p-3 rounded-xl bg-aven-primary/10 border border-aven-primary/30 flex items-center justify-between text-xs">
                           <div>
-                            <div className="text-[10px] text-slate-400">Meeting Time:</div>
-                            <div className="font-bold text-white font-mono">
+                            <div className="text-[10px] text-aven-text-subtle">Meeting Time:</div>
+                            <div className="font-bold text-aven-text font-mono">
                               {new Date(session.scheduled_at).toLocaleString([], {
                                 month: 'short',
                                 day: 'numeric',
@@ -277,8 +277,8 @@ export default function MentorSessionsPage() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-[10px] text-slate-400">Duration:</div>
-                            <div className="font-bold text-slate-200">{session.duration_minutes} mins</div>
+                            <div className="text-[10px] text-aven-text-subtle">Duration:</div>
+                            <div className="font-bold text-aven-text">{session.duration_minutes} mins</div>
                           </div>
                         </div>
                       ) : (
@@ -289,11 +289,11 @@ export default function MentorSessionsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="pt-3 border-t border-border flex items-center justify-between gap-2">
+                    <div className="pt-3 border-t border-aven-border flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => router.push(`/mentor/learner-intel?profile_id=${session.profile_id || 1}`)}
-                          className="px-3 py-1.5 rounded-xl bg-surface-secondary hover:bg-slate-700 text-indigo-300 text-xs font-semibold flex items-center gap-1.5 border border-border transition"
+                          className="px-3 py-1.5 rounded-xl bg-aven-surface hover:bg-slate-700 text-aven-primary text-xs font-semibold flex items-center gap-1.5 border border-aven-border transition"
                         >
                           <BrainCircuit size={13} />
                           <span>360° Intel</span>
@@ -301,7 +301,7 @@ export default function MentorSessionsPage() {
 
                         <button
                           onClick={() => setSchedulingSession(session)}
-                          className="px-3 py-1.5 rounded-xl bg-surface-secondary hover:bg-surface-tertiary border border-border text-xs font-semibold text-slate-300 transition"
+                          className="px-3 py-1.5 rounded-xl bg-aven-surface hover:bg-aven-base border border-aven-border border border-aven-border text-xs font-semibold text-aven-text-subtle transition"
                         >
                           {session.scheduled_at ? 'Reschedule' : 'Schedule Time'}
                         </button>
@@ -311,7 +311,7 @@ export default function MentorSessionsPage() {
                         {isScheduled && (
                           <button
                             onClick={() => handleJoinMeeting(session)}
-                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-glow-indigo transition"
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-aven-text font-bold text-xs shadow-glow-indigo transition"
                           >
                             <Video size={13} />
                             <span>Join Meeting</span>
@@ -338,21 +338,21 @@ export default function MentorSessionsPage() {
       {sessionsTab === 'completed' && (
         <div>
           {completedSessions.length === 0 ? (
-            <div className="p-16 bg-surface border border-border rounded-3xl text-center space-y-2">
-              <FileText className="text-slate-500 mx-auto" size={36} />
-              <h3 className="text-sm font-bold text-white">No Completed Sessions Yet</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <div className="p-16 bg-aven-base border border-aven-border rounded-3xl text-center space-y-2">
+              <FileText className="text-aven-text-muted mx-auto" size={36} />
+              <h3 className="text-sm font-bold text-aven-text">No Completed Sessions Yet</h3>
+              <p className="text-xs text-aven-text-subtle max-w-sm mx-auto">
                 Completed mentorship logs and recommendations will appear here once sessions are finalized.
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               {completedSessions.map((session) => (
-                <div key={session.id} className="p-5 rounded-2xl bg-surface border border-border space-y-3 shadow-glass">
+                <div key={session.id} className="p-5 rounded-2xl bg-aven-base border border-aven-border space-y-3 shadow-glass">
                   <div className="flex justify-between items-start">
                     <div>
-                      <div className="text-sm font-bold text-white">{session.title}</div>
-                      <div className="text-xs text-slate-400">
+                      <div className="text-sm font-bold text-aven-text">{session.title}</div>
+                      <div className="text-xs text-aven-text-subtle">
                         Learner: {session.learner_name} ({session.learner_email})
                       </div>
                     </div>
@@ -362,15 +362,15 @@ export default function MentorSessionsPage() {
                   </div>
 
                   {session.mentor_notes && (
-                    <div className="p-3 bg-surface-secondary/50 rounded-xl text-xs space-y-1 border border-border">
-                      <div className="font-bold text-slate-300">Mentor Takeaways:</div>
-                      <p className="text-slate-300">{session.mentor_notes}</p>
+                    <div className="p-3 bg-aven-surface rounded-xl text-xs space-y-1 border border-aven-border">
+                      <div className="font-bold text-aven-text-subtle">Mentor Takeaways:</div>
+                      <p className="text-aven-text-subtle">{session.mentor_notes}</p>
                     </div>
                   )}
 
                   {session.recommendations && (
-                    <div className="p-3 bg-brand-500/5 rounded-xl text-xs space-y-1 border border-brand-500/20">
-                      <div className="font-bold text-brand-300">Actionable Roadmap Recommendations:</div>
+                    <div className="p-3 bg-brand-500/5 rounded-xl text-xs space-y-1 border border-aven-primary/20">
+                      <div className="font-bold text-aven-primary">Actionable Roadmap Recommendations:</div>
                       <p className="text-brand-200">{session.recommendations}</p>
                     </div>
                   )}
