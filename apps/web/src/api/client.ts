@@ -1188,3 +1188,53 @@ export const learnerRoadmapGraph = async (slug: string) => {
   return await fetchApi(`/learner/roadmaps/${slug}/graph`);
 };
 
+// ---------------------------------------------------------------------------
+// Hackathon API Client Functions
+// ---------------------------------------------------------------------------
+
+export const getHackathons = async (filters: import('@aven/shared-types').HackathonFilters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.page) params.append('page', filters.page.toString());
+  if (filters.page_size) params.append('page_size', filters.page_size.toString());
+  if (filters.mode) params.append('mode', filters.mode);
+  if (filters.city) params.append('city', filters.city);
+  if (filters.status) params.append('status', filters.status);
+  if (filters.min_prize) params.append('min_prize', filters.min_prize.toString());
+  if (filters.sort) params.append('sort', filters.sort);
+  if (filters.source) {
+    if (Array.isArray(filters.source)) {
+      filters.source.forEach(s => params.append('source', s));
+    } else if (typeof filters.source === 'string' && (filters.source as string).trim().length > 0) {
+      params.append('source', (filters.source as string).trim());
+    }
+  }
+  const queryString = params.toString() ? `?${params.toString()}` : '';
+  return await fetchApi(`/hackathons${queryString}`);
+};
+
+export const getHackathonDetail = async (id: string) => {
+  return await fetchApi(`/hackathons/${id}`);
+};
+
+export const searchHackathons = async (q: string, page = 1, page_size = 20) => {
+  const params = new URLSearchParams({ q, page: page.toString(), page_size: page_size.toString() });
+  return await fetchApi(`/hackathons/search?${params.toString()}`);
+};
+
+export const getUpcomingHackathons = async (page = 1, page_size = 20) => {
+  const params = new URLSearchParams({ page: page.toString(), page_size: page_size.toString() });
+  return await fetchApi(`/hackathons/upcoming?${params.toString()}`);
+};
+
+export const getHackathonSources = async () => {
+  return await fetchApi('/hackathons/sources');
+};
+
+export const triggerHackathonScrape = async (source: string, limit?: number) => {
+  return await fetchApi('/hackathons/scrape', {
+    method: 'POST',
+    body: JSON.stringify({ source, limit: limit || 50 })
+  });
+};
+
+

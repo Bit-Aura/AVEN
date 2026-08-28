@@ -445,5 +445,34 @@ class MockInterviewTurn(Base):
     session: Mapped["MockInterviewSession"] = relationship(back_populates="turns")
 
 
+class HackathonEvent(Base):
+    __tablename__ = "hackathon_events"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    external_id: Mapped[str] = mapped_column(String(255), index=True)
+    source: Mapped[str] = mapped_column(String(100), index=True)
+    title: Mapped[str] = mapped_column(String(512))
+    organizer: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    url: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
+    location: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    city: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    state: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    country: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    mode: Mapped[Optional[str]] = mapped_column(String(50), default="online")
+    prize_pool: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    registration_deadline: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    event_start_date: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    event_end_date: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    skills: Mapped[Optional[Any]] = mapped_column(JSON, nullable=True)
+    cover_image: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
+    scraped_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
+    __table_args__ = (
+        UniqueConstraint("source", "external_id", name="uq_hackathon_event_source_extid"),
+    )
+
+
+
 
 

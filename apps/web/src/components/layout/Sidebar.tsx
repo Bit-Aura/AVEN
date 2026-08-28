@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Mic,
   Map,
+  Trophy,
 } from 'lucide-react';
 import { useClerk } from '@clerk/nextjs';
 import { usePathStore } from '../../store/usePathStore';
@@ -59,6 +60,7 @@ export default function Sidebar() {
         { name: 'Day-One Simulator', href: '/learner/simulator', icon: BrainCircuit, badge: 'Job' },
         { name: 'Skill Graph', href: '/learner/graph', icon: Network },
         { name: 'Market Radar', href: '/market-radar', icon: Radar, badge: 'ETL' },
+        { name: 'Hackathon Radar', href: '/learner/hackathons', icon: Trophy, badge: 'LIVE' },
         { name: 'Proof Portfolio', href: '/learner/portfolio', icon: Award },
       ]
     },
@@ -77,6 +79,7 @@ export default function Sidebar() {
       items: [
         { name: 'Mentor Connect', href: '/mentor', icon: ShieldAlert, badge: 'Live' },
         { name: 'Learner 360° Intel', href: '/mentor/learner-intel', icon: BrainCircuit, badge: '360°' },
+        { name: 'Hackathon Radar', href: '/learner/hackathons', icon: Trophy, badge: 'LIVE' },
       ]
     }
   ];
@@ -96,6 +99,7 @@ export default function Sidebar() {
         { name: 'Learning Path View', href: '/learner', icon: Compass },
         { name: 'Skill Graph View', href: '/learner/graph', icon: Network },
         { name: 'Market Radar', href: '/market-radar', icon: Radar },
+        { name: 'Hackathon Radar', href: '/learner/hackathons', icon: Trophy, badge: 'LIVE' },
       ]
     }
   ];
