@@ -25,6 +25,9 @@ import { useClerk } from '@clerk/nextjs';
 import { usePathStore } from '../../store/usePathStore';
 import { useSafeUser, SafeUserButton, isClerkConfigured } from '../../lib/clerkSafe';
 import { logoutUser } from '../../api/client';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { UserSettingsModal, Tab } from '../profile/UserSettingsModal';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -47,6 +50,23 @@ export default function Sidebar() {
   const userEmail = user?.primaryEmailAddress?.emailAddress || 'demo@pathfinder.dev';
   const userName = user?.fullName || user?.firstName || user?.username || 'Demo User';
   const userInitials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'DU';
+  const userAvatarUrl = user?.imageUrl;
+
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<Tab>('account');
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Role-Specific Navigation Definitions
   const learnerGroups = [
@@ -131,24 +151,31 @@ export default function Sidebar() {
     }
   };
 
+  const openSettings = (tab: Tab) => {
+    setIsProfileMenuOpen(false);
+    if (isClerkConfigured && clerkInstance?.openUserProfile) {
+      clerkInstance.openUserProfile();
+    } else {
+      setSettingsTab(tab);
+      setIsSettingsModalOpen(true);
+    }
+  };
+
   return (
     <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} transition-all duration-300 ease-in-out bg-[#3d3d3a] flex flex-col shrink-0 min-h-screen select-none`}>
       <div className={`h-16 border-b border-[#141413]/20 flex items-center ${isSidebarOpen ? 'px-4 justify-between' : 'px-0 justify-center cursor-pointer hover:bg-[#faf9f5]/10 transition-colors'}`} onClick={!isSidebarOpen ? toggleSidebar : undefined}>
         {isSidebarOpen ? (
-          <div className="flex items-center gap-2 overflow-hidden">
-            <div className="w-8 h-8 shrink-0 rounded bg-[#faf9f5] flex items-center justify-center border border-[#faf9f5]">
-              <BrainCircuit className="text-[#141413]" size={18} />
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full overflow-hidden border border-[#faf9f5]/20 shadow-sm">
+              <img src="/Logo.png" alt="AVEN Logo" className="w-full h-full object-cover" />
             </div>
             <div className="flex items-center overflow-hidden">
-              <span className="font-black text-[#faf9f5] uppercase tracking-wider text-sm truncate">PathFinder</span>
-              <span className="ml-1.5 shrink-0 text-[9px] uppercase font-black px-1 py-0.5 rounded bg-[#3d3d3a] text-[#faf9f5] border border-[#3d3d3a]">
-                AVEN
-              </span>
+              <span className="font-black text-[#faf9f5] uppercase tracking-widest text-xl truncate">AVEN</span>
             </div>
           </div>
         ) : (
-          <div className="w-8 h-8 rounded bg-[#faf9f5] flex items-center justify-center border border-[#faf9f5]">
-            <BrainCircuit className="text-[#141413]" size={18} />
+          <div className="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden border border-[#faf9f5]/20 shadow-sm">
+            <img src="/Logo.png" alt="AVEN Logo" className="w-full h-full object-cover" />
           </div>
         )}
         
@@ -252,36 +279,87 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom Profile & Sign Out Bar */}
-      <div className={`p-4 border-t border-[#141413]/20 bg-[#3d3d3a] flex ${isSidebarOpen ? 'items-center justify-between' : 'flex-col items-center gap-4'}`}>
-        <div className={`flex items-center gap-2.5 overflow-hidden ${!isSidebarOpen && 'justify-center'}`}>
-          {isLoaded && user ? (
-            <SafeUserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 rounded" } }} />
-          ) : (
-            <div className="w-8 h-8 shrink-0 rounded bg-[#e8e6dc] flex items-center justify-center font-black text-[#141413] text-xs border border-[#e8e6dc]">
-              {userInitials}
-            </div>
-          )}
-          {isSidebarOpen && (
-            <div className="overflow-hidden">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-black uppercase text-[#faf9f5] truncate max-w-[90px]">{userName}</span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-[#faf9f5]/10 text-[#faf9f5] border border-[#faf9f5]/20 shrink-0">
-                  {userRole === 'ADMIN' ? 'Admin' : userRole === 'MENTOR' ? 'Mentor' : 'Learner'}
-                </span>
+      <div className="relative border-t border-[#141413]/20 bg-[#3d3d3a]" ref={profileMenuRef}>
+        <AnimatePresence>
+          {isProfileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className={`absolute bottom-[calc(100%+8px)] ${isSidebarOpen ? 'left-4 w-[calc(100%-32px)]' : 'left-4 w-56'} bg-[#faf9f5] border border-[#d6d3c4] rounded shadow-[0_8px_32px_-8px_rgba(20,20,19,0.5)] z-50 overflow-hidden flex flex-col`}
+            >
+              <div className="p-4 border-b border-[#d6d3c4]/50 bg-[#e8e6dc]/30">
+                <div className="text-[10px] font-black text-[#87867f] uppercase tracking-widest mb-1">Authenticated As</div>
+                <div className="text-sm font-black text-[#141413] truncate">{userName}</div>
+                <div className="text-xs font-bold text-[#87867f] truncate">{userEmail}</div>
               </div>
-              <div className="text-[10px] font-bold text-[#faf9f5]/70 truncate">{userEmail}</div>
-            </div>
+              
+              <div className="p-2 flex flex-col gap-1">
+                <button 
+                  className="flex items-center gap-3 px-3 py-2 w-full text-left rounded text-xs font-bold text-[#3d3d3a] hover:bg-[#e8e6dc] transition-colors group"
+                  onClick={() => openSettings('account')}
+                >
+                  <UserCheck size={16} className="text-[#87867f] group-hover:text-[#141413]" />
+                  <span>Account Settings</span>
+                </button>
+              </div>
+
+              <div className="p-2 border-t border-[#d6d3c4]/50">
+                <button
+                  onClick={() => {
+                    setIsProfileMenuOpen(false);
+                    handleSignOut();
+                  }}
+                  className="flex items-center gap-3 px-3 py-2 w-full text-left rounded text-xs font-bold text-[#cf3e3e] hover:bg-[#cf3e3e]/10 transition-colors"
+                >
+                  <LogOut size={16} />
+                  <span>Terminate Session</span>
+                </button>
+              </div>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
 
         <button
-          onClick={handleSignOut}
-          className={`p-2 rounded text-[#faf9f5]/70 hover:text-[#141413] hover:bg-[#e8e6dc] transition-colors ${!isSidebarOpen && 'w-full flex justify-center'}`}
-          title="Sign Out"
+          onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+          className={`w-full p-4 flex items-center justify-between hover:bg-[#faf9f5]/5 transition-colors focus:outline-none focus:bg-[#faf9f5]/5 ${!isSidebarOpen && 'flex-col gap-4'}`}
+          aria-label="User menu"
         >
-          <LogOut size={15} />
+          <div className={`flex items-center gap-2.5 overflow-hidden ${!isSidebarOpen && 'justify-center w-full'}`}>
+            {isLoaded && userAvatarUrl ? (
+              <img src={userAvatarUrl} alt={userName} className="w-8 h-8 rounded object-cover border border-[#141413]/50" />
+            ) : (
+              <div className="w-8 h-8 shrink-0 rounded bg-[#e8e6dc] flex items-center justify-center font-black text-[#141413] text-xs border border-[#141413]/50">
+                {userInitials}
+              </div>
+            )}
+            
+            {isSidebarOpen && (
+              <div className="overflow-hidden text-left flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black uppercase text-[#faf9f5] truncate">{userName}</span>
+                </div>
+                <div className="text-[10px] font-bold text-[#faf9f5]/50 truncate">{userRole === 'ADMIN' ? 'Admin' : userRole === 'MENTOR' ? 'Mentor' : 'Learner'}</div>
+              </div>
+            )}
+          </div>
+
+          {isSidebarOpen && (
+            <div className={`w-6 h-6 rounded flex items-center justify-center shrink-0 transition-transform duration-200 text-[#faf9f5]/50 ${isProfileMenuOpen ? 'rotate-180 bg-[#faf9f5]/10 text-[#faf9f5]' : ''}`}>
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 5L5 1L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          )}
         </button>
       </div>
+
+      <UserSettingsModal 
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        defaultTab={settingsTab}
+      />
     </aside>
   );
 }
