@@ -253,8 +253,8 @@ export default function Sidebar() {
                     href={item.href}
                     title={isSidebarOpen ? undefined : item.name}
                     className={`flex items-center ${isSidebarOpen ? 'px-3' : 'justify-center w-12'} py-2.5 rounded text-xs font-black uppercase tracking-widest transition-all duration-200 active:scale-95 group ${isActive
-                        ? 'bg-white text-aven-primary shadow-md'
-                        : 'text-aven-base opacity-70 hover:opacity-100 hover:bg-white/10'
+                      ? 'bg-white text-aven-primary shadow-md'
+                      : 'text-aven-base opacity-70 hover:opacity-100 hover:bg-white/10'
                       }`}
                   >
                     <div className="flex items-center gap-3">
@@ -266,8 +266,8 @@ export default function Sidebar() {
                     </div>
                     {isSidebarOpen && item.badge && (
                       <span className={`text-[9px] uppercase px-1.5 py-0.5 rounded font-black ml-3 transition-colors ${isActive
-                          ? 'bg-aven-secondary text-white border border-aven-secondary'
-                          : 'bg-aven-base/10 text-aven-base border border-aven-base/20 group-hover:bg-aven-secondary group-hover:text-white group-hover:border-aven-secondary'
+                        ? 'bg-aven-secondary text-white border border-aven-secondary'
+                        : 'bg-aven-base/10 text-aven-base border border-aven-base/20 group-hover:bg-aven-secondary group-hover:text-white group-hover:border-aven-secondary'
                         }`}>
                         {item.badge}
                       </span>
@@ -324,15 +324,9 @@ export default function Sidebar() {
         </AnimatePresence>
 
         <button
-<<<<<<< HEAD
           onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
           className={`w-full p-4 flex items-center justify-between hover:bg-[#faf9f5]/5 transition-colors focus:outline-none focus:bg-[#faf9f5]/5 ${!isSidebarOpen && 'flex-col gap-4'}`}
           aria-label="User menu"
-=======
-          onClick={handleSignOut}
-          className={`p-2 rounded text-aven-base opacity-70 hover:opacity-100 hover:bg-white/10 active:scale-90 transition-all ${!isSidebarOpen && 'w-full flex justify-center'}`}
-          title="Sign Out"
->>>>>>> 9f07d17 (style: ui migrate to global styling)
         >
           <div className={`flex items-center gap-2.5 overflow-hidden ${!isSidebarOpen && 'justify-center w-full'}`}>
             {isLoaded && userAvatarUrl ? (
