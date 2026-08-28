@@ -110,6 +110,25 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
 
 // --- Auth Endpoints ---
 
+export const downloadCertificate = async (profileId: number, courseName: string, roleId: string) => {
+  const response = await fetch(`${BASE_URL}/certificates/issue`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ profile_id: profileId, course_name: courseName, role_id: roleId }),
+  });
+  if (!response.ok) throw new Error('Failed to download certificate');
+  
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `AVEN_Certificate_${courseName.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+};
+
 export const loginUser = async (payload: { email: string; password: string }) => {
   const res = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
@@ -216,6 +235,20 @@ export const syncClerkUser = async (payload: ClerkSyncInput): Promise<ClerkSyncR
 
 export const fetchCurrentUser = async () => {
   return await fetchApi('/auth/me');
+};
+
+export const updateUserProfile = async (payload: { name: string; email: string }) => {
+  return await fetchApi('/auth/me', {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const updateUserPassword = async (payload: { current_password: string; new_password: string }) => {
+  return await fetchApi('/auth/password', {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
 };
 
 export const logoutUser = () => {
@@ -501,11 +534,18 @@ export const fetchMentorLearners = async () => {
   return await fetchApi('/mentor-connect/learners');
 };
 
-export const checkRoadmapSanity = async (payload: any) => {
+export const sanityCheckRoadmap = async (payload: { profile_id: number; modified_nodes: any[] }) => {
   return await fetchApi('/roadmap/sanity-check', {
     method: 'POST',
     body: JSON.stringify(payload)
   });
+};
+
+export const fetchRelevantCourses = async (profileId: number, activeMilestone?: string) => {
+  const url = activeMilestone 
+    ? `/learner/courses?profile_id=${profileId}&active_milestone=${encodeURIComponent(activeMilestone)}`
+    : `/learner/courses?profile_id=${profileId}`;
+  return await fetchApi(url);
 };
 
 export const updateWeights = async (payload: SliderWeightsInput) => {

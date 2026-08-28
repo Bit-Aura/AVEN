@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { usePathStore } from '../../store/usePathStore';
 import { 
   TerminalWindow, 
-  ShieldCheck
+  ShieldCheck,
+  Medal
 } from '@phosphor-icons/react';
+import { downloadCertificate } from '../../api/client';
 
 interface CurrentNodeCardProps {
   nodeName?: string;
@@ -27,8 +29,22 @@ export default function CurrentNodeCard({
   const profileId = usePathStore((state) => state.profileId);
 
   const currentSkillId = activeMilestone?.id || nodeName || 'python_basics';
-  const displayTitle = activeMilestone?.title || (nodeName ? nodeName.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Design RESTful APIs');
+  const displayTitle = activeMilestone?.title || (activeMilestone as any)?.data?.label || (nodeName ? nodeName.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Design RESTful APIs');
   const displayWhy = activeMilestone?.explanation || pathExplanation || whyThisStep || 'Outstanding achievement! You have mastered all prerequisite milestones for this path.';
+  
+  const isCompleted = (activeMilestone as any)?.data?.status === 'completed' || activeMilestone?.status === 'completed';
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleClaimCertificate = async () => {
+    setIsDownloading(true);
+    try {
+      await downloadCertificate(profileId || 1, displayTitle, currentSkillId);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const handleAssessmentTrigger = () => {
     if (onStartAssessment) {
@@ -55,7 +71,15 @@ export default function CurrentNodeCard({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          <button
+            onClick={handleClaimCertificate}
+            disabled={isDownloading}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#3d3d3a] hover:opacity-90 text-white text-xs font-bold transition-opacity disabled:opacity-50"
+          >
+            <Medal size={16} weight="bold" />
+            <span>{isDownloading ? 'Generating...' : 'Claim Certificate'}</span>
+          </button>
           <button
             onClick={() => openIde(currentSkillId)}
             className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#3d3d3a] hover:opacity-90 text-white text-xs font-bold transition-opacity"
