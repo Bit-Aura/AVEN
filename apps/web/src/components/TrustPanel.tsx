@@ -44,23 +44,23 @@ export default function TrustPanel() {
       {/* Backdrop */}
       <div 
         onClick={toggleTrustPanel}
-        className="fixed inset-0 bg-[#141413]/20 backdrop-blur-sm animate-in fade-in duration-200"
+        className="fixed inset-0 bg-aven-text/20 backdrop-blur-sm animate-in fade-in duration-200"
       />
 
       {/* Drawer Content */}
-      <div className="relative w-80 md:w-[420px] bg-[#faf9f5] border-l border-[#d6d3c4] h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-300 z-10 text-[#141413]">
+      <div className="relative w-80 md:w-[420px] bg-aven-base border-l border-aven-border h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-300 z-10 text-aven-text">
         
         {/* Header */}
-        <div className="p-6 border-b border-[#3d3d3a] flex justify-between items-center bg-[#3d3d3a]">
-          <div className="flex items-center gap-3 text-[#faf9f5]">
-            <div className="w-10 h-10 rounded bg-[#faf9f5] text-[#3d3d3a] flex items-center justify-center">
+        <div className="p-6 border-b border-aven-text-subtle flex justify-between items-center bg-aven-text-subtle">
+          <div className="flex items-center gap-3 text-aven-base">
+            <div className="w-10 h-10 rounded bg-aven-base text-aven-text-subtle flex items-center justify-center">
               <ShieldCheck size={22} />
             </div>
             <span className="uppercase tracking-tight font-black text-lg">Bayesian Readiness Vector</span>
           </div>
           <button 
             onClick={toggleTrustPanel}
-            className="p-1.5 rounded text-[#87867f] hover:text-[#faf9f5] hover:bg-[#3d3d3a] transition-colors"
+            className="p-1.5 rounded text-aven-text-muted hover:text-aven-base hover:bg-aven-text-subtle transition-colors"
             title="Close Panel"
           >
             <X size={20} />
@@ -72,30 +72,30 @@ export default function TrustPanel() {
           
           {/* Goal Proximity Meter */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between font-bold uppercase tracking-widest text-[#141413]">
+            <div className="flex items-center justify-between font-bold uppercase tracking-widest text-aven-text">
               <span className="text-sm">Target Role Match</span>
               <span className="text-4xl tracking-tighter">{progressPercent}%</span>
             </div>
-            <div className="w-full h-4 bg-[#e8e6dc] rounded-full overflow-hidden border border-[#3d3d3a]">
+            <div className="w-full h-4 bg-aven-surface rounded-full overflow-hidden border border-aven-text-subtle">
               <div 
-                className="h-full bg-[#3d3d3a] transition-all duration-700"
+                className="h-full bg-aven-text-subtle transition-all duration-700"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <p className="text-xs text-[#3d3d3a] leading-relaxed font-medium">
-              Calibrated across posterior mastery probabilities for <span className="font-bold text-[#141413]">{targetRole}</span>.
+            <p className="text-xs text-aven-text-subtle leading-relaxed font-medium">
+              Calibrated across posterior mastery probabilities for <span className="font-bold text-aven-text">{targetRole}</span>.
             </p>
           </div>
 
-          <div className="w-full h-px bg-[#d6d3c4]" />
+          <div className="w-full h-px bg-aven-border" />
 
           {/* Explainability Trace */}
           <div className="space-y-4">
-            <div className="text-xs font-bold uppercase tracking-widest text-[#141413] flex items-center gap-2">
+            <div className="text-xs font-bold uppercase tracking-widest text-aven-text flex items-center gap-2">
               <Sparkles size={16} />
               <span>Grounded Decision Trace</span>
             </div>
-            <div className="p-4 rounded-xl bg-[#e8e6dc] border border-[#d6d3c4] text-sm text-[#141413] leading-relaxed whitespace-pre-wrap font-medium">
+            <div className="p-4 rounded-xl bg-aven-surface border border-aven-border text-sm text-aven-text leading-relaxed whitespace-pre-wrap font-medium">
               {pathExplanation || 
                 (activePathPlan?.decision_trace?.explanation || 
                 "PathFinder computes prerequisite paths deterministically through Neo4j topological sorting. Active focus is placed strictly on the nearest unmastered node to maximize velocity.")}
@@ -104,7 +104,7 @@ export default function TrustPanel() {
 
           {/* Time Budget Reality Check */}
           {activePathPlan?.decision_trace?.time_budget_warning && (
-            <div className="p-4 rounded-xl bg-[#faf9f5] border border-[#141413] text-[#141413] text-sm space-y-2 shadow-sm">
+            <div className="p-4 rounded-xl bg-aven-base border border-aven-text text-aven-text text-sm space-y-2 shadow-sm">
               <div className="font-black flex items-center gap-2 uppercase tracking-widest text-xs">
                 <AlertTriangle size={16} />
                 Time Budget Warning
@@ -113,11 +113,11 @@ export default function TrustPanel() {
             </div>
           )}
 
-          <div className="w-full h-px bg-[#d6d3c4]" />
+          <div className="w-full h-px bg-aven-border" />
 
           {/* Milestone Status Breakdown */}
           <div className="space-y-4">
-            <div className="text-xs font-bold uppercase tracking-widest text-[#141413] flex items-center gap-2">
+            <div className="text-xs font-bold uppercase tracking-widest text-aven-text flex items-center gap-2">
               <Activity size={16} />
               <span>Topological Pipeline</span>
             </div>
@@ -127,15 +127,15 @@ export default function TrustPanel() {
                   key={idx} 
                   className={`p-4 rounded-xl border flex items-center justify-between text-xs transition-colors ${
                     mod.status === 'completed'
-                      ? 'bg-[#e8e6dc] border-[#d6d3c4] text-[#3d3d3a]'
+                      ? 'bg-aven-surface border-aven-border text-aven-text-subtle'
                       : mod.status === 'active'
-                      ? 'bg-[#3d3d3a] border-[#3d3d3a] text-[#faf9f5] font-bold shadow-lg shadow-black/10'
-                      : 'bg-transparent border-[#d6d3c4] text-[#87867f] font-medium'
+                      ? 'bg-aven-text-subtle border-aven-text-subtle text-aven-base font-bold shadow-lg shadow-black/10'
+                      : 'bg-transparent border-aven-border text-aven-text-muted font-medium'
                   }`}
                 >
                   <div className="flex items-center gap-3 truncate">
                     {mod.status === 'completed' && <CheckCircle2 size={18} className="shrink-0" />}
-                    {mod.status === 'active' && <Sparkles size={18} className="shrink-0 text-[#e8e6dc]" />}
+                    {mod.status === 'active' && <Sparkles size={18} className="shrink-0 text-aven-surface" />}
                     {mod.status === 'locked' && <Lock size={16} className="shrink-0 opacity-70" />}
                     <span className="truncate text-sm">{mod.name}</span>
                   </div>

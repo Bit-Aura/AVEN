@@ -131,22 +131,22 @@ export default function PlacementJourney() {
       <motion.div 
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-8 pb-6 border-b border-[#141413]/10"
+        className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-8 pb-6 border-b border-aven-text/10"
       >
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-2">
-            <Flame className="text-[#141413]" size={18} />
-            <span className="text-xs font-bold tracking-widest uppercase text-[#3d3d3a]">Focus Path</span>
+            <Flame className="text-aven-status-active" size={18} />
+            <span className="text-xs font-bold tracking-widest uppercase text-aven-text-subtle">Focus Path</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-semibold text-[#141413] tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-semibold text-aven-primary tracking-tight">
             Your Placement Journey
           </h1>
         </div>
 
         {/* Action Bar (Contrast & Alignment) */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-3 bg-[#faf9f5] border border-[#141413]/20 focus-within:border-[#141413] px-4 py-2.5 rounded-2xl transition-colors">
-            <Building2 size={20} className="text-[#141413]" />
+          <div className="flex items-center gap-3 bg-aven-base border border-aven-text/20 focus-within:border-aven-text px-4 py-2.5 rounded-2xl transition-colors">
+            <Building2 size={20} className="text-aven-text" />
             <input
               type="text"
               list="company-list"
@@ -158,7 +158,7 @@ export default function PlacementJourney() {
                  }
               }}
               onChange={(e) => setSelectedCompany(e.target.value)}
-              className="bg-transparent text-sm font-medium text-[#141413] focus:outline-none placeholder:text-[#3d3d3a]/50 w-40 tracking-wide"
+              className="bg-transparent text-sm font-medium text-aven-text focus:outline-none placeholder:text-aven-text-subtle/50 w-40 tracking-wide"
             />
             <datalist id="company-list">
               {companies.map((comp) => (
@@ -167,8 +167,8 @@ export default function PlacementJourney() {
             </datalist>
           </div>
           
-          <div className="flex items-center gap-3 bg-[#faf9f5] border border-[#141413]/20 focus-within:border-[#141413] px-4 py-2.5 rounded-2xl transition-colors">
-            <Calendar size={20} className="text-[#141413]" />
+          <div className="flex items-center gap-3 bg-aven-base border border-aven-text/20 focus-within:border-aven-text px-4 py-2.5 rounded-2xl transition-colors">
+            <Calendar size={20} className="text-aven-text" />
             <input
               type="date"
               value={interviewDate}
@@ -176,7 +176,7 @@ export default function PlacementJourney() {
                 setInterviewDate(e.target.value);
                 loadPlacementPlan(selectedCompany, e.target.value);
               }}
-              className="bg-transparent text-sm font-medium text-[#141413] focus:outline-none cursor-pointer tracking-wide"
+              className="bg-transparent text-sm font-medium text-aven-text focus:outline-none cursor-pointer tracking-wide"
             />
           </div>
 
@@ -185,9 +185,9 @@ export default function PlacementJourney() {
             whileTap={{ scale: 0.98 }}
             onClick={() => loadPlacementPlan(selectedCompany, interviewDate)}
             disabled={isLoading}
-            className="bg-[#141413] text-[#faf9f5] hover:bg-[#3d3d3a] text-sm font-bold px-6 py-2.5 rounded-2xl transition-colors flex items-center gap-2 border border-[#141413] shadow-sm disabled:opacity-50"
+            className="bg-aven-status-active text-aven-text hover:brightness-110 text-sm font-bold px-6 py-2.5 rounded-2xl transition-all flex items-center gap-2 shadow-md disabled:opacity-50"
           >
-            {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Flame size={16} />}
+            {isLoading ? <Loader2 size={16} className="animate-spin text-aven-text" /> : <Flame size={16} className="text-aven-text" />}
             Generate Path
           </motion.button>
         </div>
@@ -205,12 +205,12 @@ export default function PlacementJourney() {
             className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-pulse"
           >
             <div className="lg:col-span-8 space-y-6">
-              <div className="bg-[#e8e6dc] border border-[#141413]/10 h-40 rounded-3xl"></div>
-              <div className="bg-[#e8e6dc] border border-[#141413]/10 h-96 rounded-3xl"></div>
+              <div className="bg-aven-surface border border-aven-text/10 h-40 rounded-3xl"></div>
+              <div className="bg-aven-surface border border-aven-text/10 h-96 rounded-3xl"></div>
             </div>
             <div className="lg:col-span-4 space-y-6">
-              <div className="bg-[#e8e6dc] border border-[#141413]/10 h-56 rounded-3xl"></div>
-              <div className="bg-[#e8e6dc] border border-[#141413]/10 h-80 rounded-3xl"></div>
+              <div className="bg-aven-surface border border-aven-text/10 h-56 rounded-3xl"></div>
+              <div className="bg-aven-surface border border-aven-text/10 h-80 rounded-3xl"></div>
             </div>
           </motion.div>
         )}
@@ -220,11 +220,11 @@ export default function PlacementJourney() {
             key="error"
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-12 text-center bg-[#141413] border border-[#141413] rounded-3xl"
+            className="p-12 text-center bg-aven-text border border-aven-text rounded-3xl"
           >
-            <AlertCircle className="text-[#faf9f5] mx-auto mb-3" size={40} />
-            <h3 className="text-lg font-bold text-[#faf9f5] mb-1">We couldn't map this path</h3>
-            <p className="text-[#e8e6dc] text-sm max-w-sm mx-auto font-medium">{errorMsg}</p>
+            <AlertCircle className="text-aven-base mx-auto mb-3" size={40} />
+            <h3 className="text-lg font-bold text-aven-base mb-1">We couldn't map this path</h3>
+            <p className="text-aven-surface text-sm max-w-sm mx-auto font-medium">{errorMsg}</p>
           </motion.div>
         )}
 
@@ -237,34 +237,34 @@ export default function PlacementJourney() {
             className="grid grid-cols-1 lg:grid-cols-12 gap-6"
           >
             {/* 1. EMPHASIS: Massive Countdown Card */}
-            <motion.div variants={itemVariants} className="lg:col-span-8 bg-[#faf9f5] border border-[#141413]/10 p-8 rounded-3xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-8 shadow-sm">
-              <div className="space-y-1 relative z-10">
-                <div className="text-xs font-bold uppercase tracking-widest text-[#3d3d3a] flex items-center gap-2 mb-2">
-                  <Clock size={16} className="text-[#141413]" />
+            <motion.div variants={itemVariants} className="lg:col-span-8 bg-aven-primary border border-aven-primary p-8 rounded-3xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-8 shadow-lg">
+              <div className="space-y-1 relative z-10 text-aven-base">
+                <div className="text-xs font-black uppercase tracking-widest text-aven-base opacity-70 flex items-center gap-2 mb-2">
+                  <Clock size={16} className="text-aven-status-active" />
                   <span>Countdown to {plan?.company_name || companies.find(c => c.id === selectedCompany)?.name}</span>
                 </div>
                 {/* 3. CONTRAST: Massive high-contrast number */}
                 <div className="flex items-baseline gap-3">
-                  <span className="text-7xl font-semibold text-[#141413] tracking-tighter">
+                  <span className="text-7xl font-semibold text-white tracking-tighter">
                     {daysRemaining}
                   </span>
-                  <span className="text-lg font-medium text-[#3d3d3a]">
+                  <span className="text-lg font-medium text-white/70">
                     Days
                   </span>
                 </div>
                 {targetRole && (
-                  <div className="mt-4 text-[10px] font-bold uppercase tracking-widest text-[#141413] bg-[#e8e6dc] border border-[#141413]/10 px-3 py-1.5 inline-block rounded-lg">
+                  <div className="mt-4 text-[10px] font-black uppercase tracking-widest text-aven-base bg-white/10 border border-white/20 px-3 py-1.5 inline-block rounded-lg">
                     Target: {targetRole}
                   </div>
                 )}
               </div>
 
-              <div className="p-6 bg-[#e8e6dc] border border-[#141413]/10 rounded-2xl relative z-10 w-full md:w-auto text-center md:text-left">
-                <div className="text-xs font-bold uppercase tracking-widest text-[#3d3d3a] mb-2">Target Pace</div>
-                <div className="text-2xl font-semibold text-[#141413]">
-                  {plan?.weekly_study_hours || 14} <span className="text-sm text-[#3d3d3a]">hrs/week</span>
+              <div className="p-6 bg-white/5 border border-white/10 rounded-2xl relative z-10 w-full md:w-auto text-center md:text-left shadow-inner backdrop-blur-sm">
+                <div className="text-xs font-black uppercase tracking-widest text-white/60 mb-2">Target Pace</div>
+                <div className="text-2xl font-semibold text-white">
+                  {plan?.weekly_study_hours || 14} <span className="text-sm font-medium text-white/60">hrs/week</span>
                 </div>
-                <div className="text-[10px] font-bold uppercase tracking-widest mt-4 flex items-center justify-center md:justify-start gap-1.5 text-[#141413]">
+                <div className={`text-[10px] font-black uppercase tracking-widest mt-4 flex items-center justify-center md:justify-start gap-1.5 ${isFeasible ? 'text-green-400' : 'text-aven-status-locked'}`}>
                   {isFeasible ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
                   {isFeasible ? 'Comfortable Timeline' : 'Aggressive Pace Needed'}
                 </div>
@@ -274,16 +274,16 @@ export default function PlacementJourney() {
             {/* Pacing & Energy Card */}
             <motion.div variants={itemVariants} className={`lg:col-span-4 p-8 border rounded-3xl space-y-6 flex flex-col justify-center shadow-sm ${
               burnoutRisk > 70 
-                ? 'bg-[#141413] border-[#141413]'
-                : 'bg-[#faf9f5] border-[#141413]/10'
+                ? 'bg-aven-text border-aven-text'
+                : 'bg-aven-base border-aven-text/10'
             }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <AlertCircle size={18} className={burnoutRisk > 70 ? 'text-[#faf9f5]' : 'text-[#141413]'} />
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${burnoutRisk > 70 ? 'text-[#faf9f5]' : 'text-[#3d3d3a]'}`}>Pacing & Energy</span>
+                  <AlertCircle size={18} className={burnoutRisk > 70 ? 'text-aven-base' : 'text-aven-text'} />
+                  <span className={`text-[10px] font-bold uppercase tracking-widest ${burnoutRisk > 70 ? 'text-aven-base' : 'text-aven-text-subtle'}`}>Pacing & Energy</span>
                 </div>
                 <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 border rounded-lg ${
-                  burnoutRisk > 70 ? 'bg-[#faf9f5] text-[#141413] border-[#faf9f5]' : 'bg-[#e8e6dc] text-[#141413] border-[#141413]/10'
+                  burnoutRisk > 70 ? 'bg-aven-base text-aven-text border-aven-base' : 'bg-aven-surface text-aven-text border-aven-text/10'
                 }`}>
                   {burnoutRisk > 70 ? 'High Friction' : 'Great Momentum'}
                 </span>
@@ -291,16 +291,16 @@ export default function PlacementJourney() {
 
               <div className="space-y-3">
                 <div className="flex items-end gap-2">
-                  <span className={`text-3xl font-semibold ${burnoutRisk > 70 ? 'text-[#faf9f5]' : 'text-[#141413]'}`}>{burnoutRisk}%</span>
-                  <span className={`text-xs font-medium pb-1 ${burnoutRisk > 70 ? 'text-[#e8e6dc]' : 'text-[#3d3d3a]'}`}>Stress Index</span>
+                  <span className={`text-3xl font-semibold ${burnoutRisk > 70 ? 'text-aven-base' : 'text-aven-text'}`}>{burnoutRisk}%</span>
+                  <span className={`text-xs font-medium pb-1 ${burnoutRisk > 70 ? 'text-aven-surface' : 'text-aven-text-subtle'}`}>Stress Index</span>
                 </div>
-                <div className={`w-full h-2 rounded-full overflow-hidden border ${burnoutRisk > 70 ? 'bg-[#3d3d3a] border-[#faf9f5]/20' : 'bg-[#e8e6dc] border-[#141413]/10'}`}>
+                <div className={`w-full h-2 rounded-full overflow-hidden border ${burnoutRisk > 70 ? 'bg-aven-text-subtle border-aven-base/20' : 'bg-aven-surface border-aven-text/10'}`}>
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(100, burnoutRisk)}%` }}
                     transition={{ duration: 1, ease: "easeOut" }}
                     className={`h-full ${
-                      burnoutRisk > 70 ? 'bg-[#faf9f5]' : 'bg-[#141413]'
+                      burnoutRisk > 70 ? 'bg-aven-base' : 'bg-aven-text'
                     }`}
                   />
                 </div>
@@ -315,7 +315,7 @@ export default function PlacementJourney() {
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={() => setIsBreakAcknowledged(true)}
-                    className="w-full py-3 px-4 rounded-2xl bg-[#faf9f5] hover:bg-[#e8e6dc] border border-[#faf9f5] text-[#141413] font-medium text-sm transition-colors shadow-sm"
+                    className="w-full py-3 px-4 rounded-2xl bg-aven-base hover:bg-aven-surface border border-aven-base text-aven-text font-medium text-sm transition-colors shadow-sm"
                   >
                     Schedule 24h Rest
                   </motion.button>
@@ -323,7 +323,7 @@ export default function PlacementJourney() {
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="py-3 px-4 rounded-2xl bg-[#e8e6dc] border border-[#141413]/10 text-xs text-[#141413] flex items-center justify-center gap-2 font-medium shadow-sm"
+                    className="py-3 px-4 rounded-2xl bg-aven-surface border border-aven-text/10 text-xs text-aven-text flex items-center justify-center gap-2 font-medium shadow-sm"
                   >
                     <CheckCircle2 size={16} />
                     <span>Rest scheduled. Keep it up!</span>
@@ -333,9 +333,9 @@ export default function PlacementJourney() {
             </motion.div>
 
             {/* 5. HIERARCHY: Sprints timeline below emphasis */}
-            <motion.div variants={itemVariants} className="lg:col-span-8 bg-[#faf9f5] border border-[#141413]/10 p-8 rounded-3xl shadow-sm">
-              <div className="text-[10px] font-black uppercase tracking-widest text-[#3d3d3a] flex items-center gap-2 mb-6">
-                <ListChecks size={16} className="text-[#141413]" />
+            <motion.div variants={itemVariants} className="lg:col-span-8 bg-aven-base border border-aven-text/10 p-8 rounded-3xl shadow-sm">
+              <div className="text-[10px] font-black uppercase tracking-widest text-aven-text-subtle flex items-center gap-2 mb-6">
+                <ListChecks size={16} className="text-aven-text" />
                 <span>Your Milestones ({sprints.length} Weeks)</span>
               </div>
               
@@ -349,31 +349,31 @@ export default function PlacementJourney() {
                       layout
                       onClick={() => setExpandedSprint(isExpanded ? null : idx)}
                       className={`group cursor-pointer rounded-2xl border transition-all duration-300 overflow-hidden ${
-                        isExpanded ? 'bg-[#e8e6dc] border-[#141413]' : 
-                        sprint.is_crunch_week ? 'bg-[#faf9f5] border-[#141413] border-2 shadow-sm' : 'bg-[#faf9f5] border-[#141413]/10 hover:border-[#141413]'
+                        isExpanded ? 'bg-aven-surface border-aven-text' : 
+                        sprint.is_crunch_week ? 'bg-aven-base border-aven-text border-2 shadow-sm' : 'bg-aven-base border-aven-text/10 hover:border-aven-text'
                       }`}
                     >
                       <motion.div layout className="p-5 flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <div className={`w-8 h-8 rounded-full font-black text-[11px] flex items-center justify-center border transition-colors ${
-                            isExpanded ? 'bg-[#141413] text-[#faf9f5] border-[#141413]' : 
-                            sprint.is_crunch_week ? 'bg-[#141413] text-[#faf9f5] border-[#141413]' :
-                            'bg-[#e8e6dc] border-[#141413]/10 text-[#141413] group-hover:bg-[#141413] group-hover:text-[#faf9f5] group-hover:border-[#141413]'
+                            isExpanded ? 'bg-aven-text text-aven-base border-aven-text' : 
+                            sprint.is_crunch_week ? 'bg-aven-text text-aven-base border-aven-text' :
+                            'bg-aven-surface border-aven-text/10 text-aven-text group-hover:bg-aven-text group-hover:text-aven-base group-hover:border-aven-text'
                           }`}>
                             {sprint.week_number}
                           </div>
                           <span className={`text-[13px] font-black uppercase tracking-wide transition-colors ${
-                            isExpanded ? 'text-[#141413]' : 
-                            sprint.is_crunch_week ? 'text-[#141413]' :
-                            'text-[#141413]'
+                            isExpanded ? 'text-aven-text' : 
+                            sprint.is_crunch_week ? 'text-aven-text' :
+                            'text-aven-text'
                           }`}>
                             {sprint.week_label || `Week ${sprint.week_number}`}
                           </span>
                         </div>
                         <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border ${
-                          sprint.is_crunch_week ? 'bg-[#141413] text-[#faf9f5] border-[#141413]' : 
-                          isExpanded ? 'bg-[#141413] text-[#faf9f5] border-[#141413]' :
-                          'bg-[#e8e6dc] border-[#141413]/10 text-[#3d3d3a]'
+                          sprint.is_crunch_week ? 'bg-aven-text text-aven-base border-aven-text' : 
+                          isExpanded ? 'bg-aven-text text-aven-base border-aven-text' :
+                          'bg-aven-surface border-aven-text/10 text-aven-text-subtle'
                         }`}>
                           {sprint.focus_area}
                         </span>
@@ -387,7 +387,7 @@ export default function PlacementJourney() {
                             exit={{ opacity: 0, height: 0 }}
                             className="px-5 pb-5 pt-0 space-y-3"
                           >
-                            <div className="w-full h-px bg-[#141413]/10 mb-4 ml-12 max-w-[calc(100%-3rem)]" />
+                            <div className="w-full h-px bg-aven-text/10 mb-4 ml-12 max-w-[calc(100%-3rem)]" />
                             {sprint.tasks.map((task: any, tIdx: number) => {
                               const isAssessment = task.action_type === 'assessment';
                               const isResource = task.action_type === 'resource';
@@ -396,8 +396,8 @@ export default function PlacementJourney() {
                               if (task.action_type === 'info' || typeof task === 'string') {
                                 const title = typeof task === 'string' ? task : task.title;
                                 return (
-                                  <div key={tIdx} className="text-xs font-bold text-[#3d3d3a] flex items-start gap-3 pl-12 py-1">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#141413] mt-1.5 shrink-0" />
+                                  <div key={tIdx} className="text-xs font-bold text-aven-text-subtle flex items-start gap-3 pl-12 py-1">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-aven-text mt-1.5 shrink-0" />
                                     <span className="leading-relaxed">{title}</span>
                                   </div>
                                 );
@@ -415,25 +415,25 @@ export default function PlacementJourney() {
                                     if (isAssessment && !isCompleted) setActiveAssessment(task.action_payload);
                                   }}
                                   className={`w-full text-left text-xs font-bold flex items-center justify-between p-4 ml-12 rounded-xl max-w-[calc(100%-3rem)] transition-colors border shadow-sm ${
-                                    isCompleted ? 'bg-[#faf9f5] text-[#3d3d3a] border-[#141413]/10 opacity-70' :
-                                    isAssessment ? 'bg-[#faf9f5] hover:bg-[#e8e6dc] text-[#141413] border-[#141413] border-[1.5px]' :
-                                    'bg-[#faf9f5] hover:bg-[#e8e6dc] text-[#141413] border-[#141413]/10 hover:border-[#141413]'
+                                    isCompleted ? 'bg-aven-base text-aven-text-subtle border-aven-text/10 opacity-70' :
+                                    isAssessment ? 'bg-aven-base hover:bg-aven-surface text-aven-text border-aven-text border-[1.5px]' :
+                                    'bg-aven-base hover:bg-aven-surface text-aven-text border-aven-text/10 hover:border-aven-text'
                                   }`}
                                 >
                                   <span className="flex items-center gap-3">
-                                    {isCompleted ? <CheckCircle2 size={16} className="text-[#141413]" /> : (
+                                    {isCompleted ? <CheckCircle2 size={16} className="text-aven-text" /> : (
                                       <>
-                                        {isAssessment && <PlayCircle size={16} className="text-[#141413]" />}
-                                        {isResource && <BookOpen size={16} className="text-[#141413]" />}
-                                        {isMock && <Code2 size={16} className="text-[#141413]" />}
+                                        {isAssessment && <PlayCircle size={16} className="text-aven-text" />}
+                                        {isResource && <BookOpen size={16} className="text-aven-text" />}
+                                        {isMock && <Code2 size={16} className="text-aven-text" />}
                                       </>
                                     )}
                                     <span className={`font-black tracking-wide ${isCompleted ? 'line-through opacity-50' : ''}`}>{task.title}</span>
                                   </span>
                                   {isCompleted ? (
-                                    <span className="text-[9px] uppercase tracking-widest font-black border border-[#141413]/20 text-[#141413] px-2 py-0.5 rounded-md bg-[#e8e6dc]">Done</span>
+                                    <span className="text-[9px] uppercase tracking-widest font-black border border-aven-text/20 text-aven-text px-2 py-0.5 rounded-md bg-aven-surface">Done</span>
                                   ) : (
-                                    isAssessment && <span className="text-[9px] uppercase tracking-widest font-black bg-[#faf9f5] text-[#141413] border border-[#141413] px-2 py-0.5 rounded-md shadow-sm">Challenge</span>
+                                    isAssessment && <span className="text-[9px] uppercase tracking-widest font-black bg-aven-base text-aven-text border border-aven-text px-2 py-0.5 rounded-md shadow-sm">Challenge</span>
                                   )}
                                 </motion.button>
                               );
@@ -449,13 +449,13 @@ export default function PlacementJourney() {
 
             {/* Opportunities Horizon Card */}
             {plan?.market_signals && plan.market_signals.length > 0 && (
-              <motion.div variants={itemVariants} className="lg:col-span-4 p-8 bg-[#faf9f5] border border-[#141413]/10 rounded-3xl flex flex-col max-h-[600px] shadow-sm">
+              <motion.div variants={itemVariants} className="lg:col-span-4 p-8 bg-aven-base border border-aven-text/10 rounded-3xl flex flex-col max-h-[600px] shadow-sm">
                 <div className="flex items-center gap-2 mb-6">
-                  <Flame size={16} className="text-[#141413]" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#3d3d3a]">Market Signals</span>
+                  <Flame size={16} className="text-aven-text" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-aven-text-subtle">Market Signals</span>
                 </div>
                 
-                <p className="text-[11px] font-bold text-[#3d3d3a] uppercase tracking-widest leading-relaxed mb-6">
+                <p className="text-[11px] font-bold text-aven-text-subtle uppercase tracking-widest leading-relaxed mb-6">
                   Tailored based on {plan.market_signals.length} active roles currently open at {plan.company_name}.
                 </p>
                 
@@ -464,10 +464,10 @@ export default function PlacementJourney() {
                   {plan.market_signals.map((signal: any, idx: number) => (
                     <div 
                       key={idx} 
-                      className="p-5 bg-[#e8e6dc] border border-[#141413]/10 rounded-2xl relative"
+                      className="p-5 bg-aven-surface border border-aven-text/10 rounded-2xl relative"
                     >
                       <div className="flex items-start justify-between gap-3 mb-4">
-                        <div className="text-[13px] font-black uppercase tracking-wide text-[#141413] leading-tight">
+                        <div className="text-[13px] font-black uppercase tracking-wide text-aven-text leading-tight">
                           {signal.job_title}
                         </div>
                         {signal.url && (
@@ -475,7 +475,7 @@ export default function PlacementJourney() {
                             href={signal.url} 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            className="text-[#3d3d3a] hover:text-[#faf9f5] hover:bg-[#141413] bg-[#faf9f5] border border-[#141413]/20 p-2 rounded-lg transition-all flex-shrink-0 shadow-sm"
+                            className="text-aven-text-subtle hover:text-aven-base hover:bg-aven-text bg-aven-base border border-aven-text/20 p-2 rounded-lg transition-all flex-shrink-0 shadow-sm"
                             title="View full job posting"
                           >
                             <ExternalLink size={14} />
@@ -487,7 +487,7 @@ export default function PlacementJourney() {
                         {signal.extracted_skills.map((skill: string, sIdx: number) => (
                           <span 
                             key={sIdx} 
-                            className="text-[9px] font-black tracking-widest uppercase text-[#3d3d3a] bg-[#faf9f5] border border-[#141413]/10 px-2.5 py-1 rounded-md"
+                            className="text-[9px] font-black tracking-widest uppercase text-aven-text-subtle bg-aven-base border border-aven-text/10 px-2.5 py-1 rounded-md"
                           >
                             {skill}
                           </span>
@@ -508,17 +508,17 @@ export default function PlacementJourney() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#faf9f5]/80 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-aven-base/80 backdrop-blur-sm flex items-center justify-center p-4"
           >
             <motion.div 
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#faf9f5] border border-[#141413]/20 rounded-3xl relative shadow-xl"
+              className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-aven-base border border-aven-text/20 rounded-3xl relative shadow-xl"
             >
               <button 
                 onClick={() => setActiveAssessment(null)}
-                className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-[#e8e6dc] border border-[#141413]/10 text-[#3d3d3a] hover:text-[#faf9f5] hover:bg-[#141413] transition-colors z-10 font-black"
+                className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-aven-surface border border-aven-text/10 text-aven-text-subtle hover:text-aven-base hover:bg-aven-text transition-colors z-10 font-black"
               >
                 ✕
               </button>

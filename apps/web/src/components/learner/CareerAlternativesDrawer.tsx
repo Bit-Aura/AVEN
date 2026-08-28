@@ -80,27 +80,27 @@ export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: 
     <div className="fixed inset-0 z-[100] flex justify-end">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-[#141413]/20 backdrop-blur-sm animate-in fade-in duration-200"
+        className="fixed inset-0 bg-aven-text/20 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
       />
       
       {/* Drawer Content */}
-      <div className="relative w-full max-w-md h-full bg-[#faf9f5] border-l border-[#d6d3c4] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 z-10 text-[#141413]">
+      <div className="relative w-full max-w-md h-full bg-aven-base border-l border-aven-border shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 z-10 text-aven-text">
         
         {/* Header */}
-        <header className="p-6 border-b border-[#3d3d3a] flex justify-between items-center bg-[#3d3d3a]">
-          <div className="flex items-center gap-3 text-[#faf9f5]">
-            <div className="w-10 h-10 rounded bg-[#faf9f5] text-[#3d3d3a] flex items-center justify-center">
+        <header className="p-6 border-b border-aven-text-subtle flex justify-between items-center bg-aven-text-subtle">
+          <div className="flex items-center gap-3 text-aven-base">
+            <div className="w-10 h-10 rounded bg-aven-base text-aven-text-subtle flex items-center justify-center">
               <RefreshCw size={20} />
             </div>
             <div>
               <h2 className="uppercase tracking-tight font-black text-lg">Career Pivot Analysis</h2>
-              <p className="text-xs text-[#faf9f5]/80 font-medium">Readiness computed from your BKT mastery scores</p>
+              <p className="text-xs text-aven-base/80 font-medium">Readiness computed from your BKT mastery scores</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-1.5 rounded text-[#87867f] hover:text-[#faf9f5] hover:bg-[#141413] transition-colors"
+            className="p-1.5 rounded text-aven-text-muted hover:text-aven-base hover:bg-aven-text transition-colors"
           >
             <X size={18} />
           </button>
@@ -108,17 +108,17 @@ export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: 
 
         {/* Body */}
         <div className="p-6 flex-1 overflow-y-auto space-y-7">
-          <div className="bg-[#e8e6dc] border border-[#d6d3c4] rounded-xl p-4">
+          <div className="bg-aven-surface border border-aven-border rounded-xl p-4">
             <div className="flex gap-3">
-              <Sparkles className="text-[#141413] shrink-0 mt-0.5" size={18} />
-              <p className="text-sm font-medium text-[#3d3d3a] leading-relaxed">
+              <Sparkles className="text-aven-text shrink-0 mt-0.5" size={18} />
+              <p className="text-sm font-medium text-aven-text-subtle leading-relaxed">
                 Your mastered skills are transferable. Below are adjacent tech roles ranked by weighted readiness from your actual assessment data.
               </p>
             </div>
           </div>
 
           {switchSuccessRole && (
-            <div className="bg-[#141413] border border-[#141413] text-[#faf9f5] rounded-xl p-4 flex items-center gap-3 animate-in fade-in">
+            <div className="bg-aven-text border border-aven-text text-aven-base rounded-xl p-4 flex items-center gap-3 animate-in fade-in">
               <CheckCircle2 size={20} className="shrink-0" />
               <div>
                 <div className="text-sm font-bold uppercase tracking-widest">Successfully Pivoted!</div>
@@ -129,14 +129,14 @@ export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: 
 
           <div className="space-y-4">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center p-12 text-[#87867f]">
-                <Loader2 className="animate-spin text-[#141413] mb-2" size={28} />
-                <span className="text-xs font-bold uppercase tracking-widest text-[#141413]">Computing readiness...</span>
+              <div className="flex flex-col items-center justify-center p-12 text-aven-text-muted">
+                <Loader2 className="animate-spin text-aven-text mb-2" size={28} />
+                <span className="text-xs font-bold uppercase tracking-widest text-aven-text">Computing readiness...</span>
               </div>
             ) : alternatives.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-12 text-[#87867f]">
-                <Briefcase className="text-[#3d3d3a] mb-2" size={28} />
-                <span className="text-xs font-bold uppercase tracking-widest text-[#141413] text-center">No career alternatives computed yet.<br/>Complete some skill assessments first.</span>
+              <div className="flex flex-col items-center justify-center p-12 text-aven-text-muted">
+                <Briefcase className="text-aven-text-subtle mb-2" size={28} />
+                <span className="text-xs font-bold uppercase tracking-widest text-aven-text text-center">No career alternatives computed yet.<br/>Complete some skill assessments first.</span>
               </div>
             ) : (
               alternatives.map((alt) => (
@@ -145,21 +145,21 @@ export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: 
                   onClick={() => setSelectedPivot(alt.id)}
                   className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 space-y-4 flex flex-col ${
                     selectedPivot === alt.id 
-                      ? 'bg-[#e8e6dc] border-[#141413]/40 shadow-sm' 
-                      : 'bg-[#faf9f5] border-[#141413]/20 hover:border-[#141413]/40'
+                      ? 'bg-aven-surface border-aven-text/40 shadow-sm' 
+                      : 'bg-aven-base border-aven-text/20 hover:border-aven-text/40'
                   }`}
                 >
                   <div className="flex justify-between items-start">
-                    <h3 className="font-bold text-sm text-[#141413] flex items-center gap-2">
-                      <Briefcase size={16} className={selectedPivot === alt.id ? "text-[#141413]" : "text-[#3d3d3a]"} />
+                    <h3 className="font-bold text-sm text-aven-text flex items-center gap-2">
+                      <Briefcase size={16} className={selectedPivot === alt.id ? "text-aven-text" : "text-aven-text-subtle"} />
                       <span>{alt.role}</span>
                     </h3>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-widest ${
                       alt.match >= 70
-                        ? 'bg-[#141413] text-[#faf9f5] border-[#141413]'
+                        ? 'bg-aven-text text-aven-base border-aven-text'
                         : alt.match >= 40
-                        ? 'bg-[#3d3d3a] text-[#faf9f5] border-[#3d3d3a]'
-                        : 'bg-[#e8e6dc] text-[#141413] border-[#d6d3c4]'
+                        ? 'bg-aven-text-subtle text-aven-base border-aven-text-subtle'
+                        : 'bg-aven-surface text-aven-text border-aven-border'
                     }`}>
                       {alt.match}% Ready
                     </span>
@@ -169,15 +169,15 @@ export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: 
                   {alt.badge && (
                     <div className={`text-[10px] font-bold px-2.5 py-1 rounded-md inline-block uppercase tracking-wider ${
                       alt.isFastTrack
-                        ? 'bg-[#e8e6dc] text-[#141413] border border-[#d6d3c4]'
-                        : 'bg-[#faf9f5] text-[#3d3d3a] border border-[#d6d3c4]'
+                        ? 'bg-aven-surface text-aven-text border border-aven-border'
+                        : 'bg-aven-base text-aven-text-subtle border border-aven-border'
                     }`}>
                       {alt.badge}
                     </div>
                   )}
                   
                   {/* Stats row */}
-                  <div className="flex gap-3 text-xs font-medium text-[#3d3d3a]">
+                  <div className="flex gap-3 text-xs font-medium text-aven-text-subtle">
                     {alt.salary && (
                       <span className="flex items-center gap-1">
                         <DollarSign size={12} />
@@ -185,7 +185,7 @@ export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: 
                       </span>
                     )}
                     {alt.growth && (
-                      <span className="flex items-center gap-1 font-bold text-[#141413]">
+                      <span className="flex items-center gap-1 font-bold text-aven-text">
                         <TrendingUp size={12} />
                         +{alt.growth}% growth
                       </span>
@@ -198,16 +198,16 @@ export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: 
                     )}
                   </div>
 
-                  <div className="space-y-2 mt-2 pt-3 border-t border-[#d6d3c4]">
-                    <div className="flex justify-between text-xs font-bold text-[#141413]">
+                  <div className="space-y-2 mt-2 pt-3 border-t border-aven-border">
+                    <div className="flex justify-between text-xs font-bold text-aven-text">
                       <span>Skills Salvaged:</span>
                       <span>{alt.salvagedSkills} / {alt.totalSkills}</span>
                     </div>
                     
                     {/* Visual Comparison Bar */}
-                    <div className="h-2 w-full bg-[#e8e6dc] rounded-full overflow-hidden flex border border-[#d6d3c4]">
+                    <div className="h-2 w-full bg-aven-surface rounded-full overflow-hidden flex border border-aven-border">
                       <div 
-                        className="h-full bg-[#141413]"
+                        className="h-full bg-aven-text"
                         style={{ width: `${alt.totalSkills > 0 ? (alt.salvagedSkills / alt.totalSkills) * 100 : 0}%` }}
                       />
                       <div 
@@ -223,17 +223,17 @@ export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: 
         </div>
 
         {/* Footer CTA */}
-        <div className="p-6 border-t border-[#d6d3c4] bg-[#e8e6dc] space-y-3">
+        <div className="p-6 border-t border-aven-border bg-aven-surface space-y-3">
           {selectedAlt && (
-            <div className="text-xs font-bold text-[#3d3d3a] flex justify-between px-1">
-              <span>Target: <span className="text-[#141413]">{selectedAlt.role}</span></span>
-              <span>Missing: <span className="text-[#141413]">{selectedAlt.missingList.length} skills</span></span>
+            <div className="text-xs font-bold text-aven-text-subtle flex justify-between px-1">
+              <span>Target: <span className="text-aven-text">{selectedAlt.role}</span></span>
+              <span>Missing: <span className="text-aven-text">{selectedAlt.missingList.length} skills</span></span>
             </div>
           )}
           <button 
             disabled={!selectedPivot || isSwitching}
             onClick={handleConfirmPivot}
-            className="w-full flex items-center justify-center gap-2 bg-[#3d3d3a] hover:bg-[#141413] text-[#faf9f5] font-bold text-xs py-3.5 rounded-xl border border-[#141413] transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest shadow-md"
+            className="w-full flex items-center justify-center gap-2 bg-aven-text-subtle hover:bg-aven-text text-aven-base font-bold text-xs py-3.5 rounded-xl border border-aven-text transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest shadow-md"
           >
             {isSwitching ? (
               <>

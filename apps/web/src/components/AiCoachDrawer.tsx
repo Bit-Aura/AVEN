@@ -63,7 +63,7 @@ export default function AiCoachDrawer() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-8 right-8 w-16 h-16 bg-[#3d3d3a] hover:bg-[#141413] text-[#faf9f5] rounded-full flex items-center justify-center z-40 transition-transform hover:scale-105 active:scale-95 border border-[#141413] shadow-lg"
+          className="fixed bottom-8 right-8 w-16 h-16 bg-aven-text-subtle hover:bg-aven-text text-aven-base rounded-full flex items-center justify-center z-40 transition-transform hover:scale-105 active:scale-95 border border-aven-text shadow-lg"
         >
           <Robot size={32} weight="fill" />
         </button>
@@ -71,20 +71,20 @@ export default function AiCoachDrawer() {
 
       {/* Centered Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#141413]/20 backdrop-blur-sm font-sans antialiased">
-          <div className="flex flex-col h-[85vh] max-h-[800px] w-full max-w-[800px] bg-[#faf9f5] text-[#141413] rounded-2xl overflow-hidden border border-[#d6d3c4] shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-aven-text/20 backdrop-blur-sm font-sans antialiased">
+          <div className="flex flex-col h-[85vh] max-h-[800px] w-full max-w-[800px] bg-aven-base text-aven-text rounded-2xl overflow-hidden border border-aven-border shadow-2xl relative">
             
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#d6d3c4] bg-[#e8e6dc]">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-aven-border bg-aven-surface">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded bg-[#3d3d3a] flex items-center justify-center text-[#faf9f5]">
+                <div className="w-10 h-10 rounded bg-aven-text-subtle flex items-center justify-center text-aven-base">
                   <Robot size={24} weight="duotone" />
                 </div>
                 <div>
-                  <h3 className="text-[#141413] font-black uppercase tracking-tight text-[15px] leading-tight">
+                  <h3 className="text-aven-text font-black uppercase tracking-tight text-[15px] leading-tight">
                     AI Coach
                   </h3>
-                  <div className="text-[11px] font-bold text-[#3d3d3a] mt-0.5 uppercase tracking-wider">
+                  <div className="text-[11px] font-bold text-aven-text-subtle mt-0.5 uppercase tracking-wider">
                     Context: {contextLabel}
                   </div>
                 </div>
@@ -95,7 +95,7 @@ export default function AiCoachDrawer() {
                   setIsOpen(false);
                   closeCoach(); // clear context if needed
                 }}
-                className="text-[#87867f] hover:text-[#141413] transition-colors w-8 h-8 flex items-center justify-center rounded-md hover:bg-[#d6d3c4]"
+                className="text-aven-text-muted hover:text-aven-text transition-colors w-8 h-8 flex items-center justify-center rounded-md hover:bg-aven-border"
               >
                 <X size={20} />
               </button>
@@ -103,12 +103,12 @@ export default function AiCoachDrawer() {
 
             {/* Praise Card */}
             {coachPraiseCard && (
-              <div className="mx-6 mt-6 bg-[#3d3d3a] border border-[#3d3d3a] rounded-xl p-4 animate-in fade-in slide-in-from-top-2 text-[#faf9f5]">
+              <div className="mx-6 mt-6 bg-aven-text-subtle border border-aven-text-subtle rounded-xl p-4 animate-in fade-in slide-in-from-top-2 text-aven-base">
                 <div className="flex items-start gap-3">
-                  <Award className="text-[#faf9f5] shrink-0 mt-0.5" size={20} />
+                  <Award className="text-aven-base shrink-0 mt-0.5" size={20} />
                   <div>
-                    <h3 className="text-xs font-black uppercase tracking-widest text-[#faf9f5] mb-1">Process Praise</h3>
-                    <p className="text-[13px] font-medium leading-snug mb-3 text-[#faf9f5]/90">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-aven-base mb-1">Process Praise</h3>
+                    <p className="text-[13px] font-medium leading-snug mb-3 text-aven-base/90">
                       {coachPraiseCard.message}
                     </p>
                     {coachPraiseCard.badge && (
@@ -117,7 +117,7 @@ export default function AiCoachDrawer() {
                           setIsOpen(false);
                           openProofCard(coachPraiseCard.badge!);
                         }}
-                        className="px-3 py-1.5 bg-[#faf9f5] hover:bg-[#e8e6dc] text-[#141413] text-[11px] font-bold uppercase tracking-widest rounded-lg transition-colors border border-[#141413]"
+                        className="px-3 py-1.5 bg-aven-base hover:bg-aven-surface text-aven-text text-[11px] font-bold uppercase tracking-widest rounded-lg transition-colors border border-aven-text"
                       >
                         View Mastery Badge
                       </button>
@@ -132,14 +132,14 @@ export default function AiCoachDrawer() {
               {coachMessages.map((msg, i) => (
                 <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${
-                    msg.role === 'ai' ? 'bg-[#3d3d3a] text-[#faf9f5] border-[#3d3d3a]' : 'bg-[#e8e6dc] text-[#141413] border-[#d6d3c4]'
+                    msg.role === 'ai' ? 'bg-aven-text-subtle text-aven-base border-aven-text-subtle' : 'bg-aven-surface text-aven-text border-aven-border'
                   }`}>
                     {msg.role === 'ai' ? <Robot size={20} weight="fill" /> : <User size={20} />}
                   </div>
                   <div className={`px-4 py-3 rounded-2xl max-w-[85%] text-[13px] font-medium leading-relaxed shadow-sm border ${
                     msg.role === 'ai' 
-                      ? 'bg-[#e8e6dc] border-[#d6d3c4] text-[#141413] rounded-tl-none' 
-                      : 'bg-[#3d3d3a] border-[#141413] text-[#faf9f5] rounded-tr-none'
+                      ? 'bg-aven-surface border-aven-border text-aven-text rounded-tl-none' 
+                      : 'bg-aven-text-subtle border-aven-text text-aven-base rounded-tr-none'
                   }`}>
                     {msg.text}
                   </div>
@@ -147,10 +147,10 @@ export default function AiCoachDrawer() {
               ))}
               {isCoachTyping && (
                 <div className="flex gap-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[#3d3d3a] text-[#faf9f5] border border-[#3d3d3a]">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-aven-text-subtle text-aven-base border border-aven-text-subtle">
                     <Robot size={20} weight="fill" />
                   </div>
-                  <div className="px-4 py-3 rounded-2xl text-[13px] font-bold uppercase tracking-widest bg-[#e8e6dc] border border-[#d6d3c4] text-[#3d3d3a] rounded-tl-none animate-pulse">
+                  <div className="px-4 py-3 rounded-2xl text-[13px] font-bold uppercase tracking-widest bg-aven-surface border border-aven-border text-aven-text-subtle rounded-tl-none animate-pulse">
                     Analyzing context...
                   </div>
                 </div>
@@ -159,7 +159,7 @@ export default function AiCoachDrawer() {
             </div>
 
             {/* Input Area */}
-            <form onSubmit={handleSend} className="p-4 border-t border-[#d6d3c4] bg-[#faf9f5] shrink-0">
+            <form onSubmit={handleSend} className="p-4 border-t border-aven-border bg-aven-base shrink-0">
               <div className="flex gap-3">
                 <input
                   type="text"
@@ -167,12 +167,12 @@ export default function AiCoachDrawer() {
                   onChange={(e) => setInputMessage(e.target.value)}
                   placeholder="Ask your coach for guidance..."
                   disabled={isCoachTyping}
-                  className="flex-1 bg-[#e8e6dc] border border-[#d6d3c4] hover:border-[#141413] rounded-xl px-4 py-3 text-[13px] font-medium text-[#141413] focus:outline-none focus:border-[#141413] transition-colors disabled:opacity-50 placeholder-[#87867f]"
+                  className="flex-1 bg-aven-surface border border-aven-border hover:border-aven-text rounded-xl px-4 py-3 text-[13px] font-medium text-aven-text focus:outline-none focus:border-aven-text transition-colors disabled:opacity-50 placeholder-aven-text-muted"
                 />
                 <button 
                   type="submit"
                   disabled={isCoachTyping || !inputMessage.trim()}
-                  className="px-5 bg-[#3d3d3a] hover:bg-[#141413] disabled:bg-[#d6d3c4] disabled:border-[#d6d3c4] disabled:text-[#87867f] text-[#faf9f5] rounded-xl transition-all flex items-center justify-center shrink-0 border border-[#141413] shadow-md disabled:shadow-none"
+                  className="px-5 bg-aven-text-subtle hover:bg-aven-text disabled:bg-aven-border disabled:border-aven-border disabled:text-aven-text-muted text-aven-base rounded-xl transition-all flex items-center justify-center shrink-0 border border-aven-text shadow-md disabled:shadow-none"
                 >
                   <Send size={20} />
                 </button>

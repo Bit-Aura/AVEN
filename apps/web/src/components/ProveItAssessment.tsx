@@ -133,15 +133,15 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
   };
 
   return (
-    <div className="flex flex-col h-[90vh] max-h-[900px] w-full max-w-[1200px] bg-[#faf9f5] text-[#141413] rounded-3xl overflow-hidden font-sans border border-[#141413]/20 shadow-sm">
+    <div className="flex flex-col h-[90vh] max-h-[900px] w-full max-w-[1200px] bg-aven-base text-aven-text rounded-3xl overflow-hidden font-sans border border-aven-text/20 shadow-sm">
       {/* IDE Header */}
-      <div className="flex justify-between items-center px-6 py-4 border-b border-[#141413]/20 bg-[#e8e6dc]">
+      <div className="flex justify-between items-center px-6 py-4 border-b border-aven-text/20 bg-aven-surface">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-[#141413] flex items-center justify-center border border-[#141413]/20">
-            <Code2 className="text-[#faf9f5]" size={16} />
+          <div className="w-8 h-8 rounded-xl bg-aven-text flex items-center justify-center border border-aven-text/20">
+            <Code2 className="text-aven-base" size={16} />
           </div>
           <div>
-            <h3 className="text-[#141413] font-bold text-sm tracking-wide uppercase">
+            <h3 className="text-aven-text font-bold text-sm tracking-wide uppercase">
               {activeMilestone?.title || 'Technical Screen'}
             </h3>
           </div>
@@ -150,7 +150,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
 
       {isFetchingAssessment ? (
         <div className="flex-1 flex justify-center items-center">
-          <Loader2 size={32} className="animate-spin text-[#141413]" />
+          <Loader2 size={32} className="animate-spin text-aven-text" />
         </div>
       ) : currentAssessment ? (
         isCodingChallenge ? (
@@ -161,25 +161,25 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
             <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
 
               {/* Left Panel: Problem Statement */}
-              <div className="w-full lg:w-[40%] border-r border-[#141413]/20 bg-[#faf9f5] flex flex-col overflow-hidden">
-                <div className="px-6 py-3 bg-[#e8e6dc] border-b border-[#141413]/20 flex items-center gap-2">
-                  <BookOpen size={16} className="text-[#141413]" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-[#141413]">Description</span>
+              <div className="w-full lg:w-[40%] border-r border-aven-text/20 bg-aven-base flex flex-col overflow-hidden">
+                <div className="px-6 py-3 bg-aven-surface border-b border-aven-text/20 flex items-center gap-2">
+                  <BookOpen size={16} className="text-aven-text" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-aven-text">Description</span>
                 </div>
                 <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
                   <div className="space-y-8">
                     <div>
-                      <h3 className="text-[#141413] text-lg font-bold mb-3">Problem Statement</h3>
-                      <p className="text-[#3d3d3a] leading-relaxed text-sm">{currentAssessment.question}</p>
+                      <h3 className="text-aven-text text-lg font-bold mb-3">Problem Statement</h3>
+                      <p className="text-aven-text-subtle leading-relaxed text-sm">{currentAssessment.question}</p>
                     </div>
-                    <div className="p-5 bg-[#e8e6dc] border border-[#141413]/20 rounded-2xl font-mono text-xs text-[#141413] space-y-2">
+                    <div className="p-5 bg-aven-surface border border-aven-text/20 rounded-2xl font-mono text-xs text-aven-text space-y-2">
                       <p><span className="font-bold">Input:</span> data = [1, 2, 3, 4]</p>
                       <p><span className="font-bold">Output:</span> True</p>
                       <p><span className="font-bold">Explanation:</span> The sequence satisfies the core constraints of the problem.</p>
                     </div>
                     <div>
-                      <h3 className="text-[#141413] text-sm font-bold uppercase tracking-widest mb-3">Constraints</h3>
-                      <ul className="list-disc list-inside text-sm text-[#3d3d3a] space-y-2 font-medium">
+                      <h3 className="text-aven-text text-sm font-bold uppercase tracking-widest mb-3">Constraints</h3>
+                      <ul className="list-disc list-inside text-sm text-aven-text-subtle space-y-2 font-medium">
                         <li><code>1 &lt;= len(data) &lt;= 10^5</code></li>
                         <li>Elements are purely numeric</li>
                         <li>Optimize for space complexity</li>
@@ -190,21 +190,21 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
               </div>
 
               {/* Right Panel: Code Editor + Terminal */}
-              <div className="w-full lg:w-[60%] flex flex-col bg-[#faf9f5] relative">
+              <div className="w-full lg:w-[60%] flex flex-col bg-aven-base relative">
 
                 {/* File Tabs & Actions */}
-                <div className="flex items-center justify-between bg-[#e8e6dc] border-b border-[#141413]/20 pl-0 pr-4">
+                <div className="flex items-center justify-between bg-aven-surface border-b border-aven-text/20 pl-0 pr-4">
                   <div className="flex items-center">
-                    <div className="px-6 py-3 bg-[#faf9f5] border-r border-[#141413]/20 flex items-center gap-2">
-                      <FileCode2 className="text-[#141413]" size={16} />
-                      <span className="text-xs font-bold font-mono text-[#141413]">solution.py</span>
+                    <div className="px-6 py-3 bg-aven-base border-r border-aven-text/20 flex items-center gap-2">
+                      <FileCode2 className="text-aven-text" size={16} />
+                      <span className="text-xs font-bold font-mono text-aven-text">solution.py</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 py-2">
                     <button
                       onClick={handleRunTests}
                       disabled={isEvaluating}
-                      className="flex items-center gap-2 px-4 py-2 bg-[#faf9f5] hover:bg-[#141413] hover:text-[#faf9f5] text-[#141413] text-xs font-bold border border-[#141413]/20 rounded-xl transition-colors disabled:opacity-50 uppercase tracking-widest"
+                      className="flex items-center gap-2 px-4 py-2 bg-aven-base hover:bg-aven-text hover:text-aven-base text-aven-text text-xs font-bold border border-aven-text/20 rounded-xl transition-colors disabled:opacity-50 uppercase tracking-widest"
                     >
                       {isEvaluating ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} className="fill-current" />}
                       Run Code
@@ -214,7 +214,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         onClick={handleSubmitSolution}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#141413] hover:bg-[#3d3d3a] text-[#faf9f5] text-xs font-bold border border-[#141413] rounded-xl transition-colors shadow-sm uppercase tracking-widest"
+                        className="flex items-center gap-2 px-4 py-2 bg-aven-text hover:bg-aven-text-subtle text-aven-base text-xs font-bold border border-aven-text rounded-xl transition-colors shadow-sm uppercase tracking-widest"
                       >
                         <Send size={16} />
                         Submit
@@ -226,20 +226,20 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
                 {/* Editor Area */}
                 <div className="flex-1 flex overflow-hidden relative group">
                   {/* Line Numbers */}
-                  <div className="w-12 flex-shrink-0 bg-[#faf9f5] text-right pr-4 py-5 select-none border-r border-[#141413]/10">
+                  <div className="w-12 flex-shrink-0 bg-aven-base text-right pr-4 py-5 select-none border-r border-aven-text/10">
                     {Array.from({ length: Math.max(15, lines) }).map((_, i) => (
-                      <div key={i} className="text-xs leading-[24px] font-mono font-bold text-[#141413]/40">
+                      <div key={i} className="text-xs leading-[24px] font-mono font-bold text-aven-text/40">
                         {i + 1}
                       </div>
                     ))}
                   </div>
 
                   {/* Textarea overlaying Syntax Highlighted Div */}
-                  <div className="flex-1 relative overflow-hidden bg-[#faf9f5]">
+                  <div className="flex-1 relative overflow-hidden bg-aven-base">
                     <pre
                       ref={highlightRef}
                       aria-hidden="true"
-                      className="absolute inset-0 p-5 m-0 font-mono text-sm leading-[24px] whitespace-pre-wrap break-words overflow-hidden pointer-events-none text-[#141413]"
+                      className="absolute inset-0 p-5 m-0 font-mono text-sm leading-[24px] whitespace-pre-wrap break-words overflow-hidden pointer-events-none text-aven-text"
                       dangerouslySetInnerHTML={{ __html: highlightPython(code) + '<br/>' }}
                     />
                     <textarea
@@ -248,28 +248,28 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
                       onChange={(e) => setCode(e.target.value)}
                       onScroll={handleScroll}
                       spellCheck={false}
-                      className="absolute inset-0 p-5 m-0 font-mono text-sm leading-[24px] text-transparent caret-[#141413] bg-transparent outline-none resize-none whitespace-pre-wrap break-words custom-scrollbar"
+                      className="absolute inset-0 p-5 m-0 font-mono text-sm leading-[24px] text-transparent caret-aven-text bg-transparent outline-none resize-none whitespace-pre-wrap break-words custom-scrollbar"
                       style={{ tabSize: 4 }}
                     />
                   </div>
                 </div>
 
                 {/* Terminal Panel */}
-                <div className="h-56 border-t border-[#141413]/20 bg-[#faf9f5] flex flex-col">
-                  <div className="px-5 py-3 border-b border-[#141413]/20 flex items-center justify-between bg-[#e8e6dc]">
+                <div className="h-56 border-t border-aven-text/20 bg-aven-base flex flex-col">
+                  <div className="px-5 py-3 border-b border-aven-text/20 flex items-center justify-between bg-aven-surface">
                     <div className="flex items-center gap-2">
-                      <Terminal className="text-[#141413]" size={16} />
-                      <span className="text-[10px] font-mono font-bold text-[#141413] uppercase tracking-widest">Test Results</span>
+                      <Terminal className="text-aven-text" size={16} />
+                      <span className="text-[10px] font-mono font-bold text-aven-text uppercase tracking-widest">Test Results</span>
                     </div>
                     {evaluationPhase === 'success' && (
-                      <span className="text-[10px] font-mono font-bold text-[#141413] uppercase tracking-widest flex items-center gap-1 border border-[#141413]/20 px-2 py-0.5 rounded-md bg-[#faf9f5]">
-                        <CheckCircle2 size={14} className="fill-[#141413]/10 text-[#141413]" /> Accepted
+                      <span className="text-[10px] font-mono font-bold text-aven-text uppercase tracking-widest flex items-center gap-1 border border-aven-text/20 px-2 py-0.5 rounded-md bg-aven-base">
+                        <CheckCircle2 size={14} className="fill-aven-text/10 text-aven-text" /> Accepted
                       </span>
                     )}
                   </div>
-                  <div className="flex-1 p-5 overflow-y-auto font-mono text-xs leading-loose space-y-2 custom-scrollbar bg-[#faf9f5]">
+                  <div className="flex-1 p-5 overflow-y-auto font-mono text-xs leading-loose space-y-2 custom-scrollbar bg-aven-base">
                     {terminalLogs.length === 0 && (
-                      <span className="text-[#3d3d3a] font-medium">You must run your code first.</span>
+                      <span className="text-aven-text-subtle font-medium">You must run your code first.</span>
                     )}
                     <AnimatePresence>
                       {terminalLogs.map((log, idx) => (
@@ -278,7 +278,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
                           initial={{ opacity: 0, x: -5 }}
                           animate={{ opacity: 1, x: 0 }}
                           className={
-                            log.includes('PASS') || log.includes('SUCCESS') ? 'text-[#141413] font-bold' : 'text-[#3d3d3a]'
+                            log.includes('PASS') || log.includes('SUCCESS') ? 'text-aven-text font-bold' : 'text-aven-text-subtle'
                           }
                         >
                           {log}
@@ -294,12 +294,12 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
           // ==============================
           // MULTIPLE CHOICE AESTHETIC
           // ==============================
-          <div className="flex flex-col flex-1 p-12 overflow-y-auto bg-[#faf9f5] items-center justify-center">
+          <div className="flex flex-col flex-1 p-12 overflow-y-auto bg-aven-base items-center justify-center">
             <div className="w-full max-w-3xl">
-              <h4 className="text-[11px] font-bold uppercase tracking-widest text-[#3d3d3a] mb-6 flex items-center gap-2">
-                <BookOpen size={16} className="text-[#141413]"/> Knowledge Check
+              <h4 className="text-[11px] font-bold uppercase tracking-widest text-aven-text-subtle mb-6 flex items-center gap-2">
+                <BookOpen size={16} className="text-aven-text"/> Knowledge Check
               </h4>
-              <p className="text-2xl text-[#141413] font-bold leading-relaxed mb-12">
+              <p className="text-2xl text-aven-text font-bold leading-relaxed mb-12">
                 {currentAssessment.question}
               </p>
               <div className="space-y-4">
@@ -310,11 +310,11 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
                     key={i}
                     onClick={() => setSelectedOpt(opt)}
                     className={`w-full text-left p-6 rounded-2xl border transition-all flex items-center gap-6 shadow-sm ${selectedOpt === opt
-                      ? 'border-[#141413]/40 bg-[#141413] text-[#faf9f5]'
-                      : 'border-[#141413]/10 bg-[#faf9f5] hover:border-[#141413]/40 text-[#141413]'
+                      ? 'border-aven-text/40 bg-aven-text text-aven-base'
+                      : 'border-aven-text/10 bg-aven-base hover:border-aven-text/40 text-aven-text'
                       }`}
                   >
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 ${selectedOpt === opt ? 'bg-[#faf9f5] text-[#141413]' : 'bg-[#e8e6dc] border border-[#141413]/10 text-[#3d3d3a]'
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 ${selectedOpt === opt ? 'bg-aven-base text-aven-text' : 'bg-aven-surface border border-aven-text/10 text-aven-text-subtle'
                       }`}>
                       {String.fromCharCode(65 + i)}
                     </div>
@@ -328,7 +328,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
                   whileTap={selectedOpt ? { scale: 0.98 } : {}}
                   onClick={handleMultipleChoiceSubmit}
                   disabled={!selectedOpt}
-                  className="px-8 py-4 bg-[#141413] text-[#faf9f5] font-bold text-sm uppercase tracking-widest rounded-2xl hover:bg-[#3d3d3a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm flex items-center gap-2"
+                  className="px-8 py-4 bg-aven-text text-aven-base font-bold text-sm uppercase tracking-widest rounded-2xl hover:bg-aven-text-subtle disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm flex items-center gap-2"
                 >
                   <CheckCircle2 size={18} />
                   Submit Answer
@@ -338,8 +338,8 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
           </div>
         )
       ) : (
-        <div className="flex-1 flex justify-center items-center bg-[#faf9f5]">
-          <p className="text-[#3d3d3a] font-medium border border-[#141413]/10 px-6 py-3 rounded-2xl bg-[#e8e6dc]">Assessment data could not be loaded.</p>
+        <div className="flex-1 flex justify-center items-center bg-aven-base">
+          <p className="text-aven-text-subtle font-medium border border-aven-text/10 px-6 py-3 rounded-2xl bg-aven-surface">Assessment data could not be loaded.</p>
         </div>
       )}
     </div>

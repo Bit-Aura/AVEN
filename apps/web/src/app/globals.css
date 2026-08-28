@@ -52,11 +52,27 @@
   font-display: swap;
 }
 @layer base {
+  :root {
+    --aven-primary: #3d348b;
+    --aven-secondary: #7678ed;
+    --aven-base: #faf9f5;
+    --aven-surface: #e8e6dc;
+    --aven-border: #d6d3c4;
+    --aven-text: #141413;
+    --aven-text-subtle: #3d3d3a;
+    --aven-text-muted: #87867f;
+    --aven-status-active: #f7b801;
+    --aven-status-locked: #f18701;
+    --aven-status-mastered: #f35b04;
+  }
+  
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
   body {
-    @apply bg-background text-slate-100 antialiased font-sans;
+    background-color: var(--aven-base);
+    color: var(--aven-text);
+    @apply antialiased font-sans;
     min-height: 100vh;
   }
 }

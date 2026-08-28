@@ -13,6 +13,23 @@ export default {
         mono: ['"Anthropic Mono"', '"JetBrains Mono"', 'monospace'],
       },
       colors: {
+        aven: {
+          primary: 'var(--aven-primary)',
+          secondary: 'var(--aven-secondary)',
+          base: 'var(--aven-base)',
+          surface: 'var(--aven-surface)',
+          border: 'var(--aven-border)',
+          text: {
+            DEFAULT: 'var(--aven-text)',
+            subtle: 'var(--aven-text-subtle)',
+            muted: 'var(--aven-text-muted)'
+          },
+          status: {
+            active: 'var(--aven-status-active)',
+            locked: 'var(--aven-status-locked)',
+            mastered: 'var(--aven-status-mastered)'
+          }
+        },
         background: "#090d16",
         surface: {
           DEFAULT: "#0f172a",

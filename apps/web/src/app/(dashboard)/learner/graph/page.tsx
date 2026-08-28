@@ -64,14 +64,14 @@ const SpineNode = ({ data }: any) => {
   return (
     <div style={{
       width: SPINE_NODE_W, minHeight: SPINE_NODE_H,
-      background: isCompleted ? '#faf9f5' : '#3d3d3a', 
-      border: isCompleted ? '1px solid #d6d3c4' : isActive ? '2px solid #3b82f6' : '1px solid #141413',
+      background: isCompleted ? 'var(--aven-base)' : 'var(--aven-primary)', 
+      border: isCompleted ? '1px solid var(--aven-status-mastered)' : isActive ? '2px solid var(--aven-status-active)' : '1px solid var(--aven-primary)',
       borderRadius: '12px', display: 'flex', alignItems: 'center',
       justifyContent: 'space-between', padding: '10px 14px',
       cursor: isLocked ? 'not-allowed' : 'pointer', 
       transition: 'all 0.2s ease',
       opacity: isLocked ? 0.6 : 1,
-      boxShadow: isActive ? '0 0 0 4px rgba(59, 130, 246, 0.2)' : 'none',
+      boxShadow: isActive ? '0 0 0 4px rgba(247, 184, 1, 0.2)' : 'none',
     }} className={!isLocked ? "hover:opacity-90 hover:-translate-y-0.5" : ""}>
       <Handle type="target" position={Position.Top}   id="top"     style={{ opacity: 0 }} />
       <Handle type="source" position={Position.Bottom} id="bottom"  style={{ opacity: 0 }} />
@@ -82,15 +82,15 @@ const SpineNode = ({ data }: any) => {
       
       <span style={{ 
         fontSize: 13, fontWeight: 700, 
-        color: isCompleted ? '#87867f' : '#faf9f5', 
+        color: isCompleted ? 'var(--aven-text)' : 'var(--aven-base)', 
         textAlign: 'left', lineHeight: 1.25, flex: 1
       }}>
         {data.label}
       </span>
 
-      {isCompleted && <CheckCircle2 size={16} className="text-[#87867f] ml-2 shrink-0" />}
-      {isLocked && <Lock size={14} className="text-[#faf9f5] ml-2 shrink-0" />}
-      {isActive && <div className="w-2 h-2 rounded-full bg-[#3b82f6] ml-2 shrink-0 animate-pulse" />}
+      {isCompleted && <CheckCircle2 size={16} className="text-aven-status-mastered ml-2 shrink-0" />}
+      {isLocked && <Lock size={14} className="text-aven-status-locked ml-2 shrink-0" />}
+      {isActive && <div className="w-2 h-2 rounded-full bg-aven-status-active ml-2 shrink-0 animate-pulse" />}
     </div>
   );
 };
@@ -104,14 +104,14 @@ const LeafNode = ({ data }: any) => {
   return (
     <div style={{
       width: LEAF_NODE_W, minHeight: LEAF_NODE_H,
-      background: isCompleted ? '#faf9f5' : isActive ? '#fff' : '#e8e6dc', 
-      border: isCompleted ? '1px dashed #d6d3c4' : isActive ? '2px solid #3b82f6' : '1px solid #d6d3c4',
+      background: isCompleted ? 'var(--aven-base)' : isActive ? '#fff' : 'var(--aven-surface)', 
+      border: isCompleted ? '1px dashed var(--aven-status-mastered)' : isActive ? '2px solid var(--aven-status-active)' : '1px solid var(--aven-border)',
       borderRadius: '8px', display: 'flex', alignItems: 'center',
       justifyContent: 'space-between', padding: '6px 10px',
       cursor: isLocked ? 'not-allowed' : 'pointer', 
       transition: 'all 0.2s ease',
       opacity: isLocked ? 0.6 : 1,
-    }} className={!isLocked ? "hover:bg-[#d6d3c4] hover:border-[#87867f] hover:-translate-y-0.5" : ""}>
+    }} className={!isLocked ? "hover:bg-aven-secondary/10 hover:border-aven-secondary hover:text-aven-primary hover:-translate-y-0.5" : ""}>
       <Handle type="target" position={Position.Left}  id="left-t"  style={{ opacity: 0 }} />
       <Handle type="target" position={Position.Right} id="right-t" style={{ opacity: 0 }} />
       <Handle type="source" position={Position.Left}  id="left-s"  style={{ opacity: 0 }} />
@@ -119,15 +119,15 @@ const LeafNode = ({ data }: any) => {
       
       <span style={{ 
         fontSize: 12, fontWeight: 600, 
-        color: isCompleted ? '#87867f' : '#141413', 
+        color: isCompleted ? 'var(--aven-text)' : 'var(--aven-text)', 
         textAlign: 'left', lineHeight: 1.2, flex: 1 
-      }}>
+      }} className={!isLocked ? "group-hover:text-aven-primary" : ""}>
         {data.label}
       </span>
 
-      {isCompleted && <CheckCircle2 size={14} className="text-[#87867f] ml-2 shrink-0" />}
-      {isLocked && <Lock size={12} className="text-[#87867f] ml-2 shrink-0" />}
-      {isActive && <div className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] ml-2 shrink-0 animate-pulse" />}
+      {isCompleted && <CheckCircle2 size={14} className="text-aven-status-mastered ml-2 shrink-0" />}
+      {isLocked && <Lock size={12} className="text-aven-status-locked ml-2 shrink-0" />}
+      {isActive && <div className="w-1.5 h-1.5 rounded-full bg-aven-status-active ml-2 shrink-0 animate-pulse" />}
     </div>
   );
 };
@@ -135,14 +135,14 @@ const LeafNode = ({ data }: any) => {
 const ContainerNode = ({ data }: any) => (
   <div style={{
     width: data.containerW || 500, height: data.containerH || 200,
-    background: 'transparent', border: '1px dashed #87867f',
+    background: 'transparent', border: '1px dashed var(--aven-text-muted)',
     borderRadius: '12px', padding: CONTAINER_PAD,
     pointerEvents: 'none',
   }}>
     <Handle type="target" position={Position.Left}  id="left-t"  style={{ opacity: 0 }} />
     <Handle type="target" position={Position.Right} id="right-t" style={{ opacity: 0 }} />
     <span style={{
-      fontSize: 10, fontWeight: 800, color: '#87867f',
+      fontSize: 10, fontWeight: 800, color: 'var(--aven-text-muted)',
       textTransform: 'uppercase', letterSpacing: '0.05em',
     }}>
       {data.label}
@@ -153,7 +153,7 @@ const ContainerNode = ({ data }: any) => (
 const LabelNode = ({ data }: any) => (
   <div style={{ pointerEvents: 'none' }}>
     <span style={{
-      fontSize: 10, fontWeight: 800, color: '#87867f',
+      fontSize: 10, fontWeight: 800, color: 'var(--aven-text-muted)',
       textTransform: 'uppercase', letterSpacing: '0.05em',
     }}>
       {data.label}
@@ -476,65 +476,65 @@ function TopicDrawer({ node, slug, onClose, onAssess, onIde, onCoach }: any) {
         boxShadow: '0 8px 32px rgba(20,20,19,0.12)', animation: 'fadeIn 0.2s ease' }}>
       
       {/* HEADER */}
-      <div className="p-4 border-b border-[#d6d3c4] bg-[#faf9f5] sticky top-0 z-10 flex items-start justify-between">
+      <div className="p-4 border-b border-aven-border bg-aven-base sticky top-0 z-10 flex items-start justify-between">
         <div>
-          <h2 className="text-[#141413] font-bold text-lg leading-snug">{topicName}</h2>
+          <h2 className="text-aven-text font-bold text-lg leading-snug">{topicName}</h2>
           {status && (
-            <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#87867f]">
-              {isCompleted && <span className="flex items-center gap-1 text-[#141413] bg-[#e8e6dc] px-1.5 py-0.5 rounded border border-[#d6d3c4]"><CheckCircle2 size={10} /> MASTERED</span>}
-              {isLocked && <span className="flex items-center gap-1 text-[#87867f] bg-[#e8e6dc] px-1.5 py-0.5 rounded border border-[#d6d3c4]"><Lock size={10} /> LOCKED</span>}
-              {status === 'active' && <span className="flex items-center gap-1 text-[#141413] bg-[#e8e6dc] px-1.5 py-0.5 rounded border border-[#d6d3c4]"><div className="w-1.5 h-1.5 bg-[#141413] rounded-full animate-pulse" /> ACTIVE MILESTONE</span>}
+            <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-aven-text-muted">
+              {isCompleted && <span className="flex items-center gap-1 text-aven-status-mastered bg-aven-surface px-1.5 py-0.5 rounded border border-aven-border"><CheckCircle2 size={10} /> MASTERED</span>}
+              {isLocked && <span className="flex items-center gap-1 text-aven-status-locked bg-aven-surface px-1.5 py-0.5 rounded border border-aven-border"><Lock size={10} /> LOCKED</span>}
+              {status === 'active' && <span className="flex items-center gap-1 text-aven-status-active bg-aven-surface px-1.5 py-0.5 rounded border border-aven-border"><div className="w-1.5 h-1.5 bg-aven-status-active rounded-full animate-pulse" /> ACTIVE MILESTONE</span>}
             </div>
           )}
         </div>
-        <button onClick={onClose} className="p-1 -mr-1 mt-0.5 text-[#87867f] hover:text-[#141413] hover:bg-[#e8e6dc] rounded-md transition"><X size={16} /></button>
+        <button onClick={onClose} className="p-1 -mr-1 mt-0.5 text-aven-text-muted hover:text-aven-text hover:bg-aven-surface rounded-md transition"><X size={16} /></button>
       </div>
       
       <div className="p-4 flex-1 flex flex-col gap-4">
         {/* DESCRIPTION */}
-        <p className="text-[13px] text-[#3d3d3a] leading-relaxed">
+        <p className="text-[13px] text-aven-text-subtle leading-relaxed">
           {node.description || `${topicName} is a core prerequisite in the ${slug} learning path. Mastering this concept is critical for advancing to subsequent architectural milestones.`}
         </p>
 
         {/* LAUNCHPAD BOX */}
-        <div className="border border-[#d6d3c4] rounded-xl bg-[#faf9f5] p-3 shadow-sm">
+        <div className="border border-aven-border rounded-xl bg-aven-base p-3 shadow-sm">
           <div className="flex items-center gap-1.5 mb-3">
-            <Command size={14} className="text-[#141413]" />
-            <h3 className="text-[13px] font-bold text-[#141413]">Launchpad</h3>
+            <Command size={14} className="text-aven-text" />
+            <h3 className="text-[13px] font-bold text-aven-text">Launchpad</h3>
           </div>
           {isLocked ? (
-            <div className="bg-[#e8e6dc] border border-[#d6d3c4] rounded-lg p-3 text-center">
-              <Lock size={14} className="text-[#87867f] mx-auto mb-1.5" />
-              <p className="text-[11px] font-bold text-[#3d3d3a]">Milestone Locked</p>
+            <div className="bg-aven-surface border border-aven-border rounded-lg p-3 text-center">
+              <Lock size={14} className="text-aven-text-muted mx-auto mb-1.5" />
+              <p className="text-[11px] font-bold text-aven-text-subtle">Milestone Locked</p>
             </div>
           ) : (
             <div className="flex flex-col gap-1.5">
-              <button onClick={onIde} className="w-full py-2 px-3 rounded-md text-[11px] font-bold border border-[#d6d3c4] bg-[#faf9f5] hover:bg-[#e8e6dc] text-[#141413] flex items-center justify-between transition shadow-sm group">
-                <div className="flex items-center gap-2"><MonitorPlay size={12} className="text-[#87867f] group-hover:text-[#141413]" /> Day-One Simulator</div>
-                <ArrowRight size={10} className="text-[#87867f] group-hover:text-[#141413]" />
+              <button onClick={onIde} className="w-full py-2 px-3 rounded-md text-[11px] font-bold border border-aven-border bg-aven-base hover:bg-aven-surface text-aven-text flex items-center justify-between transition shadow-sm group">
+                <div className="flex items-center gap-2"><MonitorPlay size={12} className="text-aven-text-muted group-hover:text-aven-text" /> Day-One Simulator</div>
+                <ArrowRight size={10} className="text-aven-text-muted group-hover:text-aven-text" />
               </button>
-              <button onClick={onCoach} className="w-full py-2 px-3 rounded-md text-[11px] font-bold border border-[#d6d3c4] bg-[#faf9f5] hover:bg-[#e8e6dc] text-[#141413] flex items-center justify-between transition shadow-sm group">
-                <div className="flex items-center gap-2"><Mic size={12} className="text-[#87867f] group-hover:text-[#141413]" /> AI Mock Interview</div>
-                <ArrowRight size={10} className="text-[#87867f] group-hover:text-[#141413]" />
+              <button onClick={onCoach} className="w-full py-2 px-3 rounded-md text-[11px] font-bold border border-aven-border bg-aven-base hover:bg-aven-surface text-aven-text flex items-center justify-between transition shadow-sm group">
+                <div className="flex items-center gap-2"><Mic size={12} className="text-aven-text-muted group-hover:text-aven-text" /> AI Mock Interview</div>
+                <ArrowRight size={10} className="text-aven-text-muted group-hover:text-aven-text" />
               </button>
             </div>
           )}
         </div>
 
         {/* FREE RESOURCES BOX */}
-        <div className="border border-[#d6d3c4] rounded-xl bg-[#faf9f5] p-3 shadow-sm mb-2">
+        <div className="border border-aven-border rounded-xl bg-aven-base p-3 shadow-sm mb-2">
           <div className="flex items-center gap-1.5 mb-3">
-            <Heart size={14} className="text-[#141413]" />
-            <h3 className="text-[13px] font-bold text-[#141413]">Free Resources</h3>
+            <Heart size={14} className="text-aven-text" />
+            <h3 className="text-[13px] font-bold text-aven-text">Free Resources</h3>
           </div>
           <div className="flex flex-col gap-2">
             {freeResources.map((res, i) => (
               <a key={i} href={res.url} target="_blank" rel="noreferrer" 
-                 className="flex items-center gap-2 p-1.5 -mx-1.5 rounded-md hover:bg-[#e8e6dc] transition group">
-                <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border bg-[#e8e6dc] text-[#141413] border-[#d6d3c4] shrink-0">
+                 className="flex items-center gap-2 p-1.5 -mx-1.5 rounded-md hover:bg-aven-surface transition group">
+                <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded border bg-aven-surface text-aven-text border-aven-border shrink-0">
                   {res.type}
                 </span>
-                <span className="text-[12px] font-medium text-[#3d3d3a] group-hover:text-[#141413] transition truncate underline decoration-[#d6d3c4] underline-offset-2 group-hover:decoration-[#3d3d3a]">
+                <span className="text-[12px] font-medium text-aven-text-subtle group-hover:text-aven-text transition truncate underline decoration-aven-border underline-offset-2 group-hover:decoration-aven-text-subtle">
                   {res.title}
                 </span>
               </a>
@@ -623,28 +623,28 @@ function GraphInner() {
   }, [setCenter]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-80px)] bg-[#faf9f5] -m-6 md:-m-8" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="flex flex-col h-[calc(100vh-80px)] bg-aven-base -m-6 md:-m-8" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
-      <div className="border-b border-[#d6d3c4] bg-[#faf9f5] shrink-0 z-10 relative px-6 md:px-8 py-6">
+      <div className="border-b border-aven-border bg-aven-base shrink-0 z-10 relative px-6 md:px-8 py-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Compass size={16} className="text-[#141413]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#87867f]">Skill Graph Explorer</span>
+            <Compass size={16} className="text-aven-text" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-aven-text-muted">Skill Graph Explorer</span>
           </div>
         </div>
         
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl md:text-4xl font-medium text-[#141413] tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-medium text-aven-text tracking-tight">
             Curriculum Topology
           </h1>
           
-          <div className="flex items-center bg-[#e8e6dc] p-1 rounded-lg border border-[#d6d3c4]">
+          <div className="flex items-center bg-aven-surface p-1 rounded-lg border border-aven-border">
             <button onClick={() => setViewMode('graph')}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'graph' ? 'bg-[#3d3d3a] text-white' : 'text-[#87867f] hover:text-[#141413]'}`}>
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'graph' ? 'bg-aven-text-subtle text-white' : 'text-aven-text-muted hover:text-aven-text'}`}>
               <Network size={14} /><span>My Graph</span>
             </button>
             <button onClick={() => setViewMode('roadmap')}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'roadmap' ? 'bg-[#3d3d3a] text-white' : 'text-[#87867f] hover:text-[#141413]'}`}>
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'roadmap' ? 'bg-aven-text-subtle text-white' : 'text-aven-text-muted hover:text-aven-text'}`}>
               <Map size={14} /><span>Roadmaps</span>
             </button>
           </div>
@@ -658,8 +658,8 @@ function GraphInner() {
                 <button key={r.slug} onClick={() => setSelectedRoadmap(r.slug)}
                   className={`flex items-center px-3 py-1.5 rounded-md text-xs font-bold transition shrink-0 border ${
                     active 
-                      ? 'bg-[#3d3d3a] text-white border-[#3d3d3a]' 
-                      : 'bg-[#faf9f5] text-[#87867f] border-[#d6d3c4] hover:border-[#87867f] hover:text-[#141413]'
+                      ? 'bg-aven-text-subtle text-white border-aven-text-subtle' 
+                      : 'bg-aven-base text-aven-text-muted border-aven-border hover:border-aven-text-muted hover:text-aven-text'
                   }`}>
                   {r.label}
                 </button>
@@ -670,10 +670,10 @@ function GraphInner() {
       </div>
 
       {/* Canvas */}
-      <div className="flex-1 relative w-full h-full bg-[#faf9f5]">
+      <div className="flex-1 relative w-full h-full bg-aven-base">
         {loading && (
-          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#faf9f5]/80 backdrop-blur-sm">
-            <div className="text-sm font-bold tracking-widest uppercase text-[#87867f] animate-pulse">Computing Layout...</div>
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-aven-base/80 backdrop-blur-sm">
+            <div className="text-sm font-bold tracking-widest uppercase text-aven-text-muted animate-pulse">Computing Layout...</div>
           </div>
         )}
         <ReactFlow
@@ -685,7 +685,7 @@ function GraphInner() {
           nodesDraggable={false} nodesConnectable={false} elementsSelectable
         >
           <Background color="#d6d3c4" gap={28} size={1} />
-          <Controls className="bg-white border border-[#d6d3c4] rounded overflow-hidden shadow-sm" />
+          <Controls className="bg-white border border-aven-border rounded overflow-hidden shadow-sm" />
         </ReactFlow>
 
         {selectedNode && (
@@ -699,9 +699,9 @@ function GraphInner() {
 
       {/* Assessment Modal */}
       {isAssessmentOpen && (
-        <div className="fixed inset-0 z-50 bg-[#141413]/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#faf9f5] border border-[#d6d3c4] rounded-2xl p-6 max-w-xl w-full shadow-2xl relative">
-            <button onClick={() => setIsAssessmentOpen(false)} className="absolute top-4 right-4 text-[#87867f] hover:text-[#141413]">
+        <div className="fixed inset-0 z-50 bg-aven-text/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-aven-base border border-aven-border rounded-2xl p-6 max-w-xl w-full shadow-2xl relative">
+            <button onClick={() => setIsAssessmentOpen(false)} className="absolute top-4 right-4 text-aven-text-muted hover:text-aven-text">
               <X size={20} />
             </button>
             <ProveItAssessment milestoneId={selectedNode?.id || ''} />

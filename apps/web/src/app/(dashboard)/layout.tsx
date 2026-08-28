@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <RoleGuard>
-      <div className={`h-screen bg-[#faf9f5] flex text-[#141413] overflow-hidden ${
+      <div className={`h-screen bg-aven-base flex text-aven-text overflow-hidden ${
         isFocusMode ? 'focus-mode-active' : ''
       }`}>
         {/* Persistent Navigation Sidebar */}

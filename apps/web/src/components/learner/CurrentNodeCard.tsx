@@ -55,18 +55,18 @@ export default function CurrentNodeCard({
   };
 
   return (
-    <div className="bg-[#e8e6dc] border border-[#d6d3c4] text-[#141413] rounded-2xl p-8 relative overflow-hidden flex flex-col gap-8">
+    <div className="bg-aven-primary border border-aven-primary text-aven-base rounded-2xl p-8 relative overflow-hidden flex flex-col gap-8 shadow-lg">
       {/* Header & Milestone Status */}
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 border-b border-[#d6d3c4] pb-8">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 border-b border-white/10 pb-8">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-2 h-2 rounded-full bg-[#141413]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#141413]">Current Milestone</span>
+            <span className="w-2 h-2 rounded-full bg-aven-status-active animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-aven-text-muted">Current Milestone</span>
           </div>
-          <h2 className="text-3xl font-medium text-[#141413] tracking-tight mb-4">
+          <h2 className="text-3xl font-medium text-white tracking-tight mb-4">
             {displayTitle}
           </h2>
-          <div className="text-sm text-[#3d3d3a] max-w-xl leading-relaxed">
+          <div className="text-sm text-aven-surface max-w-xl leading-relaxed">
             {displayWhy}
           </div>
         </div>
@@ -82,14 +82,14 @@ export default function CurrentNodeCard({
           </button>
           <button
             onClick={() => openIde(currentSkillId)}
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#3d3d3a] hover:opacity-90 text-white text-xs font-bold transition-opacity"
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-aven-status-active hover:brightness-110 text-aven-text text-xs font-black transition-all border border-aven-status-active"
           >
             <TerminalWindow size={16} weight="bold" />
             <span>Sandbox IDE</span>
           </button>
           <button
             onClick={handleAssessmentTrigger}
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#3d3d3a] hover:opacity-90 text-white text-xs font-bold transition-opacity"
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-aven-text-subtle hover:brightness-110 text-white text-xs font-black transition-all"
           >
             <ShieldCheck size={16} weight="bold" />
             <span>Prove It</span>

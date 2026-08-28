@@ -74,19 +74,19 @@ export default function RequestMentorModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#141413]/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-      <div className="bg-[#faf9f5] border border-[#d6d3c4] w-full max-w-lg rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-aven-text/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+      <div className="bg-aven-base border border-aven-border w-full max-w-lg rounded-xl shadow-lg overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-[#d6d3c4] bg-[#e8e6dc] flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-aven-border bg-aven-surface flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded bg-[#faf9f5] border border-[#d6d3c4] text-[#141413]">
+            <div className="p-2 rounded bg-aven-base border border-aven-border text-aven-text">
               <Users size={16} />
             </div>
             <div>
-              <h3 className="text-sm font-black text-[#141413] uppercase tracking-widest">
+              <h3 className="text-sm font-black text-aven-text uppercase tracking-widest">
                 Request 1-on-1 Mentor Session
               </h3>
-              <p className="text-[11px] font-bold text-[#3d3d3a] mt-0.5">
+              <p className="text-[11px] font-bold text-aven-text-subtle mt-0.5">
                 Connect directly with a human industry mentor on your learning path
               </p>
             </div>
@@ -94,7 +94,7 @@ export default function RequestMentorModal({
 
           <button
             onClick={onClose}
-            className="text-[#3d3d3a] hover:text-[#141413] p-1.5 rounded hover:bg-[#faf9f5] transition-colors"
+            className="text-aven-text-subtle hover:text-aven-text p-1.5 rounded hover:bg-aven-base transition-colors"
           >
             <X size={18} />
           </button>
@@ -117,7 +117,7 @@ export default function RequestMentorModal({
           )}
 
           <div>
-            <label className="block text-[10px] font-black text-[#141413] uppercase tracking-widest mb-1.5">
+            <label className="block text-[10px] font-black text-aven-text uppercase tracking-widest mb-1.5">
               Session Topic / Title <span className="text-red-500">*</span>
             </label>
             <input
@@ -126,13 +126,13 @@ export default function RequestMentorModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Debugging async queue timeouts & worker concurrency"
-              className="w-full bg-[#faf9f5] border border-[#d6d3c4] rounded px-3 py-2 text-xs text-[#141413] placeholder-[#a3a198] focus:outline-none focus:border-[#141413] focus:ring-0"
+              className="w-full bg-aven-base border border-aven-border rounded px-3 py-2 text-xs text-aven-text placeholder-[#a3a198] focus:outline-none focus:border-aven-text focus:ring-0"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-black text-[#141413] uppercase tracking-widest mb-1.5">
+              <label className="block text-[10px] font-black text-aven-text uppercase tracking-widest mb-1.5">
                 Related Skill Identifier
               </label>
               <input
@@ -140,18 +140,18 @@ export default function RequestMentorModal({
                 value={skillId}
                 onChange={(e) => setSkillId(e.target.value)}
                 placeholder="e.g. async_python"
-                className="w-full bg-[#faf9f5] border border-[#d6d3c4] rounded px-3 py-2 text-xs text-[#141413] placeholder-[#a3a198] focus:outline-none focus:border-[#141413] focus:ring-0 font-mono"
+                className="w-full bg-aven-base border border-aven-border rounded px-3 py-2 text-xs text-aven-text placeholder-[#a3a198] focus:outline-none focus:border-aven-text focus:ring-0 font-mono"
               />
             </div>
 
             <div>
-              <label className="block text-[10px] font-black text-[#141413] uppercase tracking-widest mb-1.5">
+              <label className="block text-[10px] font-black text-aven-text uppercase tracking-widest mb-1.5">
                 Preferred Duration
               </label>
               <select
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full bg-[#faf9f5] border border-[#d6d3c4] rounded px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#141413] focus:ring-0 cursor-pointer"
+                className="w-full bg-aven-base border border-aven-border rounded px-3 py-2 text-xs text-aven-text focus:outline-none focus:border-aven-text focus:ring-0 cursor-pointer"
               >
                 <option value={15}>15 Minutes</option>
                 <option value={30}>30 Minutes</option>
@@ -162,7 +162,7 @@ export default function RequestMentorModal({
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-[#141413] uppercase tracking-widest mb-1.5">
+            <label className="block text-[10px] font-black text-aven-text uppercase tracking-widest mb-1.5">
               Why do you need human mentor help? <span className="text-red-500">*</span>
             </label>
             <input
@@ -171,12 +171,12 @@ export default function RequestMentorModal({
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="e.g. Stuck on deadlock concept..."
-              className="w-full bg-[#faf9f5] border border-[#d6d3c4] rounded px-3 py-2 text-xs text-[#141413] placeholder-[#a3a198] focus:outline-none focus:border-[#141413] focus:ring-0"
+              className="w-full bg-aven-base border border-aven-border rounded px-3 py-2 text-xs text-aven-text placeholder-[#a3a198] focus:outline-none focus:border-aven-text focus:ring-0"
             />
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-[#141413] uppercase tracking-widest mb-1.5">
+            <label className="block text-[10px] font-black text-aven-text uppercase tracking-widest mb-1.5">
               Problem Description & What You Tried <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -185,22 +185,22 @@ export default function RequestMentorModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe the exact code behavior, error messages, and what hypothesis you've tested so far..."
-              className="w-full bg-[#faf9f5] border border-[#d6d3c4] rounded p-3 text-xs text-[#141413] placeholder-[#a3a198] focus:outline-none focus:border-[#141413] focus:ring-0"
+              className="w-full bg-aven-base border border-aven-border rounded p-3 text-xs text-aven-text placeholder-[#a3a198] focus:outline-none focus:border-aven-text focus:ring-0"
             />
           </div>
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-[#d6d3c4]">
+          <div className="pt-4 flex justify-end gap-3 border-t border-aven-border">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded bg-[#faf9f5] border border-[#d6d3c4] text-[#141413] hover:border-[#141413] text-[10px] font-black uppercase tracking-widest transition-colors"
+              className="px-4 py-2 rounded bg-aven-base border border-aven-border text-aven-text hover:border-aven-text text-[10px] font-black uppercase tracking-widest transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !!successMsg}
-              className="flex items-center gap-2 px-5 py-2 rounded bg-[#3d3d3a] hover:bg-[#141413] disabled:opacity-50 text-[#faf9f5] font-black text-[10px] uppercase tracking-widest shadow-sm transition-all"
+              className="flex items-center gap-2 px-5 py-2 rounded bg-aven-text-subtle hover:bg-aven-text disabled:opacity-50 text-aven-base font-black text-[10px] uppercase tracking-widest shadow-sm transition-all"
             >
               {isSubmitting ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
               <span>Submit Request</span>

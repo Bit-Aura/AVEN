@@ -270,42 +270,42 @@ export default function IdeSidecar() {
   const getVerdictBadge = (verdict: string) => {
     switch (verdict) {
       case 'excellent':
-        return <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#141413] text-[#faf9f5] border border-[#141413]">🏆 Excellent</span>;
+        return <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-aven-text text-aven-base border border-aven-text">🏆 Excellent</span>;
       case 'good':
-        return <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#3d3d3a] text-[#faf9f5] border border-[#3d3d3a]">✅ Good</span>;
+        return <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-aven-text-subtle text-aven-base border border-aven-text-subtle">✅ Good</span>;
       case 'partial':
-        return <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#e8e6dc] text-[#141413] border border-[#d6d3c4]">⚠️ Partial</span>;
+        return <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-aven-surface text-aven-text border border-aven-border">⚠️ Partial</span>;
       case 'needs_improvement':
-        return <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#faf9f5] text-[#141413] border border-[#141413]">🔄 Needs Improvement</span>;
+        return <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-aven-base text-aven-text border border-aven-text">🔄 Needs Improvement</span>;
       default:
-        return <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-[#faf9f5] text-[#141413] border-2 border-[#141413]">❌ Incorrect</span>;
+        return <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-aven-base text-aven-text border-2 border-aven-text">❌ Incorrect</span>;
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'text-[#faf9f5] border-[#141413] bg-[#141413]';
-    if (score >= 70) return 'text-[#faf9f5] border-[#3d3d3a] bg-[#3d3d3a]';
-    if (score >= 50) return 'text-[#141413] border-[#d6d3c4] bg-[#e8e6dc]';
-    return 'text-[#141413] border-[#141413] bg-[#faf9f5]';
+    if (score >= 85) return 'text-aven-base border-aven-text bg-aven-text';
+    if (score >= 70) return 'text-aven-base border-aven-text-subtle bg-aven-text-subtle';
+    if (score >= 50) return 'text-aven-text border-aven-border bg-aven-surface';
+    return 'text-aven-text border-aven-text bg-aven-base';
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#141413]/20 backdrop-blur-sm font-sans antialiased">
-      <div className="flex flex-col h-[90vh] max-h-[900px] w-full max-w-[1200px] bg-[#faf9f5] text-[#141413] rounded-2xl overflow-hidden border border-[#d6d3c4] shadow-2xl">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-aven-text/20 backdrop-blur-sm font-sans antialiased">
+      <div className="flex flex-col h-[90vh] max-h-[900px] w-full max-w-[1200px] bg-aven-base text-aven-text rounded-2xl overflow-hidden border border-aven-border shadow-2xl">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#d6d3c4] bg-[#e8e6dc] shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-aven-border bg-aven-surface shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#141413] border border-[#141413] flex items-center justify-center text-[#faf9f5] shadow-sm">
+          <div className="w-8 h-8 rounded-lg bg-aven-text border border-aven-text flex items-center justify-center text-aven-base shadow-sm">
             <TerminalSquare size={18} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-[#141413] tracking-tight">AI Coding Sandbox</span>
-              <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-[#3d3d3a] text-[#faf9f5] border border-[#3d3d3a]">
+              <span className="text-sm font-bold text-aven-text tracking-tight">AI Coding Sandbox</span>
+              <span className="px-1.5 py-0.5 text-[10px] font-medium rounded bg-aven-text-subtle text-aven-base border border-aven-text-subtle">
                 Claude Sonnet
               </span>
             </div>
-            <p className="text-[11px] text-[#3d3d3a] truncate max-w-[320px] font-medium">
+            <p className="text-[11px] text-aven-text-subtle truncate max-w-[320px] font-medium">
               {targetRole} • {activeIdeNodeId.replace(/_/g, ' ')}
             </p>
           </div>
@@ -315,22 +315,22 @@ export default function IdeSidecar() {
           <div className="relative">
             <button
               onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-              className="bg-[#faf9f5] text-xs text-[#141413] px-3 py-1.5 rounded-md outline-none border border-[#d6d3c4] hover:border-[#141413] font-bold transition-colors flex items-center gap-2 min-w-[120px] justify-between"
+              className="bg-aven-base text-xs text-aven-text px-3 py-1.5 rounded-md outline-none border border-aven-border hover:border-aven-text font-bold transition-colors flex items-center gap-2 min-w-[120px] justify-between"
             >
               <span>{language === 'python' ? 'Python 3.10' : 'TypeScript 5.0'}</span>
               <span className="text-[10px]">▼</span>
             </button>
             {isLangDropdownOpen && (
-              <div className="absolute top-full mt-1 right-0 w-full bg-[#faf9f5] border border-[#d6d3c4] rounded-md shadow-xl overflow-hidden z-[120]">
+              <div className="absolute top-full mt-1 right-0 w-full bg-aven-base border border-aven-border rounded-md shadow-xl overflow-hidden z-[120]">
                 <button
                   onClick={() => { setLanguage('python'); setIsLangDropdownOpen(false); }}
-                  className={`w-full text-left px-3 py-2 text-xs font-bold hover:bg-[#d6d3c4] transition-colors ${language === 'python' ? 'bg-[#e8e6dc] text-[#141413]' : 'text-[#3d3d3a]'}`}
+                  className={`w-full text-left px-3 py-2 text-xs font-bold hover:bg-aven-border transition-colors ${language === 'python' ? 'bg-aven-surface text-aven-text' : 'text-aven-text-subtle'}`}
                 >
                   Python 3.10
                 </button>
                 <button
                   onClick={() => { setLanguage('typescript'); setIsLangDropdownOpen(false); }}
-                  className={`w-full text-left px-3 py-2 text-xs font-bold hover:bg-[#d6d3c4] transition-colors ${language === 'typescript' ? 'bg-[#e8e6dc] text-[#141413]' : 'text-[#3d3d3a]'}`}
+                  className={`w-full text-left px-3 py-2 text-xs font-bold hover:bg-aven-border transition-colors ${language === 'typescript' ? 'bg-aven-surface text-aven-text' : 'text-aven-text-subtle'}`}
                 >
                   TypeScript 5.0
                 </button>
@@ -339,7 +339,7 @@ export default function IdeSidecar() {
           </div>
           <button
             onClick={closeIde}
-            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-[#d6d3c4] text-[#87867f] hover:text-[#141413] transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-aven-border text-aven-text-muted hover:text-aven-text transition-colors"
           >
             ✕
           </button>
@@ -350,16 +350,16 @@ export default function IdeSidecar() {
       <div className="flex-1 overflow-hidden">
         <PanelGroup orientation="horizontal" className="h-full w-full">
           {/* Left Panel: Context, Challenge, Examples, Hints, Evaluation */}
-          <Panel defaultSize={40} minSize={20} className="border-r border-[#d6d3c4]">
-            <div className="h-full flex flex-col bg-[#faf9f5]">
+          <Panel defaultSize={40} minSize={20} className="border-r border-aven-border">
+            <div className="h-full flex flex-col bg-aven-base">
               {/* Tab Navigation */}
-              <div className="flex items-center gap-1 px-3 pt-2 border-b border-[#d6d3c4] bg-[#e8e6dc] shrink-0 text-xs">
+              <div className="flex items-center gap-1 px-3 pt-2 border-b border-aven-border bg-aven-surface shrink-0 text-xs">
                 <button
                   onClick={() => setActiveTab('problem')}
                   className={`flex items-center gap-1.5 px-3 py-1.5 border-b-2 font-medium transition-colors ${
                     activeTab === 'problem'
-                      ? 'border-[#141413] text-[#141413] bg-[#faf9f5] font-bold'
-                      : 'border-transparent text-[#87867f] hover:text-[#141413]'
+                      ? 'border-aven-text text-aven-text bg-aven-base font-bold'
+                      : 'border-transparent text-aven-text-muted hover:text-aven-text'
                   }`}
                 >
                   <BookOpen size={14} /> Problem
@@ -368,8 +368,8 @@ export default function IdeSidecar() {
                   onClick={() => setActiveTab('examples')}
                   className={`flex items-center gap-1.5 px-3 py-1.5 border-b-2 font-medium transition-colors ${
                     activeTab === 'examples'
-                      ? 'border-[#141413] text-[#141413] bg-[#faf9f5] font-bold'
-                      : 'border-transparent text-[#87867f] hover:text-[#141413]'
+                      ? 'border-aven-text text-aven-text bg-aven-base font-bold'
+                      : 'border-transparent text-aven-text-muted hover:text-aven-text'
                   }`}
                 >
                   <Layers size={14} /> Examples ({challenge?.examples?.length || 0})
@@ -378,8 +378,8 @@ export default function IdeSidecar() {
                   onClick={() => setActiveTab('hints')}
                   className={`flex items-center gap-1.5 px-3 py-1.5 border-b-2 font-medium transition-colors ${
                     activeTab === 'hints'
-                      ? 'border-[#141413] text-[#141413] bg-[#faf9f5] font-bold'
-                      : 'border-transparent text-[#87867f] hover:text-[#141413]'
+                      ? 'border-aven-text text-aven-text bg-aven-base font-bold'
+                      : 'border-transparent text-aven-text-muted hover:text-aven-text'
                   }`}
                 >
                   <Lightbulb size={14} /> Hints ({challenge?.hints?.length || 0})
@@ -389,8 +389,8 @@ export default function IdeSidecar() {
                     onClick={() => setActiveTab('evaluation')}
                     className={`flex items-center gap-1.5 px-3 py-1.5 border-b-2 font-medium transition-colors ${
                       activeTab === 'evaluation'
-                        ? 'border-[#141413] text-[#141413] bg-[#faf9f5] font-bold'
-                        : 'border-transparent text-[#141413] hover:opacity-70 font-bold'
+                        ? 'border-aven-text text-aven-text bg-aven-base font-bold'
+                        : 'border-transparent text-aven-text hover:opacity-70 font-bold'
                     }`}
                   >
                     <Sparkles size={14} /> AI Review ({evaluation.score}/100)
@@ -399,47 +399,47 @@ export default function IdeSidecar() {
               </div>
 
               {/* Tab Content Area */}
-              <div className="flex-1 overflow-y-auto p-4 text-sm text-[#3d3d3a]">
+              <div className="flex-1 overflow-y-auto p-4 text-sm text-aven-text-subtle">
                 {isGenerating ? (
                   <div className="flex flex-col items-center justify-center h-full py-8 text-center space-y-3">
-                    <Loader2 className="animate-spin text-[#141413]" size={28} />
-                    <p className="text-sm text-[#3d3d3a] font-medium">Generating Claude AI coding challenge...</p>
-                    <p className="text-xs text-[#87867f] max-w-sm">
+                    <Loader2 className="animate-spin text-aven-text" size={28} />
+                    <p className="text-sm text-aven-text-subtle font-medium">Generating Claude AI coding challenge...</p>
+                    <p className="text-xs text-aven-text-muted max-w-sm">
                       Aligning problem parameters with {targetRole} requirements and your skill graph.
                     </p>
                   </div>
                 ) : challengeError ? (
-                  <div className="p-3 bg-[#e8e6dc] border border-[#141413] rounded-lg text-[#141413] font-bold text-xs">
+                  <div className="p-3 bg-aven-surface border border-aven-text rounded-lg text-aven-text font-bold text-xs">
                     {challengeError}
                   </div>
                 ) : activeTab === 'problem' ? (
                   <div className="space-y-4">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h2 className="text-base font-bold text-[#141413] tracking-tight">
+                        <h2 className="text-base font-bold text-aven-text tracking-tight">
                           {challenge?.title || activeIdeNodeId.replace(/_/g, ' ').toUpperCase()}
                         </h2>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="px-2 py-0.5 text-[11px] rounded font-medium bg-[#3d3d3a] text-[#faf9f5] border border-[#3d3d3a]">
+                          <span className="px-2 py-0.5 text-[11px] rounded font-medium bg-aven-text-subtle text-aven-base border border-aven-text-subtle">
                             {challenge?.skill || activeIdeNodeId}
                           </span>
-                          <span className="px-2 py-0.5 text-[11px] rounded font-medium bg-[#e8e6dc] text-[#141413] border border-[#d6d3c4]">
+                          <span className="px-2 py-0.5 text-[11px] rounded font-medium bg-aven-surface text-aven-text border border-aven-border">
                             {challenge?.difficulty || "Intermediate"}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="prose prose-sm max-w-none text-[#3d3d3a] leading-relaxed whitespace-pre-wrap">
+                    <div className="prose prose-sm max-w-none text-aven-text-subtle leading-relaxed whitespace-pre-wrap">
                       {challenge?.problem_statement || "Implement the solution to pass evaluation."}
                     </div>
 
                     {challenge?.constraints && challenge.constraints.length > 0 && (
                       <div className="pt-2 border-t border-[#27272a]">
-                        <h4 className="text-xs font-semibold text-[#141413] mb-1.5 flex items-center gap-1">
-                          <Cpu size={13} className="text-[#3d3d3a]" /> Constraints:
+                        <h4 className="text-xs font-semibold text-aven-text mb-1.5 flex items-center gap-1">
+                          <Cpu size={13} className="text-aven-text-subtle" /> Constraints:
                         </h4>
-                        <ul className="list-disc list-inside space-y-1 text-xs text-[#3d3d3a] font-mono">
+                        <ul className="list-disc list-inside space-y-1 text-xs text-aven-text-subtle font-mono">
                           {challenge.constraints.map((c, i) => (
                             <li key={i}>{c}</li>
                           ))}
@@ -449,79 +449,79 @@ export default function IdeSidecar() {
                   </div>
                 ) : activeTab === 'examples' ? (
                   <div className="space-y-3">
-                    <h3 className="text-xs font-semibold text-[#3d3d3a]">Input & Output Specifications</h3>
+                    <h3 className="text-xs font-semibold text-aven-text-subtle">Input & Output Specifications</h3>
                     {challenge?.examples && challenge.examples.length > 0 ? (
                       challenge.examples.map((ex, idx) => (
-                        <div key={idx} className="p-3 bg-[#e8e6dc] border border-[#d6d3c4] rounded-lg text-xs space-y-2">
-                          <div className="font-semibold text-[#141413] font-bold">Example {idx + 1}</div>
+                        <div key={idx} className="p-3 bg-aven-surface border border-aven-border rounded-lg text-xs space-y-2">
+                          <div className="font-semibold text-aven-text font-bold">Example {idx + 1}</div>
                           <div>
-                            <span className="text-[#87867f] font-mono">Input: </span>
-                            <span className="text-[#141413] font-mono bg-[#faf9f5] px-1.5 py-0.5 rounded">{ex.input}</span>
+                            <span className="text-aven-text-muted font-mono">Input: </span>
+                            <span className="text-aven-text font-mono bg-aven-base px-1.5 py-0.5 rounded">{ex.input}</span>
                           </div>
                           <div>
-                            <span className="text-[#87867f] font-mono">Output: </span>
-                            <span className="text-[#141413] font-bold font-mono bg-[#faf9f5] px-1.5 py-0.5 rounded">{ex.output}</span>
+                            <span className="text-aven-text-muted font-mono">Output: </span>
+                            <span className="text-aven-text font-bold font-mono bg-aven-base px-1.5 py-0.5 rounded">{ex.output}</span>
                           </div>
                           {ex.explanation && (
-                            <div className="text-[#3d3d3a] italic pt-1 border-t border-[#d6d3c4]">
+                            <div className="text-aven-text-subtle italic pt-1 border-t border-aven-border">
                               {ex.explanation}
                             </div>
                           )}
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-[#87867f]">No examples provided for this challenge.</p>
+                      <p className="text-xs text-aven-text-muted">No examples provided for this challenge.</p>
                     )}
                   </div>
                 ) : activeTab === 'hints' ? (
                   <div className="space-y-3">
-                    <h3 className="text-xs font-semibold text-[#3d3d3a] flex items-center gap-1.5">
-                      <Lightbulb size={14} className="text-[#141413]" /> Progressive Guidance
+                    <h3 className="text-xs font-semibold text-aven-text-subtle flex items-center gap-1.5">
+                      <Lightbulb size={14} className="text-aven-text" /> Progressive Guidance
                     </h3>
                     {challenge?.hints && challenge.hints.length > 0 ? (
                       challenge.hints.map((hint, idx) => (
-                        <div key={idx} className="border border-[#d6d3c4] rounded-lg bg-[#e8e6dc] overflow-hidden">
+                        <div key={idx} className="border border-aven-border rounded-lg bg-aven-surface overflow-hidden">
                           <button
                             onClick={() => {
                               const updated = [...showHints];
                               updated[idx] = !updated[idx];
                               setShowHints(updated);
                             }}
-                            className="w-full text-left px-3 py-2 text-xs font-medium text-[#3d3d3a] hover:bg-[#d6d3c4] flex justify-between items-center transition-colors"
+                            className="w-full text-left px-3 py-2 text-xs font-medium text-aven-text-subtle hover:bg-aven-border flex justify-between items-center transition-colors"
                           >
                             <span>Hint {idx + 1}</span>
-                            <span className="text-[#87867f] text-[10px]">{showHints[idx] ? 'Hide' : 'Reveal'}</span>
+                            <span className="text-aven-text-muted text-[10px]">{showHints[idx] ? 'Hide' : 'Reveal'}</span>
                           </button>
                           {showHints[idx] && (
-                            <div className="px-3 py-2 text-xs text-[#3d3d3a] bg-[#faf9f5] border-t border-[#d6d3c4] leading-relaxed">
+                            <div className="px-3 py-2 text-xs text-aven-text-subtle bg-aven-base border-t border-aven-border leading-relaxed">
                               {hint}
                             </div>
                           )}
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-[#87867f]">No hints available.</p>
+                      <p className="text-xs text-aven-text-muted">No hints available.</p>
                     )}
                   </div>
                 ) : activeTab === 'evaluation' ? (
                   <div className="space-y-4">
                     {isEvaluating ? (
                       <div className="py-10 text-center space-y-3">
-                        <Loader2 className="animate-spin text-[#141413] mx-auto" size={32} />
-                        <h4 className="text-sm font-bold text-[#141413] tracking-tight">Claude AI Evaluation in Progress</h4>
-                        <p className="text-xs text-[#3d3d3a] max-w-md mx-auto leading-relaxed">
+                        <Loader2 className="animate-spin text-aven-text mx-auto" size={32} />
+                        <h4 className="text-sm font-bold text-aven-text tracking-tight">Claude AI Evaluation in Progress</h4>
+                        <p className="text-xs text-aven-text-subtle max-w-md mx-auto leading-relaxed">
                           Performing static algorithmic inspection, time/space complexity derivation, edge-case coverage, and clean code scoring...
                         </p>
                       </div>
                     ) : evalError ? (
-                      <div className="p-3 bg-[#faf9f5] border-2 border-[#141413] rounded-lg text-[#141413] font-bold text-xs">
+                      <div className="p-3 bg-aven-base border-2 border-aven-text rounded-lg text-aven-text font-bold text-xs">
                         <div className="font-semibold mb-1">Evaluation Error</div>
                         {evalError}
                       </div>
                     ) : evaluation ? (
                       <div className="space-y-4 animate-in fade-in duration-200">
                         {/* Score Card Banner */}
-                        <div className="p-4 rounded-xl bg-[#e8e6dc] border border-[#d6d3c4] flex items-center justify-between">
+                        <div className="p-4 rounded-xl bg-aven-surface border border-aven-border flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             <div className={`w-14 h-14 rounded-full flex flex-col items-center justify-center border-2 font-bold ${getScoreColor(evaluation.score)}`}>
                               <span className="text-base leading-none">{evaluation.score}</span>
@@ -529,66 +529,66 @@ export default function IdeSidecar() {
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <h3 className="font-bold text-[#141413] text-base">Evaluation Verdict</h3>
+                                <h3 className="font-bold text-aven-text text-base">Evaluation Verdict</h3>
                                 {getVerdictBadge(evaluation.verdict)}
                               </div>
-                              <p className="text-xs text-[#3d3d3a] mt-0.5">{evaluation.summary}</p>
+                              <p className="text-xs text-aven-text-subtle mt-0.5">{evaluation.summary}</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Notice on Methodology */}
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-[#faf9f5] border border-[#d6d3c4] text-[11px] text-[#141413] font-bold">
-                          <Sparkles size={14} className="shrink-0 text-[#141413]" />
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-aven-base border border-aven-border text-[11px] text-aven-text font-bold">
+                          <Sparkles size={14} className="shrink-0 text-aven-text" />
                           <span>{evaluation.evaluation_note || "AI evaluation is based on static code analysis and algorithmic reasoning."}</span>
                         </div>
 
                         {/* Dimension Subscores */}
                         <div className="grid grid-cols-3 gap-2">
-                          <div className="p-2.5 rounded-lg bg-[#faf9f5] border border-[#d6d3c4] text-center">
-                            <div className="text-[10px] text-[#3d3d3a] uppercase font-medium">Correctness</div>
-                            <div className="text-base font-bold text-[#141413] mt-0.5">{evaluation.correctness_score}%</div>
+                          <div className="p-2.5 rounded-lg bg-aven-base border border-aven-border text-center">
+                            <div className="text-[10px] text-aven-text-subtle uppercase font-medium">Correctness</div>
+                            <div className="text-base font-bold text-aven-text mt-0.5">{evaluation.correctness_score}%</div>
                           </div>
-                          <div className="p-2.5 rounded-lg bg-[#faf9f5] border border-[#d6d3c4] text-center">
-                            <div className="text-[10px] text-[#3d3d3a] uppercase font-medium">Algorithm / Logic</div>
-                            <div className="text-base font-bold text-[#141413] mt-0.5">{evaluation.reasoning_score}%</div>
+                          <div className="p-2.5 rounded-lg bg-aven-base border border-aven-border text-center">
+                            <div className="text-[10px] text-aven-text-subtle uppercase font-medium">Algorithm / Logic</div>
+                            <div className="text-base font-bold text-aven-text mt-0.5">{evaluation.reasoning_score}%</div>
                           </div>
-                          <div className="p-2.5 rounded-lg bg-[#faf9f5] border border-[#d6d3c4] text-center">
-                            <div className="text-[10px] text-[#3d3d3a] uppercase font-medium">Code Quality</div>
-                            <div className="text-base font-bold text-[#141413] mt-0.5">{evaluation.code_quality_score}%</div>
+                          <div className="p-2.5 rounded-lg bg-aven-base border border-aven-border text-center">
+                            <div className="text-[10px] text-aven-text-subtle uppercase font-medium">Code Quality</div>
+                            <div className="text-base font-bold text-aven-text mt-0.5">{evaluation.code_quality_score}%</div>
                           </div>
                         </div>
 
                         {/* Complexity Cards */}
                         {evaluation.complexity_analysis && (
-                          <div className="p-3 bg-[#faf9f5] border border-[#d6d3c4] rounded-lg text-xs space-y-1.5">
+                          <div className="p-3 bg-aven-base border border-aven-border rounded-lg text-xs space-y-1.5">
                             <div className="flex items-center justify-between">
-                              <span className="font-semibold text-[#141413] flex items-center gap-1.5">
-                                <TrendingUp size={14} className="text-[#141413]" /> Complexity Analysis
+                              <span className="font-semibold text-aven-text flex items-center gap-1.5">
+                                <TrendingUp size={14} className="text-aven-text" /> Complexity Analysis
                               </span>
                               <div className="flex items-center gap-2 font-mono">
-                                <span className="bg-[#141413] text-[#faf9f5] font-bold px-2 py-0.5 rounded border border-[#141413] text-[10px]">
+                                <span className="bg-aven-text text-aven-base font-bold px-2 py-0.5 rounded border border-aven-text text-[10px]">
                                   Time: {evaluation.complexity_analysis.time_complexity}
                                 </span>
-                                <span className="bg-[#3d3d3a] text-[#faf9f5] font-bold px-2 py-0.5 rounded border border-[#3d3d3a] text-[10px]">
+                                <span className="bg-aven-text-subtle text-aven-base font-bold px-2 py-0.5 rounded border border-aven-text-subtle text-[10px]">
                                   Space: {evaluation.complexity_analysis.space_complexity}
                                 </span>
                               </div>
                             </div>
-                            <p className="text-[#3d3d3a] leading-relaxed">{evaluation.complexity_analysis.details}</p>
+                            <p className="text-aven-text-subtle leading-relaxed">{evaluation.complexity_analysis.details}</p>
                           </div>
                         )}
 
                         {/* Strengths */}
                         {evaluation.strengths && evaluation.strengths.length > 0 && (
                           <div className="space-y-1.5">
-                            <h4 className="text-xs font-semibold text-[#141413] flex items-center gap-1">
+                            <h4 className="text-xs font-semibold text-aven-text flex items-center gap-1">
                               <CheckCircle2 size={13} /> Strengths
                             </h4>
-                            <ul className="space-y-1 text-xs text-[#3d3d3a]">
+                            <ul className="space-y-1 text-xs text-aven-text-subtle">
                               {evaluation.strengths.map((s, i) => (
                                 <li key={i} className="flex items-start gap-1.5">
-                                  <span className="text-[#141413] font-bold">•</span>
+                                  <span className="text-aven-text font-bold">•</span>
                                   <span>{s}</span>
                                 </li>
                               ))}
@@ -599,13 +599,13 @@ export default function IdeSidecar() {
                         {/* Issues / Deficiencies */}
                         {evaluation.issues && evaluation.issues.length > 0 && (
                           <div className="space-y-1.5">
-                            <h4 className="text-xs font-semibold text-[#141413] flex items-center gap-1">
+                            <h4 className="text-xs font-semibold text-aven-text flex items-center gap-1">
                               <AlertTriangle size={13} /> Areas for Review
                             </h4>
-                            <ul className="space-y-1 text-xs text-[#3d3d3a]">
+                            <ul className="space-y-1 text-xs text-aven-text-subtle">
                               {evaluation.issues.map((issue, i) => (
                                 <li key={i} className="flex items-start gap-1.5">
-                                  <span className="text-[#141413] font-bold">•</span>
+                                  <span className="text-aven-text font-bold">•</span>
                                   <span>{issue}</span>
                                 </li>
                               ))}
@@ -616,13 +616,13 @@ export default function IdeSidecar() {
                         {/* Improvements */}
                         {evaluation.improvements && evaluation.improvements.length > 0 && (
                           <div className="space-y-1.5">
-                            <h4 className="text-xs font-semibold text-[#141413] flex items-center gap-1">
+                            <h4 className="text-xs font-semibold text-aven-text flex items-center gap-1">
                               <Lightbulb size={13} /> Actionable Recommendations
                             </h4>
-                            <ul className="space-y-1 text-xs text-[#3d3d3a]">
+                            <ul className="space-y-1 text-xs text-aven-text-subtle">
                               {evaluation.improvements.map((imp, i) => (
                                 <li key={i} className="flex items-start gap-1.5">
-                                  <span className="text-[#141413] font-bold">•</span>
+                                  <span className="text-aven-text font-bold">•</span>
                                   <span>{imp}</span>
                                 </li>
                               ))}
@@ -632,22 +632,22 @@ export default function IdeSidecar() {
 
                         {/* Detailed Instructor Feedback */}
                         {evaluation.detailed_feedback && (
-                          <div className="p-3 bg-[#e8e6dc] border border-[#141413] rounded-lg text-xs space-y-1">
-                            <span className="font-bold text-[#141413]">Instructor Commentary:</span>
-                            <p className="text-[#141413] font-medium leading-relaxed">{evaluation.detailed_feedback}</p>
+                          <div className="p-3 bg-aven-surface border border-aven-text rounded-lg text-xs space-y-1">
+                            <span className="font-bold text-aven-text">Instructor Commentary:</span>
+                            <p className="text-aven-text font-medium leading-relaxed">{evaluation.detailed_feedback}</p>
                           </div>
                         )}
 
                         {/* Next Steps */}
                         {evaluation.next_steps && evaluation.next_steps.length > 0 && (
                           <div className="space-y-1.5">
-                            <h4 className="text-xs font-semibold text-[#141413] font-bold flex items-center gap-1">
+                            <h4 className="text-xs font-semibold text-aven-text font-bold flex items-center gap-1">
                               <ArrowRight size={13} /> Next Learning Steps
                             </h4>
-                            <ul className="space-y-1 text-xs text-[#3d3d3a]">
+                            <ul className="space-y-1 text-xs text-aven-text-subtle">
                               {evaluation.next_steps.map((step, i) => (
                                 <li key={i} className="flex items-start gap-1.5">
-                                  <span className="text-[#141413]">→</span>
+                                  <span className="text-aven-text">→</span>
                                   <span>{step}</span>
                                 </li>
                               ))}
@@ -656,7 +656,7 @@ export default function IdeSidecar() {
                         )}
                       </div>
                     ) : (
-                      <p className="text-xs text-[#87867f]">Submit your code for Claude AI evaluation.</p>
+                      <p className="text-xs text-aven-text-muted">Submit your code for Claude AI evaluation.</p>
                     )}
                   </div>
                 ) : null}
@@ -664,8 +664,8 @@ export default function IdeSidecar() {
             </div>
           </Panel>
 
-          <PanelResizeHandle className="w-1 bg-[#d6d3c4] hover:bg-[#141413] transition-colors flex items-center justify-center cursor-col-resize">
-            <div className="h-10 w-1 bg-[#87867f] rounded-full" />
+          <PanelResizeHandle className="w-1 bg-aven-border hover:bg-aven-text transition-colors flex items-center justify-center cursor-col-resize">
+            <div className="h-10 w-1 bg-aven-text-muted rounded-full" />
           </PanelResizeHandle>
 
           {/* Right Panel: Monaco Code Editor + Terminal */}
@@ -673,12 +673,12 @@ export default function IdeSidecar() {
             <PanelGroup orientation="vertical">
               {/* Code Editor */}
               <Panel defaultSize={70} minSize={30}>
-                <div className="h-full w-full bg-[#faf9f5] flex flex-col">
-              <div className="flex items-center justify-between px-3 py-1.5 bg-[#e8e6dc] border-b border-[#d6d3c4] text-[11px] text-[#3d3d3a]">
-                <span className="font-mono font-bold text-[#141413]">solution.{language === 'python' ? 'py' : 'ts'}</span>
+                <div className="h-full w-full bg-aven-base flex flex-col">
+              <div className="flex items-center justify-between px-3 py-1.5 bg-aven-surface border-b border-aven-border text-[11px] text-aven-text-subtle">
+                <span className="font-mono font-bold text-aven-text">solution.{language === 'python' ? 'py' : 'ts'}</span>
                 <button
                   onClick={handleResetCode}
-                  className="flex items-center gap-1 hover:text-[#141413] transition-colors"
+                  className="flex items-center gap-1 hover:text-aven-text transition-colors"
                   title="Reset to starter boilerplate"
                 >
                   <RotateCcw size={12} /> Reset Template
@@ -704,22 +704,22 @@ export default function IdeSidecar() {
             </div>
           </Panel>
 
-          <PanelResizeHandle className="h-1 bg-[#d6d3c4] hover:bg-[#141413] transition-colors flex items-center justify-center cursor-row-resize">
-            <div className="w-10 h-1 bg-[#87867f] rounded-full" />
+          <PanelResizeHandle className="h-1 bg-aven-border hover:bg-aven-text transition-colors flex items-center justify-center cursor-row-resize">
+            <div className="w-10 h-1 bg-aven-text-muted rounded-full" />
           </PanelResizeHandle>
 
           {/* Bottom Panel: Local Terminal / Diagnostics Output */}
           <Panel defaultSize={20} minSize={10}>
-            <div className="h-full w-full bg-[#141413] flex flex-col font-mono">
-              <div className="flex items-center justify-between px-3 py-1.5 border-b border-[#d6d3c4] bg-[#e8e6dc] text-[11px]">
-                <span className="font-bold text-[#141413]">Terminal & Test Output</span>
+            <div className="h-full w-full bg-aven-text flex flex-col font-mono">
+              <div className="flex items-center justify-between px-3 py-1.5 border-b border-aven-border bg-aven-surface text-[11px]">
+                <span className="font-bold text-aven-text">Terminal & Test Output</span>
                 {isLocalPassed && (
-                  <span className="text-[#141413] text-[10px] flex items-center gap-1 font-sans font-bold">
+                  <span className="text-aven-text text-[10px] flex items-center gap-1 font-sans font-bold">
                     <CheckCircle2 size={12} /> Local Tests Passed
                   </span>
                 )}
               </div>
-              <div className="p-3 flex-1 overflow-y-auto text-xs whitespace-pre-wrap text-[#faf9f5] bg-[#141413]">
+              <div className="p-3 flex-1 overflow-y-auto text-xs whitespace-pre-wrap text-aven-base bg-aven-text">
                 {output || '> Ready. Press "Run Tests" to test locally or "Evaluate Solution" for Claude AI review.'}
               </div>
             </div>
@@ -730,11 +730,11 @@ export default function IdeSidecar() {
       </div>
 
       {/* Action Bar Footer */}
-      <div className="p-3 border-t border-[#d6d3c4] bg-[#e8e6dc] flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2 text-xs text-[#3d3d3a]">
+      <div className="p-3 border-t border-aven-border bg-aven-surface flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2 text-xs text-aven-text-subtle">
           {evaluation && (
-            <span className="flex items-center gap-1 text-[#3d3d3a]">
-              Score: <strong className="text-[#141413]">{evaluation.score}/100</strong>
+            <span className="flex items-center gap-1 text-aven-text-subtle">
+              Score: <strong className="text-aven-text">{evaluation.score}/100</strong>
             </span>
           )}
         </div>
@@ -743,7 +743,7 @@ export default function IdeSidecar() {
           <button
             onClick={handleRunLocal}
             disabled={isRunning || isEvaluating}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#faf9f5] hover:bg-[#d6d3c4] disabled:opacity-50 text-[#141413] border border-[#d6d3c4] rounded-lg text-xs font-bold transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-aven-base hover:bg-aven-border disabled:opacity-50 text-aven-text border border-aven-border rounded-lg text-xs font-bold transition-colors"
           >
             <Play size={14} /> {isRunning ? 'Running...' : 'Run Tests'}
           </button>
@@ -751,7 +751,7 @@ export default function IdeSidecar() {
           <button
             onClick={handleEvaluateSolution}
             disabled={isEvaluating || isRunning}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#3d3d3a] hover:opacity-90 disabled:opacity-50 text-[#faf9f5] rounded-lg text-xs font-bold transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-aven-text-subtle hover:opacity-90 disabled:opacity-50 text-aven-base rounded-lg text-xs font-bold transition-all active:scale-95"
           >
             <Sparkles size={14} className={isEvaluating ? "animate-spin" : ""} />
             {isEvaluating ? 'Evaluating with Claude...' : 'Evaluate Solution'}
@@ -760,7 +760,7 @@ export default function IdeSidecar() {
           <button
             onClick={handleCompleteMilestone}
             disabled={!(evaluation?.is_passing || isLocalPassed)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#141413] hover:opacity-90 disabled:opacity-50 disabled:bg-[#d6d3c4] disabled:text-[#87867f] text-[#faf9f5] rounded-lg text-xs font-bold transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-aven-text hover:opacity-90 disabled:opacity-50 disabled:bg-aven-border disabled:text-aven-text-muted text-aven-base rounded-lg text-xs font-bold transition-colors"
           >
             <CheckCircle size={14} /> Submit & Pass
           </button>
