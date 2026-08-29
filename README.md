@@ -24,7 +24,7 @@
 
 ---
 
-## 🌟 Executive Overview
+## Executive Overview
 
 **AVEN** is an end-to-end, enterprise-ready career engineering platform designed to eliminate the hallucination and generic advice inherent in traditional AI tutoring. 
 
@@ -36,7 +36,7 @@ Instead of treating Large Language Models as unconstrained planners, **AVEN** de
 
 ---
 
-## 🏛️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TB
@@ -88,7 +88,7 @@ flowchart TB
 
 ---
 
-## 🤔 Why We Built It This Way
+## Why We Built It This Way
 
 The core engineering philosophy behind AVEN is **Determinism over Hallucination**. 
 While Large Language Models (LLMs) are exceptional at semantic reasoning, they are inherently probabilistic and make poor state engines or curriculum planners. We decouple cognitive reasoning from strict domain logic.
@@ -110,7 +110,7 @@ While Large Language Models (LLMs) are exceptional at semantic reasoning, they a
 
 ---
 
-## 🗄️ Why These Data Stores?
+## Why These Data Stores?
 
 We utilize a **polyglot persistence** model to match data structures to their ideal access patterns.
 
@@ -128,7 +128,7 @@ We utilize a **polyglot persistence** model to match data structures to their id
 
 ---
 
-## 🧠 Why AI Is Used This Way
+## Why AI Is Used This Way
 
 AVEN strictly bounds AI capabilities using an internal AI Gateway. 
 
@@ -147,7 +147,7 @@ LLMs hallucinate non-existent prerequisites, forget dependencies, and cannot rel
 
 ---
 
-## 📈 Why Bayesian Knowledge Tracing (BKT)?
+## Why Bayesian Knowledge Tracing (BKT)?
 
 **The Problem**: Simple completion percentages (e.g., "You are 80% done with Python") are pedagogically useless. They do not account for lucky guesses or momentary slips, nor do they degrade over time without use.
 
@@ -158,7 +158,7 @@ LLMs hallucinate non-existent prerequisites, forget dependencies, and cannot rel
 
 ---
 
-## 🕸️ Why a Skill Graph?
+## Why a Skill Graph?
 
 Why not just use a flat list of courses like a traditional LMS?
 
@@ -168,7 +168,7 @@ Why not just use a flat list of courses like a traditional LMS?
 
 ---
 
-## 🔄 Core Data Flow: From ATS Scraping to BKT Update
+## Core Data Flow: From ATS Scraping to BKT Update
 
 The following diagram illustrates the complete, end-to-end data flow that makes AVEN a deterministic powerhouse.
 
@@ -200,7 +200,7 @@ sequenceDiagram
 
 ---
 
-## 🏗️ Architecture Hardening & Production Readiness
+## Architecture Hardening & Production Readiness
 
 To ensure a streamlined, highly maintainable, and reliable production deployment, we deliberately avoided over-engineering with unnecessary infrastructure components. The system is designed to scale horizontally using native asyncio concurrency.
 
@@ -217,9 +217,9 @@ To ensure a streamlined, highly maintainable, and reliable production deployment
 
 ---
 
-## 🚀 Core Features & Flagship Innovations
+## Core Features & Flagship Innovations
 
-### 1. 💼 Day-One Corporate Simulator
+### 1. Day-One Corporate Simulator
 * **Interactive 5-Column Kanban Board**: Manages real-world engineering sprints across `Backlog`, `To Do`, `Enterprise Implementation`, `PR In Review`, and `Done`.
 * **Stakeholder Chatbot with RAG Memory**: Multi-turn, ticket-aware conversational Slack chat simulating:
   * **Product Manager**: Clarifies business objectives, edge cases, scope, and user personas.
@@ -231,13 +231,13 @@ To ensure a streamlined, highly maintainable, and reliable production deployment
   * **Right Pane**: Interactive PR Code Review inspector showing Senior Dev feedback, blocker badges (`BLOCKER`, `SUGGESTION`, `LINT`), and one-click jump-to-line links.
 * **Automated Acceptance PR Evaluation**: Parses submitted code against deterministic acceptance criteria, rejecting non-compliant code with line-by-line feedback and updating learner BKT mastery upon approval.
 
-### 2. ⚔️ Dynamic Placement War Room & Sprint Planner
+### 2. Dynamic Placement War Room & Sprint Planner
 * **Zero Hardcoding**: Dynamically synthesizes real-world hiring profiles for **any** tech company or startup entered by the learner.
 * **Domain-Aware Curriculum Synthesis**: Automatically detects active career domains (e.g. *Backend Software Engineer*, *Full-Stack*, *AI/ML*, *DevOps*) from the database and matches the company's real-world tech stack with ground-truth Neo4j skill nodes.
 * **Balanced Sprint Generation**: Distributes target competencies evenly across the timeline (e.g. 6-week sprints) ensuring no weeks are left blank or without concrete challenge gates.
 * **Stress Index & Feasibility Engine**: Computes weekly study pace requirements, market demand pressure, and historical pass rates to calculate an overall preparation stress percentage.
 
-### 3. 📡 Market Demand Radar (Live ATS ETL Scraping Engine)
+### 3. Market Demand Radar (Live ATS ETL Scraping Engine)
 Asynchronous, multi-adapter data ingestion pipeline in `apps/api/app/scraper/`:
 
 | Source Adapter | Target Platform | Live Endpoint Integration |
@@ -252,7 +252,7 @@ Asynchronous, multi-adapter data ingestion pipeline in `apps/api/app/scraper/`:
 * **Deduplication Engine**: In-memory similarity deduplication to remove repeated cross-team job postings.
 * **Live Profile Match Scoring**: Computes the real-time match percentage between active job requirements and the student's verified BKT knowledge state.
 
-### 4. 🧑‍🏫 Mentor Connect & Learner 360° Knowledge Inspector
+### 4. Mentor Connect & Learner 360° Knowledge Inspector
 * **First-Come-First-Served (FCFS) Escalation Queue**: Learners stuck on difficult skills can request 1-on-1 sessions, complete with reason, skill ID, and requested duration.
 * **Algorithmic Mentor Triage Queue**: Sorts learners by breakthrough leverage:
   $$\text{Triage Score} = \text{Readiness} \times (1 + \text{Urgency}) \times \text{Proximity Bonus}$$
@@ -264,20 +264,20 @@ Asynchronous, multi-adapter data ingestion pipeline in `apps/api/app/scraper/`:
   * **Executive Coaching Brief**: AI + Graph synthesized summary diagnosing learning blockers, root-cause deficiencies, and 3 curated coaching talking points.
   * **Diagnostic Activity Log**: Full chronological timeline of Prove-It assessment scores, sandbox code submissions, and mock interview reports.
 
-### 5. 🎙️ AI Voice Mock Interviewer
+### 5. AI Voice Mock Interviewer
 * **Resume Parsing Engine**: Upload PDF/DOCX resumes with automated OCR text extraction and skill verification.
 * **Real-Time Speech Recognition**: Browser-native 16kHz audio stream processing with downsampling and live transcription.
 * **Multi-Turn Interview Phases**: Walks the candidate through *Technical Fundamentals*, *System Design*, *Coding Trade-Offs*, and *Behavioral Questions*.
 * **Comprehensive Evaluation Matrix**: Generates rubrics on Technical Knowledge, Communication Clarity, Resume Honesty, and detected skill gaps.
 
-### 6. 🛡️ Role-Based Access Control (RBAC) & Authentication
+### 6. Role-Based Access Control (RBAC) & Authentication
 * **Strict Role Routing**: Instant separation between `LEARNER`, `MENTOR`, and `ADMIN` personas.
 * **Diagnostic Exemption for Mentors & Admins**: Mentors and platform administrators automatically bypass cold-start diagnostics and are routed directly to operational control centers.
 * **IDOR Protection**: Session endpoints enforce cryptographic user ownership and mentor assignment verification on every state mutation.
 
 ---
 
-## 🧮 Mathematical & Algorithmic Formulations
+## Mathematical & Algorithmic Formulations
 
 ### 1. Bayesian Knowledge Tracing (BKT)
 For each skill node $k$ and interaction attempt $t$, the probability of mastery $P(L_t)$ is updated via standard Bayesian inference:
@@ -302,7 +302,7 @@ $$\text{ProximityBonus} = \begin{cases} 1.5 & \text{if } 0.80 \le \text{Readines
 
 ---
 
-## 📁 Monorepo Structure
+## Monorepo Structure
 
 ```text
 AVEN/
@@ -362,7 +362,7 @@ AVEN/
 
 ---
 
-## 🛠️ Local Installation & Development Setup
+## Local Installation & Development Setup
 
 ### 1. Prerequisites
 * **Node.js**: `v20.0.0` or higher
@@ -423,7 +423,7 @@ Open `http://localhost:3000` in your browser.
 
 ---
 
-## 🧪 Testing & Quality Assurance
+## Testing & Quality Assurance
 
 ### Run Backend Unit & Integration Tests
 ```bash
@@ -442,7 +442,7 @@ npm test
 
 
 
-## 👥 Roles & Access Permissions
+## Roles & Access Permissions
 
 | Role | Access URL | Capabilities |
 |---|---|---|
@@ -452,7 +452,7 @@ npm test
 
 ---
 
-## 📖 Deep Dive Documentation
+## Deep Dive Documentation
 For comprehensive architectural specifications and subsystem deep dives, explore our extensive documentation:
 - [System Architecture High-Level & Low-Level Design](docs/PROJECT_SYSTEM_ARCHITECTURE_HLD_LLD.md)
 - [Authentication and Authorization Flow](docs/features/authentication-flow.md)
@@ -463,5 +463,5 @@ For comprehensive architectural specifications and subsystem deep dives, explore
 
 ---
 
-## 📜 License
+## License
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
