@@ -206,6 +206,7 @@ export default function DayOneSimulatorPage() {
   // PR Review State
   const [prResult, setPrResult] = useState<Record<string, PRResult | null>>({});
   const [isSubmittingPr, setIsSubmittingPr] = useState<boolean>(false);
+  const [prLoadingPhase, setPrLoadingPhase] = useState<number>(0);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<any>(null);
@@ -324,9 +325,15 @@ export default function DayOneSimulatorPage() {
     if (!selectedTicket) return;
 
     setIsSubmittingPr(true);
+    setPrLoadingPhase(0);
     if (!isFullscreen) {
       setActiveTab('review');
     }
+
+    // Optimistic UI phase timer
+    const phaseInterval = setInterval(() => {
+      setPrLoadingPhase(prev => (prev < 3 ? prev + 1 : prev));
+    }, 1500);
 
     try {
       const res = await fetch(`http://localhost:8000/api/v1/simulator/ticket/${selectedTicket.id}/submit-pr`, {
@@ -367,7 +374,9 @@ export default function DayOneSimulatorPage() {
     } catch (err) {
       console.error('PR submission failed:', err);
     } finally {
+      clearInterval(phaseInterval);
       setIsSubmittingPr(false);
+      setPrLoadingPhase(0);
     }
   };
 
@@ -692,11 +701,26 @@ export default function DayOneSimulatorPage() {
                 {activeTab === 'review' && (
                   <div className="flex flex-col gap-4 text-xs">
                     {isSubmittingPr ? (
-                      <div className="flex flex-col items-center gap-3 py-16">
+                      <div className="flex flex-col items-center gap-4 py-16">
                         <RefreshCw className="animate-spin text-aven-text" size={32} />
-                        <p className="text-aven-text-subtle text-center font-medium">
-                          Running automated static analysis & invoking AI Senior Tech Lead review...
-                        </p>
+                        <div className="flex flex-col gap-2 items-center w-full max-w-xs">
+                          <p className={`text-sm font-medium transition-opacity duration-300 ${prLoadingPhase >= 0 ? 'text-aven-text' : 'text-aven-text-subtle/30'}`}>
+                            {prLoadingPhase >= 0 && <Check size={14} className="inline mr-2 text-aven-status-active"/>}
+                            Packaging code changes...
+                          </p>
+                          <p className={`text-sm font-medium transition-opacity duration-300 ${prLoadingPhase >= 1 ? 'text-aven-text' : 'text-aven-text-subtle/30'}`}>
+                            {prLoadingPhase >= 1 && <Check size={14} className="inline mr-2 text-aven-status-active"/>}
+                            Running automated static analysis...
+                          </p>
+                          <p className={`text-sm font-medium transition-opacity duration-300 ${prLoadingPhase >= 2 ? 'text-aven-text' : 'text-aven-text-subtle/30'}`}>
+                            {prLoadingPhase >= 2 && <Check size={14} className="inline mr-2 text-aven-status-active"/>}
+                            Invoking AI Senior Tech Lead review...
+                          </p>
+                          <p className={`text-sm font-medium transition-opacity duration-300 ${prLoadingPhase >= 3 ? 'text-aven-text' : 'text-aven-text-subtle/30'}`}>
+                            {prLoadingPhase >= 3 && <Check size={14} className="inline mr-2 text-aven-status-active"/>}
+                            Generating feedback and scoring...
+                          </p>
+                        </div>
                       </div>
                     ) : currentPR ? (
                       <div className="flex flex-col gap-4">

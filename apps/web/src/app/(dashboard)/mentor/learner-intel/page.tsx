@@ -364,7 +364,7 @@ function LearnerIntelContent() {
               <Loader2 className="animate-spin text-aven-primary mx-auto" size={36} />
               <h3 className="text-sm font-bold text-aven-text">Synthesizing Learner 360° Knowledge</h3>
               <p className="text-xs text-aven-text-subtle max-w-sm mx-auto">
-                Analyzing graph DAG nodes, Bayesian Knowledge Tracing scores, assessment attempts, and AI mock interview gaps...
+                Analyzing learning path milestones, skill mastery scores, assessment attempts, and AI mock interview gaps...
               </p>
             </div>
           ) : (
@@ -436,7 +436,7 @@ function LearnerIntelContent() {
                         ? learnerIntel.current_frontier_skill.replace('_', ' ').toUpperCase()
                         : 'Advancing Smoothly'}
                     </div>
-                    <div className="text-[10px] text-aven-text-muted mt-1">Current bottleneck in DAG</div>
+                    <div className="text-[10px] text-aven-text-muted mt-1">Current bottleneck in path</div>
                   </div>
 
                   <div className="p-3.5 bg-aven-surface/70 rounded-2xl border border-aven-border">
@@ -509,7 +509,7 @@ function LearnerIntelContent() {
                     <div className="flex items-center gap-2">
                       <Compass size={16} className="text-aven-primary shrink-0" />
                       <span>
-                        <strong>Neo4j Skill DAG Position:</strong> Visual state of every competency required for {learnerIntel.target_role}.
+                        <strong>Learning Path Position:</strong> Visual state of every competency required for {learnerIntel.target_role}.
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-[11px] font-bold">

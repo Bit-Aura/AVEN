@@ -4,7 +4,7 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 from fastapi import FastAPI, Depends, HTTPException, Body, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -254,6 +254,13 @@ class GoalInput(BaseModel):
     goal_text: str = Field(..., description="Stated goal, e.g. 'I want to become a backend engineer'")
     preferred_modality: str = Field(default="project", description="video, text, or project")
     weekly_hours: float = Field(default=10.0, description="Hours per week they can commit to learning")
+
+    @model_validator(mode="after")
+    def validate_contradictions(self) -> 'GoalInput':
+        text = self.goal_text.lower()
+        if ("beginner" in text or "novice" in text or "no experience" in text) and ("advanced" in text or "expert" in text or "senior" in text):
+            raise ValueError("Contradictory skill levels detected in goal description. Please clarify your actual experience level.")
+        return self
 
 class DiagnosticSubmitInput(BaseModel):
     session_id: int

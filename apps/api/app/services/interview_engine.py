@@ -38,8 +38,8 @@ from app.services.path_planner import update_bkt_score, generate_or_replan_path
 logger = logging.getLogger(__name__)
 
 MAX_INTERVIEW_TURNS = 8
-CANONICAL_SKILL_SIMILARITY_THRESHOLD = 0.35
-
+MAX_INTERVIEW_TURNS = 8
+# Dynamic similarity thresholds are now calculated at runtime based on the top-k distribution.
 
 # ---------------------------------------------------------------------------
 # Context Builder
@@ -425,10 +425,18 @@ async def finalize_interview_report(
         )
 
         best_match = None
-        for m in matched_skills:
-            if m.get("similarity", 0.0) >= CANONICAL_SKILL_SIMILARITY_THRESHOLD:
-                best_match = m
-                break
+        if matched_skills:
+            best_match = matched_skills[0]
+            
+            # Calculate dynamic threshold for canonical skill mapping
+            dynamic_threshold = 0.25
+            if len(matched_skills) > 1:
+                similarities = [m.get("similarity", 0.0) for m in matched_skills]
+                mean_sim = sum(similarities) / len(similarities)
+                dynamic_threshold = max(0.20, mean_sim + 0.05) # Need to be better than average
+                
+            if best_match.get("similarity", 0.0) < dynamic_threshold:
+                best_match = None
 
         if best_match:
             canonical_gaps.append({

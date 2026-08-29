@@ -800,7 +800,7 @@ function MentorConnectDashboardContent() {
             {isLoadingIntel || !learnerIntel ? (
               <div className="flex-1 flex flex-col items-center justify-center py-24 gap-3">
                 <Loader2 className="animate-spin text-indigo-500" size={36} />
-                <p className="text-xs text-aven-text-subtle">Querying ground-truth skill graph & BKT mastery state...</p>
+                <p className="text-xs text-aven-text-subtle">Querying learning path & skill milestones...</p>
               </div>
             ) : (
               <div className="flex-1 flex flex-col overflow-hidden">
@@ -905,7 +905,7 @@ function MentorConnectDashboardContent() {
                       <div className="flex items-center gap-2">
                         <Compass size={16} className="text-aven-primary shrink-0" />
                         <span>
-                          <strong>Ground-Truth Skill Graph:</strong> Evaluated using Bayesian Knowledge Tracing (BKT) probability of mastery $P(L)$.
+                          <strong>Learning Path:</strong> Evaluated using proven cognitive tracking algorithms.
                         </span>
                       </div>
                       <div className="flex items-center gap-3 text-[11px] font-bold">
