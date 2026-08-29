@@ -27,141 +27,16 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Auto-initialize database tables and seed demo profile if not present on startup.
+    Trigger auto-initialization in the background so the app boots instantly.
     """
-    try:
-        from app.core.db import engine, async_session
-        from app.models.base import Base
-        from sqlalchemy import text
-        
-        try:
-            async with engine.connect() as conn:
-                await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-                await conn.commit()
-        except Exception:
-            pass
-            
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-            try:
-                await conn.execute(text("ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)"))
-            except Exception:
-                pass
-            try:
-                await conn.execute(text("ALTER TABLE learner_profiles ADD COLUMN last_known_weekly_hours FLOAT DEFAULT 10.0"))
-            except Exception:
-                pass
-            try:
-                await conn.execute(text("ALTER TABLE hackathon_events ADD COLUMN city VARCHAR(255)"))
-            except Exception:
-                pass
-            try:
-                await conn.execute(text("ALTER TABLE hackathon_events ADD COLUMN state VARCHAR(255)"))
-            except Exception:
-                pass
-            try:
-                await conn.execute(text("ALTER TABLE hackathon_events ADD COLUMN country VARCHAR(255)"))
-            except Exception:
-                pass
-        
-        async with async_session() as session:
-            # 1. Seed Default Admin (admin@aven.com / Aven@123) -> ADMIN
-            from app.core.auth import ensure_default_admin, hash_password
-            await ensure_default_admin(session)
-
-            # 2. Seed Demo Learner (demo@pathfinder.dev / Aven@123) -> LEARNER
-            stmt = select(User).where(User.email == "demo@pathfinder.dev")
-            user = (await session.execute(stmt)).scalars().first()
-            if not user:
-                user = User(
-                    clerk_id="clerk_demo_user",
-                    email="demo@pathfinder.dev",
-                    password_hash=hash_password("Aven@123"),
-                    name="Demo Learner",
-                    role="LEARNER",
-                    is_active=True,
-                )
-                session.add(user)
-                await session.flush()
-                profile = LearnerProfile(user_id=user.id, current_context="Backend Software Engineer")
-                session.add(profile)
-                await session.flush()
-                
-                # Seed initial baseline readiness snapshots for demo
-                for skill in ["python_basics", "sql_basics", "git_foundations", "http_methods"]:
-                    session.add(ReadinessSnapshot(profile_id=profile.id, skill_id=skill, readiness_score=0.85))
-            else:
-                user.role = "LEARNER"
-                if not user.password_hash:
-                    user.password_hash = hash_password("Aven@123")
-                
-            # 3. Seed Platform Admin User (admin@pathfinder.dev) -> ADMIN
-            stmt_admin = select(User).where(User.email == "admin@pathfinder.dev")
-            admin_user = (await session.execute(stmt_admin)).scalars().first()
-            if not admin_user:
-                admin_user = User(
-                    clerk_id="clerk_admin_user",
-                    email="admin@pathfinder.dev",
-                    password_hash=hash_password("Aven@123"),
-                    name="Platform Administrator",
-                    role="ADMIN",
-                    is_active=True,
-                )
-                session.add(admin_user)
-                await session.flush()
-                session.add(LearnerProfile(user_id=admin_user.id, current_context="Platform Administrator"))
-
-            # 4. Auto-seed initial hackathon events across all 10 sources if database is low/empty
-            from app.models.domain import HackathonEvent
-            from app.scraper.event_pipeline import EventScrapingPipeline
-            from sqlalchemy import func
-            event_count = (await session.execute(select(func.count(HackathonEvent.id)))).scalar_one()
-            if event_count < 50:
-                logger.info("[Startup] Seeding initial hackathon events feed across all 10 developer platforms...")
-                pipeline = EventScrapingPipeline()
-                for source_key in pipeline.sources.keys():
-                    try:
-                        await pipeline.scrape_source(source_key, "all", db=session)
-                    except Exception as scrape_err:
-                        logger.warning(f"[Startup] Hackathon scrape for '{source_key}' encountered notice: {scrape_err}")
-            
-            if admin_user:
-                admin_user.role = "ADMIN"
-                if not admin_user.password_hash:
-                    admin_user.password_hash = hash_password("Aven@123")
-                
-            # 4. Seed Approved Mentor User (mentor@pathfinder.dev / Aven@123) -> MENTOR
-            stmt_mentor = select(User).where(User.email == "mentor@pathfinder.dev")
-            mentor_user = (await session.execute(stmt_mentor)).scalars().first()
-            if not mentor_user:
-                mentor_user = User(
-                    clerk_id="clerk_mentor_user",
-                    email="mentor@pathfinder.dev",
-                    password_hash=hash_password("Aven@123"),
-                    name="Lead Mentor",
-                    role="MENTOR",
-                    is_active=True,
-                )
-                session.add(mentor_user)
-                await session.flush()
-                session.add(LearnerProfile(user_id=mentor_user.id, current_context="Senior Systems Engineer"))
-            else:
-                mentor_user.role = "MENTOR"
-                if not mentor_user.password_hash:
-                    mentor_user.password_hash = hash_password("Aven@123")
-                
-            await session.commit()
-
-            # 5. Seed Neo4j & Postgres skills topology via seed_all
-            try:
-                from app.services.seeder import seed_all
-                await seed_all(session, neo4j_client)
-            except Exception as seed_err:
-                logger.warning(f"[Startup] Skill seeding encountered warning: {seed_err}")
-
-            logger.info("[Startup] Successfully initialized database tables and seeded canonical demo roles (LEARNER, MENTOR, ADMIN).")
-    except Exception as e:
-        logger.warning(f"[Startup] Database table initialization warning: {e}")
+    from app.core.db import engine, async_session
+    from app.services.startup_seeder import run_startup_seeding
+    import asyncio
+    
+    # Fire and forget the heavy database seeding/scraping
+    asyncio.create_task(run_startup_seeding(engine, async_session, neo4j_client))
+    
+    logger.info("[Startup] Offloaded heavy database seeding to background task.")
     yield
 
 app = FastAPI(
@@ -169,6 +44,43 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     lifespan=lifespan
 )
+
+import time
+from fastapi import Request
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class LoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        logger.info(f"Method: {request.method} Path: {request.url.path} Status: {response.status_code} Time: {process_time:.4f}s")
+        return response
+
+app.add_middleware(LoggingMiddleware)
+
+# Simple In-Memory Rate Limiting for AI endpoints
+# Note: For a production system with multiple workers, Redis + slowapi would be used.
+# Since we explicitly decided against Redis for this scale, this in-memory approach suffices.
+_RATE_LIMIT_CACHE = {}
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.url.path.startswith("/api/v1/goal") or request.url.path.startswith("/api/v1/coach/chat"):
+            client_ip = request.client.host if request.client else "unknown"
+            now = time.time()
+            # Allow 10 requests per minute per IP for expensive endpoints
+            requests = _RATE_LIMIT_CACHE.get(client_ip, [])
+            requests = [t for t in requests if now - t < 60]
+            if len(requests) >= 10:
+                from fastapi.responses import JSONResponse
+                return JSONResponse(status_code=429, content={"detail": "Too many requests"})
+            requests.append(now)
+            _RATE_LIMIT_CACHE[client_ip] = requests
+            
+        return await call_next(request)
+
+app.add_middleware(RateLimitMiddleware)
 
 # Enable CORS for frontend connections
 app.add_middleware(
@@ -246,6 +158,26 @@ app.include_router(legacy_admin_router)
 
 # Instantiate AI Provider via factory (Antigravity Proxy > Anthropic > Mock)
 ai_provider = create_ai_provider()
+
+# Global Exception Handler
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    logger.warning(f"HTTP Error: {exc.status_code} - {exc.detail} on {request.url.path}")
+    return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    logger.error(f"Validation Error: {exc} on {request.url.path}")
+    return JSONResponse({"detail": "Invalid request payload", "errors": exc.errors()}, status_code=422)
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled Exception: {exc} on {request.url.path}", exc_info=True)
+    return JSONResponse({"detail": "Internal Server Error"}, status_code=500)
 
 # --- Pydantic Schemas for API Requests/Responses ---
 

@@ -80,11 +80,91 @@ flowchart TB
     Router_Mentor --> Jitsi
 ```
 
-Or in text form:
-1. The Next.js 15 Client Layer serves distinct, role-based workspaces for Learners and Mentors.
-2. The FastAPI Backend Engine handles high-performance, asynchronous routing for placement, simulation, and ATS scraping.
-3. The Data Layer separates concerns: Neo4j manages the topological skill DAGs, while Postgres+pgvector handles BKT state and user telemetry.
-4. The Backend Engine integrates with external AI gateways, live ATS endpoints, and Jitsi WebRTC servers to execute complex domain workflows securely.
+### Architecture — Text Form
+1. The **Next.js 15 Client Layer** serves distinct, role-based workspaces for Learners and Mentors.
+2. The **FastAPI Backend Engine** handles high-performance, asynchronous routing for placement, simulation, and ATS scraping.
+3. The **Data Layer** separates concerns: Neo4j manages the topological skill DAGs, while Postgres+pgvector handles BKT state and user telemetry.
+4. The **External Services** integrate with external AI gateways for inference, live ATS endpoints for market data, and Jitsi WebRTC servers to execute complex domain workflows securely.
+
+---
+
+## 🤔 Why We Built It This Way
+
+The core engineering philosophy behind AVEN is **Determinism over Hallucination**. 
+While Large Language Models (LLMs) are exceptional at semantic reasoning, they are inherently probabilistic and make poor state engines or curriculum planners. We decouple cognitive reasoning from strict domain logic.
+
+* **Deterministic logic where correctness matters**: Skill prerequisites, mastery calculations, and curriculum validation are strictly managed by traditional algorithms and graph traversals.
+* **AI where semantic reasoning is valuable**: Parsing unstructured ATS job postings, simulating conversational roleplay in mock interviews, and performing static code reasoning are handled by the AI Gateway.
+* **Evidence-driven personalization**: Instead of guessing what a learner needs, the system synthesizes dynamic learning sprints based on *real-world* job postings intersecting with mathematically tracked learner mastery.
+
+### Technology Decision Matrix
+
+| Decision | Chosen Technology | Why We Chose It | Why Not the Alternatives | Trade-off |
+|---|---|---|---|---|
+| **Frontend** | **Next.js 15 (App Router)** | Server-side rendering (SSR) enables fast initial loads for complex dashboard metrics, while React Flow natively supports complex interactive graph visualizations. | Pure React SPA (slower initial load, poorer SEO). Vue/Angular (team expertise and React Flow ecosystem). | Slightly higher hosting complexity (requires Node server vs static CDN). |
+| **Backend** | **FastAPI (Python)** | Native `asyncio` handles thousands of concurrent long-polling connections (ATS scrapers, IDE WebSocket simulation) with exceptional performance. Python is the lingua franca for data science and AI integration. | Express.js (weaker typing, harder ML integration). Django (too monolithic, synchronous by default). | Requires strict asynchronous discipline; blocking calls will stall the event loop. |
+| **Primary DB** | **PostgreSQL 16 + pgvector** | Transactional guarantees for user profiles, BKT state, and application telemetry. `pgvector` enables native similarity search for resumes and job descriptions without needing a separate vector DB. | MongoDB (lacks strong transactional guarantees and relational integrity for BKT state updates). | Schema migrations required for relational models vs flexible NoSQL. |
+| **Graph DB** | **Neo4j 5.20** | Our core learning engine requires repeated traversal of prerequisite relationships. Neo4j makes calculating topological sorts and bottleneck detection a native, first-class operation. | PostgreSQL Recursive CTEs (computationally expensive at scale and harder to model complex semantic relationships). | Introduces operational complexity by requiring a second database to maintain in sync. |
+| **AI Gateway** | **Custom Gateway Pattern** | Standardizes inputs/outputs and enforces strict JSON schemas across multiple providers (Anthropic, DeepSeek, local Ollama). Isolates vendor lock-in. | Direct provider SDK calls in UI or scattered across services (brittle, unmaintainable). | Requires building and maintaining internal proxy logic and caching. |
+| **LLM Model** | **Claude / DeepSeek** | Excellent at structured JSON extraction, context adherence, and zero-shot code reasoning without hallucinating outside provided rubrics. | Basic GPT-3.5 (too high hallucination rate for strict parsing). | Latency and API cost dependencies for cloud models. |
+
+---
+
+## 🗄️ Why These Data Stores?
+
+We utilize a **polyglot persistence** model to match data structures to their ideal access patterns.
+
+### PostgreSQL (The Transactional State Store)
+* **What it stores**: User profiles, Bayesian Knowledge Tracing (BKT) states, historical assessment attempts, and ingested ATS job targets.
+* **Why this store?**: Learner progress requires strict ACID compliance. When a learner passes a test, we need absolute certainty that their BKT probability $P(L_t)$ is updated atomically.
+* **Why not Neo4j for this?**: Graph databases are inefficient for high-frequency, wide-column transactional updates and aggregations (e.g. counting total passed tests across thousands of users).
+
+### Neo4j (The Deterministic Graph Store)
+* **What it stores**: The immutable domain map. Skill nodes (e.g., "Python Loops", "FastAPI Middleware"), prerequisite edges, and competency clusters.
+* **Why this store?**: When a learner fails an advanced concept, the engine must traverse backwards to find the root-cause deficiency. Representing this as native graph edges avoids complex, deeply nested SQL joins.
+* **Why not PostgreSQL for this?**: While PostgreSQL *can* use recursive CTEs to traverse hierarchies, traversing deep, multi-parent DAGs scales poorly and is conceptually misaligned with a relational schema.
+
+**The Trade-off**: Maintaining two databases introduces data synchronization overhead. We mitigate this by keeping Neo4j relatively static (the map) and PostgreSQL highly dynamic (the player's position on the map).
+
+---
+
+## 🧠 Why AI Is Used This Way
+
+AVEN strictly bounds AI capabilities using an internal AI Gateway. 
+
+**AI is appropriate for:**
+* **Semantic Interpretation**: Extracting structured constraints from natural language ("I want to be a backend dev in 3 months").
+* **Code Reasoning**: Performing static semantic analysis on submitted PRs based on a strict `DecisionTrace` rubric.
+* **Conversational Coaching**: Simulating PM or Client personas in the Day-One simulator.
+
+**Deterministic Logic is appropriate for:**
+* **BKT Mastery Updates**: The AI does not decide if a student "leveled up". The math does.
+* **Path Generation**: The AI does not generate a course list. Neo4j calculates the topological path based on ATS gaps.
+* **API Validation**: Pydantic models strictly validate and coerce every AI JSON output.
+
+**Why not let the LLM generate the entire path?**
+LLMs hallucinate non-existent prerequisites, forget dependencies, and cannot reliably maintain global state over long horizons. By forcing the LLM to output only JSON choices that map to deterministic graph nodes, we achieve 100% reliability.
+
+---
+
+## 📈 Why Bayesian Knowledge Tracing (BKT)?
+
+**The Problem**: Simple completion percentages (e.g., "You are 80% done with Python") are pedagogically useless. They do not account for lucky guesses or momentary slips, nor do they degrade over time without use.
+
+**The Solution**: We implemented standard Bayesian Knowledge Tracing (BKT) to model mastery as a hidden probabilistic state. 
+* It explicitly accounts for $P(Guess)$ and $P(Slip)$.
+* If a learner solves a hard problem but fails an easy prerequisite, BKT mathematically degrades the prerequisite's probability, triggering the Neo4j engine to dynamically route them back for remedial review.
+* **Limitations**: BKT assumes a relatively static probability of transition $P(T)$ per skill, which may not capture complex multi-skill transfer learning perfectly, but it is vastly superior to binary pass/fail tracking for our prototype.
+
+---
+
+## 🕸️ Why a Skill Graph?
+
+Why not just use a flat list of courses like a traditional LMS?
+
+1. **Root-Cause Analysis**: If a student fails a "FastAPI Middleware" assessment, the system walks the graph backward to "Python Decorators" and "HTTP Protocols" to find the true gap.
+2. **Adaptive Replanning**: Flat courses force linear progression. A DAG allows the Planner to dynamically bypass nodes the learner already knows and re-route around specific weak points based on realtime BKT probabilities.
+3. **Domain Intersections**: A skill like "SQL Joins" belongs to both "Backend Engineering" and "Data Analytics". A graph inherently models these intersections without duplication.
 
 ---
 
@@ -112,11 +192,28 @@ sequenceDiagram
     BKT->>DB: Update Mastery Probability P(Lt)
 ```
 
-Or in text form:
-1. The Multi-Source ETL Pipeline continuously polls Live ATS Endpoints for real-world job requirements.
+### Core Data Flow — Text Form
+1. The **Multi-Source ETL Pipeline** continuously polls Live ATS Endpoints for real-world job requirements.
 2. The pipeline normalizes, deduplicates, and persists these target competencies into the database.
-3. The Placement War Room fetches the learner's current BKT profile and compares it against these ATS targets to synthesize a specialized sprint.
-4. The Day-One Simulator generates a ticket, accepts learner PR submissions, and sends results to the BKT Engine, which subsequently updates the learner's true mastery state in the database.
+3. The **Placement War Room** fetches the learner's current BKT profile and compares it against these ATS targets to synthesize a specialized sprint.
+4. The **Day-One Simulator** generates a ticket, accepts learner PR submissions, and sends results to the BKT Engine, which subsequently updates the learner's true mastery state in the database.
+
+---
+
+## 🏗️ Architecture Hardening & Production Readiness
+
+To ensure a streamlined, highly maintainable, and reliable production deployment, we deliberately avoided over-engineering with unnecessary infrastructure components. The system is designed to scale horizontally using native asyncio concurrency.
+
+### Deliberate Non-Decisions
+* **Why not Redis or Celery?**: We replaced heavyweight task queues and external caches with native Python `asyncio.create_task` and localized TTL caching (e.g., in our LLM adapters). For background tasks like our initial data seeder and ATS scraper, they run as long-lived async tasks bound to the FastAPI event loop. 
+* **Why not Kafka or RabbitMQ?**: A message broker or event streaming platform is not required because our data ingestion (ATS scraping) is batch-oriented and doesn't require distributed pub/sub semantics. The scale of job postings easily fits within simple PostgreSQL inserts and asynchronous HTTP polling.
+* **Why not Microservices?**: A modular monolith approach minimizes deployment complexity and network latency while allowing us to cleanly separate concerns via FastAPI routers.
+
+### Implemented Safeguards
+* **In-Memory Rate Limiting**: AI endpoints are protected by a lightweight, in-memory rate-limiter middleware (10 requests/min per IP) to prevent expensive LLM abuse. While a multi-node deployment would typically require Redis, our single-instance deployment model operates efficiently with an in-memory cache, reducing operational complexity.
+* **Global Exception Handling**: Custom FastAPI exception handlers capture all `StarletteHTTPException`, `RequestValidationError`, and generic `Exception` events to log errors cleanly and return uniform JSON, preventing stack trace leaks.
+* **Database Pooling Strategy**: We leverage SQLAlchemy's robust connection pooling (`pool_size=20`, `max_overflow=10`, `pool_timeout=30.0`) to handle concurrent database spikes smoothly, avoiding connection exhaustion during heavy load bursts.
+* **Exponential Backoff**: The AI Gateway (`gateway.py`) and the Neo4j client implement strict retry loops with exponential backoff (`await asyncio.sleep(2 ** attempt)`) to transparently handle upstream API rate limits, transient network failures, and container startup ordering issues.
 
 ---
 
@@ -343,30 +440,7 @@ npm test
 
 ---
 
-## 🔮 Future Roadmap: Scaling to the Next Evolution
 
-Our roadmap reflects an ambitious, well-reasoned technical vision to elevate AVEN from a singular learning platform into a globally distributed, decentralized career operating system. This evolution targets immense scalability, hyper-personalized local execution, and expansive enterprise integrations.
-
-```mermaid
-timeline
-    title AVEN Technical Evolution Phases
-    Phase 1 : Advanced Peer-to-Peer Cohorts : Distributed matching engines
-            : Real-time IDE collaboration
-    Phase 2 : Edge AI & Offline Autonomy : Local LLM execution via WebGPU
-            : Disconnected BKT processing
-    Phase 3 : Enterprise SSO & Talent CRM : Multi-tenant ATS pushing
-            : Secure HR compliance suites
-    Phase 4 : Graph Federation : Global skill validation chains
-            : Cross-organization credentialing
-```
-
-Or in text form:
-1. **Phase 1: Advanced Peer-to-Peer Cohorts**: Introducing distributed matching engines and real-time multiplayer IDE collaboration for synchronous learning.
-2. **Phase 2: Edge AI & Offline Autonomy**: Deploying local LLM execution capabilities via WebGPU and completely disconnected BKT processing for zero-latency operations.
-3. **Phase 3: Enterprise SSO & Talent CRM**: Launching multi-tenant ATS integrations for automated candidate pushing and highly secure HR compliance suites.
-4. **Phase 4: Graph Federation**: Establishing global, immutable skill validation chains and standardized cross-organization credentialing.
-
----
 
 ## 👥 Roles & Access Permissions
 

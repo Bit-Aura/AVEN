@@ -16,7 +16,7 @@ from app.infrastructure.ai.gateway import AIProvider
 from app.services.graph_engine import build_skill_subgraph, get_topological_sort
 from app.services.ranker import rank_resources_for_skill
 from app.services.explainer import explain_recommendation
-from app.services.bkt_engine import get_skill_bkt_params, update_bkt_score, check_skill_decay
+from app.services.bkt_engine import get_skill_bkt_params, update_bkt_score, check_skill_decay, DEFAULT_BKT_PRIOR
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +147,19 @@ async def generate_or_replan_path(
             sname = id_to_name.get(sid, sid.replace("_", " ").title())
             target_skills.append({"name": sname})
     else:
-        target_skills = [{"name": "System Design & Scale"}]
+        logger.info(f"Target role '{target_goal}' not found in clusters. Using AI to extract fallback core skills.")
+        try:
+            # Dynamically extract core skills from the target goal via the AI Gateway
+            parsed_intent = await ai_provider.parse_goal(target_goal)
+            if "current_skills" in parsed_intent and parsed_intent["current_skills"]:
+                for s in parsed_intent["current_skills"][:5]: # Take top 5 inferred foundational skills
+                    target_skills.append({"name": s.title()})
+            
+            if not target_skills:
+                target_skills = [{"name": "System Design & Scale"}, {"name": "Algorithms"}]
+        except Exception as fallback_e:
+            logger.error(f"AI Fallback for target_skills failed: {fallback_e}")
+            target_skills = [{"name": "System Design & Scale"}, {"name": "Algorithms"}]
     
     # 3. Retrieve readiness snapshots (mastered skills are those with score >= 0.70)
     readiness_stmt = select(ReadinessSnapshot).where(ReadinessSnapshot.profile_id == profile_id)
@@ -164,7 +176,7 @@ async def generate_or_replan_path(
             snapshots[k.lower()] = max(snapshots.get(k.lower(), 0.0), score)
     
     # 4. Build subgraph from Neo4j using target skills
-    G = build_skill_subgraph(target_skills, ai_provider, neo4j_client)
+    G = await build_skill_subgraph(target_skills, ai_provider, neo4j_client)
     
     # 5. Extract topological sort order
     all_ordered_skills = get_topological_sort(G)

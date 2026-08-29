@@ -482,6 +482,7 @@ class OllamaAdapter(AIProvider):
     """
     def __init__(self, base_url: Optional[str] = None, model: Optional[str] = None) -> None:
         from openai import AsyncOpenAI
+        import time
         raw_url = (base_url or settings.OLLAMA_BASE_URL).rstrip("/")
         self.base_url = raw_url if raw_url.endswith("/v1") else f"{raw_url}/v1"
         self.model = model or settings.OLLAMA_MODEL
@@ -489,21 +490,49 @@ class OllamaAdapter(AIProvider):
             api_key="ollama",
             base_url=self.base_url
         )
+        self._cache: Dict[str, tuple[float, str]] = {}
+        self._cache_ttl = 3600  # 1 hour cache
         logger.info(f"[AI Gateway] OllamaAdapter initialized → {self.base_url} (model: {self.model})")
 
     async def _chat(self, system: str, user_prompt: str, max_tokens: int = 1000) -> str:
         """
-        Internal helper: sends a chat completion request to the Ollama server.
+        Internal helper: sends a chat completion request to the Ollama server, utilizing in-memory TTL cache.
         """
-        response = await self.client.chat.completions.create(
-            model=self.model,
-            max_tokens=max_tokens,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user_prompt},
-            ]
-        )
-        return response.choices[0].message.content.strip()
+        import hashlib
+        import time
+        
+        cache_key = hashlib.sha256(f"{self.model}:{system}:{user_prompt}".encode()).hexdigest()
+        now = time.time()
+        
+        if cache_key in self._cache:
+            timestamp, cached_resp = self._cache[cache_key]
+            if now - timestamp < self._cache_ttl:
+                logger.debug("[AI Gateway] Cache hit for LLM query")
+                return cached_resp
+            else:
+                del self._cache[cache_key]
+
+        for attempt in range(4):
+            try:
+                response = await self.client.chat.completions.create(
+                    model=self.model,
+                    max_tokens=max_tokens,
+                    messages=[
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": user_prompt},
+                    ]
+                )
+                break
+            except Exception as e:
+                logger.warning(f"[AI Gateway] Ollama attempt {attempt+1} failed: {e}")
+                if attempt == 3:
+                    raise
+                import asyncio
+                await asyncio.sleep(2 ** attempt)
+        
+        result_text = response.choices[0].message.content.strip()
+        self._cache[cache_key] = (now, result_text)
+        return result_text
 
     @staticmethod
     def _strip_code_fence(text: str) -> str:
@@ -1035,15 +1064,23 @@ class AntigravityProxyAdapter(AIProvider):
         """
         Internal helper: sends a chat completion request to the Antigravity Proxy.
         """
-        response = await self.client.chat.completions.create(
-            model=self.model,
-            max_tokens=max_tokens,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user_prompt},
-            ]
-        )
-        return response.choices[0].message.content.strip()
+        import asyncio
+        for attempt in range(4):
+            try:
+                response = await self.client.chat.completions.create(
+                    model=self.model,
+                    max_tokens=max_tokens,
+                    messages=[
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": user_prompt},
+                    ]
+                )
+                return response.choices[0].message.content.strip()
+            except Exception as e:
+                logger.warning(f"[AI Gateway] Antigravity Proxy attempt {attempt+1} failed: {e}")
+                if attempt == 3:
+                    raise
+                await asyncio.sleep(2 ** attempt)
 
     @staticmethod
     def _strip_code_fence(text: str) -> str:

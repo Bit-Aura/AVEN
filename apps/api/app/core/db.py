@@ -9,7 +9,15 @@ if db_url.startswith("postgresql://"):
     db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
 connect_args = {"timeout": 30} if "sqlite" in db_url else {}
-engine = create_async_engine(db_url, future=True, pool_pre_ping=True, connect_args=connect_args)
+engine = create_async_engine(
+    db_url,
+    future=True,
+    pool_pre_ping=True,
+    pool_size=20,
+    max_overflow=10,
+    pool_timeout=30.0,
+    connect_args=connect_args
+)
 
 # Register now() custom SQL function for SQLite connections
 @event.listens_for(engine.sync_engine, "connect")

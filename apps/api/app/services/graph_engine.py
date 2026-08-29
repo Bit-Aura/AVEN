@@ -9,7 +9,7 @@ from app.infrastructure.neo4j.client import Neo4jClient
 
 logger = logging.getLogger(__name__)
 
-def build_skill_subgraph(
+async def build_skill_subgraph(
     skills: List[Dict[str, Any]],
     ai_provider: AIProvider,
     neo4j_client: Neo4jClient
@@ -31,9 +31,9 @@ def build_skill_subgraph(
     query_nodes = "MATCH (s:Skill) RETURN s.id AS id, s.name AS name, s.description AS description"
     node_map = {}
     try:
-        with neo4j_client.driver.session() as session:
-            result = session.run(query_nodes)
-            for record in result:
+        async with neo4j_client.driver.session() as session:
+            result = await session.run(query_nodes)
+            async for record in result:
                 name = record["name"]
                 node_map[name] = {
                     "id": record["id"],
@@ -47,9 +47,9 @@ def build_skill_subgraph(
     # 2. Fetch all prerequisite relationships to build edges (pre -> target)
     query_edges = "MATCH (pre:Skill)-[:PREREQUISITE_OF]->(s:Skill) RETURN pre.name AS pre_name, s.name AS skill_name"
     try:
-        with neo4j_client.driver.session() as session:
-            result = session.run(query_edges)
-            for record in result:
+        async with neo4j_client.driver.session() as session:
+            result = await session.run(query_edges)
+            async for record in result:
                 pre_name = record["pre_name"]
                 skill_name = record["skill_name"]
                 if pre_name in G and skill_name in G:
