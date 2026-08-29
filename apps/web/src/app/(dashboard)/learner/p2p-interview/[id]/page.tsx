@@ -7,7 +7,8 @@ import { getP2PSession } from '@/api/client';
 import { Editor } from '@monaco-editor/react';
 import { useWebRTC } from '@/hooks/useWebRTC';
 import { useYjs } from '@/hooks/useYjs';
-import { Clock, Users, ArrowRight, ShieldAlert, CheckCircle, Video, Mic, MicOff, VideoOff } from 'lucide-react';
+import { Clock, Users, ArrowRight, ShieldAlert, CheckCircle, Video, Mic, MicOff, VideoOff, Maximize, Minimize } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function P2PInterviewRoomPage() {
   const params = useParams();
@@ -28,9 +29,17 @@ export default function P2PInterviewRoomPage() {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Editor ref for Yjs binding
+  // Yjs binding with Cursor Awareness
   const editorRef = useRef<any>(null);
-  const { synced } = useYjs(sessionId, editorRef);
+  const myName = user?.fullName || user?.firstName || 'Learner';
+  // Give distinct colors based on role
+  const myColor = user?.id === session?.user1_id ? '#3b82f6' : '#10b981'; 
+  const { synced } = useYjs(sessionId, editorRef, myName, myColor);
+
+  // UI toggles
+  const [isMicMuted, setIsMicMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -45,6 +54,10 @@ export default function P2PInterviewRoomPage() {
       }
     };
     if (sessionId) loadSession();
+    
+    // Auto trigger fullscreen for immersive experience
+    const t = setTimeout(() => setIsFullscreen(true), 600);
+    return () => clearTimeout(t);
   }, [sessionId]);
 
   // Attach video streams to video elements
@@ -60,13 +73,58 @@ export default function P2PInterviewRoomPage() {
     }
   }, [remoteStream]);
 
-  // Timer logic
+  // Media toggles
   useEffect(() => {
+    if (localStream) {
+      localStream.getAudioTracks().forEach(track => {
+        track.enabled = !isMicMuted;
+      });
+    }
+  }, [localStream, isMicMuted]);
+
+  useEffect(() => {
+    if (localStream) {
+      localStream.getVideoTracks().forEach(track => {
+        track.enabled = !isVideoOff;
+      });
+    }
+  }, [localStream, isVideoOff]);
+
+  // Timer logic synchronized with backend
+  useEffect(() => {
+    if (!session?.id) return; // Wait until session is loaded
+    
+    let initialElapsed = 0;
+    if (session.created_at) {
+      try {
+        let dateStr = session.created_at;
+        if (dateStr.includes(' ') && !dateStr.includes('T')) {
+          dateStr = dateStr.replace(' ', 'T');
+        }
+        const startedAt = new Date(dateStr).getTime();
+        
+        if (!isNaN(startedAt)) {
+          const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+          if (elapsed >= -60 && elapsed < 30 * 60) {
+            initialElapsed = Math.max(elapsed, 0);
+          }
+        }
+      } catch (e) {
+        // Fallback if parsing completely fails
+      }
+    }
+
+    let currentRemaining = Math.max(30 * 60 - initialElapsed, 0);
+    setTimeLeft(currentRemaining);
+
+    // Update every second using a reliable decrement so it never freezes
     const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+      currentRemaining = Math.max(currentRemaining - 1, 0);
+      setTimeLeft(currentRemaining);
     }, 1000);
+    
     return () => clearInterval(timer);
-  }, []);
+  }, [session?.id, session?.created_at]);
 
   const formatTimer = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -89,7 +147,13 @@ export default function P2PInterviewRoomPage() {
   }
 
   return (
-    <div className="h-[90vh] max-h-screen flex flex-col p-4 space-y-4">
+    <motion.div 
+      layout
+      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 200, damping: 25, mass: 0.8 }}
+      className={`flex flex-col p-4 space-y-4 bg-slate-50 overflow-hidden shadow-2xl origin-center ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : 'relative h-[90vh] max-h-screen rounded-3xl mx-4 my-2 border border-aven-border'}`}
+    >
       {/* Top Bar */}
       <div className="flex items-center justify-between p-3 px-6 rounded-2xl bg-white/80 border border-white shadow-md shadow-aven-primary/5 backdrop-blur-xl">
         <div className="flex items-center gap-3">
@@ -108,6 +172,13 @@ export default function P2PInterviewRoomPage() {
           <div className={`px-4 py-1.5 rounded-full font-bold text-sm flex items-center gap-2 ${timeLeft < 300 ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-700'}`}>
             <Clock className="w-4 h-4" /> {formatTimer(timeLeft)}
           </div>
+          <button 
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="p-2 rounded-xl bg-aven-surface/50 hover:bg-aven-surface text-aven-text transition-colors"
+            title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          >
+            {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+          </button>
           <button 
             onClick={() => router.push(`/learner/p2p-interview/${sessionId}/feedback`)}
             className="px-4 py-2 rounded-xl bg-aven-primary text-white text-sm font-semibold hover:opacity-90 shadow-sm"
@@ -169,16 +240,35 @@ export default function P2PInterviewRoomPage() {
             </div>
 
             {/* Local Video */}
-            <div className="relative rounded-2xl overflow-hidden bg-slate-800 border-2 border-aven-border shadow-md flex items-center justify-center">
+            <div className="relative rounded-2xl overflow-hidden bg-slate-800 border-2 border-aven-border shadow-md flex items-center justify-center group">
               <video 
                 ref={localVideoRef} 
                 autoPlay 
                 playsInline 
                 muted
-                className="w-full h-full object-cover transform -scale-x-100"
+                className={`w-full h-full object-cover transform -scale-x-100 transition-opacity ${isVideoOff ? 'opacity-0' : 'opacity-100'}`}
               />
+              {isVideoOff && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white/50">
+                  <VideoOff className="w-8 h-8" />
+                </div>
+              )}
               <div className="absolute bottom-2 left-2 px-2 py-1 rounded-md bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold">
                 You
+              </div>
+              <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  onClick={() => setIsMicMuted(!isMicMuted)}
+                  className={`p-2 rounded-full backdrop-blur-md transition-colors ${isMicMuted ? 'bg-rose-500/80 text-white' : 'bg-black/50 text-white hover:bg-black/70'}`}
+                >
+                  {isMicMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                </button>
+                <button 
+                  onClick={() => setIsVideoOff(!isVideoOff)}
+                  className={`p-2 rounded-full backdrop-blur-md transition-colors ${isVideoOff ? 'bg-rose-500/80 text-white' : 'bg-black/50 text-white hover:bg-black/70'}`}
+                >
+                  {isVideoOff ? <VideoOff className="w-4 h-4" /> : <Video className="w-4 h-4" />}
+                </button>
               </div>
             </div>
           </div>
@@ -187,27 +277,50 @@ export default function P2PInterviewRoomPage() {
           <div className="flex-1 bg-white rounded-3xl border border-aven-border shadow-xl p-6 overflow-y-auto">
             {isInterviewer ? (
               <div className="space-y-6">
-                <div className="inline-block px-3 py-1 rounded-full bg-aven-primary/10 text-aven-primary text-xs font-bold uppercase tracking-wider">
-                  Interviewer Guide
+                <div className="flex items-center gap-3 border-b border-aven-border pb-4">
+                  <div className="px-3 py-1.5 rounded-full bg-aven-primary/10 text-aven-primary text-xs font-black uppercase tracking-widest">
+                    Interviewer Guide
+                  </div>
+                  <span className="text-xs text-aven-text-muted font-medium">Confidential - Do not share your screen</span>
                 </div>
-                <div>
-                  <h3 className="font-bold text-aven-text mb-2">Question:</h3>
-                  <p className="text-aven-text-subtle text-sm leading-relaxed">
+                
+                <div className="bg-aven-surface/30 p-5 rounded-2xl border border-aven-border">
+                  <h3 className="font-extrabold text-aven-text mb-3 uppercase tracking-wider text-xs flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-aven-primary" />
+                    Problem Statement
+                  </h3>
+                  <p className="text-aven-text-subtle text-sm leading-relaxed whitespace-pre-wrap font-medium">
                     {session.status === 'IN_PROGRESS_2' ? session.question2_text : session.question1_text}
                   </p>
                 </div>
-                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200">
-                  <h3 className="font-bold text-amber-900 mb-2 text-sm">Solution Guidelines:</h3>
-                  <p className="text-amber-800 text-sm leading-relaxed">
+
+                <div className="p-5 rounded-2xl bg-amber-50/80 border border-amber-200">
+                  <h3 className="font-extrabold text-amber-900 mb-3 uppercase tracking-wider text-xs flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    Target Solution
+                  </h3>
+                  <p className="text-amber-800 text-sm leading-relaxed whitespace-pre-wrap font-medium">
                     {session.status === 'IN_PROGRESS_2' ? session.question2_solution : session.question1_solution}
                   </p>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="font-bold text-aven-text text-sm">Rubric to look for:</h3>
-                  <ul className="list-disc list-inside text-sm text-aven-text-subtle space-y-1">
-                    <li>Did they clarify the constraints before coding?</li>
-                    <li>Did they explain their approach effectively?</li>
-                    <li>Is the code syntax reasonably correct?</li>
+                
+                <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                  <h3 className="font-extrabold text-slate-800 mb-3 uppercase tracking-wider text-xs flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-slate-400" />
+                    Evaluation Rubric
+                  </h3>
+                  <ul className="list-none space-y-2">
+                    {[
+                      "Did they clarify constraints and edge cases before coding?",
+                      "Did they explain their algorithm's time & space complexity?",
+                      "Is the code syntax clean and reasonably correct?",
+                      "Did they dry-run their code with an example?"
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-3 text-sm text-slate-600 font-medium">
+                        <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -224,6 +337,6 @@ export default function P2PInterviewRoomPage() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

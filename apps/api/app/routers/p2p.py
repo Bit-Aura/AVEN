@@ -12,13 +12,48 @@ router = APIRouter(prefix="/p2p", tags=["p2p"])
 async def get_user_name(db: AsyncSession, clerk_id: str) -> str:
     stmt = select(User.name).where(User.clerk_id == clerk_id)
     res = await db.execute(stmt)
-    return res.scalar_one_or_none() or "Anonymous Learner"
+    name = res.scalar_one_or_none()
+    if name and name.strip():
+        return name
+    return "Anonymous Learner"
+
+@router.delete("/queue")
+async def leave_queue(user_id: str, db: AsyncSession = Depends(get_db)):
+    stmt = select(P2PQueue).where(P2PQueue.user_id == user_id)
+    res = await db.execute(stmt)
+    queue_entry = res.scalar_one_or_none()
+    if queue_entry:
+        await db.delete(queue_entry)
+        await db.commit()
+    return {"status": "SUCCESS"}
+
 
 @router.post("/queue", response_model=P2PQueueStatus)
 async def join_queue(req: P2PQueueJoin, db: AsyncSession = Depends(get_db)):
-    # 1. Check if user is already in a WAITING session or active session
-    # For prototype, we allow them to just join.
+    # 0. Optionally update user name
+    if req.user_name and req.user_name.strip():
+        from sqlalchemy import update
+        stmt_u = update(User).where(User.clerk_id == req.user_id).values(name=req.user_name.strip())
+        await db.execute(stmt_u)
+        await db.commit()
+
+    # 1. Clear any stuck active sessions for this user
+    from sqlalchemy import update
+    stmt = update(P2PSession).where(
+        ((P2PSession.user1_id == req.user_id) | (P2PSession.user2_id == req.user_id)) & 
+        (P2PSession.status.in_(["WAITING", "IN_PROGRESS_1", "SWAPPING", "IN_PROGRESS_2"]))
+    ).values(status="COMPLETED")
+    await db.execute(stmt)
+    await db.commit()
     
+    # Also remove them from queue if they are already there
+    stmt_q = select(P2PQueue).where(P2PQueue.user_id == req.user_id)
+    res_q = await db.execute(stmt_q)
+    existing_queue = res_q.scalar_one_or_none()
+    if existing_queue:
+        await db.delete(existing_queue)
+        await db.commit()
+
     # 2. Look for an existing person in the queue for the same topic
     stmt = select(P2PQueue).where(P2PQueue.topic == req.topic).order_by(P2PQueue.joined_at.asc()).limit(1)
     result = await db.execute(stmt)
@@ -26,6 +61,7 @@ async def join_queue(req: P2PQueueJoin, db: AsyncSession = Depends(get_db)):
     
     if peer:
         if peer.user_id == req.user_id:
+            # Should not happen now due to delete above, but just in case
             return P2PQueueStatus(status="WAITING", session_id=None)
             
         # Match found! Create a session.

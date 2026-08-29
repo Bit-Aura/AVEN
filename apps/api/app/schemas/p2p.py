@@ -5,6 +5,7 @@ from typing import Optional, List, Dict, Any
 class P2PQueueJoin(BaseModel):
     user_id: str
     topic: str
+    user_name: Optional[str] = None
 
 class P2PQueueResponse(BaseModel):
     id: int

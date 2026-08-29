@@ -1306,10 +1306,16 @@ export const triggerHackathonScrape = async (source: string, limit?: number) => 
 
 // --- P2P Interview Endpoints ---
 
-export const joinP2PQueue = async (payload: { user_id: string; topic: string }) => {
+export const joinP2PQueue = async (payload: { user_id: string; topic: string; user_name?: string }) => {
   return await fetchApi('/p2p/queue', {
     method: 'POST',
     body: JSON.stringify(payload)
+  });
+};
+
+export const leaveP2PQueue = async (userId: string) => {
+  return await fetchApi(`/p2p/queue?user_id=${encodeURIComponent(userId)}`, {
+    method: 'DELETE'
   });
 };
 

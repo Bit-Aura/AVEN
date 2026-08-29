@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, Code, Server, Search, RefreshCw, XCircle } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
-import { joinP2PQueue, checkP2PQueueStatus } from '@/api/client';
+import { joinP2PQueue, checkP2PQueueStatus, leaveP2PQueue } from '@/api/client';
 
 export default function P2PInterviewLobbyPage() {
   const router = useRouter();
@@ -54,7 +54,8 @@ export default function P2PInterviewLobbyPage() {
     try {
       const res = await joinP2PQueue({
         user_id: user.id,
-        topic: selectedTopic
+        topic: selectedTopic,
+        user_name: user.fullName || user.firstName || 'Anonymous Learner'
       });
       
       if (res.status === 'MATCHED' && res.session_id) {
@@ -68,11 +69,18 @@ export default function P2PInterviewLobbyPage() {
     }
   };
 
-  const handleCancelSearch = () => {
-    // In a real app, we'd hit a DELETE /queue endpoint here.
+  const handleCancelSearch = async () => {
     setIsSearching(false);
     setMatchedSessionId(null);
     setMatchedPeerName(null);
+    
+    if (user) {
+      try {
+        await leaveP2PQueue(user.id);
+      } catch (err) {
+        console.error("Failed to leave queue:", err);
+      }
+    }
   };
 
   const handleAcceptMatch = () => {

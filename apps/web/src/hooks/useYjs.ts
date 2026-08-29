@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 
-export function useYjs(sessionId: string | number | undefined, editorRef: any) {
+export function useYjs(sessionId: string | number | undefined, editorRef: any, userName: string = 'Anonymous', userColor: string = '#0088ff') {
   const [synced, setSynced] = useState(false);
   const providerRef = useRef<WebsocketProvider | null>(null);
 
@@ -30,6 +30,12 @@ export function useYjs(sessionId: string | number | undefined, editorRef: any) {
 
       provider.on('status', (event: any) => {
         setSynced(event.status === 'connected');
+      });
+
+      // Set user awareness state for cursors
+      provider.awareness.setLocalStateField('user', {
+        name: userName,
+        color: userColor
       });
 
       const ytext = ydoc.getText('monaco');
