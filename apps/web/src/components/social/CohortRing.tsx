@@ -2,6 +2,10 @@
 
 import { Users, Sparkles } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of CohortRing.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function CohortRing({ cohortName, members }: { cohortName: string, members: string[] }) {
   return (
     <div className="bg-aven-base border border-aven-border rounded-2xl p-5 shadow-glass space-y-3 max-w-sm">

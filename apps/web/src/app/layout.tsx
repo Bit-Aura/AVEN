@@ -30,6 +30,10 @@ const CLERK_PUBLISHABLE_KEY =
     ? process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
     : "pk_test_cHJpbWUtbXV0dC01NDUwLmNsZXJrLmFjY291bnRzLmRldiQ=";
 
+/**
+ * Enterprise-grade implementation of RootLayout.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{

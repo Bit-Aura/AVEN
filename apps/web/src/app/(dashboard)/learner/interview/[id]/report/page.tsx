@@ -28,6 +28,10 @@ import {
   InterviewReportSummary,
 } from '@/api/client';
 
+/**
+ * Enterprise-grade implementation of InterviewReportPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function InterviewReportPage() {
   const params = useParams();
   const router = useRouter();

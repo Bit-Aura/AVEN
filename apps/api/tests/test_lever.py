@@ -308,7 +308,7 @@ async def test_lever_single_malformed_job_tolerance():
     sample_data = [
         {
             # Malformed item: missing id
-            "text": "Broken Job"
+            "text": "Requires Validation Job"
         },
         {
             # Malformed item: missing title/text

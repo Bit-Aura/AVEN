@@ -301,7 +301,7 @@ async def test_full_session_lifecycle_and_completion_notes(test_client):
         json={
             "title": "PostgreSQL Indexing & Query Tuning",
             "skill_id": "postgres_advanced",
-            "reason": "Slow sequential scans on large dataset",
+            "reason": "Computationally Intensive sequential scans on large dataset",
             "description": "Need advice on composite index ordering and EXPLAIN ANALYZE interpretation.",
             "requested_duration_minutes": 30,
         },

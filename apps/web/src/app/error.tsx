@@ -3,6 +3,10 @@
 import { useEffect } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of Error.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function Error({
   error,
   reset,

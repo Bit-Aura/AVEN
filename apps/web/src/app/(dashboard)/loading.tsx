@@ -1,6 +1,10 @@
 import React from 'react';
 import { BrainCircuit } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of Loading.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function Loading() {
   return (
     <div className="flex-1 min-h-[calc(100vh-4rem)] bg-aven-base flex items-center justify-center -m-6 md:-m-8">

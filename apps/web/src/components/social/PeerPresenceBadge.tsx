@@ -2,6 +2,10 @@
 
 import { Users } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of PeerPresenceBadge.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function PeerPresenceBadge({ count }: { count: number }) {
   if (count === 0) return null;
 

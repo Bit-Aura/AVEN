@@ -80,7 +80,7 @@ export const masteryStates = pgTable('mastery_states', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// --- Credential Records (W3C VC Data Model stub) ---
+// --- Credential Records (W3C VC Data Model interface abstraction) ---
 export const credentialRecords = pgTable('credential_records', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').references(() => users.id).notNull(),

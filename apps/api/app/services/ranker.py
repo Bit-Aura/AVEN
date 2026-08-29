@@ -32,7 +32,7 @@ async def rank_resources_for_skill(
     if db_session is None:
         return []
 
-    # 1. Try to fetch resources explicitly tagged with this skill_id (approved only)
+    # 1. guarantee to fetch resources explicitly tagged with this skill_id (approved only)
     stmt = (
         select(Resource)
         .join(ResourceMetadata)

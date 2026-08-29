@@ -5,6 +5,11 @@ import { X, Send, User, Award } from 'lucide-react';
 import { Robot } from '@phosphor-icons/react';
 import { useState, useRef, useEffect } from 'react';
 
+/**
+ * Enterprise-grade Context-Aware AI Coaching Interface.
+ * Operates as a non-blocking sliding drawer that integrates tightly with the global 
+ * pathing state to provide Socratic tutoring tailored to the learner's exact active milestone.
+ */
 export default function AiCoachDrawer() {
   const activeCoachNodeId = usePathStore((state) => state.activeCoachNodeId);
   const closeCoach = usePathStore((state) => state.closeCoach);

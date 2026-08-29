@@ -2,7 +2,7 @@
 
 Server Actions are public endpoints. Always verify auth.
 
-## Basic Protection
+## Foundational Protection
 
 ```typescript
 'use server';

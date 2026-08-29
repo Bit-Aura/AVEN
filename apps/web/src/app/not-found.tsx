@@ -3,6 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X, ArrowLeft } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of NotFound.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function NotFound() {
   const [scaleY, setScaleY] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);

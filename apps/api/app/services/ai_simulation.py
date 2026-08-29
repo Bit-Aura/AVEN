@@ -7,7 +7,7 @@ class AISimulationService:
         Mocks a response from the AI Product Manager/Client based on the user's question.
         In a real scenario, this would call an LLM with the ticket context.
         """
-        # A simple keyword-based mock for demonstration
+        # A streamlined keyword-based mock for demonstration
         message_lower = user_message.lower()
         if "requirement" in message_lower or "detail" in message_lower:
             response_text = "The requirement is to ensure the UI is responsive and passes all accessibility tests. Let me know if you need more specifics."
@@ -26,7 +26,7 @@ class AISimulationService:
         """
         Mocks a PR review from the AI Senior Developer.
         """
-        # Return mock inline comments based on simple checks
+        # Return mock inline comments based on streamlined checks
         comments = []
         if "console.log" in code_diff:
             comments.append({

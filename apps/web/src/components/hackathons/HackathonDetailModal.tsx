@@ -10,6 +10,10 @@ interface HackathonDetailModalProps {
   onClose: () => void;
 }
 
+/**
+ * Enterprise-grade implementation of HackathonDetailModal.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function HackathonDetailModal({ event, onClose }: HackathonDetailModalProps) {
   if (!event) return null;
 

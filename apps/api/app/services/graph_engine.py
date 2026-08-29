@@ -75,15 +75,31 @@ def build_skill_subgraph(
 def get_topological_sort(G: nx.DiGraph) -> List[str]:
     """
     Returns a topologically sorted list of skill IDs (names).
-    
-    Args:
-        G (nx.DiGraph): The skill subgraph.
-        
-    Returns:
-        List[str]: Skill IDs in execution order.
+    Uses Tarjan's SCC to dynamically intercept and prune cyclic edges.
     """
+    # Identify Strongly Connected Components (Tarjan's)
+    sccs = list(nx.strongly_connected_components(G))
+    
+    for scc in sccs:
+        if len(scc) > 1:
+            # Cycle detected in this component. Break it by removing the weakest edge.
+            subgraph = G.subgraph(scc).copy()
+            weakest_edge = None
+            lowest_weight = float('inf')
+            
+            for u, v, data in subgraph.edges(data=True):
+                weight = data.get('confidence', 1.0)
+                if weight < lowest_weight:
+                    lowest_weight = weight
+                    weakest_edge = (u, v)
+                    
+            if weakest_edge:
+                logger.warning(f"Pruning empirical edge {weakest_edge} to resolve cycle.")
+                G.remove_edge(*weakest_edge)
+                
+    # Now guaranteed to be a strictly Directed Acyclic Graph (DAG)
     try:
         return list(nx.topological_sort(G))
     except nx.NetworkXUnfeasible:
-        logger.error("Unfeasible graph: cycle detected in skill prerequisites!")
+        logger.error("Unfeasible graph: unresolvable cycle detected!")
         return list(G.nodes)

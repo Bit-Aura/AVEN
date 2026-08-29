@@ -89,7 +89,7 @@ Show alternative content when the condition fails:
 
 ## Session Tasks and Pending State
 
-The `treatPendingAsSignedOut` prop controls how pending sessions (sessions with incomplete tasks) are handled:
+The `treatPendingAsSignedOut` prop controls how pending sessions (sessions with pending completion tasks) are handled:
 
 ```tsx
 // Default: pending sessions are treated as signed-out

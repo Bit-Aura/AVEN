@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 import { usePathStore } from '../../../store/usePathStore';
 import { Brain, ArrowRight, Zap, Target, Loader2 } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of IdentityOnboarding.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function IdentityOnboarding() {
   const router = useRouter();
   const updatePreference = usePathStore(state => state.updateRankingPreference);

@@ -3,6 +3,10 @@
 import { usePathStore } from '../../store/usePathStore';
 import { ShieldCheck } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of Navbar.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function Navbar() {
   const activeMilestone = usePathStore((state) => state.activeMilestone);
   const toggleTrustPanel = usePathStore((state) => state.toggleTrustPanel);

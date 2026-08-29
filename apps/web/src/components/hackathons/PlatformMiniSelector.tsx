@@ -33,6 +33,10 @@ const CUSTOM_LOGOS: Record<string, string> = {
   'hackculture.com': '/platforms/hackculture.png',
 };
 
+/**
+ * Enterprise-grade implementation of PlatformMiniSelector.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function PlatformMiniSelector({
   selectedSources = [],
   onSelectSources,

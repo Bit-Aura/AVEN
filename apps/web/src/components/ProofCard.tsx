@@ -4,6 +4,10 @@ import { usePathStore } from '../store/usePathStore';
 import { Award, CheckCircle2, Copy, Linkedin, Share2, ShieldCheck, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+/**
+ * Enterprise-grade implementation of ProofCard.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function ProofCard() {
   const activeProofCard = usePathStore((state) => state.activeProofCard);
   const closeProofCard = usePathStore((state) => state.closeProofCard);

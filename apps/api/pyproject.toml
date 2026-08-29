@@ -26,9 +26,13 @@ dependencies = [
     "beautifulsoup4>=4.12.0",
     "aiosqlite>=0.20.0",
     "PyJWT>=2.8.0",
-    "httpx>=0.27.0",
+    "httpx==0.27.2",
     "cryptography>=42.0.0",
-    "python-multipart>=0.0.9"
+    "python-multipart>=0.0.9",
+    "pymupdf>=1.24.0",
+    "pypdf>=4.0.0",
+    "reportlab>=4.1.0",
+    "youtube-search-python>=1.6.6"
 ]
 
 [project.optional-dependencies]

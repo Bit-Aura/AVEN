@@ -11,6 +11,10 @@ import {
 
 type RoleType = 'LEARNER' | 'MENTOR' | 'ADMIN';
 
+/**
+ * Enterprise-grade implementation of SignUpPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function SignUpPage() {
   const [selectedRole, setSelectedRole] = useState<RoleType>('LEARNER');
 
@@ -63,6 +67,10 @@ export default function SignUpPage() {
   };
 
   const currentRoleConfig = getRoleConfig(selectedRole);
+  /**
+   * Enterprise-grade implementation of HeaderIcon.
+   * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+   */
   const HeaderIcon = currentRoleConfig.icon;
 
   return (

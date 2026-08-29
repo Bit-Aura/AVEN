@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import { Sparkles, X, ArrowRight, Zap } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of OpportunityAlert.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function OpportunityAlert({ skill, spikePercent }: { skill: string, spikePercent: number }) {
   const [visible, setVisible] = useState(true);
 

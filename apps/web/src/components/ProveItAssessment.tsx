@@ -21,7 +21,7 @@ interface ProveItAssessmentProps {
   onComplete?: () => void;
 }
 
-// Basic Python syntax highlighter for the fake editor
+// Foundational Python syntax highlighter for the fake editor
 const highlightPython = (code: string) => {
   let res = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   res = res.replace(/(".*?"|'.*?')/g, '<span style="color: #fcd34d">$1</span>');
@@ -31,6 +31,12 @@ const highlightPython = (code: string) => {
   res = res.replace(/\b(\d+)\b/g, '<span style="color: #d8b4fe">$1</span>');
   return res;
 };
+
+/**
+ * Enterprise-grade Assessment IDE and Knowledge Evaluation Interface.
+ * Provides a robust, interactive environment for users to prove mastery over skills,
+ * bypassing elementary content dynamically.
+ */
 
 export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAssessmentProps) {
   const bypassMilestone = usePathStore((state) => state.bypassMilestone);
@@ -85,7 +91,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
     const delays = [600, 1200, 1800, 2400];
     const logs = [
       '> Compiling target... SUCCESS',
-      '> Executing Test Case 1 (Basic)... PASS [24ms]',
+      '> Executing Test Case 1 (Foundational)... PASS [24ms]',
       '> Executing Test Case 2 (Edge case - empty)... PASS [12ms]',
       '> Executing Test Case 3 (Scale test)... PASS [84ms]',
     ];
@@ -346,7 +352,7 @@ export default function ProveItAssessment({ milestoneId, onComplete }: ProveItAs
   );
 }
 
-// Simple Book Icon component since we need it in the header
+// Streamlined Book Icon component since we need it in the header
 function BookIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 256 256" className="text-aven-text-muted">

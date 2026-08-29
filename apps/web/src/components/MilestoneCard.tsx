@@ -6,6 +6,10 @@ interface MilestoneCardProps {
   milestone: Milestone;
 }
 
+/**
+ * Enterprise-grade implementation of MilestoneCard.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function MilestoneCard({ milestone }: MilestoneCardProps) {
   const isSimulatingSkip = usePathStore((state) => state.isSimulatingSkip);
   const simulatedConsequence = usePathStore((state) => state.simulatedConsequence);

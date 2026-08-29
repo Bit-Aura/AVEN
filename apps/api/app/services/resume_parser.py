@@ -153,7 +153,7 @@ def extract_resume_text(content: bytes, ext: str) -> str:
     else:
         text = extract_text_from_txt(content)
 
-    # Basic sanitation: remove NUL bytes and control characters
+    # Foundational sanitation: remove NUL bytes and control characters
     sanitized = text.replace("\x00", "").strip()
     if not sanitized:
         raise HTTPException(

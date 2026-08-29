@@ -87,9 +87,18 @@ async def find_relevant_skills(
             rows = result.all()
             
             matched_skills = []
+            
+            # Calculate dynamic threshold based on variance/mean of top k distances
+            dynamic_threshold = 0.25
+            if rows:
+                distances = [float(d) for _, d in rows if d is not None]
+                if distances:
+                    mean_dist = sum(distances) / len(distances)
+                    dynamic_threshold = max(0.20, 1.0 - mean_dist - 0.05)
+
             for skill_rec, distance in rows:
                 similarity = 1.0 - float(distance) if distance is not None else 0.0
-                if similarity >= 0.25: # Threshold for semantic relevance
+                if similarity >= dynamic_threshold: # Dynamic threshold for semantic relevance
                     matched_skills.append({
                         "id": skill_rec.id,
                         "name": skill_rec.name,

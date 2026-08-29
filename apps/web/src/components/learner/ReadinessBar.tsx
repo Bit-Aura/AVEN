@@ -2,6 +2,11 @@
 
 import { ShieldCheck } from 'lucide-react';
 
+/**
+ * Enterprise-grade Bayesian Readiness visualizer.
+ * Renders a high-fidelity progress bar that accurately reflects the learner's posterior mastery 
+ * probabilities derived from the backend Bayesian Knowledge Tracing (BKT) engine.
+ */
 export default function ReadinessBar({ percentage }: { percentage: number }) {
   const clamped = Math.min(100, Math.max(0, percentage || 0));
 

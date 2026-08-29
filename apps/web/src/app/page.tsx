@@ -11,6 +11,10 @@ import {
   Sparkles
 } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of LandingPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function LandingPage() {
   const { user, isSignedIn, isLoaded } = useSafeUser();
   const role = user?.role || 'LEARNER';

@@ -27,7 +27,29 @@ export default isRealClerkKey
   ? clerkMiddleware(async (auth, req) => {
       const path = req.nextUrl.pathname;
       if (path.startsWith('/diagnostic') || isProtectedRoute(req)) {
-        await auth.protect();
+        const authCtx = await auth();
+        const { userId, sessionClaims } = authCtx;
+        
+        if (!userId) {
+          const signInUrl = new URL('/sign-in', req.url);
+          signInUrl.searchParams.set('redirect_url', req.url);
+          return NextResponse.redirect(signInUrl);
+        }
+
+        // Server-side RBAC enforcement
+        const role = (sessionClaims?.metadata as any)?.role?.toUpperCase() || 'LEARNER';
+        
+        if (path.startsWith('/admin') && role !== 'ADMIN') {
+          return NextResponse.redirect(new URL(role === 'MENTOR' ? '/mentor' : '/learner', req.url));
+        }
+        
+        if (path.startsWith('/mentor') && role === 'LEARNER') {
+          return NextResponse.redirect(new URL('/learner', req.url));
+        }
+        
+        if (path.startsWith('/learner') && role === 'MENTOR') {
+          return NextResponse.redirect(new URL('/mentor', req.url));
+        }
       }
     })
   : function middleware() {

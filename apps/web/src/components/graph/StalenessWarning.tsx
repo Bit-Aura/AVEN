@@ -5,6 +5,10 @@ import { AlertTriangle, Clock, Play } from 'lucide-react';
 import ProveItAssessment from '../ProveItAssessment';
 import { usePathStore } from '../../store/usePathStore';
 
+/**
+ * Enterprise-grade implementation of StalenessWarning.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function StalenessWarning({ nodeName, daysStale }: { nodeName: string, daysStale: number }) {
   const [showAssessment, setShowAssessment] = useState(false);
   const startAssessment = usePathStore((state) => state.startAssessment);

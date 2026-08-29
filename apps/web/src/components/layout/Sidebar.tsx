@@ -30,6 +30,10 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserSettingsModal, Tab } from '../profile/UserSettingsModal';
 
+/**
+ * Enterprise-grade implementation of Sidebar.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function Sidebar() {
   const pathname = usePathname();
   const targetRole = usePathStore((state) => state.targetRole);

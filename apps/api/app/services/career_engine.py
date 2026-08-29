@@ -162,7 +162,7 @@ def _compute_role_readiness(
 
 
 def _project_weeks(missing_skills: List[str], weekly_hours: float) -> float:
-    """Simple hours-to-weeks projection for missing skills at DEFAULT_SKILL_HOURS each."""
+    """Streamlined hours-to-weeks projection for missing skills at DEFAULT_SKILL_HOURS each."""
     if not missing_skills or weekly_hours <= 0:
         return 0.0
     total_hours = len(missing_skills) * DEFAULT_SKILL_HOURS

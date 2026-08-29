@@ -23,6 +23,10 @@ interface JitsiMeetingModalProps {
   durationMinutes?: number;
 }
 
+/**
+ * Enterprise-grade implementation of JitsiMeetingModal.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function JitsiMeetingModal({
   isOpen,
   onClose,

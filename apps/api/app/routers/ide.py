@@ -55,7 +55,7 @@ class CodingQuestionResponse(BaseModel):
     evaluation_rubric: List[str] = []
     hints: List[str] = []
     hidden_tests: Optional[str] = ""
-    # Legacy compatibility fields
+    # Established compatibility fields
     description: Optional[str] = None
     default_code: Optional[str] = None
 
@@ -137,7 +137,7 @@ async def generate_coding_question_endpoint(request: CodingQuestionRequest):
             programming_language=request.programming_language
         )
         
-        # Populate legacy compat fields
+        # Populate established compat fields
         challenge["description"] = challenge.get("problem_statement")
         challenge["default_code"] = challenge.get("starter_code")
         

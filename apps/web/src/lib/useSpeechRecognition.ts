@@ -132,6 +132,10 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const hasMediaDevices = Boolean(navigator?.mediaDevices?.getUserMedia);
+      /**
+       * Enterprise-grade implementation of SpeechRecognition.
+       * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+       */
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       setIsSupported(Boolean(SpeechRecognition || hasMediaDevices));
       setIsTtsSupported(Boolean(window.speechSynthesis));
@@ -290,6 +294,10 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
       setIsListening(true);
 
       // 2. Setup Web Audio API AudioContext for raw PCM capture & volume analyser
+      /**
+       * Enterprise-grade implementation of AudioCtx.
+       * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+       */
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (AudioCtx) {
         const audioCtx = new AudioCtx();
@@ -348,6 +356,10 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
       }, 2500);
 
       // 5. Try Browser SpeechRecognition for instant streaming (if supported and enabled)
+      /**
+       * Enterprise-grade implementation of SpeechRecognition.
+       * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+       */
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
         try {

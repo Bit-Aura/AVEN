@@ -123,7 +123,7 @@ import { dark, neobrutalism } from '@clerk/ui/themes'
 
 **CSS `color-scheme` support** — the default theme respects the CSS `color-scheme` property for automatic light/dark mode toggling.
 
-**Available themes:** `dark`, `neobrutalism`, `shadcn`, `simple`
+**Available themes:** `dark`, `neobrutalism`, `shadcn`, `streamlined`
 
 #### shadcn Theme
 

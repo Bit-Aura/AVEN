@@ -5,6 +5,10 @@ import { createPortal } from 'react-dom';
 import { Briefcase, ArrowRight, X, Sparkles, RefreshCw, Loader2, TrendingUp, DollarSign, Clock, CheckCircle2 } from 'lucide-react';
 import { usePathStore } from '../../store/usePathStore';
 
+/**
+ * Enterprise-grade implementation of CareerAlternativesDrawer.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function CareerAlternativesDrawer({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [selectedPivot, setSelectedPivot] = useState<string | null>(null);
   const [alternatives, setAlternatives] = useState<any[]>([]);

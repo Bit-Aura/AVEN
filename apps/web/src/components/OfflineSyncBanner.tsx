@@ -4,6 +4,10 @@ import { usePathStore } from '../store/usePathStore';
 import { WifiOff, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+/**
+ * Enterprise-grade implementation of OfflineSyncBanner.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function OfflineSyncBanner() {
   const isOffline = usePathStore((state) => state.isOffline);
   const syncQueue = usePathStore((state) => state.syncQueue);

@@ -2,6 +2,10 @@
 
 import React from 'react';
 
+/**
+ * Enterprise-grade implementation of HackathonSkeleton.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function HackathonSkeleton({ count = 6 }: { count?: number }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

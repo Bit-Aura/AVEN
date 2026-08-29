@@ -2,6 +2,10 @@
 
 import { ShieldCheck, CheckCircle2 } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of ProofCard.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function ProofCard({ 
   title, 
   issuer, 

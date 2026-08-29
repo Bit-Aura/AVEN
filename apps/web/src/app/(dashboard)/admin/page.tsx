@@ -62,6 +62,10 @@ import {
 
 type TabType = 'overview' | 'users' | 'mentors' | 'resources' | 'system' | 'roadmap_sync';
 
+/**
+ * Enterprise-grade implementation of PlatformAdminDashboard.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function PlatformAdminDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [isLoading, setIsLoading] = useState(true);
@@ -1369,6 +1373,10 @@ export default function PlatformAdminDashboard() {
   );
 }
 
+/**
+ * Enterprise-grade implementation of RoadmapSyncTabContent.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 function RoadmapSyncTabContent({ showNotification }: { showNotification: (msg: string, type?: 'success' | 'error') => void }) {
   const [roadmaps, setRoadmaps] = useState<any[]>([]);
   const [conflicts, setConflicts] = useState<any[]>([]);

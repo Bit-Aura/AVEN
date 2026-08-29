@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Target, X } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of CalibrationModal.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function CalibrationModal({ 
   skillId, 
   onComplete,

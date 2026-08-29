@@ -29,6 +29,10 @@ interface ConflictItem {
   created_at: string;
 }
 
+/**
+ * Enterprise-grade implementation of RoadmapSyncAdminPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function RoadmapSyncAdminPage() {
   const [roadmaps, setRoadmaps] = useState<RoadmapItem[]>([]);
   const [conflicts, setConflicts] = useState<ConflictItem[]>([]);

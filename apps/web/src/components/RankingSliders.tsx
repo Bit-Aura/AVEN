@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import { usePathStore, RankingPreferences } from '../store/usePathStore';
 import { Settings2, Zap, Brain, DollarSign, Gift, PlaySquare, Briefcase } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of RankingSliders.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function RankingSliders() {
   const rankingPreferences = usePathStore((state) => state.rankingPreferences);
   const updateRankingPreference = usePathStore((state) => state.updateRankingPreference);

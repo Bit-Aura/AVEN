@@ -6,6 +6,10 @@ import { usePathStore } from '../../store/usePathStore';
 import { AlertCircle, Target, TrendingUp, ShieldCheck, Loader2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
+/**
+ * Enterprise-grade implementation of MicroAssessmentModal.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function MicroAssessmentModal({ skillId, onClose }: { skillId: string, onClose: () => void }) {
   const [step, setStep] = useState<'calibration' | 'quiz' | 'result'>('calibration');
   const [confidence, setConfidence] = useState(50);

@@ -34,6 +34,10 @@ import {
 } from '@/api/client';
 import { useSpeechRecognition } from '@/lib/useSpeechRecognition';
 
+/**
+ * Enterprise-grade implementation of LiveInterviewRoomPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function LiveInterviewRoomPage() {
   const params = useParams();
   const router = useRouter();

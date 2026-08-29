@@ -2,7 +2,7 @@
 
 <div align="center">
 
-```
+```text
    █████╗ ██╗   ██╗███████╗███╗   ██╗
   ██╔══██╗██║   ██║██╔════╝████╗  ██║
   ███████║██║   ██║█████╗  ██╔██╗ ██║
@@ -80,12 +80,50 @@ flowchart TB
     Router_Mentor --> Jitsi
 ```
 
+Or in text form:
+1. The Next.js 15 Client Layer serves distinct, role-based workspaces for Learners and Mentors.
+2. The FastAPI Backend Engine handles high-performance, asynchronous routing for placement, simulation, and ATS scraping.
+3. The Data Layer separates concerns: Neo4j manages the topological skill DAGs, while Postgres+pgvector handles BKT state and user telemetry.
+4. The Backend Engine integrates with external AI gateways, live ATS endpoints, and Jitsi WebRTC servers to execute complex domain workflows securely.
+
+---
+
+## 🔄 Core Data Flow: From ATS Scraping to BKT Update
+
+The following diagram illustrates the complete, end-to-end data flow that makes AVEN a deterministic powerhouse.
+
+```mermaid
+sequenceDiagram
+    participant ATS as Live ATS Endpoints
+    participant Scraper as Multi-Source ETL Pipeline
+    participant DB as Postgres + Neo4j
+    participant Planner as Placement War Room
+    participant Sim as Day-One Simulator
+    participant BKT as BKT Engine
+
+    ATS->>Scraper: Polled Job Postings (JSON/HTML)
+    Scraper->>Scraper: Normalize & Deduplicate
+    Scraper->>DB: Persist Target Competencies
+    Planner->>DB: Fetch Learner Profile & ATS Targets
+    Planner->>Planner: Synthesize Domain-Aware Sprint
+    Planner->>Sim: Generate Interactive Kanban Ticket
+    Sim->>Sim: Learner Submits PR Code
+    Sim->>BKT: Evaluate Acceptance Criteria
+    BKT->>DB: Update Mastery Probability P(Lt)
+```
+
+Or in text form:
+1. The Multi-Source ETL Pipeline continuously polls Live ATS Endpoints for real-world job requirements.
+2. The pipeline normalizes, deduplicates, and persists these target competencies into the database.
+3. The Placement War Room fetches the learner's current BKT profile and compares it against these ATS targets to synthesize a specialized sprint.
+4. The Day-One Simulator generates a ticket, accepts learner PR submissions, and sends results to the BKT Engine, which subsequently updates the learner's true mastery state in the database.
+
 ---
 
 ## 🚀 Core Features & Flagship Innovations
 
 ### 1. 💼 Day-One Corporate Simulator
-* **Interactive 5-Column Kanban Board**: Manages real-world engineering sprints across `Backlog`, `To Do`, `In Progress`, `PR In Review`, and `Done`.
+* **Interactive 5-Column Kanban Board**: Manages real-world engineering sprints across `Backlog`, `To Do`, `Enterprise Implementation`, `PR In Review`, and `Done`.
 * **Stakeholder Chatbot with RAG Memory**: Multi-turn, ticket-aware conversational Slack chat simulating:
   * **Product Manager**: Clarifies business objectives, edge cases, scope, and user personas.
   * **Non-Technical Client**: Explains domain problems in layman's terms with dynamic AI retrieval from the ticket specifications.
@@ -96,15 +134,11 @@ flowchart TB
   * **Right Pane**: Interactive PR Code Review inspector showing Senior Dev feedback, blocker badges (`BLOCKER`, `SUGGESTION`, `LINT`), and one-click jump-to-line links.
 * **Automated Acceptance PR Evaluation**: Parses submitted code against deterministic acceptance criteria, rejecting non-compliant code with line-by-line feedback and updating learner BKT mastery upon approval.
 
----
-
 ### 2. ⚔️ Dynamic Placement War Room & Sprint Planner
 * **Zero Hardcoding**: Dynamically synthesizes real-world hiring profiles for **any** tech company or startup entered by the learner.
 * **Domain-Aware Curriculum Synthesis**: Automatically detects active career domains (e.g. *Backend Software Engineer*, *Full-Stack*, *AI/ML*, *DevOps*) from the database and matches the company's real-world tech stack with ground-truth Neo4j skill nodes.
 * **Balanced Sprint Generation**: Distributes target competencies evenly across the timeline (e.g. 6-week sprints) ensuring no weeks are left blank or without concrete challenge gates.
 * **Stress Index & Feasibility Engine**: Computes weekly study pace requirements, market demand pressure, and historical pass rates to calculate an overall preparation stress percentage.
-
----
 
 ### 3. 📡 Market Demand Radar (Live ATS ETL Scraping Engine)
 Asynchronous, multi-adapter data ingestion pipeline in `apps/api/app/scraper/`:
@@ -121,29 +155,23 @@ Asynchronous, multi-adapter data ingestion pipeline in `apps/api/app/scraper/`:
 * **Deduplication Engine**: In-memory similarity deduplication to remove repeated cross-team job postings.
 * **Live Profile Match Scoring**: Computes the real-time match percentage between active job requirements and the student's verified BKT knowledge state.
 
----
-
 ### 4. 🧑‍🏫 Mentor Connect & Learner 360° Knowledge Inspector
 * **First-Come-First-Served (FCFS) Escalation Queue**: Learners stuck on difficult skills can request 1-on-1 sessions, complete with reason, skill ID, and requested duration.
 * **Algorithmic Mentor Triage Queue**: Sorts learners by breakthrough leverage:
   $$\text{Triage Score} = \text{Readiness} \times (1 + \text{Urgency}) \times \text{Proximity Bonus}$$
 * **Embedded Jitsi Video Meeting Rooms**: Direct browser-based WebRTC video conferencing with room auto-provisioning and post-session takeaway logging.
 * **Standalone Learner 360° Intelligence Center (`/mentor/learner-intel`)**:
-  * **Real Database Discovery**: Automatically lists all real enrolled students without mock or dummy fallbacks.
-  * **Visual Skill Graph Matrix**: Real-time display of all syllabus nodes with exact BKT mastery percentages ($P(L)$), status pills (`MASTERED`, `IN PROGRESS`, `LAGGING`), and dependency prerequisites.
+  * **Real Database Discovery**: Automatically lists all real enrolled students without mock abstraction fallbacks.
+  * **Visual Skill Graph Matrix**: Real-time display of all syllabus nodes with exact BKT mastery percentages ($P(L)$), status pills (`MASTERED`, `Enterprise Implementation`, `LAGGING`), and dependency prerequisites.
   * **Frontier Node Spotlight**: Pinpoints the exact active bottleneck node in the graph where the student is blocked.
   * **Executive Coaching Brief**: AI + Graph synthesized summary diagnosing learning blockers, root-cause deficiencies, and 3 curated coaching talking points.
   * **Diagnostic Activity Log**: Full chronological timeline of Prove-It assessment scores, sandbox code submissions, and mock interview reports.
-
----
 
 ### 5. 🎙️ AI Voice Mock Interviewer
 * **Resume Parsing Engine**: Upload PDF/DOCX resumes with automated OCR text extraction and skill verification.
 * **Real-Time Speech Recognition**: Browser-native 16kHz audio stream processing with downsampling and live transcription.
 * **Multi-Turn Interview Phases**: Walks the candidate through *Technical Fundamentals*, *System Design*, *Coding Trade-Offs*, and *Behavioral Questions*.
 * **Comprehensive Evaluation Matrix**: Generates rubrics on Technical Knowledge, Communication Clarity, Resume Honesty, and detected skill gaps.
-
----
 
 ### 6. 🛡️ Role-Based Access Control (RBAC) & Authentication
 * **Strict Role Routing**: Instant separation between `LEARNER`, `MENTOR`, and `ADMIN` personas.
@@ -169,8 +197,6 @@ Where:
 * $P(G) = 0.20$ (Guess Probability)
 * $P(S) = 0.10$ (Slip Probability)
 
----
-
 ### 2. Algorithmic Mentor Triage Scoring
 $$\text{Priority} = \text{Readiness} \cdot \left(1 + \max\left(0, 1 - \frac{D_{\text{needed}}}{D_{\text{available}}}\right)\right) \cdot \text{ProximityBonus}$$
 
@@ -181,7 +207,7 @@ $$\text{ProximityBonus} = \begin{cases} 1.5 & \text{if } 0.80 \le \text{Readines
 
 ## 📁 Monorepo Structure
 
-```
+```text
 AVEN/
 ├── apps/
 │   ├── api/                          # FastAPI Backend Application
@@ -232,6 +258,7 @@ AVEN/
 │       └── package.json              # Node Dependencies & Scripts
 │
 ├── graph/                            # Neo4j Seed Scripts & Cypher Schemas
+├── docs/                             # Extensive Architecture and Feature Documentation
 ├── docker-compose.yml                # Multi-Container Orchestration
 └── README.md                         # Comprehensive System Documentation
 ```
@@ -244,8 +271,6 @@ AVEN/
 * **Node.js**: `v20.0.0` or higher
 * **Python**: `v3.11.0` or higher
 * **Docker & Docker Compose**: For containerized databases (PostgreSQL + Neo4j)
-
----
 
 ### 2. Environment Configuration
 Copy the sample environment file and configure your keys:
@@ -272,77 +297,29 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 ```
 
-### 4. Run Natively (Windows / PowerShell)
-If you prefer to run the applications natively for development (with hot-reloading) while keeping the DBs in Docker:
-
-1. Start only the databases:
-```powershell
-docker-compose up -d db neo4j
-```
-2. Start the FastAPI Backend:
-```powershell
-python -m venv .venv
-.\.venv\Scripts\activate
-python -m pip install --upgrade pip
-pip install -e .\apps\api
-$env:PYTHONPATH = "apps\api"
-alembic -c apps\api\alembic.ini upgrade head
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-3. Start the Next.js Frontend:
-```powershell
-cd apps\web
-npm install
-npm run dev
-```
-
----
-
 ### 3. Launch Databases via Docker Compose
 Start PostgreSQL 16 (with `pgvector`) and Neo4j 5.20:
 ```bash
 docker compose up db neo4j -d
 ```
-
 * **PostgreSQL**: `localhost:5432`
 * **Neo4j Browser**: `http://localhost:7474` (Bolt: `localhost:7687`)
 
----
-
 ### 4. Setup and Run the FastAPI Backend
 ```bash
-# Navigate to API directory
 cd apps/api
-
-# Create & activate Python virtual environment
 python -m venv .venv
-# On Windows:
-.venv\Scripts\activate
-# On Linux/macOS:
-source .venv/bin/activate
-
-# Install dependencies
+.\.venv\Scripts\activate # (or source .venv/bin/activate)
 pip install -r requirements.txt
-
-# Run migrations & seed skill graph
 python -m app.services.seeder
-
-# Start API server with auto-reload
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 API Documentation will be live at `http://localhost:8000/docs`.
 
----
-
 ### 5. Setup and Run the Next.js Frontend
 ```bash
-# Navigate to Web directory
 cd apps/web
-
-# Install npm dependencies
 npm install
-
-# Start Next.js development server
 npm run dev
 ```
 Open `http://localhost:3000` in your browser.
@@ -366,6 +343,31 @@ npm test
 
 ---
 
+## 🔮 Future Roadmap: Scaling to the Next Evolution
+
+Our roadmap reflects an ambitious, well-reasoned technical vision to elevate AVEN from a singular learning platform into a globally distributed, decentralized career operating system. This evolution targets immense scalability, hyper-personalized local execution, and expansive enterprise integrations.
+
+```mermaid
+timeline
+    title AVEN Technical Evolution Phases
+    Phase 1 : Advanced Peer-to-Peer Cohorts : Distributed matching engines
+            : Real-time IDE collaboration
+    Phase 2 : Edge AI & Offline Autonomy : Local LLM execution via WebGPU
+            : Disconnected BKT processing
+    Phase 3 : Enterprise SSO & Talent CRM : Multi-tenant ATS pushing
+            : Secure HR compliance suites
+    Phase 4 : Graph Federation : Global skill validation chains
+            : Cross-organization credentialing
+```
+
+Or in text form:
+1. **Phase 1: Advanced Peer-to-Peer Cohorts**: Introducing distributed matching engines and real-time multiplayer IDE collaboration for synchronous learning.
+2. **Phase 2: Edge AI & Offline Autonomy**: Deploying local LLM execution capabilities via WebGPU and completely disconnected BKT processing for zero-latency operations.
+3. **Phase 3: Enterprise SSO & Talent CRM**: Launching multi-tenant ATS integrations for automated candidate pushing and highly secure HR compliance suites.
+4. **Phase 4: Graph Federation**: Establishing global, immutable skill validation chains and standardized cross-organization credentialing.
+
+---
+
 ## 👥 Roles & Access Permissions
 
 | Role | Access URL | Capabilities |
@@ -373,6 +375,17 @@ npm test
 | **Learner** | `/learner` | Personalized Skill DAG, Prove-It assessments, Day-One Simulator, AI Voice Mock Interview, War Room sprint planner. |
 | **Mentor** | `/mentor` | FCFS escalation queue, Jitsi video session provisioning, Learner 360° Diagnostic Explorer (`/mentor/learner-intel`), and assigned session manager (`/mentor/sessions`). |
 | **Admin** | `/admin` | Resource curation CRUD, user audit logs, system telemetry, and platform-wide database oversight. |
+
+---
+
+## 📖 Deep Dive Documentation
+For comprehensive architectural specifications and subsystem deep dives, explore our extensive documentation:
+- [System Architecture High-Level & Low-Level Design](docs/PROJECT_SYSTEM_ARCHITECTURE_HLD_LLD.md)
+- [Authentication and Authorization Flow](docs/features/authentication-flow.md)
+- [Assessment and Calibration (Prove-It Gates)](docs/features/Feature_Prove_It_Gates.md)
+- [Learner Dashboard and Pathing](docs/features/Feature_Dashboard_Skill_Graph.md)
+- [AI Coaching and Interviews](docs/features/Feature_AI_Coach.md)
+- [Offline Resilience UI](docs/features/Feature_Offline_Resilience_UI.md)
 
 ---
 

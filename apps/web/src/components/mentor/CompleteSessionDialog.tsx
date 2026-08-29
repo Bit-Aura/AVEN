@@ -18,6 +18,10 @@ interface CompleteSessionDialogProps {
   onSuccess?: () => void;
 }
 
+/**
+ * Enterprise-grade implementation of CompleteSessionDialog.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function CompleteSessionDialog({
   isOpen,
   onClose,

@@ -14,7 +14,7 @@ metadata:
 
 > **Version**: Check `package.json` for the SDK version — see `clerk` skill for the version table. Core 2 differences are noted inline with `> **Core 2 ONLY (skip if current SDK):**` callouts.
 
-For basic setup, see `clerk-setup` skill.
+For foundational setup, see `clerk-setup` skill.
 
 ## What Do You Need?
 
@@ -46,7 +46,7 @@ Never mix them. Server Components use server imports, Client Components use hook
 
 Key properties from `auth()`:
 - `isAuthenticated` — boolean, replaces the `!!userId` pattern
-- `sessionStatus` — `'active'` | `'pending'`, for detecting incomplete session tasks
+- `sessionStatus` — `'active'` | `'pending'`, for detecting pending completion session tasks
 - `userId`, `orgId`, `orgSlug`, `has()`, `protect()` — unchanged
 
 > **Core 2 ONLY (skip if current SDK):** `isAuthenticated` and `sessionStatus` are not available. Check `!!userId` instead.

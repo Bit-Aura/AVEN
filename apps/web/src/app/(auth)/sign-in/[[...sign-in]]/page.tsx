@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { SignIn } from '@clerk/nextjs';
 import { Compass } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of SignInPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function SignInPage() {
   return (
     <div className="min-h-screen w-full bg-aven-base flex flex-col items-center justify-center p-4 relative overflow-hidden text-aven-text">

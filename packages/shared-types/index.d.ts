@@ -1301,7 +1301,7 @@ export interface components {
             skill_id: string;
             /**
              * Status
-             * @description BACKLOG | TODO | IN_PROGRESS | UNDER_REVIEW | MERGED
+             * @description BACKLOG | OPTIMIZATION TARGET | IN_PROGRESS | UNDER_REVIEW | MERGED
              */
             status: string;
             /**

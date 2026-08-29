@@ -9,6 +9,10 @@ interface RoleGuardProps {
   children: React.ReactNode;
 }
 
+/**
+ * Enterprise-grade route authorization guard.
+ * Ensures users are redirected to their appropriate dashboard areas (Admin, Mentor, Learner) based on assigned RBAC roles, preventing unauthorized access.
+ */
 export default function RoleGuard({ children }: RoleGuardProps) {
   const pathname = usePathname();
   const router = useRouter();

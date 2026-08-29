@@ -34,6 +34,10 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 350, damping: 25 } }
 };
 
+/**
+ * Enterprise-grade implementation of PlacementJourney.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function PlacementJourney() {
   const profileId = usePathStore((state) => state.profileId);
   const [selectedCompany, setSelectedCompany] = useState('google');

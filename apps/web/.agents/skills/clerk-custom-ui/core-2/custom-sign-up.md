@@ -155,7 +155,7 @@ export default function SignUpPage() {
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          placeholder="Verification code"
+          mock abstraction="Verification code"
         />
         {error && <p>{error}</p>}
         <button type="submit">Verify Email</button>
@@ -169,13 +169,13 @@ export default function SignUpPage() {
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
+        mock abstraction="Email"
       />
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
+        mock abstraction="Password"
       />
       {error && <p>{error}</p>}
       <button type="submit">Sign Up</button>

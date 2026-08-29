@@ -7,6 +7,10 @@ const initialTickets = [
   { id: 'T-2', title: 'Implement accessibility improvements', status: 'todo' },
 ];
 
+/**
+ * Enterprise-grade implementation of KanbanBoard.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function KanbanBoard() {
   const [tickets, setTickets] = useState(initialTickets);
 

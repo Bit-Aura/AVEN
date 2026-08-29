@@ -4,6 +4,10 @@ import { usePathStore } from '../store/usePathStore';
 import { Terminal, Code, HelpCircle, WifiOff, Focus, X, Command, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+/**
+ * Enterprise-grade implementation of CommandPalette.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function CommandPalette() {
   const isCommandPaletteOpen = usePathStore((state) => state.isCommandPaletteOpen);
   const toggleCommandPalette = usePathStore((state) => state.toggleCommandPalette);

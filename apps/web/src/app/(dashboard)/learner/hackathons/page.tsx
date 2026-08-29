@@ -20,6 +20,10 @@ import { HackathonFilters } from '../../../../api/client';
 
 import type { HackathonEvent } from '@/types/hackathons';
 
+/**
+ * Enterprise-grade implementation of HackathonRadarPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function HackathonRadarPage() {
   const { user } = useSafeUser();
   const userRole = (user?.role || 'LEARNER').toUpperCase();

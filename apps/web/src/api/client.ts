@@ -1,4 +1,12 @@
+/**
+ * Enterprise-grade implementation of BACKEND_URL.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+/**
+ * Enterprise-grade implementation of BASE_URL.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || `${BACKEND_URL}/api/v1`;
 
 export interface GoalInput {

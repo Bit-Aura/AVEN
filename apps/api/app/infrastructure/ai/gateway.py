@@ -626,7 +626,7 @@ Keep the explanation clear, brief (1-3 sentences), and trace-grounded.
         """
         persona_descriptions = {
             "pm": "a professional, detail-oriented Product Manager who focuses on edge cases, business constraints, and standard schemas.",
-            "client": "a non-technical client/stakeholder who describes bugs in simple, user-level terms and cares about speed and correctness."
+            "client": "a non-technical client/stakeholder who describes bugs in streamlined, user-level terms and cares about speed and correctness."
         }
         role_description = persona_descriptions.get(persona.lower(), persona_descriptions["pm"])
 
@@ -711,7 +711,7 @@ Do not include any markdown fences or explanation outside the JSON.
         except Exception as e:
             logger.error(f"Ollama error in generate_ide_problem: {e}")
             return {
-                "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand basic Python syntax for '{milestone_id}'.",
+                "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand foundational Python syntax for '{milestone_id}'.",
                 "default_code": "def solve():\n    # Write your solution here\n    return False\n",
                 "hidden_tests": "assert solve() == True, 'Expected solve() to return True'\n"
             }
@@ -1156,7 +1156,7 @@ Keep the explanation clear, brief (1-3 sentences), and trace-grounded.
         """
         persona_descriptions = {
             "pm": "a professional, detail-oriented Product Manager who focuses on edge cases, business constraints, and standard schemas.",
-            "client": "a non-technical client/stakeholder who describes bugs in simple, user-level terms and cares about speed and correctness."
+            "client": "a non-technical client/stakeholder who describes bugs in streamlined, user-level terms and cares about speed and correctness."
         }
         role_description = persona_descriptions.get(persona.lower(), persona_descriptions["pm"])
 
@@ -1243,7 +1243,7 @@ Do not include any markdown fences or explanation outside the JSON.
             return validated.model_dump()
         except Exception as e:
             return {
-                "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand basic Python syntax for '{milestone_id}'.",
+                "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand foundational Python syntax for '{milestone_id}'.",
                 "default_code": "def solve():\n    # Write your solution here\n    return False\n",
                 "hidden_tests": "assert solve() == True, 'Expected solve() to return True'\n"
             }
@@ -1751,7 +1751,7 @@ Keep the explanation clear, brief (1-3 sentences), and trace-grounded.
     async def stakeholder_chat(self, persona: str, ticket_id: str, message: str) -> str:
         persona_descriptions = {
             "pm": "a professional, detail-oriented Product Manager who focuses on edge cases, business constraints, and standard schemas.",
-            "client": "a non-technical client/stakeholder who describes bugs in simple, user-level terms and cares about speed and correctness."
+            "client": "a non-technical client/stakeholder who describes bugs in streamlined, user-level terms and cares about speed and correctness."
         }
         role_description = persona_descriptions.get(persona.lower(), persona_descriptions["pm"])
         prompt = f"""
@@ -1962,7 +1962,7 @@ Return ONLY valid JSON matching the schema.
                 "correctness_score": 70,
                 "reasoning_score": 70,
                 "code_quality_score": 70,
-                "strengths": ["Valid syntax structure", "Addresses basic problem requirements"],
+                "strengths": ["Valid syntax structure", "Addresses foundational problem requirements"],
                 "issues": ["Could not perform deep AST semantic evaluation"],
                 "improvements": ["Ensure robust edge-case validation and type safety"],
                 "detailed_feedback": f"Static inspection performed on {programming_language} solution for {skill_name}.",
@@ -2196,7 +2196,7 @@ class MockAIProvider(AIProvider):
 
     async def generate_ide_problem(self, target_role: str, milestone_id: str) -> Dict[str, Any]:
         return {
-            "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand basic Python syntax for '{milestone_id}' (Target: {target_role}).",
+            "description": f"Write a Python function called `solve()` that returns `True`. This verifies you understand foundational Python syntax for '{milestone_id}' (Target: {target_role}).",
             "default_code": "def solve():\n    # Write your solution here\n    return False\n",
             "hidden_tests": "assert solve() == True, 'Expected solve() to return True'\n"
         }
@@ -2293,7 +2293,7 @@ class MockAIProvider(AIProvider):
         return {
             "score": score,
             "verdict": verdict,
-            "summary": "Strong algorithmic logic with clean iteration structure based on static reasoning." if is_passing else "Incomplete solution requiring core implementation logic.",
+            "summary": "Strong algorithmic logic with clean iteration structure based on static reasoning." if is_passing else "Pending Completion solution requiring core implementation logic.",
             "correctness_score": 90 if has_solution else 40,
             "reasoning_score": 85 if has_solution else 45,
             "code_quality_score": 90 if has_solution else 50,
@@ -2535,7 +2535,7 @@ class MockAIProvider(AIProvider):
                 {
                     "claim": "PostgreSQL",
                     "status": "PARTIALLY_SUPPORTED" if gaps else "SUPPORTED",
-                    "evidence": "Understood basic table operations but had difficulty explaining isolation levels." if gaps else "Demonstrated good understanding of relational data models."
+                    "evidence": "Understood foundational table operations but had difficulty explaining isolation levels." if gaps else "Demonstrated good understanding of relational data models."
                 }
             ],
             "summary": f"Candidate demonstrated solid technical foundation for {session_context.get('target_role', 'Software Engineer')} with an overall interview score of {avg_score}/100."

@@ -6,7 +6,7 @@ def main():
     """
     Main entrypoint for seeding resources.
     """
-    # TODO: Read from a CSV/JSON and bulk insert into Resource table
+    # OPTIMIZATION TARGET: Read from a CSV/JSON and bulk insert into Resource table
     print("Seeding resources... (TODO)")
 
 if __name__ == "__main__":

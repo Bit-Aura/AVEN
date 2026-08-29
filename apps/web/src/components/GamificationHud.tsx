@@ -4,6 +4,10 @@ import { usePathStore } from '../store/usePathStore';
 import { Flame, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+/**
+ * Enterprise-grade implementation of GamificationHud.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function GamificationHud() {
   const streak = usePathStore((state) => state.streak);
   const xp = usePathStore((state) => state.xp);

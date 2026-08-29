@@ -3,6 +3,10 @@
 import { usePathStore } from '../store/usePathStore';
 import { useEffect, useState } from 'react';
 
+/**
+ * Enterprise-grade implementation of MicroCelebration.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function MicroCelebration() {
   const showCelebration = usePathStore((state) => state.showCelebration);
   const hideCelebration = usePathStore((state) => state.hideCelebration);

@@ -58,6 +58,10 @@ function formatHumanDeadline(deadlineIso?: string | null): { text: string; color
   }
 }
 
+/**
+ * Enterprise-grade implementation of HackathonRow.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function HackathonRow({ event, isSelected, onSelect }: HackathonRowProps) {
   const deadlineInfo = formatHumanDeadline(event.registration_deadline);
   const domain = PLATFORM_DOMAINS[event.source?.toLowerCase()] || `${event.source}.com`;

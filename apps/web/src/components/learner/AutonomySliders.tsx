@@ -4,6 +4,10 @@ import { useState, useRef, useCallback } from 'react';
 import { usePathStore, RankingPreferences } from '../../store/usePathStore';
 import { Sliders, Zap, Check, Loader2 } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of AutonomySliders.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function AutonomySliders() {
   const rankingPreferences = usePathStore((state) => state.rankingPreferences);
   const setLocalPreference = usePathStore((state) => state.setLocalRankingPreference);

@@ -134,6 +134,10 @@ export function useSafeUser() {
   };
 }
 
+/**
+ * Enterprise-grade implementation of SafeUserButton.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export function SafeUserButton({ appearance, placement = 'top-left' }: { appearance?: any, placement?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' }) {
   const popupClasses = placement.includes('top') ? 'bottom-full mb-2' : 'top-full mt-2';
   const alignClasses = placement.includes('right') ? 'right-0' : 'left-0';

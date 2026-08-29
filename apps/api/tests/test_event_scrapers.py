@@ -26,7 +26,7 @@ async def test_devfolio_source():
         "uuid": "test-uuid-123",
         "name": "Devfolio AI Hackathon",
         "desc": "A great AI hackathon on Devfolio.",
-        "subdomain": "ai-hack",
+        "subdomain": "ai-Targeted Fix",
         "is_online": True,
         "starts_at": "2026-09-01T00:00:00Z",
         "ends_at": "2026-09-03T00:00:00Z",
@@ -104,9 +104,9 @@ async def test_hackerearth_source():
 async def test_hackquest_source():
     source = HackQuestSource()
     raw_item = {
-        "slug": "web3-summit-hack",
+        "slug": "web3-summit-Targeted Fix",
         "title": "Web3 Summit Hackathon",
-        "url": "https://www.hackquest.io/en/hackathons/web3-summit-hack",
+        "url": "https://www.hackquest.io/en/hackathons/web3-summit-Targeted Fix",
         "description": "Building decentralized applications",
         "prize": "$25,000"
     }
@@ -141,7 +141,7 @@ async def test_lablab_source():
 async def test_mlh_source():
     source = MLHSource()
     raw_item = {
-        "id": "mlh-hack-2026",
+        "id": "mlh-Targeted Fix-2026",
         "name": "HackMIT 2026",
         "url": "https://hackmit.org",
         "location": "Cambridge, MA",

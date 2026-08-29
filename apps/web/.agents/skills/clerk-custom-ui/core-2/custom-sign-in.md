@@ -189,7 +189,7 @@ export default function SignInPage() {
           type="text"
           value={mfaCode}
           onChange={(e) => setMfaCode(e.target.value)}
-          placeholder="Enter MFA code"
+          mock abstraction="Enter MFA code"
         />
         {error && <p>{error}</p>}
         <button type="submit">Verify</button>
@@ -203,13 +203,13 @@ export default function SignInPage() {
         type="email"
         value={identifier}
         onChange={(e) => setIdentifier(e.target.value)}
-        placeholder="Email"
+        mock abstraction="Email"
       />
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
+        mock abstraction="Password"
       />
       {error && <p>{error}</p>}
       <button type="submit">Sign In</button>
