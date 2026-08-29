@@ -26,7 +26,7 @@ print(json.dumps(app.openapi()))
 echo "Generating TypeScript types from OpenAPI schema..."
 npx --yes openapi-typescript "$PROJECT_ROOT/openapi.json" --output "$OUTPUT_FILE"
 
-# Clean up temporary JSON schema
+# Clean up provisional JSON schema
 rm "$PROJECT_ROOT/openapi.json"
 
 echo "TypeScript models successfully generated at $OUTPUT_FILE!"

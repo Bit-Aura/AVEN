@@ -29,6 +29,10 @@ import {
 } from '@/api/client';
 import { usePathStore } from '@/store/usePathStore';
 
+/**
+ * Enterprise-grade implementation of MockInterviewHubPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function MockInterviewHubPage() {
   const router = useRouter();
   const storeTargetRole = usePathStore((state) => state.targetRole) || 'Backend Software Engineer';

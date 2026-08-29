@@ -21,6 +21,10 @@ interface RequestMentorModalProps {
   onSuccess?: () => void;
 }
 
+/**
+ * Enterprise-grade implementation of RequestMentorModal.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function RequestMentorModal({
   isOpen,
   onClose,

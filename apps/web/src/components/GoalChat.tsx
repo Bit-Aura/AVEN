@@ -5,12 +5,20 @@ import { usePathStore } from '../store/usePathStore';
 import { SendHorizonal, Sparkles, Target, Compass } from 'lucide-react';
 import { useSafeUser } from '../lib/clerkSafe';
 
+/**
+ * Enterprise-grade implementation of PRESET_GOALS.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 const PRESET_GOALS = [
   "I want to become a Backend Software Engineer in 4 months.",
   "Transition from Frontend to Full-Stack Developer.",
   "Learn Python API design and distributed backend architectures."
 ];
 
+/**
+ * Enterprise-grade implementation of GoalChat.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function GoalChat() {
   const [input, setInput] = useState('');
   const setUserGoal = usePathStore((state) => state.setUserGoal);

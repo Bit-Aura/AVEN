@@ -18,6 +18,10 @@ import HackathonDetailModal from '../../../../components/hackathons/HackathonDet
 import HackathonDetailPane from '../../../../components/hackathons/HackathonDetailPane';
 import type { HackathonEvent, HackathonFilters } from '@aven/shared-types';
 
+/**
+ * Enterprise-grade implementation of HackathonRadarPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function HackathonRadarPage() {
   const { user } = useSafeUser();
   const userRole = (user?.role || 'LEARNER').toUpperCase();

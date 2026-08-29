@@ -201,7 +201,7 @@ Return STRICTLY a JSON object with this schema:
                     "reason": "Django is valid, though FastAPI is preferred in modern stacks.",
                     "top_companies": ["Pinterest", "Instagram"],
                     "trend_direction": "DOWN",
-                    "market_context": "Losing massive market share to FastAPI for microservices, though legacy monoliths still maintain it."
+                    "market_context": "Losing massive market share to FastAPI for microservices, though established monoliths still maintain it."
                 }
             ]
 

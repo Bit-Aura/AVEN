@@ -14,6 +14,10 @@ interface UserSettingsModalProps {
   defaultTab?: Tab;
 }
 
+/**
+ * Enterprise-grade implementation of UserSettingsModal.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export function UserSettingsModal({ isOpen, onClose, defaultTab = 'account' }: UserSettingsModalProps) {
   const { user } = useSafeUser();
   const [activeTab, setActiveTab] = useState<Tab>(defaultTab);

@@ -224,8 +224,8 @@ async def test_greenhouse_partial_tolerance_malformed_single_job():
         "jobs": [
             {
                 # Malformed: missing "id"
-                "title": "Broken Job",
-                "content": "Broken"
+                "title": "Requires Validation Job",
+                "content": "Requires Validation"
             },
             {
                 # Valid job

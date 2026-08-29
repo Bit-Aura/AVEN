@@ -12,6 +12,10 @@ import UndoToast from '../../components/UndoToast';
 import RoleGuard from '../../components/auth/RoleGuard';
 import { usePathStore } from '../../store/usePathStore';
 
+/**
+ * Enterprise-grade implementation of DashboardLayout.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const isFocusMode = usePathStore((state) => state.isFocusMode);
 

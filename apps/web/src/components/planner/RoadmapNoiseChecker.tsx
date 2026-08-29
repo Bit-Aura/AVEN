@@ -18,6 +18,10 @@ import {
 import { sanityCheckRoadmap } from '../../api/client';
 import { usePathStore } from '../../store/usePathStore';
 
+/**
+ * Enterprise-grade implementation of SAMPLE_ROADMAPS.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 const SAMPLE_ROADMAPS = [
   {
     title: "Overhyped YouTube Roadmap",
@@ -29,6 +33,10 @@ const SAMPLE_ROADMAPS = [
   }
 ];
 
+/**
+ * Enterprise-grade implementation of RoadmapNoiseChecker.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function RoadmapNoiseChecker() {
   const targetRole = usePathStore((state) => state.targetRole);
   const [adviceText, setAdviceText] = useState(SAMPLE_ROADMAPS[0].text);

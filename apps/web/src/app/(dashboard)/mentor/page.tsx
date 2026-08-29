@@ -46,6 +46,10 @@ import JitsiMeetingModal from '../../../components/mentor/JitsiMeetingModal';
 import SessionScheduleDialog from '../../../components/mentor/SessionScheduleDialog';
 import CompleteSessionDialog from '../../../components/mentor/CompleteSessionDialog';
 
+/**
+ * Enterprise-grade implementation of MentorConnectDashboardContent.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 function MentorConnectDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1148,6 +1152,10 @@ function MentorConnectDashboardContent() {
   );
 }
 
+/**
+ * Enterprise-grade implementation of MentorConnectDashboard.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function MentorConnectDashboard() {
   return (
     <Suspense fallback={

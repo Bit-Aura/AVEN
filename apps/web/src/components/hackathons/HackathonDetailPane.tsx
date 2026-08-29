@@ -27,6 +27,10 @@ const CUSTOM_LOGOS: Record<string, string> = {
   'hackculture.com': '/platforms/hackculture.png',
 };
 
+/**
+ * Enterprise-grade implementation of FormattedDescription.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 const FormattedDescription = ({ text }: { text: string }) => {
   if (!text) return null;
 
@@ -109,6 +113,10 @@ const FormattedDescription = ({ text }: { text: string }) => {
   );
 };
 
+/**
+ * Enterprise-grade implementation of HackathonDetailPane.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function HackathonDetailPane({ event }: HackathonDetailPaneProps) {
   if (!event) {
     return (

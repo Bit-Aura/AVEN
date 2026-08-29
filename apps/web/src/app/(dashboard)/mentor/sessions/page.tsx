@@ -27,6 +27,10 @@ import JitsiMeetingModal from '../../../../components/mentor/JitsiMeetingModal';
 import SessionScheduleDialog from '../../../../components/mentor/SessionScheduleDialog';
 import CompleteSessionDialog from '../../../../components/mentor/CompleteSessionDialog';
 
+/**
+ * Enterprise-grade implementation of MentorSessionsPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function MentorSessionsPage() {
   const router = useRouter();
   const [sessionsTab, setSessionsTab] = useState<'upcoming' | 'completed'>('upcoming');

@@ -198,7 +198,7 @@ class AmazonJobsSource(BaseJobSource):
             raw_loc = ", ".join(loc_parts)
         location = normalize_location(raw_loc)
 
-        # 4. Description assembly (Body + Basic Qualifications + Preferred Qualifications)
+        # 4. Description assembly (Body + Foundational Qualifications + Preferred Qualifications)
         desc_parts = []
         body = raw_data.get("description") or raw_data.get("description_short")
         if body:

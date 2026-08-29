@@ -17,6 +17,10 @@ import {
   Lock
 } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of PortfolioPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function PortfolioPage() {
   const profileId = usePathStore((state) => state.profileId);
   const targetRole = usePathStore((state) => state.targetRole);

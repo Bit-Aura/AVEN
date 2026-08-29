@@ -12,7 +12,7 @@ SKILLS_SEED = [
     {
         "id": "python_basics",
         "name": "Python Basics",
-        "description": "Syntax, variable assignments, loops, control structures, and basic functions in Python.",
+        "description": "Syntax, variable assignments, loops, control structures, and foundational functions in Python.",
         "prereqs": [],
         "bkt": {"p_l0": 0.25, "p_t": 0.30, "p_s": 0.08, "p_g": 0.25}
     },
@@ -26,7 +26,7 @@ SKILLS_SEED = [
     {
         "id": "sql_basics",
         "name": "SQL Basics",
-        "description": "Basic database queries including SELECT, WHERE, GROUP BY, and simple filtering.",
+        "description": "Foundational database queries including SELECT, WHERE, GROUP BY, and streamlined filtering.",
         "prereqs": ["python_basics"],
         "bkt": {"p_l0": 0.22, "p_t": 0.28, "p_s": 0.09, "p_g": 0.22}
     },
@@ -245,7 +245,7 @@ ASSESSMENTS_SEED = [
         "difficulty": "advanced"
     },
     {
-        "title": "SQL Basic Filters",
+        "title": "SQL Foundational Filters",
         "content": '{"question": "Which SQL clause is used to filter group results after grouping?", "options": ["HAVING", "WHERE", "FILTER"], "correct_answer": "HAVING", "target_skill": "sql_basics"}',
         "difficulty": "beginner"
     },

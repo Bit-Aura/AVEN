@@ -113,7 +113,7 @@ def detect_job_type(
     if re.search(r"\b(intern|internship|co-op|coop|apprentice|apprenticeship|summer student)\b", title_lower):
         return "internship"
 
-    # Contract / Temporary
+    # Contract / Provisional
     if re.search(r"\b(contract|contractor|freelance|consultant|temporary|temp)\b", title_lower):
         return "contract"
 

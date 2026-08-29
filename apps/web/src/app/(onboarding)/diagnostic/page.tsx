@@ -9,6 +9,10 @@ import Link from 'next/link';
 import { ArrowLeft, Compass } from 'lucide-react';
 import { SafeUserButton, useSafeUser } from '../../../lib/clerkSafe';
 
+/**
+ * Enterprise-grade implementation of DiagnosticPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function DiagnosticPage() {
   const router = useRouter();
   const { user, isLoaded } = useSafeUser();

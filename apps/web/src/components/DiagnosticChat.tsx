@@ -5,6 +5,10 @@ import { usePathStore } from '../store/usePathStore';
 import { BrainCircuit, CheckCircle2, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+/**
+ * Enterprise-grade implementation of DiagnosticChat.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function DiagnosticChat() {
   const router = useRouter();
   const completeDiagnostic = usePathStore((state) => state.completeDiagnostic);

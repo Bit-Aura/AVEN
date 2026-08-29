@@ -131,7 +131,7 @@ class Neo4jClient:
         Executes a Cypher query and returns the results.
         """
         driver = self.driver
-        # Use sync execution inside an executor or simple blocking call since neo4j driver is thread-safe
+        # Use sync execution inside an executor or streamlined blocking call since neo4j driver is thread-safe
         # For simplicity in this scaffolding, we run standard session query.
         def _run(tx):
             result = tx.run(query, parameters or {})

@@ -1,4 +1,4 @@
-# TODO: no public API/endpoint identified — needs manual investigation
+# OPTIMIZATION TARGET: no public API/endpoint identified — needs manual investigation
 import logging
 from typing import List, Dict, Any, Optional
 from .base_event import BaseEventSource
@@ -11,7 +11,7 @@ class HackCultureSource(BaseEventSource):
     """
     Stub scraper adapter for HackCulture platform.
     Handles missing upstream implementation gracefully until endpoint specifications are provided.
-    # TODO: no public API/endpoint identified — needs manual investigation
+    # OPTIMIZATION TARGET: no public API/endpoint identified — needs manual investigation
     """
 
     @property

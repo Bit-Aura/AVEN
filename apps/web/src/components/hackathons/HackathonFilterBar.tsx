@@ -16,6 +16,10 @@ interface HackathonFilterBarProps {
   onToggleShowSaved?: (show: boolean) => void;
 }
 
+/**
+ * Enterprise-grade implementation of HackathonFilterBar.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function HackathonFilterBar({
   filters,
   searchQuery,

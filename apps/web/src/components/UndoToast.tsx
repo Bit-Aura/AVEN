@@ -4,6 +4,10 @@ import { usePathStore } from '../store/usePathStore';
 import { RotateCcw, X } from 'lucide-react';
 import { useEffect } from 'react';
 
+/**
+ * Enterprise-grade implementation of UndoToast.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function UndoToast() {
   const showUndoToast = usePathStore((state) => state.showUndoToast);
   const hideUndoToast = usePathStore((state) => state.hideUndoToast);

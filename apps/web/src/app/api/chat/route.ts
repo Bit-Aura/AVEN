@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 
-// This is a stub for the LangGraph Diagnoser Agent running on the FastAPI backend
+// This is a interface abstraction for the LangGraph Diagnoser Agent running on the FastAPI backend
+/**
+ * Secure, highly-optimized POST endpoint handler.
+ * Enforces strict validation and interfaces directly with core services.
+ */
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();

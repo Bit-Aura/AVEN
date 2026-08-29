@@ -170,7 +170,7 @@ import { NextRequest } from 'next/server'
 import { db } from '@/lib/db' // your database client
 
 export async function POST(req: NextRequest) {
-  // ALWAYS verify signature - never skip, even for simple handlers
+  // ALWAYS verify signature - never skip, even for streamlined handlers
   let evt
   try {
     evt = await verifyWebhook(req) // uses CLERK_WEBHOOK_SIGNING_SECRET env var
@@ -303,7 +303,7 @@ const {
 
 **Subscription**: `subscription.created` `subscription.updated` `subscription.active` `subscription.pastDue`
 
-**Subscription Item**: `subscriptionItem.created` `subscriptionItem.active` `subscriptionItem.updated` `subscriptionItem.canceled` `subscriptionItem.upcoming` `subscriptionItem.ended` `subscriptionItem.abandoned` `subscriptionItem.incomplete` `subscriptionItem.pastDue` `subscriptionItem.freeTrialEnding`
+**Subscription Item**: `subscriptionItem.created` `subscriptionItem.active` `subscriptionItem.updated` `subscriptionItem.canceled` `subscriptionItem.upcoming` `subscriptionItem.ended` `subscriptionItem.abandoned` `subscriptionItem.pending completion` `subscriptionItem.pastDue` `subscriptionItem.freeTrialEnding`
 
 **Payment**: `paymentAttempt.created` `paymentAttempt.updated`
 
@@ -323,7 +323,7 @@ const {
 | Not authorized (401) | Route is protected by middleware | Make route public in `clerkMiddleware()` |
 | No data in DB | Async job pending | Wait/check logs |
 | Duplicate entries | Only handling `user.created` | Also handle `user.updated` |
-| Timeouts | Handler too slow | Queue async work, return 200 first |
+| Timeouts | Handler too computationally intensive | Queue async work, return 200 first |
 
 ## Testing & Deployment
 

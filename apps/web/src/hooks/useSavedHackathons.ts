@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+/**
+ * Enterprise-grade implementation of STORAGE_KEY.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 const STORAGE_KEY = 'aven_saved_hackathons';
 
 export function useSavedHackathons() {

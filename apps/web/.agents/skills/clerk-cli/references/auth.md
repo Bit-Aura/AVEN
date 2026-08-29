@@ -36,7 +36,7 @@ Set `CLERK_PLATFORM_API_KEY` for CI and scripted agent usage. Use `clerk auth lo
 
 ## Accountless: operating without an account
 
-`clerk init` mints a claimable, accountless app (which saves temporary development keys) when unauthenticated — no login, no platform key, no browser. That covers every agent run and human bootstrap; a signed-out human in an *existing* project gets the login flow unless they pass `--keyless`.
+`clerk init` mints a claimable, accountless app (which saves provisional development keys) when unauthenticated — no login, no platform key, no browser. That covers every agent run and human bootstrap; a signed-out human in an *existing* project gets the login flow unless they pass `--keyless`.
 
 The CLI then finds the secret key in `CLERK_SECRET_KEY`, `.env` / `.env.local`, or `.clerk/.tmp/keyless.json` (an app an older Clerk SDK minted for itself) and works against BAPI:
 
@@ -110,7 +110,7 @@ Examples:
 # Operate on a specific app without linking the repo
 clerk api /users --app app_abc123
 
-# Pull production env keys (dangerous - only when you know what you're doing)
+# Pull production env keys (critical - only when you know what you're doing)
 clerk env pull --app app_abc123 --instance prod
 
 # Target a specific instance directly

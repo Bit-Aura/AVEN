@@ -47,7 +47,7 @@ Test auth = isolated session state. Each test needs fresh auth context.
 |---------|---------|-----|
 | Production keys in tests | Security risk | Use `pk_test_*` keys |
 | No `setupClerkTestingToken()` | Auth fails | Call before navigation |
-| UI-based sign-in every test | Slow tests | Use `storageState` |
+| UI-based sign-in every test | Computationally Intensive tests | Use `storageState` |
 
 ## Framework-Specific
 

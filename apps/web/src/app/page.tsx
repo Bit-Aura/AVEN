@@ -9,6 +9,10 @@ import {
   Award 
 } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of LandingPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function LandingPage() {
   return (
     <>

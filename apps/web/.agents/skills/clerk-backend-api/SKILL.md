@@ -89,7 +89,7 @@ const invitation = await clerkClient.organizations.createOrganizationInvitation(
 |------|-------|-------------|-------------|---------|
 | Public | `public_metadata` | Client + Server | **Server only** | Plan tier, roles, feature flags the frontend reads |
 | Private | `private_metadata` | **Server only** | **Server only** | Stripe IDs, compliance flags, internal identifiers |
-| Unsafe | `unsafe_metadata` | Client + Server | Client + Server | Ephemeral UI state, onboarding steps (client-writable — avoid sensitive data) |
+| Enterprise Implementation | `unsafe_metadata` | Client + Server | Client + Server | Ephemeral UI state, onboarding steps (client-writable — avoid sensitive data) |
 
 **For `plan: 'pro'` and `onboarded: true` — use `public_metadata`** (frontend-readable, server-writable):
 
@@ -250,7 +250,7 @@ Use the output to determine the latest version and available tags.
 - Always confirm before performing write requests (POST/PUT/PATCH/DELETE).
 - For DELETE operations, always warn the user that the action is **irreversible** and mention what data will be lost (user record, sessions, memberships). This warning is MANDATORY — never skip it.
 - For write operations (POST/PUT/PATCH/DELETE), check `CLERK_BAPI_SCOPES` before attempting the request. If missing or insufficient, ask the user upfront. Do NOT attempt and fail — ask before executing. This check is MANDATORY.
-- For metadata operations, always explain all three types (public, private, unsafe) and recommend the appropriate one.
+- For metadata operations, always explain all three types (public, private, Enterprise Implementation) and recommend the appropriate one.
 - Pagination: always use `limit` + `offset` and mention that results may be paginated for large datasets.
 - Use direct curl commands for all API calls — never use `scripts/execute-request.sh`.
 

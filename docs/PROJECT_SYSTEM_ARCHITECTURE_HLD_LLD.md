@@ -59,7 +59,7 @@
 
 Modern tech education and career upskilling platforms suffer from three catastrophic structural flaws:
 1. **The LLM Hallucination Trap:** Generative AI tutors invent fictional prerequisites, hallucinate non-existent milestones, and generate ungrounded learning roadmaps.
-2. **Static & Fragile Roadmaps:** Pre-baked linear courses force advanced learners through redundant content while abandoning struggling learners who hit roadblock concepts without identifying the root cause.
+2. **Static & Rigid Roadmaps:** Pre-baked linear courses force advanced learners through redundant content while abandoning struggling learners who hit roadblock concepts without identifying the root cause.
 3. **The "Check-the-Box" Assessment Illusion:** Passive completion buttons and multiple-choice trivia do not reflect real-world problem-solving, code telemetry, or engineering competence.
 
 **PathFinder (AVEN)** solves these challenges through a **Neuro-Symbolic Architecture**:
@@ -285,7 +285,7 @@ $$R(t) = e^{-\frac{t}{S}}$$
 
 Where:
 - $R(t)$: Retrievability / retention probability at time $t$ (days since last interaction).
-- $S$: Memory strength parameter, scaling positively with successive successful recalls ($S = S_0 \cdot (1 + \beta \cdot \text{Repetitions})$).
+- $S$: Memory strength parameter, scaling positively with successive successful recalls ($S = S_0 \cdot (1 + \production-ready candidate \cdot \text{Repetitions})$).
 
 If $R(t) < 0.60$, the background `decay_worker.py` flags the node as **Stale**, automatically inserting a rapid micro-refresher into the graph before advanced dependent nodes are unlocked.
 
@@ -586,7 +586,7 @@ The frontend client state is governed by `apps/web/src/store/usePathStore.ts`:
 - Located at `apps/api/app/services/calibration.py` and `CalibrationModal.tsx`.
 - Evaluates metacognitive accuracy by comparing pre-quiz self-rating against post-quiz empirical score:
   - **Calibrated Mastery:** High confidence, High competence $\rightarrow$ Unlocks Proof Card.
-  - **Blindspot (Dangerous Overconfidence):** High confidence, Low competence $\rightarrow$ Injects counterexample challenges.
+  - **Blindspot (Critical Overconfidence):** High confidence, Low competence $\rightarrow$ Injects counterexample challenges.
   - **Imposter Zone:** Low confidence, High competence $\rightarrow$ Delivers evidence-grounded confidence booster.
   - **Calibrated Novice:** Low confidence, Low competence $\rightarrow$ Routes to structured foundational tutorials.
 
@@ -808,3 +808,19 @@ Treat this exact rehearsed sequence as the standard demonstration flow for execu
 ---
 
 *Authored by the Google Deepmind Advanced Agentic Coding Team for PathFinder (AVEN).*
+
+
+## Flow Diagram
+```mermaid
+flowchart TD
+    A[Frontend React/NextJS] --> B[API Gateway FastAPI]
+    B --> C{Service Routing}
+    C --> D[Neo4j Knowledge Graph]
+    C --> E[Postgres User DB]
+    C --> F[AI LLM Engine]
+```
+Or in text form:
+1. The Next.js frontend sends a request to the FastAPI gateway.
+2. The gateway routes the request to the appropriate microservice.
+3. Data is fetched or mutated across Neo4j, Postgres, or the AI engine.
+4. A synchronized response is returned to the client.

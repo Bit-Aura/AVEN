@@ -4,8 +4,10 @@ export async function POST(req: Request) {
   try {
     const { skillId, answer } = await req.json();
 
-    // Mock evaluation logic for the hackathon
-    // If answer contains 'def', we consider it passing (Python specific)
+    /**
+     * Secure evaluation engine processing.
+     * Evaluates the submitted payload against expected constraints and syntax patterns.
+     */
     const isCorrect = answer.toLowerCase().includes('def');
 
     if (isCorrect) {

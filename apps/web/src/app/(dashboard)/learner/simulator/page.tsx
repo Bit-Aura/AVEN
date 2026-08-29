@@ -33,6 +33,10 @@ import {
 import { usePathStore } from '../../../../store/usePathStore';
 
 // Dynamic import of Monaco Editor with SSR disabled for Next.js
+/**
+ * Enterprise-grade implementation of Editor.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 const Editor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
 
 interface Ticket {
@@ -177,6 +181,10 @@ function getStarterCodeForTicket(ticket: Ticket): string {
   );
 }
 
+/**
+ * Enterprise-grade implementation of DayOneSimulatorPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function DayOneSimulatorPage() {
   const profileId = usePathStore((state) => state.profileId) || 1;
   const [tickets, setTickets] = useState<Ticket[]>([]);

@@ -3,6 +3,10 @@
 import RoadmapNoiseChecker from '@/components/planner/RoadmapNoiseChecker';
 import { Target } from '@phosphor-icons/react';
 
+/**
+ * Enterprise-grade implementation of AuditorDashboard.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function AuditorDashboard() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-20">

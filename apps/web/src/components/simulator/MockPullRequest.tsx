@@ -2,6 +2,10 @@
 
 import React, { useState } from 'react';
 
+/**
+ * Enterprise-grade implementation of MockPullRequest.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function MockPullRequest() {
   const [code, setCode] = useState('');
   const [review, setReview] = useState<{ status: string, summary: string, comments: any[] } | null>(null);

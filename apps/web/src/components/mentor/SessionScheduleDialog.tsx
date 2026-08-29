@@ -19,6 +19,10 @@ interface SessionScheduleDialogProps {
   onSuccess?: () => void;
 }
 
+/**
+ * Enterprise-grade implementation of SessionScheduleDialog.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function SessionScheduleDialog({
   isOpen,
   onClose,

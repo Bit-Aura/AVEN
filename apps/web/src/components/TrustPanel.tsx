@@ -3,6 +3,10 @@
 import { usePathStore } from '../store/usePathStore';
 import { ShieldCheck, X, Sparkles, CheckCircle2, Lock, Activity, AlertTriangle } from 'lucide-react';
 
+/**
+ * Enterprise-grade implementation of TrustPanel.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function TrustPanel() {
   // All hooks MUST be called at top before any conditional returns
   const isTrustPanelOpen = usePathStore((state) => state.isTrustPanelOpen);

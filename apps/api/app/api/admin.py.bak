@@ -150,7 +150,7 @@ async def get_system_health(
 
 
 # =============================================================================
-# 2. BASIC USER MANAGEMENT
+# 2. FOUNDATIONAL USER MANAGEMENT
 # =============================================================================
 
 @router.get("/admin/users", response_model=AdminUsersListResponse)

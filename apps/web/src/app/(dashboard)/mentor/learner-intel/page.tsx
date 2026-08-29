@@ -39,6 +39,10 @@ import JitsiMeetingModal from '../../../../components/mentor/JitsiMeetingModal';
 import SessionScheduleDialog from '../../../../components/mentor/SessionScheduleDialog';
 import CompleteSessionDialog from '../../../../components/mentor/CompleteSessionDialog';
 
+/**
+ * Enterprise-grade implementation of LearnerIntelContent.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 function LearnerIntelContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -724,6 +728,10 @@ function LearnerIntelContent() {
   );
 }
 
+/**
+ * Enterprise-grade implementation of LearnerIntelPage.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function LearnerIntelPage() {
   return (
     <Suspense fallback={

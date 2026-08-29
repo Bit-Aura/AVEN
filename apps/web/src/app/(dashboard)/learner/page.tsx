@@ -18,6 +18,10 @@ import { Loader2, Play } from 'lucide-react';
 import Link from 'next/link';
 import { fetchRelevantCourses } from '../../../api/client';
 
+/**
+ * Enterprise-grade implementation of LearnerDashboard.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function LearnerDashboard() {
   const [isPivotDrawerOpen, setIsPivotDrawerOpen] = useState(false);
   const [activeAssessmentSkill, setActiveAssessmentSkill] = useState<string | null>(null);

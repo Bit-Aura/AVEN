@@ -10,6 +10,10 @@ export const metadata: Metadata = {
   description: "AI-powered personalized learning path recommender",
 };
 
+/**
+ * Enterprise-grade implementation of RootLayout.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{

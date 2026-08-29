@@ -98,7 +98,7 @@ const { error } = await signIn.sso({
 
 The `identifier` is the user's email. Clerk uses the domain to route to the correct Enterprise SSO connection. If no matching connection exists, the sign-in falls back to standard email/password or returns an error.
 
-> **Core 2 / legacy:** `signIn.authenticateWithRedirect({ strategy: 'enterprise_sso', identifier, redirectUrl, redirectUrlComplete })` still exists on the SDK for backwards compatibility, but for new code use `signIn.sso()` per the current enterprise-connections custom flow doc.
+> **Core 2 / established:** `signIn.authenticateWithRedirect({ strategy: 'enterprise_sso', identifier, redirectUrl, redirectUrlComplete })` still exists on the SDK for backwards compatibility, but for new code use `signIn.sso()` per the current enterprise-connections custom flow doc.
 
 ## Key Rules
 
@@ -107,4 +107,4 @@ The `identifier` is the user's email. Clerk uses the domain to route to the corr
 - **Strategy name matters.** Core 3 uses `'enterprise_sso'`; Core 2 used `'saml'`. They are NOT interchangeable.
 - **Multiple connections per org is fine.** Typical enterprise: one SAML connection to Okta + one OIDC to Azure AD for different user segments / domains.
 - **Auto-join via JIT Provisioning.** Users who authenticate via an Organization's Enterprise SSO connection are added to the org automatically with the org's Default Role. No invitation step.
-- **Two setup paths.** Dashboard for interactive UI, or `clerk api` for scripted setup: `clerk api -X POST /v1/enterprise_connections` (create), `clerk api -X PATCH /v1/enterprise_connections/{id}` (update), `clerk api -X DELETE /v1/enterprise_connections/{id}` (remove). Pass the IdP metadata or client credentials in the request body; Clerk returns the ACS URL + Entity ID in the response. Create / update endpoints require a plan with the SAML feature enabled. The legacy `/v1/saml_connections` endpoint is deprecated, use `/v1/enterprise_connections` instead.
+- **Two setup paths.** Dashboard for interactive UI, or `clerk api` for scripted setup: `clerk api -X POST /v1/enterprise_connections` (create), `clerk api -X PATCH /v1/enterprise_connections/{id}` (update), `clerk api -X DELETE /v1/enterprise_connections/{id}` (remove). Pass the IdP metadata or client credentials in the request body; Clerk returns the ACS URL + Entity ID in the response. Create / update endpoints require a plan with the SAML feature enabled. The established `/v1/saml_connections` endpoint is phased out, use `/v1/enterprise_connections` instead.

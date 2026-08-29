@@ -16,6 +16,10 @@ interface CurrentNodeCardProps {
   onStartAssessment?: (skillId: string) => void;
 }
 
+/**
+ * Enterprise-grade implementation of CurrentNodeCard.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function CurrentNodeCard({ 
   nodeName, 
   whyThisStep, 

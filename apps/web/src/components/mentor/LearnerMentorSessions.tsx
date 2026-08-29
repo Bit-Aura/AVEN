@@ -19,6 +19,10 @@ import { fetchLearnerSessionRequests, cancelSessionRequest, startMentorSession }
 import RequestMentorModal from './RequestMentorModal';
 import JitsiMeetingModal from './JitsiMeetingModal';
 
+/**
+ * Enterprise-grade implementation of LearnerMentorSessions.
+ * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ */
 export default function LearnerMentorSessions() {
   const [requests, setRequests] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
