@@ -27,16 +27,36 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Trigger auto-initialization in the background so the app boots instantly.
+    Trigger auto-initialization in the background safely with Postgres advisory locks.
     """
     from app.core.db import engine, async_session
     from app.services.startup_seeder import run_startup_seeding
+    from sqlalchemy import text
     import asyncio
     
-    # Fire and forget the heavy database seeding/scraping
-    asyncio.create_task(run_startup_seeding(engine, async_session, neo4j_client))
-    
-    logger.info("[Startup] Offloaded heavy database seeding to background task.")
+    async def safe_seed():
+        async with async_session() as session:
+            # Create rate limit table if not exists
+            await session.execute(text("CREATE TABLE IF NOT EXISTS rate_limits (id SERIAL PRIMARY KEY, client_ip TEXT, timestamp FLOAT)"))
+            await session.commit()
+            
+            # Use advisory lock to prevent multiple workers from seeding at the same time
+            # 123456789 is just a unique arbitrary lock ID
+            lock_res = await session.execute(text("SELECT pg_try_advisory_lock(123456789)"))
+            locked = lock_res.scalar()
+            
+            if locked:
+                logger.info("[Startup] Acquired advisory lock. Proceeding with seeding...")
+                try:
+                    await run_startup_seeding(engine, async_session, neo4j_client)
+                finally:
+                    await session.execute(text("SELECT pg_advisory_unlock(123456789)"))
+                    await session.commit()
+            else:
+                logger.info("[Startup] Another worker is seeding. Skipping.")
+
+    asyncio.create_task(safe_seed())
+    logger.info("[Startup] Offloaded safe database seeding to background task.")
     yield
 
 app = FastAPI(
@@ -59,28 +79,8 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(LoggingMiddleware)
 
-# Simple In-Memory Rate Limiting for AI endpoints
-# Note: For a production system with multiple workers, Redis + slowapi would be used.
-# Since we explicitly decided against Redis for this scale, this in-memory approach suffices.
-_RATE_LIMIT_CACHE = {}
-
-class RateLimitMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        if request.url.path.startswith("/api/v1/goal") or request.url.path.startswith("/api/v1/coach/chat"):
-            client_ip = request.client.host if request.client else "unknown"
-            now = time.time()
-            # Allow 10 requests per minute per IP for expensive endpoints
-            requests = _RATE_LIMIT_CACHE.get(client_ip, [])
-            requests = [t for t in requests if now - t < 60]
-            if len(requests) >= 10:
-                from fastapi.responses import JSONResponse
-                return JSONResponse(status_code=429, content={"detail": "Too many requests"})
-            requests.append(now)
-            _RATE_LIMIT_CACHE[client_ip] = requests
-            
-        return await call_next(request)
-
-app.add_middleware(RateLimitMiddleware)
+from app.core.rate_limiter import RateLimiterMiddleware
+app.add_middleware(RateLimiterMiddleware)
 
 # Enable CORS for frontend connections
 app.add_middleware(
@@ -187,66 +187,11 @@ async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse({"detail": "Internal Server Error"}, status_code=500)
 
 # --- Pydantic Schemas for API Requests/Responses ---
-
-class GoalInput(BaseModel):
-    user_email: str = Field(default="demo@pathfinder.dev", description="Demo user email")
-    goal_text: str = Field(..., description="Stated goal, e.g. 'I want to become a backend engineer'")
-    preferred_modality: str = Field(default="project", description="video, text, or project")
-    weekly_hours: float = Field(default=10.0, description="Hours per week they can commit to learning")
-
-    @model_validator(mode="after")
-    def validate_contradictions(self) -> 'GoalInput':
-        text = self.goal_text.lower()
-        if ("beginner" in text or "novice" in text or "no experience" in text) and ("advanced" in text or "expert" in text or "senior" in text):
-            raise ValueError("Contradictory skill levels detected in goal description. Please clarify your actual experience level.")
-        return self
-
-class DiagnosticSubmitInput(BaseModel):
-    session_id: int
-    question_id: str
-    answer: str
-
-class SkipSimulationInput(BaseModel):
-    profile_id: int
-    skill_id: str
-
-class CheckpointSubmitInput(BaseModel):
-    profile_id: int
-    skill_id: str
-    user_answer: str
-
-class CoachChatInput(BaseModel):
-    skill_id: str
-    message: str
-    profile_id: Optional[int] = None
-
-class SliderWeightsInput(BaseModel):
-    profile_id: int
-    speed: float = Field(default=0.5, ge=0.0, le=1.0)
-    depth: float = Field(default=0.5, ge=0.0, le=1.0)
-    cost: float = Field(default=0.5, ge=0.0, le=1.0)
-
-class CareerPivotInput(BaseModel):
-    profile_id: int
-    role_id: str
-
-class CertificateRequest(BaseModel):
-    profile_id: int
-    course_name: str
-    role_id: str
-
-class ScrapeJobsInput(BaseModel):
-    source: str = Field(default="greenhouse", description="Source adapter name (e.g. 'greenhouse')")
-    board_token: str = Field(..., description="Job board identifier token (e.g. 'canonical', 'stripe')")
-    company_name: Optional[str] = Field(default=None, description="Optional company display name")
-    limit: Optional[int] = Field(default=None, ge=1, description="Max jobs to return")
-
-class ScrapeEventsInput(BaseModel):
-    source: str = Field(default="devfolio", description="Event source adapter name (e.g. 'devfolio', 'unstop')")
-    board_token: str = Field(default="all", description="Board token, category, or filter query")
-    company_name: Optional[str] = Field(default=None, description="Optional organizer or sponsor display name")
-    limit: Optional[int] = Field(default=None, ge=1, description="Max events to return")
-
+from app.schemas.requests import (
+    GoalInput, DiagnosticSubmitInput, SkipSimulationInput, 
+    CheckpointSubmitInput, CoachChatInput, SliderWeightsInput, 
+    CareerPivotInput, CertificateRequest, ScrapeJobsInput, ScrapeEventsInput
+)
 
 # --- Innovation Endpoint Schemas (imported from service modules) ---
 # These are re-exported here so they appear in the OpenAPI schema.
@@ -283,25 +228,8 @@ async def get_or_create_profile(email: str, db: AsyncSession) -> LearnerProfile:
 
 # --- API Endpoints ---
 
-@app.get("/health")
-async def health_check():
-    """
-    Standard service health check endpoint.
-    """
-    return {"status": "ok", "provider": ai_provider.__class__.__name__}
-
-@app.post("/api/v1/seed")
-async def seed_databases(db: AsyncSession = Depends(get_db)):
-    """
-    Seeds Postgres and Neo4j databases with default skills, resources, and quizzes.
-    """
-    from app.services.seeder import seed_all
-    try:
-        await seed_all(db, neo4j_client)
-        return {"status": "success", "message": "Databases successfully seeded with 15 SWE skills!"}
-    except Exception as e:
-        logger.exception("Database seeding failed")
-        raise HTTPException(status_code=500, detail=f"Database seeding failed: {e}")
+from app.routers.system import router as system_router
+app.include_router(system_router)
 
 @app.post("/api/v1/goal")
 async def parse_and_initiate_goal(

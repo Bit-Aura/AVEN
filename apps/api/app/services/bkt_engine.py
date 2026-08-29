@@ -6,6 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.domain import SkillRecord, ReadinessSnapshot
 from app.infrastructure.neo4j.client import Neo4jClient
+from app.db.repositories.skill_repo import SkillRepository
+from app.infrastructure.neo4j.repositories import Neo4jSkillRepository
 
 logger = logging.getLogger(__name__)
 
@@ -19,36 +21,19 @@ DEFAULT_BKT_GUESS = 0.20
 DECAY_STABILITY_DAYS = 30.0
 
 async def get_skill_bkt_params(skill_id: str, db: AsyncSession, neo4j_client: Optional[Neo4jClient] = None) -> Dict[str, float]:
-    try:
-        stmt = select(SkillRecord).where(SkillRecord.id == skill_id)
-        result = await db.execute(stmt)
-        skill_rec = result.scalars().first()
-        if skill_rec:
-            return {
-                "p_l0": skill_rec.bkt_p_l0,
-                "p_t": skill_rec.bkt_p_t,
-                "p_s": skill_rec.bkt_p_s,
-                "p_g": skill_rec.bkt_p_g
-            }
-    except Exception as e:
-        logger.debug(f"Postgres skill lookup for BKT failed: {e}")
+    pg_repo = SkillRepository(db)
+    
+    # Try Postgres First
+    bkt_params = await pg_repo.get_skill_bkt_params(skill_id)
+    if bkt_params:
+        return bkt_params
 
+    # Try Neo4j Fallback
     if neo4j_client:
-        try:
-            with neo4j_client.driver.session() as session:
-                res = session.run(
-                    "MATCH (s:Skill {id: $id}) RETURN s.bkt_p_l0 AS p_l0, s.bkt_p_t AS p_t, s.bkt_p_s AS p_s, s.bkt_p_g AS p_g",
-                    {"id": skill_id}
-                ).single()
-                if res and res["p_l0"] is not None:
-                    return {
-                        "p_l0": float(res["p_l0"]),
-                        "p_t": float(res["p_t"]),
-                        "p_s": float(res["p_s"]),
-                        "p_g": float(res["p_g"])
-                    }
-        except Exception as e:
-            logger.debug(f"Neo4j skill lookup for BKT failed: {e}")
+        neo4j_repo = Neo4jSkillRepository(neo4j_client)
+        bkt_params = neo4j_repo.get_skill_bkt_params(skill_id)
+        if bkt_params:
+            return bkt_params
 
     return {
         "p_l0": DEFAULT_BKT_PRIOR,

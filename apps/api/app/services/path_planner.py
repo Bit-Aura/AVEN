@@ -17,6 +17,8 @@ from app.services.graph_engine import build_skill_subgraph, get_topological_sort
 from app.services.ranker import rank_resources_for_skill
 from app.services.explainer import explain_recommendation
 from app.services.bkt_engine import get_skill_bkt_params, update_bkt_score, check_skill_decay, DEFAULT_BKT_PRIOR
+from app.db.repositories.skill_repo import SkillRepository
+from app.infrastructure.neo4j.repositories import Neo4jSkillRepository
 
 logger = logging.getLogger(__name__)
 
@@ -36,30 +38,16 @@ async def failure_root_cause_backtrace(
     a focused refresher.
     """
     # 1. Fetch all ancestors recursively from Neo4j
-    query_all_ancestors = """
-    MATCH path = (pre:Skill)-[:PREREQUISITE_OF*1..]->(s:Skill {id: $skill_id})
-    RETURN pre.id AS id, pre.name AS name, length(path) AS depth
-    ORDER BY depth ASC
-    """
-    ancestor_ids = []
-    try:
-        with neo4j_client.driver.session() as session:
-            result = session.run(query_all_ancestors, {"skill_id": failed_skill_id})
-            ancestor_ids = [record["id"] for record in result]
-    except Exception as e:
-        logger.error(f"Neo4j path matching failed in root-cause backtrace: {e}")
-        return None
+    neo4j_repo = Neo4jSkillRepository(neo4j_client)
+    pg_repo = SkillRepository(db)
+
+    ancestor_ids = neo4j_repo.get_all_ancestors(failed_skill_id)
         
     if not ancestor_ids:
         return None
         
     # 2. Check Postgres readiness scores for all ancestors
-    stmt = select(ReadinessSnapshot).where(
-        ReadinessSnapshot.profile_id == profile_id,
-        ReadinessSnapshot.skill_id.in_(ancestor_ids)
-    )
-    result = await db.execute(stmt)
-    snapshots = {s.skill_id: s.readiness_score for s in result.scalars().all()}
+    snapshots = await pg_repo.get_ancestor_readiness(profile_id, ancestor_ids)
     
     # 3. Identify the weakest prerequisite among sub-0.70 nodes
     weakest_skill = None
@@ -76,17 +64,7 @@ async def failure_root_cause_backtrace(
 
     # 4. FALLBACK: All ancestors are >= 0.70.
     # Query direct (immediate) prerequisite parents and select the one with the lowest score.
-    query_direct_parents = """
-    MATCH (pre:Skill)-[:PREREQUISITE_OF]->(s:Skill {id: $skill_id})
-    RETURN pre.id AS id
-    """
-    direct_parents = []
-    try:
-        with neo4j_client.driver.session() as session:
-            res = session.run(query_direct_parents, {"skill_id": failed_skill_id})
-            direct_parents = [record["id"] for record in res]
-    except Exception as e:
-        logger.error(f"Neo4j direct parent lookup failed: {e}")
+    direct_parents = neo4j_repo.get_direct_parents(failed_skill_id)
 
     if direct_parents:
         # Fallback to the lowest-scoring direct parent
