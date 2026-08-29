@@ -402,6 +402,118 @@ function generateRoadmapLayout(
 
   if (!skills || skills.length === 0) return { nodes: [], edges: [] };
 
+  const hasCatHierarchy = skills.some(s => s.id && s.id.includes('_cat_'));
+
+  if (!hasCatHierarchy) {
+    // 1. Build adjacency maps
+    const adj: Record<string, string[]> = {};
+    const inDegree: Record<string, number> = {};
+    const skillMap: Record<string, any> = {};
+
+    skills.forEach(s => {
+      skillMap[s.id] = s;
+      adj[s.id] = [];
+      inDegree[s.id] = 0;
+    });
+
+    edges.forEach(e => {
+      const src = e.source_id || e.source;
+      const tgt = e.target_id || e.target;
+      if (adj[src] && inDegree[tgt] !== undefined) {
+        adj[src].push(tgt);
+        inDegree[tgt] = (inDegree[tgt] || 0) + 1;
+      }
+    });
+
+    // 2. Compute layer depths using topological traversal
+    const depth: Record<string, number> = {};
+    const queue: string[] = [];
+
+    skills.forEach(s => {
+      if ((inDegree[s.id] || 0) === 0) {
+        depth[s.id] = 0;
+        queue.push(s.id);
+      }
+    });
+
+    if (queue.length === 0 && skills.length > 0) {
+      depth[skills[0].id] = 0;
+      queue.push(skills[0].id);
+    }
+
+    const visited = new Set<string>();
+    while (queue.length > 0) {
+      const curr = queue.shift()!;
+      if (visited.has(curr)) continue;
+      visited.add(curr);
+
+      const currDepth = depth[curr] || 0;
+      for (const neighbor of (adj[curr] || [])) {
+        depth[neighbor] = Math.max(depth[neighbor] || 0, currDepth + 1);
+        if (!visited.has(neighbor)) {
+          queue.push(neighbor);
+        }
+      }
+    }
+
+    // Ensure all skills have a depth
+    skills.forEach(s => {
+      if (depth[s.id] === undefined) {
+        depth[s.id] = 0;
+      }
+    });
+
+    // Group skills by depth
+    const layers: Record<number, any[]> = {};
+    skills.forEach(s => {
+      const d = depth[s.id] || 0;
+      if (!layers[d]) layers[d] = [];
+      layers[d].push(s);
+    });
+
+    const maxDepth = Math.max(...Object.keys(layers).map(Number), 0);
+    let currentY = 80;
+
+    for (let d = 0; d <= maxDepth; d++) {
+      const layerSkills = layers[d] || [];
+      const count = layerSkills.length;
+      if (count === 0) continue;
+
+      const totalW = count * SPINE_NODE_W + (count - 1) * 60;
+      const startX = CENTER_X - totalW / 2;
+
+      layerSkills.forEach((sk, idx) => {
+        const x = startX + idx * (SPINE_NODE_W + 60);
+        const y = currentY;
+        layoutNodes.push({
+          id: sk.id,
+          type: 'spineNode',
+          position: { x, y },
+          data: { label: sk.name || sk.label || sk.id, skill: sk },
+        });
+      });
+
+      currentY += SPINE_NODE_H + SPINE_GAP + 30;
+    }
+
+    // Generate flow edges
+    edges.forEach(e => {
+      const src = e.source_id || e.source;
+      const tgt = e.target_id || e.target;
+      flowEdges.push({
+        id: `e-${src}-${tgt}`,
+        source: src,
+        target: tgt,
+        type: 'smoothstep',
+        sourceHandle: 'bottom',
+        targetHandle: 'top',
+        style: { stroke: '#141413', strokeWidth: 2.5 },
+      });
+    });
+
+    return { nodes: layoutNodes, edges: flowEdges };
+  }
+
   const childrenOf: Record<string, string[]> = {};
   edges.forEach(e => {
     const src = e.source_id || e.source;
@@ -716,11 +828,11 @@ function GraphInner() {
           
           <div className="flex items-center bg-aven-surface p-1 rounded-lg border border-aven-border">
             <button onClick={() => setViewMode('graph')}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'graph' ? 'bg-aven-text-subtle text-aven-text' : 'text-aven-text-muted hover:text-aven-text'}`}>
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'graph' ? 'bg-aven-primary text-aven-base shadow-sm' : 'text-aven-text-muted hover:text-aven-text'}`}>
               <Network size={14} /><span>My Graph</span>
             </button>
             <button onClick={() => setViewMode('roadmap')}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'roadmap' ? 'bg-aven-text-subtle text-aven-text' : 'text-aven-text-muted hover:text-aven-text'}`}>
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition ${viewMode === 'roadmap' ? 'bg-aven-primary text-aven-base shadow-sm' : 'text-aven-text-muted hover:text-aven-text'}`}>
               <Map size={14} /><span>Roadmaps</span>
             </button>
           </div>
@@ -734,7 +846,7 @@ function GraphInner() {
                 <button key={r.slug} onClick={() => setSelectedRoadmap(r.slug)}
                   className={`flex items-center px-3 py-1.5 rounded-md text-xs font-bold transition shrink-0 border ${
                     active 
-                      ? 'bg-aven-text-subtle text-aven-text border-aven-text-subtle' 
+                      ? 'bg-aven-primary text-aven-base border-aven-primary shadow-sm' 
                       : 'bg-aven-base text-aven-text-muted border-aven-border hover:border-aven-text-muted hover:text-aven-text'
                   }`}>
                   {r.label}

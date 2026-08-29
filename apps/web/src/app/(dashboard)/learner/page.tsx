@@ -70,8 +70,9 @@ export default function LearnerDashboard() {
 
   useEffect(() => {
     if (readinessScore > 0 && prevReadiness.current > 0 && readinessScore !== prevReadiness.current) {
-      const diff = (readinessScore - prevReadiness.current).toFixed(2);
-      setBktUpdateMsg(`BKT Score Updated! P(L) shifted by ${diff > 0 ? '+' : ''}${diff}. Path adaptivity triggered.`);
+      const diffNum = readinessScore - prevReadiness.current;
+      const diff = diffNum.toFixed(2);
+      setBktUpdateMsg(`BKT Score Updated! P(L) shifted by ${diffNum > 0 ? '+' : ''}${diff}. Path adaptivity triggered.`);
       setTimeout(() => setBktUpdateMsg(null), 5000);
     }
     prevReadiness.current = readinessScore;
