@@ -20,9 +20,9 @@ export function useYjs(sessionId: string | number | undefined, editorRef: any, u
       // Create a new Yjs document
       ydoc = new Y.Doc();
       
-      // Connect to public y-websocket server (replace with own in production)
+      // Connect to dedicated local y-websocket server (run via `npm run yjs-server`)
       provider = new WebsocketProvider(
-        'wss://demos.yjs.dev/ws',
+        'ws://localhost:1234',
         `aven-p2p-session-${sessionId}`,
         ydoc
       );

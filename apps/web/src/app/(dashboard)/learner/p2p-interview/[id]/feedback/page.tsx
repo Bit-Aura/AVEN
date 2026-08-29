@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { Star, Send, ArrowRight } from 'lucide-react';
+import { submitP2PFeedback } from '@/api/client';
 
 export default function P2PFeedbackPage() {
   const params = useParams();
@@ -24,21 +25,18 @@ export default function P2PFeedbackPage() {
 
     setIsSubmitting(true);
     try {
-      // In a real app, we'd hit POST /p2p/session/{id}/feedback
-      // const client = getClient();
-      // await client.post(`/api/v1/p2p/session/${sessionId}/feedback`, {
-      //   user_id: user.id,
-      //   communication_score: commScore,
-      //   technical_score: techScore,
-      //   feedback_text: feedbackText
-      // });
-      
-      // Simulate submission for prototype
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      router.push('/learner/interview');
+      if (typeof sessionId === 'string') {
+        await submitP2PFeedback(sessionId, {
+          user_id: user.id,
+          communication_score: commScore,
+          technical_score: techScore,
+          feedback_text: feedbackText
+        });
+      }
+      router.push('/learner/p2p-interview');
     } catch (err) {
       console.error(err);
+      alert("Failed to submit feedback. Please try again.");
       setIsSubmitting(false);
     }
   };

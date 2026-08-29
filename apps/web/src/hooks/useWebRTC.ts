@@ -9,6 +9,7 @@ type SignalMessage = {
 
 export function useWebRTC(sessionId: string | number | undefined, userId: string | undefined) {
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'failed'>('connecting');
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   
@@ -51,6 +52,17 @@ export function useWebRTC(sessionId: string | number | undefined, userId: string
           type: 'ice-candidate',
           candidate: event.candidate
         }));
+      }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log("ICE Connection State:", pc.iceConnectionState);
+      if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') {
+        setConnectionStatus('connected');
+      } else if (pc.iceConnectionState === 'disconnected') {
+        setConnectionStatus('disconnected');
+      } else if (pc.iceConnectionState === 'failed') {
+        setConnectionStatus('failed');
       }
     };
 
@@ -118,5 +130,5 @@ export function useWebRTC(sessionId: string | number | undefined, userId: string
     }
   }, [localStream]);
 
-  return { localStream, remoteStream, isConnected };
+  return { localStream, remoteStream, isConnected, connectionStatus };
 }

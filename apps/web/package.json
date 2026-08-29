@@ -10,7 +10,8 @@
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "postinstall": "node scripts/patch-y-monaco.cjs"
+    "postinstall": "node scripts/patch-y-monaco.cjs",
+    "yjs-server": "HOST=localhost PORT=1234 npx y-websocket"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.8.0",

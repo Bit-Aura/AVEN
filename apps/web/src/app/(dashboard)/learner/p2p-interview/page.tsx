@@ -2,9 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, Code, Server, Search, RefreshCw, XCircle } from 'lucide-react';
+import { Users, Code, Server, Search, RefreshCw, XCircle, Star } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
-import { joinP2PQueue, checkP2PQueueStatus, leaveP2PQueue } from '@/api/client';
+import { joinP2PQueue, checkP2PQueueStatus, leaveP2PQueue, fetchP2PHistory } from '@/api/client';
+
+interface HistoryItem {
+  session_id: number;
+  topic: string;
+  date: string;
+  peer_name: string;
+  role: string;
+  feedback_received: any | null;
+}
 
 export default function P2PInterviewLobbyPage() {
   const router = useRouter();
@@ -14,6 +23,9 @@ export default function P2PInterviewLobbyPage() {
   const [matchedSessionId, setMatchedSessionId] = useState<string | null>(null);
   const [matchedPeerName, setMatchedPeerName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [showAllHistory, setShowAllHistory] = useState(false);
 
   const topics = [
     { id: 'data_structures', name: 'Data Structures & Algorithms', icon: Code, description: 'Classic algorithmic problem solving (Arrays, Trees, Graphs, DP)' },
@@ -44,6 +56,16 @@ export default function P2PInterviewLobbyPage() {
       if (interval) clearInterval(interval);
     };
   }, [isSearching, user, matchedSessionId]);
+
+  useEffect(() => {
+    if (user) {
+      setIsLoadingHistory(true);
+      fetchP2PHistory(user.id)
+        .then(res => setHistory(res || []))
+        .catch(err => console.error("Failed to load history", err))
+        .finally(() => setIsLoadingHistory(false));
+    }
+  }, [user]);
 
   const handleJoinQueue = async () => {
     if (!user) return;
@@ -228,6 +250,78 @@ export default function P2PInterviewLobbyPage() {
           >
             <XCircle className="w-4 h-4" /> Cancel Search
           </button>
+        </div>
+      )}
+
+      {/* History Section */}
+      {!isSearching && !matchedSessionId && (
+        <div className="bg-white rounded-3xl border border-aven-border shadow-lg p-8 mt-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-aven-text">Past Interviews</h2>
+            <div className="px-3 py-1 bg-aven-surface rounded-full text-xs font-bold text-aven-text-subtle">
+              {history.length} Sessions
+            </div>
+          </div>
+          
+          {isLoadingHistory ? (
+            <div className="flex justify-center p-8">
+              <div className="w-8 h-8 border-4 border-aven-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : history.length === 0 ? (
+            <div className="text-center p-8 bg-aven-surface/50 rounded-2xl border border-aven-border border-dashed">
+              <p className="text-aven-text-subtle font-medium">You haven't completed any interviews yet.</p>
+              <p className="text-xs text-aven-text-muted mt-1">Join the queue above to get started!</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="space-y-3">
+                {(showAllHistory ? history : history.slice(0, 3)).map((session) => {
+                  const dateObj = new Date(session.date);
+                const dateStr = isNaN(dateObj.getTime()) ? 'Recently' : dateObj.toLocaleDateString();
+                return (
+                <div key={session.session_id} className="px-5 py-3 rounded-2xl border border-aven-border hover:border-aven-primary/30 transition-colors bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-aven-text text-base">{session.topic.replace('_', ' ').toUpperCase()}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold">COMPLETED</span>
+                    </div>
+                    <p className="text-xs text-aven-text-subtle">
+                      Interviewed with <span className="font-semibold text-aven-text">{session.peer_name}</span> • {dateStr}
+                    </p>
+                  </div>
+                  
+                  {session.feedback_received ? (
+                    <div className="flex items-center gap-4 text-left">
+                      <div className="flex items-center gap-1.5 text-amber-500 text-xs font-bold bg-white px-2 py-1 rounded-md border border-aven-border shadow-sm">
+                        <span className="text-[10px] text-aven-text-muted uppercase">Comm:</span>
+                        <Star className="w-3 h-3 fill-current" /> {session.feedback_received.communication_score}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-amber-500 text-xs font-bold bg-white px-2 py-1 rounded-md border border-aven-border shadow-sm">
+                        <span className="text-[10px] text-aven-text-muted uppercase">Tech:</span>
+                        <Star className="w-3 h-3 fill-current" /> {session.feedback_received.technical_score}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="px-3 py-1.5 rounded-lg border border-aven-border border-dashed bg-white text-[11px] text-aven-text-muted italic w-fit">
+                      Waiting for feedback
+                    </div>
+                  )}
+                </div>
+                )})}
+              </div>
+              
+              {history.length > 3 && (
+                <div className="flex justify-center pt-2">
+                  <button 
+                    onClick={() => setShowAllHistory(!showAllHistory)}
+                    className="px-6 py-2 rounded-xl border border-aven-border hover:border-aven-primary hover:bg-aven-primary/5 text-aven-text-subtle hover:text-aven-primary font-semibold text-sm transition-all"
+                  >
+                    {showAllHistory ? 'Show Less' : `View All ${history.length} Interviews`}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

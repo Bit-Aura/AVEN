@@ -19,8 +19,13 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Career PathFinder",
-  description: "AI-powered personalized learning path recommender",
+  title: "AVEN",
+  description: "Advanced Peer-to-Peer Mock Interviews & AI-powered personalized learning",
+  icons: {
+    icon: "/Logo.png",
+    shortcut: "/Logo.png",
+    apple: "/Logo.png",
+  }
 };
 
 const CLERK_PUBLISHABLE_KEY =

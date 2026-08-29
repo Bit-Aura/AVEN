@@ -3,11 +3,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import { getP2PSession } from '@/api/client';
+import { getP2PSession, swapP2PSessionRoles } from '@/api/client';
 import { Editor } from '@monaco-editor/react';
 import { useWebRTC } from '@/hooks/useWebRTC';
 import { useYjs } from '@/hooks/useYjs';
-import { Clock, Users, ArrowRight, ShieldAlert, CheckCircle, Video, Mic, MicOff, VideoOff, Maximize, Minimize } from 'lucide-react';
+import { Clock, Users, ArrowRight, ShieldAlert, CheckCircle, Video, Mic, MicOff, VideoOff, Maximize, Minimize, ArrowRightLeft, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function P2PInterviewRoomPage() {
@@ -23,7 +23,7 @@ export default function P2PInterviewRoomPage() {
   const [timeLeft, setTimeLeft] = useState<number>(30 * 60); // 30 mins per half
   
   // WebRTC hooks
-  const { localStream, remoteStream, isConnected } = useWebRTC(sessionId, user?.id);
+  const { localStream, remoteStream, isConnected, connectionStatus } = useWebRTC(sessionId, user?.id);
   
   // Video element refs
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -137,10 +137,23 @@ export default function P2PInterviewRoomPage() {
   };
 
   const isUser1 = user?.id === session?.user1_id;
-  // Part 1: User 1 is interviewer. Part 2: User 2 is interviewer.
   const isInterviewer = session?.status === 'IN_PROGRESS_2' ? !isUser1 : isUser1;
   const peerName = isUser1 ? session?.user2_name : session?.user1_name;
   const displayPeerName = peerName || 'Peer';
+
+  const handleSwapRoles = async () => {
+    if (!session || !user) return;
+    try {
+      const updatedSession = await swapP2PSessionRoles(session.id, user.id);
+      setSession(updatedSession);
+      // Clear editor content for the new problem
+      if (editorRef.current) {
+        editorRef.current.getModel()?.setValue('# Time to swap roles!\n# The new candidate can start typing here.\n');
+      }
+    } catch (e) {
+      console.error("Failed to swap roles", e);
+    }
+  };
 
   if (!isClient || !session) {
     return <div className="min-h-screen flex items-center justify-center text-aven-text-subtle font-medium">Loading Interview Room...</div>;
@@ -172,6 +185,14 @@ export default function P2PInterviewRoomPage() {
           <div className={`px-4 py-1.5 rounded-full font-bold text-sm flex items-center gap-2 ${timeLeft < 300 ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-700'}`}>
             <Clock className="w-4 h-4" /> {formatTimer(timeLeft)}
           </div>
+          {session.status !== 'IN_PROGRESS_2' && isInterviewer && (
+            <button 
+              onClick={handleSwapRoles}
+              className="px-4 py-2 rounded-xl bg-aven-surface text-aven-text text-sm font-bold hover:bg-aven-border transition-colors shadow-sm flex items-center gap-2 border border-aven-border"
+            >
+              <ArrowRightLeft className="w-4 h-4" /> Swap Roles
+            </button>
+          )}
           <button 
             onClick={() => setIsFullscreen(!isFullscreen)}
             className="p-2 rounded-xl bg-aven-surface/50 hover:bg-aven-surface text-aven-text transition-colors"
@@ -226,15 +247,32 @@ export default function P2PInterviewRoomPage() {
                 ref={remoteVideoRef} 
                 autoPlay 
                 playsInline 
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover transition-opacity duration-300 ${connectionStatus === 'disconnected' || connectionStatus === 'failed' ? 'opacity-30 blur-sm' : 'opacity-100'}`}
               />
-              {!remoteStream && (
+              
+              {/* Connection Status Overlays */}
+              <AnimatePresence>
+                {(connectionStatus === 'disconnected' || connectionStatus === 'failed') && remoteStream && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm z-20"
+                  >
+                    <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                    <span className="text-sm font-bold text-white drop-shadow-md">Reconnecting to peer...</span>
+                    <span className="text-xs font-medium text-white/70 mt-1 max-w-[80%] text-center">Their connection dropped. Please wait.</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {!remoteStream && connectionStatus !== 'disconnected' && connectionStatus !== 'failed' && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white/50">
                   <VideoOff className="w-8 h-8 mb-2" />
                   <span className="text-xs font-medium text-center px-4">Waiting for {displayPeerName}'s video...</span>
                 </div>
               )}
-              <div className="absolute bottom-2 left-2 px-2 py-1 rounded-md bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold">
+              <div className="absolute bottom-2 left-2 px-2 py-1 rounded-md bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold z-30">
                 {displayPeerName}
               </div>
             </div>

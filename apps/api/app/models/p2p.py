@@ -31,3 +31,12 @@ class P2PSession(Base):
     # Store feedback as JSON for simplicity
     feedback_user1 = Column(JSON, nullable=True) # Feedback given BY user1 TO user2
     feedback_user2 = Column(JSON, nullable=True) # Feedback given BY user2 TO user1
+
+class P2PQuestion(Base):
+    __tablename__ = "p2p_questions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    topic = Column(String, index=True, nullable=False)
+    difficulty = Column(String, default="Medium")
+    question_text = Column(Text, nullable=False)
+    solution_guidelines = Column(Text, nullable=False)

@@ -1326,3 +1326,20 @@ export const checkP2PQueueStatus = async (userId: string) => {
 export const getP2PSession = async (sessionId: string | number) => {
   return await fetchApi(`/p2p/session/${sessionId}`);
 };
+
+export const swapP2PSessionRoles = async (sessionId: string | number, userId: string) => {
+  return await fetchApi(`/p2p/session/${sessionId}/swap?user_id=${encodeURIComponent(userId)}`, {
+    method: 'PATCH'
+  });
+};
+
+export const fetchP2PHistory = async (userId: string) => {
+  return await fetchApi(`/p2p/history?user_id=${encodeURIComponent(userId)}`);
+};
+
+export const submitP2PFeedback = async (sessionId: string | number, payload: { user_id: string; communication_score: number; technical_score: number; feedback_text: string }) => {
+  return await fetchApi(`/p2p/session/${sessionId}/feedback`, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
