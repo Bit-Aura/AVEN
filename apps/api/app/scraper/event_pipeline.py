@@ -1,7 +1,15 @@
 import logging
 from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any, Tuple
-from rapidfuzz import fuzz
+try:
+    from rapidfuzz import fuzz
+except ImportError:
+    import difflib
+    class FuzzFallback:
+        @staticmethod
+        def ratio(s1, s2):
+            return difflib.SequenceMatcher(None, str(s1), str(s2)).ratio() * 100
+    fuzz = FuzzFallback()
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert

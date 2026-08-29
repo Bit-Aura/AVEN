@@ -39,7 +39,7 @@ class GenericScrapedJob(BaseScrapedJob):
 
 JobSchema = Annotated[
     Union[AshbyScrapedJob, GreenhouseScrapedJob, GenericScrapedJob],
-    Field(discriminator="type", union_mode="left_to_right")
+    Field(discriminator="type")
 ]
 
 class ScrapedJob(BaseModel):

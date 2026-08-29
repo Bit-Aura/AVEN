@@ -555,6 +555,8 @@ export const sanityCheckRoadmap = async (payload: {
   });
 };
 
+export const checkRoadmapSanity = sanityCheckRoadmap;
+
 export const fetchRelevantCourses = async (profileId: number, activeMilestone?: string) => {
   const url = activeMilestone 
     ? `/learner/courses?profile_id=${profileId}&active_milestone=${encodeURIComponent(activeMilestone)}`
