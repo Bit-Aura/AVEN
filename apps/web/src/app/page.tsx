@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { SafeUserButton } from '../lib/clerkSafe';
+import { SafeUserButton, useSafeUser } from '../lib/clerkSafe';
 import { 
   ArrowRight, 
   ShieldCheck, 
   Network, 
-  Award 
+  Award,
+  LogIn,
+  Sparkles
 } from 'lucide-react';
 
 /**
@@ -14,6 +16,10 @@ import {
  * Provides production-ready logic and seamless integration within the AVEN ecosystem.
  */
 export default function LandingPage() {
+  const { user, isSignedIn, isLoaded } = useSafeUser();
+  const role = user?.role || 'LEARNER';
+  const dashboardHref = role === 'ADMIN' ? '/admin' : role === 'MENTOR' ? '/mentor' : '/learner';
+
   return (
     <>
       <style dangerouslySetInnerHTML={{__html: `
@@ -88,8 +94,36 @@ export default function LandingPage() {
               </span>
               <sup className="text-sm md:text-base text-white tracking-widest mt-2">AVEN</sup>
             </div>
-            <div className="flex items-center">
-              <SafeUserButton appearance={{ elements: { userButtonAvatarBox: "w-10 h-10 border border-white/20" } }} placement="bottom-right" />
+            <div className="flex items-center gap-3">
+              {isLoaded && isSignedIn && user ? (
+                <>
+                  <Link
+                    href={dashboardHref}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md transition-all cursor-pointer"
+                  >
+                    <span>Dashboard</span>
+                    <ArrowRight size={13} />
+                  </Link>
+                  <SafeUserButton appearance={{ elements: { userButtonAvatarBox: "w-10 h-10 border border-white/20" } }} placement="bottom-right" />
+                </>
+              ) : (
+                <div className="flex items-center gap-2.5">
+                  <Link
+                    href="/sign-in"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all cursor-pointer backdrop-blur-md"
+                  >
+                    <LogIn size={13} />
+                    <span>Sign In</span>
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-black bg-white hover:bg-white/90 shadow-md transition-all cursor-pointer"
+                  >
+                    <Sparkles size={13} className="text-indigo-600" />
+                    <span>Get Started</span>
+                  </Link>
+                </div>
+              )}
             </div>
           </nav>
 

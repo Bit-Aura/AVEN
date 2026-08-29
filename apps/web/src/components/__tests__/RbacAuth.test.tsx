@@ -172,7 +172,7 @@ describe('RBAC Authentication & User Flows', () => {
       render(<Sidebar />);
 
       expect(screen.getByText('Mentor Connect')).toBeInTheDocument();
-      expect(screen.getByText('1-on-1 Mentorship Feed')).toBeInTheDocument();
+      expect(screen.getByText('Learner 360° Intel')).toBeInTheDocument();
       expect(screen.queryByText('Platform Admin')).not.toBeInTheDocument();
     });
 

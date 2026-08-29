@@ -156,6 +156,13 @@ app.include_router(admin_router)
 from app.routers.admin import router as legacy_admin_router
 app.include_router(legacy_admin_router)
 
+# Include P2P Routers
+from app.routers.p2p import router as p2p_router
+app.include_router(p2p_router, prefix=settings.API_V1_STR)
+
+from app.routers.ws_p2p import router as ws_p2p_router
+app.include_router(ws_p2p_router, prefix=settings.API_V1_STR)
+
 # Instantiate AI Provider via factory (Antigravity Proxy > Anthropic > Mock)
 ai_provider = create_ai_provider()
 

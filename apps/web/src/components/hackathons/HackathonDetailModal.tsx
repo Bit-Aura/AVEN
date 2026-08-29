@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, Building, Clock, Calendar, Trophy, Globe, MapPin } from 'lucide-react';
-import type { HackathonEvent } from '@aven/shared-types';
+import type { HackathonEvent } from '@/types/hackathons';
 
 interface HackathonDetailModalProps {
   event: HackathonEvent | null;
@@ -112,10 +112,10 @@ export default function HackathonDetailModal({ event, onClose }: HackathonDetail
                   <span>Application Deadline: <strong>{new Date(event.registration_deadline.replace('Z', '+00:00')).toLocaleString()}</strong></span>
                 </div>
               )}
-              {event.event_start_date && (
+              {event.start_date && (
                 <div className="flex items-center gap-2">
                   <Calendar size={14} className="text-emerald-600" />
-                  <span>Hackathon Begins: <strong>{new Date(event.event_start_date.replace('Z', '+00:00')).toLocaleString()}</strong></span>
+                  <span>Hackathon Begins: <strong>{new Date(event.start_date.replace('Z', '+00:00')).toLocaleString()}</strong></span>
                 </div>
               )}
             </div>

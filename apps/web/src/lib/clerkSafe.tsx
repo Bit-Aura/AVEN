@@ -5,14 +5,15 @@ import { useUser as useClerkUser, useClerk, UserButton as ClerkUserButton } from
 import { logoutUser } from '../api/client';
 import { usePathStore } from '../store/usePathStore';
 
-const key = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
+const rawKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
+const key = (rawKey && !rawKey.includes('placeholder') && !rawKey.includes('dummy') && !rawKey.includes('your_clerk'))
+  ? rawKey
+  : 'pk_test_cHJpbWUtbXV0dC01NDUwLmNsZXJrLmFjY291bnRzLmRldiQ=';
+
 export const isClerkConfigured = Boolean(
   key &&
   key.startsWith('pk_') &&
-  key.length > 25 &&
-  !key.includes('placeholder') &&
-  !key.includes('dummy') &&
-  !key.includes('ZGVtby')
+  key.length > 25
 );
 
 export interface AuthenticatedUser {
@@ -120,15 +121,8 @@ export function useSafeUser() {
         primaryEmailAddress: { emailAddress: userToUse.email || '' },
       });
     } else {
-      // Default demo learner
-      setLocalUser({
-        id: 'demo_user',
-        fullName: 'Demo Learner',
-        firstName: 'Demo',
-        username: 'demo_learner',
-        role: 'LEARNER',
-        primaryEmailAddress: { emailAddress: 'demo@pathfinder.dev' },
-      });
+      // Unauthenticated state
+      setLocalUser(null);
     }
     setIsLoaded(true);
   }, [clerkUserObj, clerkLoaded, storeUser]);
@@ -136,7 +130,7 @@ export function useSafeUser() {
   return {
     user: localUser,
     isLoaded: isLoaded,
-    isSignedIn: !!localUser,
+    isSignedIn: Boolean(localUser),
   };
 }
 
@@ -147,7 +141,7 @@ export function useSafeUser() {
 export function SafeUserButton({ appearance, placement = 'top-left' }: { appearance?: any, placement?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' }) {
   const popupClasses = placement.includes('top') ? 'bottom-full mb-2' : 'top-full mt-2';
   const alignClasses = placement.includes('right') ? 'right-0' : 'left-0';
-  const { user } = useSafeUser();
+  const { user, isSignedIn, isLoaded } = useSafeUser();
   const [isOpen, setIsOpen] = useState(false);
   let clerkInstance: any = null;
 
@@ -159,8 +153,21 @@ export function SafeUserButton({ appearance, placement = 'top-left' }: { appeara
     }
   }
 
+  // If not signed in and loaded, render Sign In link
+  if (isLoaded && (!isSignedIn || !user)) {
+    return (
+      <a
+        href="/sign-in"
+        className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all cursor-pointer"
+      >
+        Sign In
+      </a>
+    );
+  }
+
   const role = user?.role || 'LEARNER';
-  const initials = (user?.fullName || 'DL')
+  const dashboardHref = role === 'ADMIN' ? '/admin' : role === 'MENTOR' ? '/mentor' : '/learner';
+  const initials = (user?.fullName || 'User')
     .split(' ')
     .map((n) => n[0])
     .join('')
@@ -173,6 +180,23 @@ export function SafeUserButton({ appearance, placement = 'top-left' }: { appeara
       : role === 'MENTOR'
       ? 'from-emerald-500 to-teal-700'
       : 'from-indigo-500 to-indigo-700';
+
+  const handleSignOut = async () => {
+    logoutUser();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('aven_auth_token');
+      localStorage.removeItem('aven_auth_user');
+      localStorage.removeItem('pathfinder_diagnostic_complete');
+    }
+    if (isClerkConfigured && clerkInstance?.signOut) {
+      try {
+        await clerkInstance.signOut();
+      } catch (e) {
+        console.error('Clerk sign out error', e);
+      }
+    }
+    window.location.href = '/sign-in';
+  };
 
   return (
     <div className="relative flex items-center gap-2">
@@ -195,31 +219,43 @@ export function SafeUserButton({ appearance, placement = 'top-left' }: { appeara
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className={`absolute ${popupClasses} ${alignClasses} w-64 bg-[#2b2b2a] border border-[#3d3d3a] rounded-lg shadow-xl z-50 p-4 text-[#faf9f5]`}>
+          <div className={`absolute ${popupClasses} ${alignClasses} w-64 bg-aven-surface border border-aven-border rounded-2xl shadow-xl z-50 p-4 text-aven-text`}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#87867f]">User Profile</span>
-              <button onClick={() => setIsOpen(false)} className="text-[#87867f] hover:text-[#faf9f5]">
+              <span className="text-[10px] font-black uppercase tracking-widest text-aven-text-muted">User Profile</span>
+              <button onClick={() => setIsOpen(false)} className="text-aven-text-muted hover:text-aven-text cursor-pointer">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
               </button>
             </div>
-            <div className="flex items-center gap-3 mb-3 pb-3 border-b border-[#3d3d3a]">
+            <div className="flex items-center gap-3 mb-3 pb-3 border-b border-aven-border">
               {user?.imageUrl ? (
-                <img src={user.imageUrl} alt="Profile" className="w-10 h-10 rounded-full border border-white/20" />
+                <img src={user.imageUrl} alt="Profile" className="w-10 h-10 rounded-full border border-aven-border object-cover" />
               ) : (
-                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${roleColor} flex items-center justify-center font-bold text-white text-sm border border-white/20`}>
+                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${roleColor} flex items-center justify-center font-bold text-white text-sm border border-aven-border`}>
                   {initials}
                 </div>
               )}
               <div className="overflow-hidden">
-                <div className="text-sm font-black truncate">{user?.fullName}</div>
-                <div className="text-[10px] text-[#87867f] truncate">{user?.primaryEmailAddress?.emailAddress}</div>
+                <div className="text-sm font-black truncate text-aven-text">{user?.fullName}</div>
+                <div className="text-[10px] text-aven-text-subtle truncate">{user?.primaryEmailAddress?.emailAddress}</div>
               </div>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-[#87867f] font-bold">Role</span>
-                <span className={`text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider ${role === 'ADMIN' ? 'bg-rose-500/20 text-rose-400' : role === 'MENTOR' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-indigo-500/20 text-indigo-400'}`}>{role}</span>
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-center text-xs pb-2 border-b border-aven-border">
+                <span className="text-aven-text-subtle font-bold">Role</span>
+                <span className={`text-[9px] px-2 py-0.5 rounded font-black uppercase tracking-wider ${role === 'ADMIN' ? 'bg-rose-500/15 text-rose-700 border border-rose-500/30' : role === 'MENTOR' ? 'bg-emerald-500/15 text-emerald-700 border border-emerald-500/30' : 'bg-aven-primary/15 text-aven-primary border border-aven-primary/30'}`}>{role}</span>
               </div>
+              <a
+                href={dashboardHref}
+                className="w-full text-center py-2 px-3 rounded-lg bg-aven-primary hover:bg-aven-primary/90 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+              >
+                Go to Dashboard
+              </a>
+              <button
+                onClick={handleSignOut}
+                className="w-full text-center py-2 px-3 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 font-bold text-xs border border-rose-500/20 transition-all cursor-pointer"
+              >
+                Sign Out
+              </button>
             </div>
           </div>
         </>

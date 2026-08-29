@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Search, X, SlidersHorizontal, Heart } from 'lucide-react';
-import type { HackathonFilters } from '@aven/shared-types';
+import type { HackathonFilters } from '@/types/hackathons';
 
 interface HackathonFilterBarProps {
   filters: HackathonFilters;
@@ -99,7 +99,7 @@ export default function HackathonFilterBar({
           {/* Format / Mode Dropdown */}
           <select
             value={activeMode}
-            onChange={(e) => onFilterChange({ mode: e.target.value || undefined, offset: 0 })}
+            onChange={(e) => onFilterChange({ mode: e.target.value || undefined, page: 1 })}
             className="w-full bg-white border border-black/5 rounded-lg px-3 py-2 text-[13px] text-[#141413] font-medium focus:outline-none focus:border-black/20 hover:border-black/10 transition-colors shadow-sm cursor-pointer"
           >
             <option value="">All Formats</option>
@@ -111,7 +111,7 @@ export default function HackathonFilterBar({
           {/* Timeline / Status Dropdown */}
           <select
             value={activeStatus}
-            onChange={(e) => onFilterChange({ status: e.target.value || undefined, offset: 0 })}
+            onChange={(e) => onFilterChange({ status: e.target.value || undefined, page: 1 })}
             className="w-full bg-white border border-black/5 rounded-lg px-3 py-2 text-[13px] text-[#141413] font-medium focus:outline-none focus:border-black/20 hover:border-black/10 transition-colors shadow-sm cursor-pointer"
           >
             <option value="">All Timelines</option>
@@ -123,7 +123,7 @@ export default function HackathonFilterBar({
           {/* Sort Dropdown */}
           <select
             value={activeSort}
-            onChange={(e) => onFilterChange({ sort: e.target.value, offset: 0 })}
+            onChange={(e) => onFilterChange({ sort: e.target.value, page: 1 })}
             className="w-full bg-white border border-black/5 rounded-lg px-3 py-2 text-[13px] text-[#141413] font-medium focus:outline-none focus:border-black/20 hover:border-black/10 transition-colors shadow-sm cursor-pointer"
           >
             <option value="newest">Sort: Newest</option>

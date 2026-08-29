@@ -1,56 +1,10 @@
+@import "@xyflow/react/dist/style.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import "@xyflow/react/dist/style.css";
 
-@font-face {
-  font-family: 'Anthropic Sans';
-  src: url('/fonts/AnthropicSans-Roman-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Anthropic Sans';
-  src: url('/fonts/AnthropicSans-Italic-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Anthropic Serif';
-  src: url('/fonts/AnthropicSerif-Roman-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Anthropic Serif';
-  src: url('/fonts/AnthropicSerif-Italic-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Anthropic Mono';
-  src: url('/fonts/AnthropicMono-Roman-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Anthropic Mono';
-  src: url('/fonts/AnthropicMono-Italic-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
 @layer base {
   :root {
     --aven-primary: #3d348b;
@@ -93,3 +47,24 @@
   background: transparent;
 }
 
+/* Yjs Monaco Remote Cursor Base Styles */
+.yRemoteSelection {
+  background-color: rgba(250, 129, 0, 0.2);
+}
+.yRemoteSelectionHead {
+  position: absolute;
+  border-left: 2px solid orange;
+  height: 100%;
+  box-sizing: border-box;
+  z-index: 10;
+  transition: all 0.1s ease;
+}
+.yRemoteSelectionHead::after {
+  position: absolute;
+  content: '';
+  border: 4px solid orange;
+  border-radius: 4px;
+  left: -5px;
+  top: -5px;
+  transition: all 0.1s ease;
+}

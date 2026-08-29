@@ -542,7 +542,13 @@ export const fetchMentorLearners = async () => {
   return await fetchApi('/mentor-connect/learners');
 };
 
-export const sanityCheckRoadmap = async (payload: { profile_id: number; modified_nodes: any[] }) => {
+export const sanityCheckRoadmap = async (payload: { 
+  profile_id?: number; 
+  modified_nodes?: any[];
+  advice_text?: string;
+  source_label?: string;
+  target_role?: string;
+}) => {
   return await fetchApi('/roadmap/sanity-check', {
     method: 'POST',
     body: JSON.stringify(payload)
@@ -1240,7 +1246,18 @@ export const learnerRoadmapGraph = async (slug: string) => {
 // Hackathon API Client Functions
 // ---------------------------------------------------------------------------
 
-export const getHackathons = async (filters: import('@aven/shared-types').HackathonFilters = {}) => {
+export interface HackathonFilters {
+  page?: number;
+  page_size?: number;
+  mode?: string;
+  city?: string;
+  status?: string;
+  min_prize?: number;
+  sort?: string;
+  source?: string | string[];
+}
+
+export const getHackathons = async (filters: HackathonFilters = {}) => {
   const params = new URLSearchParams();
   if (filters.page) params.append('page', filters.page.toString());
   if (filters.page_size) params.append('page_size', filters.page_size.toString());
@@ -1286,3 +1303,43 @@ export const triggerHackathonScrape = async (source: string, limit?: number) => 
 };
 
 
+
+// --- P2P Interview Endpoints ---
+
+export const joinP2PQueue = async (payload: { user_id: string; topic: string; user_name?: string }) => {
+  return await fetchApi('/p2p/queue', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};
+
+export const leaveP2PQueue = async (userId: string) => {
+  return await fetchApi(`/p2p/queue?user_id=${encodeURIComponent(userId)}`, {
+    method: 'DELETE'
+  });
+};
+
+export const checkP2PQueueStatus = async (userId: string) => {
+  return await fetchApi(`/p2p/queue/status?user_id=${encodeURIComponent(userId)}`);
+};
+
+export const getP2PSession = async (sessionId: string | number) => {
+  return await fetchApi(`/p2p/session/${sessionId}`);
+};
+
+export const swapP2PSessionRoles = async (sessionId: string | number, userId: string) => {
+  return await fetchApi(`/p2p/session/${sessionId}/swap?user_id=${encodeURIComponent(userId)}`, {
+    method: 'PATCH'
+  });
+};
+
+export const fetchP2PHistory = async (userId: string) => {
+  return await fetchApi(`/p2p/history?user_id=${encodeURIComponent(userId)}`);
+};
+
+export const submitP2PFeedback = async (sessionId: string | number, payload: { user_id: string; communication_score: number; technical_score: number; feedback_text: string }) => {
+  return await fetchApi(`/p2p/session/${sessionId}/feedback`, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+};

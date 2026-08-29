@@ -200,11 +200,11 @@ export default function LiveInterviewRoomPage() {
     return (
       <div className="max-w-2xl mx-auto my-12 p-8 rounded-2xl bg-rose-950/30 border border-rose-500/30 text-center space-y-4">
         <AlertCircle className="w-12 h-12 text-rose-400 mx-auto" />
-        <h2 className="text-xl font-bold text-aven-text">Interview Session Error</h2>
-        <p className="text-sm text-aven-text-subtle">{errorMessage}</p>
+        <h2 className="text-xl font-bold text-slate-100">Interview Session Error</h2>
+        <p className="text-sm text-rose-200">{errorMessage}</p>
         <Link
           href="/learner/interview"
-          className="inline-block px-6 py-2.5 rounded-xl bg-slate-800 text-aven-text text-sm font-semibold hover:bg-slate-700"
+          className="inline-block px-6 py-2.5 rounded-xl bg-slate-800 text-slate-100 text-sm font-semibold hover:bg-slate-700"
         >
           Return to Interview Hub
         </Link>
@@ -215,7 +215,7 @@ export default function LiveInterviewRoomPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-20 px-4">
       {/* Top Session Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-md">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-white/80 border border-white shadow-md shadow-aven-primary/5 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-aven-primary/10 border border-aven-primary/30 flex items-center justify-center text-aven-primary">
             <Bot className="w-5 h-5" />
@@ -239,7 +239,7 @@ export default function LiveInterviewRoomPage() {
             className={`p-2.5 rounded-xl border text-xs flex items-center gap-1.5 transition-colors ${
               ttsEnabled
                 ? 'bg-aven-primary/10 border-aven-primary/30 text-aven-primary'
-                : 'bg-slate-800/60 border-slate-700 text-aven-text-subtle'
+                : 'bg-aven-surface border-aven-border text-aven-text-subtle'
             }`}
             title={ttsEnabled ? 'Disable Spoken AI Audio' : 'Enable Spoken AI Audio'}
           >
@@ -250,7 +250,7 @@ export default function LiveInterviewRoomPage() {
           <button
             onClick={handleCompleteEarly}
             disabled={isCompleting}
-            className="px-3.5 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="px-3.5 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 text-xs font-semibold flex items-center gap-1.5 transition-colors"
           >
             {isCompleting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Square className="w-3.5 h-3.5" />}
             <span>End Session</span>
@@ -259,21 +259,21 @@ export default function LiveInterviewRoomPage() {
       </div>
 
       {/* Main AI Interviewer Visualizer Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border border-slate-800 p-8 shadow-2xl space-y-8">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-white to-aven-surface/30 border border-white shadow-2xl shadow-aven-primary/5 p-8 space-y-8 backdrop-blur-sm">
         {/* Animated Avatar Centerpiece */}
-        <div className="flex flex-col items-center justify-center space-y-4 pt-4">
+        <div className="flex flex-col items-center justify-center space-y-10 pt-6 pb-2">
           <div className="relative">
             {/* Pulsing rings during speech */}
             {(isSpeaking || isListening) && (
-              <div className={`absolute inset-0 -m-3 rounded-full animate-ping opacity-30 ${isSpeaking ? 'bg-indigo-500' : 'bg-cyan-500'}`} />
+              <div className={`absolute inset-0 -m-6 rounded-full animate-ping opacity-20 ${isSpeaking ? 'bg-aven-primary' : 'bg-cyan-400'}`} />
             )}
             <div
-              className={`relative w-24 h-24 rounded-full border-2 flex items-center justify-center shadow-2xl transition-all duration-300 ${
+              className={`relative z-10 w-24 h-24 rounded-full border-4 flex items-center justify-center shadow-xl transition-all duration-500 ${
                 isSpeaking
-                  ? 'border-indigo-400 bg-indigo-950/60 text-aven-primary shadow-indigo-500/30 scale-105'
+                  ? 'border-aven-primary bg-white text-aven-primary shadow-aven-primary/30 scale-105 ring-4 ring-aven-primary/10'
                   : isListening
-                  ? 'border-cyan-400 bg-cyan-950/60 text-cyan-300 shadow-cyan-500/30 scale-105'
-                  : 'border-slate-700 bg-slate-900 text-aven-text-subtle'
+                  ? 'border-cyan-400 bg-white text-cyan-500 shadow-cyan-500/30 scale-105 ring-4 ring-cyan-400/10'
+                  : 'border-aven-surface bg-white text-aven-text-muted shadow-sm'
               }`}
             >
               <Bot className="w-12 h-12" />
@@ -282,30 +282,30 @@ export default function LiveInterviewRoomPage() {
 
           {/* Status Capsule */}
           <div className="text-center space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-semibold">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-white shadow-sm text-xs font-semibold transition-all">
               {isSpeaking ? (
                 <>
-                  <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-aven-primary animate-ping" />
                   <span className="text-aven-primary">AI Interviewer Speaking...</span>
                 </>
               ) : isTranscribing ? (
                 <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-400" />
-                  <span className="text-cyan-300">Transcribing Spoken Answer...</span>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-600" />
+                  <span className="text-cyan-700">Transcribing Spoken Answer...</span>
                 </>
               ) : isListening ? (
                 <>
                   <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                  <span className="text-rose-300">Recording ({formatTimer(recordingSeconds)}) • Speak Clearly</span>
+                  <span className="text-rose-600">Recording ({formatTimer(recordingSeconds)}) • Speak Clearly</span>
                 </>
               ) : isSubmitting ? (
                 <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-400" />
-                  <span className="text-amber-300">Calibrating & Analyzing Response...</span>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-500" />
+                  <span className="text-amber-600">Calibrating & Analyzing Response...</span>
                 </>
               ) : (
                 <>
-                  <span className="w-2 h-2 rounded-full bg-slate-500" />
+                  <span className="w-2 h-2 rounded-full bg-aven-border" />
                   <span className="text-aven-text-subtle">Awaiting Verbal Response</span>
                 </>
               )}
@@ -326,10 +326,10 @@ export default function LiveInterviewRoomPage() {
                     key={idx}
                     className={`w-1 rounded-full transition-all duration-75 ${
                       isSpeaking
-                        ? 'bg-indigo-400 animate-pulse'
+                        ? 'bg-aven-primary animate-pulse'
                         : isListening
-                        ? 'bg-gradient-to-t from-cyan-500 to-rose-400'
-                        : 'bg-slate-800'
+                        ? 'bg-gradient-to-t from-cyan-400 to-rose-400'
+                        : 'bg-aven-border'
                     }`}
                     style={{ height: `${dynamicHeight}px` }}
                   />
@@ -340,10 +340,10 @@ export default function LiveInterviewRoomPage() {
         </div>
 
         {/* Current Question Bubble */}
-        <div className="relative rounded-2xl bg-indigo-950/30 border border-aven-primary/30 p-6 backdrop-blur-sm space-y-4">
+        <div className="relative rounded-2xl bg-aven-surface/40 border border-transparent p-6 space-y-4 shadow-sm">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md bg-aven-primary/20 text-aven-primary font-bold text-xs">
+              <span className="px-2.5 py-0.5 rounded-md bg-aven-primary/10 text-aven-primary font-bold text-xs">
                 Question {((currentTurn?.turn_index || 0) + 1)}
               </span>
               <span className="text-xs text-aven-text-subtle font-medium uppercase tracking-wider">
@@ -353,13 +353,13 @@ export default function LiveInterviewRoomPage() {
 
             <button
               onClick={handleReplayQuestion}
-              className="text-xs text-aven-primary hover:text-aven-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-aven-primary/10 border border-indigo-500/20 hover:bg-aven-primary/20 transition-colors"
+              className="text-xs text-aven-primary hover:text-aven-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-aven-primary/20 hover:bg-aven-primary/5 transition-colors shadow-sm"
             >
               <Volume2 className="w-3.5 h-3.5" /> Replay Audio
             </button>
           </div>
 
-          <p className="text-lg sm:text-xl font-semibold text-aven-text leading-relaxed">
+          <p className="text-lg font-medium text-aven-text leading-relaxed">
             "{currentTurn?.question_text}"
           </p>
         </div>
@@ -368,13 +368,13 @@ export default function LiveInterviewRoomPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <label className="text-xs font-semibold text-aven-text-subtle uppercase tracking-wider flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-cyan-400" /> Your Spoken Answer
+              <User className="w-3.5 h-3.5 text-cyan-600" /> Your Spoken Answer
             </label>
 
             {transcript && (
               <button
                 onClick={resetTranscript}
-                className="text-xs text-aven-text-subtle hover:text-aven-text-subtle"
+                className="text-xs text-aven-text-subtle hover:text-aven-text font-medium"
               >
                 Clear Transcript
               </button>
@@ -382,18 +382,18 @@ export default function LiveInterviewRoomPage() {
           </div>
 
           {speechError && (
-            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start justify-between gap-3 animate-fadeIn">
+            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start justify-between gap-3 animate-fadeIn">
               <div className="flex items-start gap-2.5">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
                 <div className="space-y-1.5">
-                  <p className="font-medium text-amber-200">{speechError}</p>
+                  <p className="font-medium">{speechError}</p>
                   <div className="flex items-center gap-2 pt-0.5">
                     <button
                       onClick={() => {
                         clearSpeechError();
                         textareaRef.current?.focus();
                       }}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-semibold text-[11px] transition-colors"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold text-[11px] transition-colors"
                     >
                       <Keyboard className="w-3 h-3" /> Type Answer Directly
                     </button>
@@ -402,16 +402,16 @@ export default function LiveInterviewRoomPage() {
                         clearSpeechError();
                         startListening();
                       }}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-aven-text font-medium text-[11px] transition-colors border border-slate-700"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white hover:bg-aven-surface text-aven-text font-medium text-[11px] transition-colors border border-aven-border shadow-sm"
                     >
-                      <Mic className="w-3 h-3 text-cyan-400" /> Try Mic Again
+                      <Mic className="w-3 h-3 text-cyan-600" /> Try Mic Again
                     </button>
                   </div>
                 </div>
               </div>
               <button
                 onClick={clearSpeechError}
-                className="text-amber-400/80 hover:text-amber-200 p-1 rounded-md hover:bg-amber-500/20 transition-colors shrink-0"
+                className="text-amber-500 hover:text-amber-700 p-1 rounded-md hover:bg-amber-100 transition-colors shrink-0"
                 title="Dismiss Notice"
               >
                 <X className="w-4 h-4" />
@@ -430,15 +430,15 @@ export default function LiveInterviewRoomPage() {
                   ? 'Listening... Speak clearly into your microphone.'
                   : 'Speak through your microphone or type your answer directly here...'
               }
-              className={`w-full p-4 rounded-2xl bg-slate-950/70 border text-aven-text placeholder-slate-500 text-sm leading-relaxed focus:outline-none transition-all ${
+              className={`w-full p-4 rounded-2xl bg-white border shadow-[inset_0_2px_8px_rgba(0,0,0,0.04)] text-aven-text placeholder-aven-text-muted text-sm leading-relaxed focus:outline-none transition-all duration-300 ${
                 isListening
-                  ? 'border-cyan-500 shadow-lg shadow-cyan-500/10'
-                  : 'border-slate-800 focus:border-indigo-500'
+                  ? 'border-cyan-400 ring-4 ring-cyan-400/10'
+                  : 'border-aven-border focus:border-aven-primary focus:ring-4 focus:ring-aven-primary/10'
               }`}
             />
 
             {interimTranscript && (
-              <span className="absolute bottom-3 right-3 text-[10px] text-cyan-400 animate-pulse font-medium">
+              <span className="absolute bottom-3 right-3 text-[10px] text-cyan-600 animate-pulse font-medium">
                 Live transcribing...
               </span>
             )}
@@ -449,17 +449,17 @@ export default function LiveInterviewRoomPage() {
             <button
               onClick={handleToggleListening}
               disabled={isTranscribing}
-              className={`flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-all shadow-md ${
+              className={`flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-sm hover:-translate-y-0.5 active:translate-y-0 ${
                 isTranscribing
-                  ? 'bg-slate-800 text-cyan-300 border border-cyan-500/30 cursor-wait'
+                  ? 'bg-cyan-50 text-cyan-700 border border-cyan-200 cursor-wait'
                   : isListening
-                  ? 'bg-rose-600 hover:bg-rose-500 text-aven-text shadow-rose-500/25 animate-pulse'
-                  : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-cyan-500/25'
+                  ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/30 animate-pulse'
+                  : 'bg-white border border-aven-border hover:bg-aven-surface text-aven-text hover:shadow-md'
               }`}
             >
               {isTranscribing ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-cyan-300" /> Transcribing Speech...
+                  <RefreshCw className="w-4 h-4 animate-spin text-cyan-700" /> Transcribing Speech...
                 </>
               ) : isListening ? (
                 <>
@@ -475,7 +475,7 @@ export default function LiveInterviewRoomPage() {
             <button
               onClick={handleSubmitAnswer}
               disabled={isSubmitting || (!transcript.trim() && !interimTranscript.trim())}
-              className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-aven-text font-bold text-sm shadow-lg shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
+              className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-aven-primary to-aven-secondary hover:opacity-90 text-white font-bold text-sm shadow-lg shadow-aven-primary/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none disabled:transform-none"
             >
               {isSubmitting ? (
                 <>
@@ -493,21 +493,21 @@ export default function LiveInterviewRoomPage() {
 
       {/* Turn History Accordion */}
       {session && session.turns.length > 1 && (
-        <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
+        <div className="p-6 rounded-2xl bg-white/60 backdrop-blur-md border border-white shadow-md shadow-aven-primary/5 space-y-4">
           <h3 className="text-xs font-bold uppercase tracking-wider text-aven-text-subtle">Previous Turns in this Session</h3>
           <div className="space-y-3">
             {session.turns
               .filter((t) => t.turn_index < session.current_turn_index && t.learner_answer)
               .map((t) => (
-                <div key={t.id} className="p-3.5 rounded-xl bg-slate-950/40 border border-slate-800 text-xs space-y-2">
+                <div key={t.id} className="p-4 rounded-xl bg-white border border-aven-primary/10 shadow-sm text-xs space-y-2 transition-all hover:shadow-md">
                   <div className="flex items-center justify-between text-aven-text-subtle">
                     <span className="font-semibold text-aven-primary">Turn {t.turn_index + 1} ({t.category})</span>
                     {typeof t.answer_score === 'number' && (
-                      <span className="font-bold text-emerald-400">{Math.round(t.answer_score)}%</span>
+                      <span className="font-bold text-emerald-600">{Math.round(t.answer_score)}%</span>
                     )}
                   </div>
-                  <p className="text-aven-text-subtle font-medium">Q: {t.question_text}</p>
-                  <p className="text-aven-text-subtle italic bg-slate-900/80 p-2 rounded-lg border border-slate-800/60">
+                  <p className="text-aven-text font-medium">Q: {t.question_text}</p>
+                  <p className="text-aven-text-subtle italic bg-white p-2 rounded-lg border border-aven-border/60">
                     "{t.learner_answer}"
                   </p>
                 </div>

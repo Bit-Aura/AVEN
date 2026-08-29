@@ -1,6 +1,6 @@
 import React from 'react';
 import { ExternalLink, Building, Clock, Calendar, Trophy, Globe, MapPin } from 'lucide-react';
-import type { HackathonEvent } from '@aven/shared-types';
+import type { HackathonEvent } from '@/types/hackathons';
 
 interface HackathonDetailPaneProps {
   event: HackathonEvent | null;
@@ -218,10 +218,10 @@ export default function HackathonDetailPane({ event }: HackathonDetailPaneProps)
                 <span>Deadline: <strong>{new Date(event.registration_deadline.replace('Z', '+00:00')).toLocaleString()}</strong></span>
               </div>
             )}
-            {event.event_start_date && (
+            {event.start_date && (
               <div className="flex items-center gap-3">
                 <Calendar size={16} className="text-emerald-600" />
-                <span>Starts: <strong>{new Date(event.event_start_date.replace('Z', '+00:00')).toLocaleString()}</strong></span>
+                <span>Starts: <strong>{new Date(event.start_date.replace('Z', '+00:00')).toLocaleString()}</strong></span>
               </div>
             )}
           </div>

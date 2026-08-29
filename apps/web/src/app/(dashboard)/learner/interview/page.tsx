@@ -16,6 +16,7 @@ import {
   ChevronRight,
   BrainCircuit,
   RefreshCw,
+  Users,
 } from 'lucide-react';
 
 import {
@@ -123,26 +124,27 @@ export default function MockInterviewHubPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-16 px-4">
-      {/* Header Banner */}
-      <div className="p-8 bg-aven-primary border border-aven-primary rounded-xl shadow-lg">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      {/* Header Banners: AI vs P2P */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* AI Mock Interview Card */}
+        <div className="p-8 bg-aven-primary border border-aven-primary rounded-xl shadow-lg flex flex-col justify-between space-y-6">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-white/10 border border-white/20 text-aven-base text-[10px] font-black uppercase tracking-widest">
               <Sparkles size={14} className="text-aven-status-active" />
-              AI-Powered Technical & HR Calibration
+              AI-Powered Technical Calibration
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-aven-base tracking-tight uppercase">
-              Voice-First AI Mock Interview
+            <h1 className="text-2xl sm:text-3xl font-black text-aven-base tracking-tight uppercase">
+              Voice-First AI Interview
             </h1>
-            <p className="text-aven-surface text-sm sm:text-base max-w-2xl font-medium leading-relaxed">
-              Experience dynamic, multi-turn interviews with spoken AI audio. Evaluates your real-time verbal answers, probes superficial claims, maps validated gaps to AVEN skills, and updates your learning path.
+            <p className="text-aven-surface text-sm font-medium leading-relaxed">
+              Experience dynamic, multi-turn interviews with spoken AI audio. Evaluates your real-time verbal answers, probes superficial claims, and maps gaps to your learning path.
             </p>
           </div>
 
           <button
             onClick={handleStartInterview}
             disabled={isStarting}
-            className="group inline-flex items-center gap-3 px-6 py-3.5 rounded-xl bg-aven-status-active hover:brightness-110 text-aven-text font-black text-xs uppercase tracking-widest shadow-md transition-all disabled:opacity-50 disabled:pointer-events-none shrink-0 border border-aven-status-active"
+            className="group inline-flex w-fit items-center gap-3 px-6 py-3.5 rounded-xl bg-aven-status-active hover:brightness-110 text-aven-text font-black text-xs uppercase tracking-widest shadow-md transition-all disabled:opacity-50 disabled:pointer-events-none border border-aven-status-active"
           >
             {isStarting ? (
               <>
@@ -152,10 +154,37 @@ export default function MockInterviewHubPage() {
             ) : (
               <>
                 <Mic size={16} className="text-aven-text" />
-                Start Voice Interview
+                Start AI Interview
               </>
             )}
           </button>
+        </div>
+
+        {/* P2P Mock Interview Card */}
+        <div className="p-8 bg-gradient-to-br from-white to-aven-surface/80 border-2 border-aven-primary/20 rounded-xl shadow-lg flex flex-col justify-between space-y-6 relative overflow-hidden group hover:border-aven-primary/50 transition-colors">
+          {/* Subtle background decoration */}
+          <Users size={120} className="absolute -bottom-8 -right-8 text-aven-primary/5 group-hover:text-aven-primary/10 transition-colors pointer-events-none" />
+          
+          <div className="space-y-3 relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-aven-primary/10 border border-aven-primary/20 text-aven-primary text-[10px] font-black uppercase tracking-widest">
+              <Users size={14} />
+              Community Collaborative Practice
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-aven-text tracking-tight uppercase">
+              Peer-to-Peer Interview
+            </h1>
+            <p className="text-aven-text-subtle text-sm font-medium leading-relaxed">
+              Match with a peer practicing the same topic. Collaborate in real-time using built-in video, audio, and a shared code editor. Take turns being the interviewer.
+            </p>
+          </div>
+
+          <Link
+            href="/learner/p2p-interview"
+            className="group inline-flex w-fit items-center gap-3 px-6 py-3.5 rounded-xl bg-aven-text hover:bg-aven-text/90 text-aven-base font-black text-xs uppercase tracking-widest shadow-md transition-all border border-aven-text relative z-10"
+          >
+            <Users size={16} className="text-aven-base" />
+            Find a Peer Match
+          </Link>
         </div>
       </div>
 

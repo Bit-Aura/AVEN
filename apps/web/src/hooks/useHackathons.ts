@@ -9,7 +9,7 @@ import {
   getHackathonSources,
   triggerHackathonScrape
 } from '../api/client';
-import type { HackathonFilters, HackathonListResponse, HackathonEvent } from '@aven/shared-types';
+import type { HackathonFilters, HackathonListResponse, HackathonEvent } from '@/types/hackathons';
 
 export function useHackathons(filters: HackathonFilters = {}) {
   return useQuery<HackathonListResponse>({
