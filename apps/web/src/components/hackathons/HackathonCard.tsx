@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Trophy } from 'lucide-react';
-import type { HackathonEvent } from '@aven/shared-types';
+import type { HackathonEvent } from '@/types/hackathons';
 
 interface HackathonCardProps {
   event: HackathonEvent;

@@ -16,7 +16,9 @@ import HackathonRow from '../../../../components/hackathons/HackathonRow';
 import HackathonSkeleton from '../../../../components/hackathons/HackathonSkeleton';
 import HackathonDetailModal from '../../../../components/hackathons/HackathonDetailModal';
 import HackathonDetailPane from '../../../../components/hackathons/HackathonDetailPane';
-import type { HackathonEvent, HackathonFilters } from '@aven/shared-types';
+import { HackathonFilters } from '../../../../api/client';
+
+import type { HackathonEvent } from '@/types/hackathons';
 
 export default function HackathonRadarPage() {
   const { user } = useSafeUser();
@@ -167,7 +169,7 @@ export default function HackathonRadarPage() {
               }}
               onFilterChange={handleFilterChange}
               onClearFilters={handleClearFilters}
-              events={rawEvents}
+              sources={sourcesData?.sources || []}
               savedCount={savedIds.length}
               showOnlySaved={showOnlySaved}
               onToggleShowSaved={(show) => setShowOnlySaved(show)}

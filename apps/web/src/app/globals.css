@@ -1,56 +1,10 @@
+@import "@xyflow/react/dist/style.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import "@xyflow/react/dist/style.css";
 
-@font-face {
-  font-family: 'Anthropic Sans';
-  src: url('/fonts/AnthropicSans-Roman-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Anthropic Sans';
-  src: url('/fonts/AnthropicSans-Italic-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Anthropic Serif';
-  src: url('/fonts/AnthropicSerif-Roman-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Anthropic Serif';
-  src: url('/fonts/AnthropicSerif-Italic-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Anthropic Mono';
-  src: url('/fonts/AnthropicMono-Roman-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Anthropic Mono';
-  src: url('/fonts/AnthropicMono-Italic-Web.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
 @layer base {
   :root {
     --aven-primary: #3d348b;

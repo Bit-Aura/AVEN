@@ -27,12 +27,7 @@ export default isRealClerkKey
   ? clerkMiddleware(async (auth, req) => {
       const path = req.nextUrl.pathname;
       if (path.startsWith('/diagnostic') || isProtectedRoute(req)) {
-        const { userId } = await auth();
-        if (!userId) {
-          const signInUrl = new URL('/sign-in', req.url);
-          signInUrl.searchParams.set('redirect_url', req.url);
-          return NextResponse.redirect(signInUrl);
-        }
+        await auth.protect();
       }
     })
   : function middleware() {

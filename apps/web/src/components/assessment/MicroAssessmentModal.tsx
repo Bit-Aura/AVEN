@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import CalibrationModal from './CalibrationModal';
 import { usePathStore } from '../../store/usePathStore';
 import { AlertCircle, Target, TrendingUp, ShieldCheck, Loader2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 export default function MicroAssessmentModal({ skillId, onClose }: { skillId: string, onClose: () => void }) {
   const [step, setStep] = useState<'calibration' | 'quiz' | 'result'>('calibration');
@@ -118,8 +119,6 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
   // Wrap in a portal or just ensure z-index since we already fixed it in CalibrationModal?
   // Actually, let's wrap this in a portal as well.
   if (typeof document === 'undefined') return null;
-
-  const { createPortal } = require('react-dom');
 
   return createPortal(
     <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">

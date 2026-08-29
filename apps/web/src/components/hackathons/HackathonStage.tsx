@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ExternalLink, Trophy, Calendar, MapPin, Users, Target, Rocket } from 'lucide-react';
-import type { HackathonEvent } from '@aven/shared-types';
+import type { HackathonEvent } from '@/types/hackathons';
 
 interface HackathonStageProps {
   event: HackathonEvent | null;
@@ -109,7 +109,7 @@ export default function HackathonStage({ event }: HackathonStageProps) {
             <span className="text-xs font-bold text-[#87867f] uppercase tracking-wider">Participants</span>
             <div className="flex items-center gap-2 text-[#141413]">
               <Users size={16} className="text-blue-500" />
-              <span className="font-bold text-lg">{event.participants_count || 'Be the first!'}</span>
+              <span className="font-bold text-lg">{event.participant_count || 'Be the first!'}</span>
             </div>
           </div>
         </div>
@@ -123,11 +123,11 @@ export default function HackathonStage({ event }: HackathonStageProps) {
         </div>
         
         {/* Themes / Tags */}
-        {(event.themes && event.themes.length > 0) && (
+        {(event.tags && event.tags.length > 0) && (
            <div className="space-y-4 mb-10">
             <h3 className="text-sm font-black text-[#87867f] uppercase tracking-wider">Themes</h3>
             <div className="flex flex-wrap gap-2">
-              {event.themes.map((theme, i) => (
+              {event.tags.map((theme, i) => (
                 <span key={i} className="px-4 py-2 bg-white border border-black/10 rounded-xl text-sm font-bold text-[#141413]">
                   {theme}
                 </span>

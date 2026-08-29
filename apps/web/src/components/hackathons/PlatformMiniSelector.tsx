@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { HackathonEvent } from '@aven/shared-types';
+import type { HackathonEvent } from '@/types/hackathons';
 
 interface PlatformSource {
   id: string;
