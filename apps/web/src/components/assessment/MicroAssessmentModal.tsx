@@ -125,24 +125,34 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
   if (typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-      <div className="bg-slate-900 border border-slate-700 shadow-2xl rounded-2xl w-full max-w-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+    <div className="fixed inset-0 bg-aven-text/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in">
+      <div className="bg-aven-base border border-aven-border shadow-2xl rounded-2xl w-full max-w-2xl flex flex-col overflow-hidden animate-in zoom-in-95" style={{ fontFamily: 'Inter, sans-serif' }}>
         
         {step === 'quiz' && (
           <>
-            <header className="bg-slate-800 p-4 flex justify-between items-center border-b border-slate-700">
-              <div className="flex items-center gap-2">
-                <Target className="text-aven-primary" size={20} />
-                <h2 className="text-lg font-bold text-aven-text">Prove It: {skillId}</h2>
+            <header className="bg-aven-surface/40 p-5 flex justify-between items-center border-b border-aven-border">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-aven-surface border border-aven-border flex items-center justify-center shrink-0">
+                  <Target className="text-aven-primary" size={20} />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-aven-text">Prove It: {skillId}</h2>
+                  <p className="text-xs text-aven-text-muted">Micro-Assessment & Verification Checkpoint</p>
+                </div>
               </div>
-              <button onClick={onClose} className="text-aven-text-subtle hover:text-aven-text transition-colors">&times;</button>
+              <button 
+                onClick={onClose} 
+                className="p-1.5 rounded-lg text-aven-text-muted hover:text-aven-text hover:bg-aven-surface transition-colors"
+              >
+                &times;
+              </button>
             </header>
 
             <div className="p-8 flex flex-col gap-6">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-3">
-                  <Loader2 className="text-indigo-500 animate-spin" size={32} />
-                  <p className="text-aven-text-subtle text-sm">Generating micro-assessment...</p>
+                  <Loader2 className="text-aven-primary animate-spin" size={32} />
+                  <p className="text-aven-text-muted text-sm font-medium">Generating micro-assessment...</p>
                 </div>
               ) : error ? (
                 <div className="flex flex-col items-center justify-center py-8 gap-3">
@@ -150,14 +160,14 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
                   <p className="text-aven-text-subtle text-sm">{error}</p>
                   <button 
                     onClick={() => setStep('calibration')}
-                    className="text-xs bg-slate-800 hover:bg-slate-700 text-aven-text-subtle px-3 py-1.5 rounded-lg border border-slate-700"
+                    className="text-xs bg-aven-base hover:bg-aven-surface text-aven-text px-3.5 py-1.5 rounded-lg border border-aven-border font-bold transition"
                   >
                     Retry
                   </button>
                 </div>
               ) : (
                 <>
-                  <p className="text-aven-text font-semibold text-base leading-relaxed">{question}</p>
+                  <p className="text-aven-text font-bold text-base leading-relaxed">{question}</p>
                   
                   {options.length > 0 ? (
                     <div className="flex flex-col gap-3">
@@ -170,13 +180,13 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
                             disabled={status === 'submitting'}
                             className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between group ${
                               isSelected 
-                                ? 'bg-indigo-600/20 border-indigo-500 text-aven-primary' 
-                                : 'bg-slate-950 border-slate-800 text-aven-text-subtle hover:border-slate-700 hover:bg-slate-900/30'
+                                ? 'bg-aven-primary/10 border-aven-primary text-aven-primary font-semibold shadow-sm' 
+                                : 'bg-aven-base border-aven-border text-aven-text hover:border-aven-text-muted hover:bg-aven-surface/60'
                             }`}
                           >
                             <span className="font-medium text-sm">{option}</span>
-                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                              isSelected ? 'border-indigo-500 bg-indigo-600' : 'border-slate-700 group-hover:border-slate-600'
+                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition ${
+                              isSelected ? 'border-aven-primary bg-aven-primary' : 'border-aven-border group-hover:border-aven-text-muted'
                             }`}>
                               {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                             </div>
@@ -188,7 +198,7 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
                     <textarea 
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
-                      className="w-full h-40 bg-slate-950 border border-slate-700 rounded-xl p-4 font-mono text-aven-text-subtle focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none"
+                      className="w-full h-40 bg-aven-base border border-aven-border rounded-xl p-4 font-mono text-aven-text focus:outline-none focus:border-aven-primary focus:ring-1 focus:ring-aven-primary resize-none text-sm"
                       placeholder="Type your answer here..."
                       disabled={status === 'submitting'}
                     />
@@ -197,9 +207,14 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
                   <button 
                     onClick={handleSubmit}
                     disabled={status === 'submitting' || !answer.trim()}
-                    className="bg-indigo-600 text-aven-text font-bold py-3 rounded-xl hover:bg-indigo-500 transition-all disabled:opacity-50 mt-2"
+                    className="bg-aven-primary text-white font-bold py-3.5 rounded-xl hover:bg-aven-primary/90 transition-all disabled:opacity-50 mt-2 shadow-md hover:shadow-lg active:scale-[0.99] flex items-center justify-center gap-2"
                   >
-                    {status === 'submitting' ? 'Evaluating...' : 'Submit Answer'}
+                    {status === 'submitting' ? (
+                      <>
+                        <Loader2 className="animate-spin" size={18} />
+                        <span>Evaluating...</span>
+                      </>
+                    ) : 'Submit Answer'}
                   </button>
                 </>
               )}
@@ -212,40 +227,40 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
             
             {/* 2x2 Quadrant Result Banner */}
             {isBlindspot && (
-              <div className="w-full bg-rose-950/40 border border-rose-500/50 rounded-xl p-6 mb-8 animate-in slide-in-from-top">
-                <AlertCircle className="text-rose-500 mx-auto mb-3" size={32} />
-                <h3 className="text-xl font-bold text-rose-400 mb-2">Blindspot Zone</h3>
-                <p className="text-aven-text-subtle text-sm">You had high confidence ({confidence}%) but the assessment failed. Let's review the counterexamples.</p>
+              <div className="w-full bg-rose-50 border border-rose-200 rounded-2xl p-6 mb-6 animate-in slide-in-from-top">
+                <AlertCircle className="text-rose-600 mx-auto mb-3" size={32} />
+                <h3 className="text-xl font-bold text-rose-900 mb-1.5">Blindspot Zone</h3>
+                <p className="text-rose-700 text-sm">You had high confidence ({confidence}%) but the assessment missed key edge cases. Let's review the counterexamples.</p>
               </div>
             )}
 
             {isImposter && (
-              <div className="w-full bg-indigo-950/40 border border-indigo-500/50 rounded-xl p-6 mb-8 animate-in slide-in-from-top">
+              <div className="w-full bg-indigo-50 border border-indigo-200 rounded-2xl p-6 mb-6 animate-in slide-in-from-top">
                 <TrendingUp className="text-aven-primary mx-auto mb-3" size={32} />
-                <h3 className="text-xl font-bold text-aven-primary mb-2">Imposter Zone</h3>
-                <p className="text-aven-text-subtle text-sm">You had low confidence ({confidence}%) but passed perfectly! Trust your skills.</p>
+                <h3 className="text-xl font-bold text-aven-primary mb-1.5">Imposter Zone</h3>
+                <p className="text-indigo-700 text-sm">You had low confidence ({confidence}%) but passed with flying colors! Trust your foundational mastery.</p>
               </div>
             )}
             
             {isMastery && (
-              <div className="w-full bg-emerald-950/40 border border-emerald-500/50 rounded-xl p-6 mb-8 animate-in slide-in-from-top">
-                <ShieldCheck className="text-emerald-400 mx-auto mb-3" size={32} />
-                <h3 className="text-xl font-bold text-emerald-400 mb-2">Verified Mastery</h3>
-                <p className="text-aven-text-subtle text-sm">High confidence ({confidence}%) and perfect execution.</p>
+              <div className="w-full bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-6 animate-in slide-in-from-top">
+                <ShieldCheck className="text-emerald-600 mx-auto mb-3" size={32} />
+                <h3 className="text-xl font-bold text-emerald-900 mb-1.5">Verified Mastery</h3>
+                <p className="text-emerald-700 text-sm">High confidence ({confidence}%) and flawless implementation.</p>
               </div>
             )}
             
             {isLearning && (
-              <div className="w-full bg-slate-800/80 border border-slate-700 rounded-xl p-6 mb-8 animate-in slide-in-from-top">
-                <Target className="text-aven-text-subtle mx-auto mb-3" size={32} />
-                <h3 className="text-xl font-bold text-aven-text-subtle mb-2">Learning Zone</h3>
-                <p className="text-aven-text-subtle text-sm">Low confidence ({confidence}%) and room for improvement. Let's keep learning!</p>
+              <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-6 animate-in slide-in-from-top">
+                <Target className="text-amber-700 mx-auto mb-3" size={32} />
+                <h3 className="text-xl font-bold text-amber-900 mb-1.5">Learning Zone</h3>
+                <p className="text-amber-700 text-sm">Low confidence ({confidence}%) with clear opportunities for growth. Let's conquer this milestone!</p>
               </div>
             )}
 
-            <div className="w-full bg-slate-950/50 border border-slate-800 rounded-lg p-4 mb-8 text-left">
-              <h4 className="text-xs font-bold text-aven-text-muted uppercase tracking-wider mb-2">AI Feedback</h4>
-              <p className="text-aven-text-subtle">{feedback}</p>
+            <div className="w-full bg-aven-surface/50 border border-aven-border rounded-xl p-4 mb-6 text-left">
+              <h4 className="text-xs font-bold text-aven-text-muted uppercase tracking-wider mb-1.5">AI Feedback</h4>
+              <p className="text-aven-text text-sm leading-relaxed">{feedback}</p>
             </div>
 
             <button 
@@ -255,11 +270,9 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
                 await fetchReadiness(safeProfileId);
                 onClose();
               }}
-              className={`w-full font-bold py-3 rounded-xl transition-all ${
-                status === 'passed' ? 'bg-emerald-600 hover:bg-emerald-500 text-aven-text' : 'bg-slate-700 hover:bg-slate-600 text-aven-text'
-              }`}
+              className="w-full bg-aven-primary hover:bg-aven-primary/90 text-white font-bold py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.99]"
             >
-              {status === 'passed' ? 'Continue Path' : 'Diagnose Root Cause'}
+              {status === 'passed' ? 'Continue Learning Path' : 'Review & Practice Milestone'}
             </button>
           </div>
         )}
