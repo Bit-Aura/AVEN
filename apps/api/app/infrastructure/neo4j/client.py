@@ -1,6 +1,6 @@
-    import logging
+import logging
 from typing import Any, Dict, List, Optional, AsyncGenerator
-from neo4j import AsyncGraphDatabase, AsyncDriver, AsyncSession
+from neo4j import AsyncGraphDatabase, AsyncDriver, AsyncSession, GraphDatabase, Driver
 from fastapi import Depends
 from app.core.config import settings
 
@@ -9,10 +9,21 @@ logger = logging.getLogger(__name__)
 class Neo4jClient:
     def __init__(self) -> None:
         self._driver: AsyncDriver | None = None
+        self._sync_driver: Driver | None = None
 
     @property
-    def driver(self):
-        return self._driver
+    def driver(self) -> Driver:
+        """
+        Returns a synchronous Neo4j Driver for synchronous service queries.
+        Lazily initializes the driver on demand.
+        """
+        if not self._sync_driver:
+            self._sync_driver = GraphDatabase.driver(
+                settings.NEO4J_URI,
+                auth=(settings.NEO4J_USERNAME, settings.NEO4J_PASSWORD),
+                connection_timeout=5.0
+            )
+        return self._sync_driver
 
     async def connect(self) -> None:
         import asyncio
@@ -38,7 +49,10 @@ class Neo4jClient:
         if self._driver:
             await self._driver.close()
             self._driver = None
-            logger.info("Neo4j database connection closed.")
+        if self._sync_driver:
+            self._sync_driver.close()
+            self._sync_driver = None
+        logger.info("Neo4j database connection closed.")
 
 neo4j_client = Neo4jClient()
 
