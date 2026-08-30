@@ -5,50 +5,54 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const defaultCards = [
   {
-    id: 'bayesian',
-    title: 'Bayesian Readiness',
-    desc: 'Standard MOOCs give 100% progress for passive video completion. PathFinder estimates actual posterior mastery through verified micro-assessments and sandbox telemetry.',
-    slideFrom: 'bottom'
+    id: 'illusion-competence',
+    title: 'Illusion of Competence',
+    desc: 'Most platforms reward passive video watching with 100% completion. You think you\'re learning, but without verified assessments, actual skill mastery remains an illusion.',
+    slideFrom: 'bottom',
+    colSpan: 'md:col-span-2'
   },
   {
-    id: 'date-delta',
-    title: 'Date-Delta Engine',
-    desc: 'Wondering what happens if you skip a fundamental concept? Our NetworkX DAG simulator calculates downstream friction days and blocked dependent nodes in real-time.',
-    slideFrom: 'top'
+    id: 'dependency-trap',
+    title: 'The Dependency Trap',
+    desc: 'Skip a fundamental concept, and you\'ll eventually hit a brick wall. Without a clear knowledge graph, learners get stuck on downstream topics and quit.',
+    slideFrom: 'top',
+    colSpan: 'md:col-span-2'
   },
   {
-    id: 'market-radar',
-    title: 'Market Radar',
-    desc: 'Live ATS scraper pulling verified openings from Canonical, Stripe, and Linear paired with HMAC-SHA256 tamper-evident proof credentials.',
-    slideFrom: 'bottom'
+    id: 'worthless-credentials',
+    title: 'Worthless Credentials',
+    desc: 'Generic certificates are ignored by modern ATS systems and employers. Spending months on a course without verifiable proof leaves your resume looking empty.',
+    slideFrom: 'bottom',
+    colSpan: 'md:col-span-2'
+  },
+  {
+    id: 'one-size-fits-all',
+    title: 'The One-Size-Fits-All Curse',
+    desc: 'Pre-recorded courses assume everyone learns the same way. If you already know a topic, you waste time. If you struggle, you get left behind.',
+    slideFrom: 'bottom',
+    colSpan: 'md:col-span-3'
+  },
+  {
+    id: 'memory-decay',
+    title: 'The Forgetting Curve',
+    desc: 'You master a skill today but forget it a month later. Traditional platforms don\'t track memory decay, leaving you unprepared for actual technical interviews.',
+    slideFrom: 'bottom',
+    colSpan: 'md:col-span-3'
   }
 ];
 
 export function AnimatedFeaturesGrid() {
   const [cards, setCards] = useState(defaultCards);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCards(currentCards => {
-        // Shuffle and ensure the order changes
-        let newCards = [...currentCards];
-        let attempts = 0;
-        do {
-          newCards = [...currentCards].sort(() => Math.random() - 0.5);
-          attempts++;
-        } while (
-          attempts < 5 && 
-          newCards.every((c, i) => c.id === currentCards[i].id)
-        );
-        return newCards;
-      });
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
+  // Shuffling effect has been disabled per user request
+  // useEffect(() => { ... }, []);
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="flex flex-col items-center w-full max-w-[1200px] mx-auto">
+      <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-12 text-center tracking-tight">
+        What people face ?
+      </h2>
+      <section className="grid grid-cols-1 md:grid-cols-6 gap-6 w-full">
       <AnimatePresence mode="popLayout">
         {cards.map((card) => (
           <motion.div
@@ -58,7 +62,7 @@ export function AnimatedFeaturesGrid() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 250, damping: 25 }}
-            className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-default select-none hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end"
+            className={`group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-default select-none hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end ${card.colSpan}`}
           >
             {/* Ambient White Glow (Resting State) */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.06] rounded-full blur-[70px] pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500"></div>
@@ -91,6 +95,7 @@ export function AnimatedFeaturesGrid() {
           </motion.div>
         ))}
       </AnimatePresence>
-    </section>
+      </section>
+    </div>
   );
 }
