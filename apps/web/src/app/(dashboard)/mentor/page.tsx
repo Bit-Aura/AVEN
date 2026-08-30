@@ -126,7 +126,7 @@ function MentorConnectDashboardContent() {
   const loadTriageQueue = useCallback(async () => {
     setIsLoadingTriage(true);
     try {
-      const res = await fetch('http://localhost:8000/api/v1/placement/triage', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/placement/triage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
