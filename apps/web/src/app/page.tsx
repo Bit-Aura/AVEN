@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { OurProcessCards } from '../components/OurProcessCards';
+import { FAQSection } from '../components/FAQSection';
 import { SafeUserButton, useSafeUser } from '../lib/clerkSafe';
 import { 
   ArrowRight, 
@@ -73,7 +75,7 @@ export default function LandingPage() {
         .animate-fade-rise-delay-2 { animation: fade-rise 0.8s ease-out 0.4s both; }
       `}} />
 
-      <div className="bg-background text-slate-100 font-sans selection:bg-brand-500/30 overflow-x-hidden">
+      <div className="bg-background text-slate-100 font-sans selection:bg-brand-500/30 overflow-x-clip">
         {/* CINEMATIC HERO SECTION */}
         <div className="cinematic-hero h-screen max-h-screen relative overflow-hidden flex flex-col">
           {/* VIDEO BACKGROUND */}
@@ -90,9 +92,8 @@ export default function LandingPage() {
           <nav className="relative z-10 flex flex-row justify-between items-center px-8 py-6 max-w-7xl mx-auto w-full">
             <div className="flex items-center gap-2">
               <span className="font-display text-5xl md:text-6xl tracking-tight text-white">
-                PathFinder
+                AVEN
               </span>
-              <sup className="text-sm md:text-base text-white tracking-widest mt-2">AVEN</sup>
             </div>
             <div className="flex items-center gap-3">
               {isLoaded && isSignedIn && user ? (
@@ -119,7 +120,6 @@ export default function LandingPage() {
                     href="/sign-up"
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-black bg-white hover:bg-white/90 shadow-md transition-all cursor-pointer"
                   >
-                    <Sparkles size={13} className="text-indigo-600" />
                     <span>Get Started</span>
                   </Link>
                 </div>
@@ -165,7 +165,7 @@ export default function LandingPage() {
           {/* Feature Grid (Tensorik UI Style) */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1: DAG vs Video Progress */}
-            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-pointer select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
+            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-default select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
               {/* Ambient White Glow (Resting State) */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.06] rounded-full blur-[70px] pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500"></div>
 
@@ -197,7 +197,7 @@ export default function LandingPage() {
             </div>
 
             {/* Card 2: Date-Delta Engine */}
-            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-pointer select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
+            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-default select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
               {/* Ambient White Glow (Resting State) */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.06] rounded-full blur-[70px] pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500"></div>
 
@@ -229,7 +229,7 @@ export default function LandingPage() {
             </div>
 
             {/* Card 3: ATS Market Radar & HMAC Proofs */}
-            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-pointer select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
+            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-default select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
               {/* Ambient White Glow (Resting State) */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.06] rounded-full blur-[70px] pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500"></div>
 
@@ -260,7 +260,12 @@ export default function LandingPage() {
               </div>
             </div>
           </section>
+        </main>
 
+        <OurProcessCards />
+        <FAQSection />
+
+        <main className="max-w-7xl mx-auto px-6 py-24 space-y-32 relative z-10">
           {/* CTA Footer Banner */}
           <section className="relative overflow-hidden p-16 md:p-24 rounded-[32px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)] text-center flex flex-col items-center justify-center">
             {/* Ambient Blue Glow */}
@@ -284,6 +289,27 @@ export default function LandingPage() {
             </div>
           </section>
         </main>
+
+        {/* FOOTER */}
+        <footer className="relative bg-[#061417] pt-24 pb-24 overflow-hidden w-full border-t border-white/5 mt-32">
+          {/* Grid Background */}
+          <div 
+            className="absolute inset-0 pointer-events-none opacity-[0.07]" 
+            style={{ 
+              backgroundImage: 'linear-gradient(rgba(255, 255, 255, 1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 1) 1px, transparent 1px)', 
+              backgroundSize: '80px 80px',
+              backgroundPosition: 'center top'
+            }}
+          ></div>
+          <div className="max-w-[1400px] mx-auto px-6 md:px-12 relative z-10 flex flex-col items-center justify-center h-full min-h-[60vh] md:min-h-[80vh]">
+            {/* Massive Logo */}
+            <div className="w-full flex justify-center items-center select-none pointer-events-none">
+               <span className="font-display text-[35vw] md:text-[28vw] lg:text-[25vw] leading-none tracking-[-0.04em] text-white/95 whitespace-nowrap">
+                 AVEN
+               </span>
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   );
