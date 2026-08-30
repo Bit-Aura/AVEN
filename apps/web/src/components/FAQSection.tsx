@@ -100,7 +100,7 @@ export function FAQSection() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-sans font-medium text-[#4d4d4d] max-w-2xl tracking-tight leading-[1.1]">
-            Questions you probably wonder about
+            Questions you probably<br />wonder about
           </h2>
           <p className="text-[#111] font-medium text-lg md:mb-4">
             More commonly known as FAQs

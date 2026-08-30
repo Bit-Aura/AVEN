@@ -38,7 +38,7 @@ export function TechStack() {
         <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4 font-medium tracking-tight text-[#111]">
           A professional technology foundation
         </h2>
-        <p className="text-lg md:text-xl text-[#555] mb-20 max-w-3xl leading-relaxed">
+        <p className="text-lg md:text-xl text-[#555] mb-20 max-w-4xl leading-relaxed mx-auto text-balance">
           Our stack is selected to balance product polish, engineering stability, system performance,
           <br className="hidden md:block" />
           and long-term scalability across web, AI, data, and operational platforms.

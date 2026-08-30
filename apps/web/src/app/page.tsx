@@ -164,7 +164,7 @@ export default function LandingPage() {
         </div>
 
         {/* REST OF PAGE - UNIFIED LIGHT BACKGROUND */}
-        <div className="relative w-full bg-white z-10">
+        <div className="relative w-full bg-white z-10 shadow-[0_30px_60px_rgba(0,0,0,0.15)] pb-10">
           {/* Global Dot Grid for all sections below hero */}
           <div 
             className="absolute inset-0 pointer-events-none opacity-[0.15]" 
@@ -208,10 +208,10 @@ export default function LandingPage() {
           </section>
         </main>
 
-        {/* FOOTER */}
-        <Footer />
-        
         </div> {/* END OF UNIFIED LIGHT BACKGROUND */}
+        
+        {/* FOOTER - placed outside to allow the fixed curtain reveal effect */}
+        <Footer />
       </div>
     </>
   );

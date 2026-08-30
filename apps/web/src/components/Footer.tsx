@@ -1,21 +1,39 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
 export function Footer() {
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const footerRef = useRef<HTMLElement>(null);
+  const [footerHeight, setFooterHeight] = useState(0);
+
+  useEffect(() => {
+    if (!footerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      setFooterHeight(entries[0].contentRect.height);
+    });
+    observer.observe(footerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
-    <footer className="relative w-full bg-[#0f0f0f] pt-2 md:pt-4 pb-5 md:pb-0 flex flex-col justify-between overflow-hidden z-20 mt-32">
-      {/* Background radial gradient from tensorik */}
-      <div 
-        className="absolute inset-0 pointer-events-none" 
-        style={{ backgroundImage: 'radial-gradient(circle at 50% 100%, rgba(37, 99, 235, 0.15) 0%, transparent 50%)' }} 
-      />
+      {/* Spacer taking up the exact height in the normal flow */}
+      <div style={{ height: footerHeight > 0 ? footerHeight : 'auto' }} />
       
-      <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-[10rem] px-6 md:px-[5%] relative z-10 mb-10 md:mb-0 max-w-[1400px] mx-auto w-full">
+      {/* The actual footer sits fixed at the bottom behind the page */}
+      <footer 
+        ref={footerRef}
+        className="fixed bottom-0 left-0 w-full bg-[#0f0f0f] pt-10 md:pt-16 pb-5 md:pb-0 flex flex-col justify-between overflow-hidden z-[-1]"
+      >
+        {/* Background radial gradient */}
+        <div 
+          className="absolute inset-0 pointer-events-none" 
+          style={{ backgroundImage: 'radial-gradient(circle at 50% 100%, rgba(37, 99, 235, 0.15) 0%, transparent 50%)' }} 
+        />
+        
+        <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-[10rem] px-6 md:px-[5%] relative z-10 mb-10 md:mb-0 max-w-[1400px] mx-auto w-full">
         
         {/* Empty left side to maintain layout if needed, or just let justify-end align the right column */}
         <div className="hidden md:block w-full"></div>
