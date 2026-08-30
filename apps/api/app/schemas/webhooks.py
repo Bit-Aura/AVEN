@@ -20,5 +20,5 @@ WebhookPayload = Annotated[
         Annotated[Union[CandidateUpdate], Field(discriminator="type")],
         FallbackWebhook
     ],
-    Field(union_mode="left_to_right")
+    Field()
 ]

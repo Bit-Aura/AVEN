@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import CalibrationModal from './CalibrationModal';
 import { usePathStore } from '../../store/usePathStore';
+import { useActivePathQuery, useReadinessQuery, useAssessmentQuery } from '../../hooks/api/useQueries';
+import { useSubmitCalibrationMutation } from '../../hooks/api/useMutations';
 import { AlertCircle, Target, TrendingUp, ShieldCheck, Loader2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
@@ -23,42 +25,30 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
   const [error, setError] = useState('');
 
   const openProofCard = usePathStore(state => state.openProofCard);
-  const bypassMilestone = usePathStore(state => state.bypassMilestone);
-  const submitCalibration = usePathStore(state => state.submitCalibration);
   const profileId = usePathStore(state => state.profileId);
-  const fetchActivePath = usePathStore(state => state.fetchActivePath);
-  const fetchReadiness = usePathStore(state => state.fetchReadiness);
+  
+  const { refetch: refetchActivePath } = useActivePathQuery();
+  const { refetch: refetchReadiness } = useReadinessQuery();
+  const { mutateAsync: submitCalibrationAsync } = useSubmitCalibrationMutation();
+  const { data: assessmentData, isLoading: assessmentLoading, error: assessmentError } = useAssessmentQuery(step === 'quiz' ? skillId : null);
 
   const [calibrationData, setCalibrationData] = useState<any>(null);
 
   useEffect(() => {
-    let active = true;
-    async function loadQuestion() {
-      try {
+    if (step === 'quiz') {
+      if (assessmentLoading) {
         setLoading(true);
-        const { getCheckpointQuestion } = await import('../../api/client');
-        const data = await getCheckpointQuestion(skillId);
-        if (active) {
-          setQuestion(data.question || 'Evaluate the following scenario.');
-          setOptions(data.options || []);
-          setError('');
-        }
-      } catch (err: any) {
-        console.error(err);
-        if (active) {
-          setError('Failed to load assessment question.');
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
+      } else if (assessmentError) {
+        setLoading(false);
+        setError('Failed to load assessment question.');
+      } else if (assessmentData) {
+        setLoading(false);
+        setQuestion(assessmentData.question || 'Evaluate the following scenario.');
+        setOptions(assessmentData.options || []);
+        setError('');
       }
     }
-    if (step === 'quiz') {
-      loadQuestion();
-    }
-    return () => { active = false; };
-  }, [skillId, step]);
+  }, [step, assessmentData, assessmentLoading, assessmentError]);
 
   const handleCalibrationComplete = (val: number) => {
     setConfidence(val);
@@ -76,7 +66,7 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
       const isCorrect = res.is_correct;
       
       // Step 2: Evaluate calibration matrix
-      const calRes = await submitCalibration({
+      const calRes = await submitCalibrationAsync({
         profile_id: safeProfileId,
         skill_id: skillId,
         confidence_pre_assessment: confidence / 100,
@@ -84,8 +74,8 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
       });
       
       // Step 3: Refresh user path plan and readiness score in real-time
-      await fetchActivePath(safeProfileId);
-      await fetchReadiness(safeProfileId);
+      await refetchActivePath();
+      await refetchReadiness();
       
       setCalibrationData(calRes);
       setStatus(isCorrect ? 'passed' : 'failed');
@@ -157,7 +147,7 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
               ) : error ? (
                 <div className="flex flex-col items-center justify-center py-8 gap-3">
                   <AlertCircle className="text-rose-500" size={32} />
-                  <p className="text-aven-text-subtle text-sm">{error}</p>
+                  <p className="text-slate-300 text-sm">{error}</p>
                   <button 
                     onClick={() => setStep('calibration')}
                     className="text-xs bg-aven-base hover:bg-aven-surface text-aven-text px-3.5 py-1.5 rounded-lg border border-aven-border font-bold transition"
@@ -265,9 +255,8 @@ export default function MicroAssessmentModal({ skillId, onClose }: { skillId: st
 
             <button 
               onClick={async () => {
-                const safeProfileId = profileId || 1;
-                await fetchActivePath(safeProfileId);
-                await fetchReadiness(safeProfileId);
+                await refetchActivePath();
+                await refetchReadiness();
                 onClose();
               }}
               className="w-full bg-aven-primary hover:bg-aven-primary/90 text-white font-bold py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.99]"

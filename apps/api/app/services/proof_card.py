@@ -94,7 +94,7 @@ def verify_proof_card_signature(
         "mastered_count": int(card_data.get("skills_mastered_count") or card_data.get("mastered_count", 0)),
         "readiness_score": round(float(card_data.get("readiness_score", 0.0)), 4),
         "issue_date": card_data.get("issue_date"),
-        "narrative_summary": card_data.get("narrative_summary")
+        "narrative_summary": card_data.get("narrative_summary", "")
     }
     
     canonical_string = json.dumps(payload, sort_keys=True)

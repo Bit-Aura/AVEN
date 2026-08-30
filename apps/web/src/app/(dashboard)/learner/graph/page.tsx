@@ -21,6 +21,7 @@ import {
 
 import { learnerRoadmapGraph } from '../../../../api/client';
 import { usePathStore } from '../../../../store/usePathStore';
+import { useActivePathQuery } from '../../../../hooks/api/useQueries';
 import ProveItAssessment from '../../../../components/ProveItAssessment';
 import AiCoachDrawer from '../../../../components/AiCoachDrawer';
 
@@ -747,19 +748,17 @@ function GraphInner() {
   const [selectedNode, setSelectedNode] = useState<any | null>(null);
   const [isAssessmentOpen, setIsAssessmentOpen] = useState(false);
 
-  const learnerNodes = usePathStore((s) => s.nodes);
-  const learnerEdges = usePathStore((s) => s.edges);
-  const fetchActivePath = usePathStore((s) => s.fetchActivePath);
+  const { data: activePathData, isLoading: isActivePathLoading } = useActivePathQuery();
+  const learnerNodes = activePathData?.nodes;
+  const learnerEdges = activePathData?.edges;
   const openIde = usePathStore((s) => s.openIde);
   const openCoach = usePathStore((s) => s.openCoach);
-
-  useEffect(() => { fetchActivePath(); }, [fetchActivePath]);
 
   useEffect(() => {
     if (viewMode === 'roadmap') loadRoadmap(selectedRoadmap);
     else if (learnerNodes && learnerNodes.length > 0) {
       const mapped = learnerNodes.map((n: any) => ({ ...n.data, id: n.id, name: n.data.label }));
-      buildAndSetLayout(mapped, learnerEdges);
+        buildAndSetLayout(mapped, learnerEdges || []);
     }
   }, [selectedRoadmap, viewMode, learnerNodes]);
 
@@ -771,18 +770,18 @@ function GraphInner() {
 
   // Smart Initial Panning
   useEffect(() => {
-    if (rfNodes.length > 0 && !loading) {
+    if (rfNodes.length > 0 && (!loading || viewMode === 'graph' && !isActivePathLoading)) {
       // Use requestAnimationFrame or a small timeout to ensure ReactFlow has mounted the nodes
       setTimeout(() => {
         let targetNode = null;
         if (viewMode === 'graph') {
           // 1. guarantee to find the active milestone
-          targetNode = rfNodes.find(n => n.data?.skill?.status === 'active');
+          targetNode = rfNodes.find((n: any) => n.data?.skill?.status === 'active' || n.data?.status === 'active');
         }
         
         // 2. Fallback to the first spine node (top of the roadmap)
         if (!targetNode) {
-          targetNode = rfNodes.find(n => n.type === 'spineNode');
+          targetNode = rfNodes.find((n: any) => n.type === 'spineNode');
         }
 
         if (targetNode) {
@@ -792,7 +791,7 @@ function GraphInner() {
         }
       }, 100);
     }
-  }, [rfNodes, viewMode, loading, setCenter]);
+  }, [rfNodes, viewMode, loading, isActivePathLoading, setCenter]);
 
   const loadRoadmap = async (slug: string) => {
     setLoading(true);

@@ -20,6 +20,8 @@ from app.services.bkt_engine import get_skill_bkt_params, update_bkt_score, chec
 from app.db.repositories.skill_repo import SkillRepository
 from app.infrastructure.neo4j.repositories import Neo4jSkillRepository
 
+DEFAULT_BKT_PRIOR = 0.5
+
 logger = logging.getLogger(__name__)
 
 async def failure_root_cause_backtrace(
@@ -314,12 +316,14 @@ async def calculate_readiness_bar(
     # 1. Build complete skill graph from Neo4j for centrality calculation
     G = nx.DiGraph()
     try:
-        with neo4j_client.driver.session() as session:
-            nodes_res = session.run("MATCH (s:Skill) RETURN s.id AS id, s.name AS name")
-            for r in nodes_res:
+        if not neo4j_client._driver:
+            await neo4j_client.connect()
+        async with neo4j_client._driver.session() as session:
+            nodes_res = await session.run("MATCH (s:Skill) RETURN s.id AS id, s.name AS name")
+            async for r in nodes_res:
                 G.add_node(r["id"])
-            edges_res = session.run("MATCH (pre:Skill)-[:PREREQUISITE_OF]->(s:Skill) RETURN pre.id AS pre_id, s.id AS s_id")
-            for r in edges_res:
+            edges_res = await session.run("MATCH (pre:Skill)-[:PREREQUISITE_OF]->(s:Skill) RETURN pre.id AS pre_id, s.id AS s_id")
+            async for r in edges_res:
                 G.add_edge(r["pre_id"], r["s_id"])
     except Exception as e:
         logger.error(f"Error loading graph for readiness bar: {e}")

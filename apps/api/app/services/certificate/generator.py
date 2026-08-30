@@ -158,7 +158,7 @@ def _build_overlay(page_width: float, page_height: float, values: dict[str, str]
         overlay_canvas.setStrokeColor(HexColor("#F5F5F5"))
         overlay_canvas.rect(61, 504, 3, 188, stroke=0, fill=1)
         
-    logo_path = r"d:\projects\AVEN\apps\web\public\Logo.png"
+    logo_path = str(ROOT_DIR.parents[3] / "web" / "public" / "Logo.png")
     if Path(logo_path).exists():
         # EXACT POSITION 1: Top-Left old logo (xref 18)
         # Draw new logo small, very small

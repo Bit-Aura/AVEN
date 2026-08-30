@@ -25,6 +25,7 @@ import {
 import { useClerk } from '@clerk/nextjs';
 import { usePathStore } from '../../store/usePathStore';
 import { useSafeUser, SafeUserButton, isClerkConfigured } from '../../lib/clerkSafe';
+import { useActivePathQuery, useReadinessQuery } from '../../hooks/api/useQueries';
 import { logoutUser } from '../../api/client';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -36,10 +37,13 @@ import { UserSettingsModal, Tab } from '../profile/UserSettingsModal';
  */
 export default function Sidebar() {
   const pathname = usePathname();
-  const targetRole = usePathStore((state) => state.targetRole);
-  const readinessScore = usePathStore((state) => state.readinessScore);
   const isSidebarOpen = usePathStore((state) => state.isSidebarOpen);
   const toggleSidebar = usePathStore((state) => state.toggleSidebar);
+  const targetRole = usePathStore((state) => state.targetRole);
+  
+  const { data: readinessData } = useReadinessQuery();
+  const readinessScore = readinessData?.readinessScore || 0;
+  
   const { user, isLoaded } = useSafeUser();
 
   let clerkInstance: any = null;

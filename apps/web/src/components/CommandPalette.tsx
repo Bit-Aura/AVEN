@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathStore } from '../store/usePathStore';
+import { useActivePathQuery } from '../hooks/api/useQueries';
 import { Terminal, Code, HelpCircle, WifiOff, Focus, X, Command, MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -12,13 +13,15 @@ export default function CommandPalette() {
   const isCommandPaletteOpen = usePathStore((state) => state.isCommandPaletteOpen);
   const toggleCommandPalette = usePathStore((state) => state.toggleCommandPalette);
   const closeCommandPalette = usePathStore((state) => state.closeCommandPalette);
-  const activeMilestone = usePathStore((state) => state.activeMilestone);
+  
+  const { data: activePathData } = useActivePathQuery();
+  const activeMilestone = activePathData?.activeMilestone;
+  const nodes = activePathData?.nodes || [];
+
   const openIde = usePathStore((state) => state.openIde);
   const openCoach = usePathStore((state) => state.openCoach);
   const toggleOffline = usePathStore((state) => state.toggleOffline);
   const toggleFocusMode = usePathStore((state) => state.toggleFocusMode);
-  const nodes = usePathStore((state) => state.nodes);
-  const setActiveMilestone = usePathStore((state) => state.setActiveMilestone);
 
   const [search, setSearch] = useState('');
 
@@ -121,12 +124,7 @@ export default function CommandPalette() {
                 <button 
                   key={node.id}
                   onClick={() => {
-                    setActiveMilestone({
-                      id: node.id,
-                      title: (node.data?.label as string) || node.id,
-                      explanation: 'Selected from command palette',
-                      status: 'active'
-                    });
+                    openIde(node.id);
                     closeCommandPalette();
                   }}
                   className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-800 text-left transition-colors group"

@@ -285,7 +285,7 @@ $$R(t) = e^{-\frac{t}{S}}$$
 
 Where:
 - $R(t)$: Retrievability / retention probability at time $t$ (days since last interaction).
-- $S$: Memory strength parameter, scaling positively with successive successful recalls ($S = S_0 \cdot (1 + \production-ready candidate \cdot \text{Repetitions})$).
+- $S$: Memory strength parameter, scaling positively with successive successful recalls ($S = S_0 \cdot (1 + \beta \cdot \text{Repetitions})$).
 
 If $R(t) < 0.60$, the background `decay_worker.py` flags the node as **Stale**, automatically inserting a rapid micro-refresher into the graph before advanced dependent nodes are unlocked.
 

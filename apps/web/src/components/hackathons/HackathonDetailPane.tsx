@@ -256,7 +256,7 @@ export default function HackathonDetailPane({ event }: HackathonDetailPaneProps)
           href={event.url || `https://${domain}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full bg-[#141413] hover:bg-black/80 text-aven-text font-bold text-sm uppercase tracking-wider py-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all hover:shadow-xl hover:-translate-y-0.5"
+          className="w-full bg-[#141413] hover:bg-black/80 text-[#faf9f5] font-bold text-sm uppercase tracking-wider py-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all hover:shadow-xl hover:-translate-y-0.5"
         >
           <span>{event.url ? `Apply on ${event.source}` : 'Visit Platform'}</span>
           <ExternalLink size={16} />

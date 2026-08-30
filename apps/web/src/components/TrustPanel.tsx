@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathStore } from '../store/usePathStore';
+import { useActivePathQuery, useReadinessQuery } from '../hooks/api/useQueries';
 import { ShieldCheck, X, Sparkles, CheckCircle2, Lock, Activity, AlertTriangle } from 'lucide-react';
 
 /**
@@ -12,11 +13,15 @@ export default function TrustPanel() {
   const isTrustPanelOpen = usePathStore((state) => state.isTrustPanelOpen);
   const toggleTrustPanel = usePathStore((state) => state.toggleTrustPanel);
   const targetRole = usePathStore((state) => state.targetRole);
-  const activeMilestone = usePathStore((state) => state.activeMilestone);
-  const nodes = usePathStore((state) => state.nodes);
-  const readinessScore = usePathStore((state) => state.readinessScore);
-  const pathExplanation = usePathStore((state) => state.pathExplanation);
-  const activePathPlan = usePathStore((state) => state.activePathPlan);
+
+  const { data: activePathData } = useActivePathQuery();
+  const { data: readinessData } = useReadinessQuery();
+
+  const activeMilestone = activePathData?.activeMilestone;
+  const nodes = activePathData?.nodes || [];
+  const readinessScore = readinessData?.readinessScore || 0;
+  const pathExplanation = activePathData?.pathExplanation || null;
+  const activePathPlan = activePathData?.activePathPlan || null;
 
   if (!isTrustPanelOpen) return null;
 

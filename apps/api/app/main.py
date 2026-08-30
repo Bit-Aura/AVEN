@@ -429,8 +429,20 @@ async def get_current_path(profile_id: int, db: AsyncSession = Depends(get_db)):
     stmt = select(PathVersion).where(PathVersion.profile_id == profile_id).order_by(PathVersion.created_at.desc())
     path_version = (await db.execute(stmt)).scalars().first()
     if not path_version:
-        raise HTTPException(status_code=404, detail="No active path version found. Please set a goal first.")
-        
+        from app.services.path_planner import generate_or_replan_path
+        try:
+            path_version = await generate_or_replan_path(
+                profile_id=profile_id,
+                trigger_event="auto_recovery_on_fetch",
+                db=db,
+                neo4j_client=neo4j_client,
+                ai_provider=ai_provider
+            )
+        except Exception as e:
+            logger.error(f"Failed to auto-generate path: {e}")
+            raise HTTPException(status_code=500, detail="Path generation failed.")
+
+
     return {
         "id": path_version.id,
         "trigger_event": path_version.trigger_event,

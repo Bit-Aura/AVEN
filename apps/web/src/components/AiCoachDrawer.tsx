@@ -1,6 +1,8 @@
 'use client';
 
 import { usePathStore } from '../store/usePathStore';
+import { useActivePathQuery } from '../hooks/api/useQueries';
+import { useSendCoachMessageMutation } from '../hooks/api/useMutations';
 import { X, Send, User, Award } from 'lucide-react';
 import { Robot } from '@phosphor-icons/react';
 import { useState, useRef, useEffect } from 'react';
@@ -13,12 +15,17 @@ import { useState, useRef, useEffect } from 'react';
 export default function AiCoachDrawer() {
   const activeCoachNodeId = usePathStore((state) => state.activeCoachNodeId);
   const closeCoach = usePathStore((state) => state.closeCoach);
-  const nodes = usePathStore((state) => state.nodes) || [];
   const coachMessages = usePathStore((state) => state.coachMessages) || [];
   const isCoachTyping = usePathStore((state) => state.isCoachTyping);
-  const sendCoachMessage = usePathStore((state) => state.sendCoachMessage);
   const coachPraiseCard = usePathStore((state) => state.coachPraiseCard);
   const openProofCard = usePathStore((state) => state.openProofCard);
+  const addCoachMessage = usePathStore((state) => state.addCoachMessage);
+  const setCoachTyping = usePathStore((state) => state.setCoachTyping);
+
+  const { data: activePathData } = useActivePathQuery();
+  const nodes = activePathData?.nodes || [];
+  
+  const { mutateAsync: sendCoachMessageAsync } = useSendCoachMessageMutation();
 
   const [isOpen, setIsOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
@@ -56,10 +63,24 @@ export default function AiCoachDrawer() {
     e.preventDefault();
     if (!inputMessage.trim() || isCoachTyping) return;
 
-    const message = inputMessage.trim();
+    const messageText = inputMessage.trim();
     setInputMessage('');
-    // Use activeCoachNodeId or a fallback general ID
-    await sendCoachMessage(activeCoachNodeId || 'general', message);
+    addCoachMessage({ role: 'user', text: messageText });
+    setCoachTyping(true);
+
+    try {
+      const res = await sendCoachMessageAsync({ 
+        nodeId: activeCoachNodeId || 'general', 
+        message: messageText 
+      });
+      if (res?.reply) {
+        addCoachMessage({ role: 'ai', text: res.reply });
+      }
+    } catch (e) {
+      addCoachMessage({ role: 'ai', text: "I'm currently unable to reach the coach engine. Please verify the backend service is active." });
+    } finally {
+      setCoachTyping(false);
+    }
   };
 
   return (

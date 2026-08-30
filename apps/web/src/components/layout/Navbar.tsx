@@ -2,13 +2,16 @@
 
 import { usePathStore } from '../../store/usePathStore';
 import { ShieldCheck } from 'lucide-react';
+import { useActivePathQuery } from '../../hooks/api/useQueries';
 
 /**
  * Enterprise-grade implementation of Navbar.
  * Provides production-ready logic and seamless integration within the AVEN ecosystem.
  */
 export default function Navbar() {
-  const activeMilestone = usePathStore((state) => state.activeMilestone);
+  const { data: activePathData } = useActivePathQuery();
+  const activeMilestone = activePathData?.activeMilestone;
+  const isCommandPaletteOpen = usePathStore((state) => state.isCommandPaletteOpen);
   const toggleTrustPanel = usePathStore((state) => state.toggleTrustPanel);
 
   return (

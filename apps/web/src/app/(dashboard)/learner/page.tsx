@@ -5,6 +5,7 @@ import { usePathStore } from '../../../store/usePathStore';
 import CurrentNodeCard from '../../../components/learner/CurrentNodeCard';
 import CareerAlternativesDrawer from '../../../components/learner/CareerAlternativesDrawer';
 import MicroAssessmentModal from '../../../components/assessment/MicroAssessmentModal';
+import { useActivePathQuery, useReadinessQuery } from '../../../hooks/api/useQueries';
 import {
   ArrowsClockwise,
   Compass,
@@ -29,24 +30,21 @@ export default function LearnerDashboard() {
   const [isLoadingCourses, setIsLoadingCourses] = useState(false);
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
-  const fetchActivePath = usePathStore((state) => state.fetchActivePath);
-  const fetchReadiness = usePathStore((state) => state.fetchReadiness);
-  const activeMilestone = usePathStore((state) => state.activeMilestone);
   const targetRole = usePathStore((state) => state.targetRole);
-  const isLoading = usePathStore((state) => state.isLoading);
-  const pathError = usePathStore((state) => state.pathError);
-  const nodes = usePathStore((state) => state.nodes);
-  const readinessScore = usePathStore((state) => state.readinessScore);
+  
+  const { data: activePathData, isLoading: isPathLoading, error: pathErrorData, refetch: refetchActivePath } = useActivePathQuery();
+  const { data: readinessData } = useReadinessQuery();
+  
+  const activeMilestone = activePathData?.activeMilestone;
+  const nodes = activePathData?.nodes || [];
+  const readinessScore = readinessData?.readinessScore || 0;
+  const pathError = pathErrorData ? (pathErrorData as Error).message : null;
+  const isLoading = isPathLoading;
 
   const [bktUpdateMsg, setBktUpdateMsg] = useState<string | null>(null);
   const prevReadiness = useRef(readinessScore);
 
   const profileId = usePathStore((state) => state.profileId);
-
-  useEffect(() => {
-    fetchActivePath();
-    fetchReadiness();
-  }, [fetchActivePath, fetchReadiness]);
 
   useEffect(() => {
     const targetProfileId = profileId || 1;
@@ -70,9 +68,9 @@ export default function LearnerDashboard() {
 
   useEffect(() => {
     if (readinessScore > 0 && prevReadiness.current > 0 && readinessScore !== prevReadiness.current) {
-      const diffNum = readinessScore - prevReadiness.current;
-      const diff = diffNum.toFixed(2);
-      setBktUpdateMsg(`BKT Score Updated! P(L) shifted by ${diffNum > 0 ? '+' : ''}${diff}. Path adaptivity triggered.`);
+      const diffVal = readinessScore - prevReadiness.current;
+      const diffStr = diffVal.toFixed(2);
+      setBktUpdateMsg(`BKT Score Updated! P(L) shifted by ${diffVal > 0 ? '+' : ''}${diffStr}. Path adaptivity triggered.`);
       setTimeout(() => setBktUpdateMsg(null), 5000);
     }
     prevReadiness.current = readinessScore;
@@ -103,7 +101,7 @@ export default function LearnerDashboard() {
               <span>{pathError}</span>
             </div>
             <button
-              onClick={() => fetchActivePath()}
+              onClick={() => refetchActivePath()}
               className="text-xs font-bold text-aven-text bg-rose-500 hover:bg-rose-600 px-4 py-2 rounded-lg transition-colors shadow-glow-rose"
             >
               Retry Fetch

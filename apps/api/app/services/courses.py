@@ -30,7 +30,10 @@ async def fetch_dynamic_courses(target_role: str, active_milestone: str = None, 
                 description = ""
                 if desc_snippet:
                     for part in desc_snippet:
-                        description += part.get("text", "")
+                        if part and isinstance(part, dict):
+                            text = part.get("text")
+                            if text:
+                                description += str(text)
                 
                 if not description:
                     description = "Comprehensive guide and course material."

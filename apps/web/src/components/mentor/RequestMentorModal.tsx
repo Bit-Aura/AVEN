@@ -46,8 +46,28 @@ export default function RequestMentorModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !description.trim() || !reason.trim()) {
+    
+    const t = title.trim();
+    const r = reason.trim();
+    const d = description.trim();
+
+    if (!t || !r || !d) {
       setErrorMsg('Please fill in all required fields.');
+      return;
+    }
+    
+    if (t.length < 3) {
+      setErrorMsg('Session topic/title must be at least 3 characters long.');
+      return;
+    }
+    
+    if (r.length < 5) {
+      setErrorMsg('Reason for human help must be at least 5 characters long.');
+      return;
+    }
+    
+    if (d.length < 10) {
+      setErrorMsg('Problem description must be at least 10 characters long.');
       return;
     }
 

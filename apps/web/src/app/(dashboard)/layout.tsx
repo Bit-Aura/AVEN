@@ -1,48 +1,14 @@
-'use client';
-
 import { ReactNode } from 'react';
-import Sidebar from '../../components/layout/Sidebar';
-import Navbar from '../../components/layout/Navbar';
-import AiCoachDrawer from '../../components/AiCoachDrawer';
-import IdeSidecar from '../../components/IdeSidecar';
-import TrustPanel from '../../components/TrustPanel';
-import CommandPalette from '../../components/CommandPalette';
-import MicroCelebration from '../../components/MicroCelebration';
-import UndoToast from '../../components/UndoToast';
-import RoleGuard from '../../components/auth/RoleGuard';
-import { usePathStore } from '../../store/usePathStore';
+import DashboardShell from './DashboardShell';
 
 /**
- * Enterprise-grade implementation of DashboardLayout.
- * Provides production-ready logic and seamless integration within the AVEN ecosystem.
+ * Dashboard layout — kept as a Server Component so Next.js can stream HTML,
+ * prefetch route segments, and avoid forcing the full client JS bundle to
+ * download before first paint.
+ *
+ * All client-side logic (Zustand store, lazy overlays, RoleGuard) lives in
+ * the DashboardShell client component.
  */
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const isFocusMode = usePathStore((state) => state.isFocusMode);
-
-  return (
-    <RoleGuard>
-      <div className={`h-screen bg-aven-base flex text-aven-text overflow-hidden ${
-        isFocusMode ? 'focus-mode-active' : ''
-      }`}>
-        {/* Persistent Navigation Sidebar */}
-        <Sidebar />
-
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <Navbar />
-          <main className="flex-1 p-6 md:p-8 overflow-y-auto">
-            {children}
-          </main>
-        </div>
-
-        {/* Global Interactive Overlays & Drawers */}
-        <AiCoachDrawer />
-        <IdeSidecar />
-        <TrustPanel />
-        <CommandPalette />
-        <MicroCelebration />
-        <UndoToast />
-      </div>
-    </RoleGuard>
-  );
+  return <DashboardShell>{children}</DashboardShell>;
 }

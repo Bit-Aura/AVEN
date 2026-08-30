@@ -55,6 +55,14 @@ jest.mock('../../api/client', () => ({
   })
 }));
 
+jest.mock('../../hooks/api/useQueries', () => ({
+  useActivePathQuery: () => ({ refetch: jest.fn(), data: {} }),
+  useReadinessQuery: () => ({ refetch: jest.fn(), data: {} }),
+}));
+jest.mock('../../hooks/api/useMutations', () => ({
+  useSubmitIdeTelemetryMutation: () => ({ mutateAsync: jest.fn() }),
+}));
+
 const baseMock = {
   userGoal: 'Backend Engineer',
   targetRole: 'Backend Software Engineer',
@@ -62,9 +70,6 @@ const baseMock = {
   activeIdeNodeId: null,
   closeIde: jest.fn(),
   completeMilestoneViaIde: jest.fn(),
-  submitIdeTelemetry: jest.fn(),
-  fetchActivePath: jest.fn(),
-  fetchReadiness: jest.fn(),
 };
 
 describe('IdeSidecar Component', () => {

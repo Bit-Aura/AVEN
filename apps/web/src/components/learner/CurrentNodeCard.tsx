@@ -91,13 +91,7 @@ export default function CurrentNodeCard({
             <TerminalWindow size={16} weight="bold" />
             <span>Sandbox IDE</span>
           </button>
-          <button
-            onClick={handleAssessmentTrigger}
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#2b2b2a] hover:brightness-110 text-aven-base text-xs font-black transition-all"
-          >
-            <ShieldCheck size={16} weight="bold" />
-            <span>Prove It</span>
-          </button>
+
         </div>
       </div>
     </div>

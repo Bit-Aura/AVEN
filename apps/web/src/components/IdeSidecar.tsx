@@ -28,6 +28,8 @@ import {
   CodingQuestionResponse,
   CodeEvaluationResponse
 } from '../api/client';
+import { useActivePathQuery, useReadinessQuery } from '../hooks/api/useQueries';
+import { useSubmitIdeTelemetryMutation } from '../hooks/api/useMutations';
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels';
 
 /**
@@ -49,11 +51,12 @@ export default function IdeSidecar() {
   const activeIdeNodeId = usePathStore((state) => state.activeIdeNodeId);
   const closeIde = usePathStore((state) => state.closeIde);
   const completeMilestoneViaIde = usePathStore((state) => state.completeMilestoneViaIde);
-  const submitIdeTelemetry = usePathStore((state) => state.submitIdeTelemetry);
   const profileId = usePathStore((state) => state.profileId);
   const targetRole = usePathStore((state) => state.targetRole) || "Backend Software Engineer";
-  const fetchActivePath = usePathStore((state) => state.fetchActivePath);
-  const fetchReadiness = usePathStore((state) => state.fetchReadiness);
+
+  const { refetch: refetchActivePath } = useActivePathQuery();
+  const { refetch: refetchReadiness } = useReadinessQuery();
+  const { mutateAsync: submitIdeTelemetryAsync } = useSubmitIdeTelemetryMutation();
 
   const [language, setLanguage] = useState<'python' | 'typescript'>('python');
   const [code, setCode] = useState(DEFAULT_PYTHON);
@@ -175,7 +178,7 @@ export default function IdeSidecar() {
         setIsLocalPassed(true);
 
         try {
-          await submitIdeTelemetry({
+          await submitIdeTelemetryAsync({
             milestone_id: activeIdeNodeId,
             code: code,
             passed: true,
@@ -191,7 +194,7 @@ export default function IdeSidecar() {
         setIsLocalPassed(false);
 
         try {
-          await submitIdeTelemetry({
+          await submitIdeTelemetryAsync({
             milestone_id: activeIdeNodeId,
             code: code,
             passed: false,
@@ -241,7 +244,7 @@ export default function IdeSidecar() {
       // Submit telemetry if score is good
       if (result.is_passing) {
         try {
-          await submitIdeTelemetry({
+          await submitIdeTelemetryAsync({
             milestone_id: activeIdeNodeId,
             code: code,
             passed: true,
@@ -265,8 +268,8 @@ export default function IdeSidecar() {
   const handleCompleteMilestone = async () => {
     completeMilestoneViaIde(activeIdeNodeId);
     if (profileId) {
-      await fetchActivePath(profileId);
-      await fetchReadiness(profileId);
+      await refetchActivePath();
+      await refetchReadiness();
     }
   };
 

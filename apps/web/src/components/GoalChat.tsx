@@ -31,7 +31,7 @@ export default function GoalChat() {
     const text = preset || input;
     if (!text.trim() || isLoading) return;
     const email = user?.primaryEmailAddress?.emailAddress || 'demo@pathfinder.dev';
-    setUserGoal(text.trim(), email);
+    setUserGoal(text.trim());
   };
 
   return (

@@ -60,7 +60,7 @@ export default function DiagnosticChat() {
             <span>Generated Milestones</span>
           </div>
           <div className="space-y-1.5">
-            {nodes.slice(0, 4).map((node, idx) => (
+            {nodes.slice(0, 3).map((node: any, idx: number) => (
               <div key={idx} className="flex items-center gap-2 text-xs text-aven-text">
                 <span className="w-5 h-5 rounded-full bg-aven-primary/20 text-aven-primary flex items-center justify-center font-bold text-[10px]">
                   {idx + 1}
@@ -68,9 +68,9 @@ export default function DiagnosticChat() {
                 <span className="font-semibold">{node.data?.label as string || node.id}</span>
               </div>
             ))}
-            {nodes.length > 4 && (
+            {nodes.length > 3 && (
               <div className="text-[11px] text-aven-text-muted pl-7">
-                + {nodes.length - 4} additional ordered prerequisite skills
+                + {nodes.length - 3} additional ordered prerequisite skills
               </div>
             )}
           </div>
@@ -86,6 +86,8 @@ export default function DiagnosticChat() {
       </div>
     );
   }
+
+  const currentQ = nextQuestion as any;
 
   return (
     <div className="w-full max-w-2xl bg-aven-base border border-aven-border p-6 md:p-8 rounded-2xl shadow-glass flex flex-col h-[640px]">
@@ -146,13 +148,13 @@ export default function DiagnosticChat() {
 
       {/* Options Panel */}
       <div className="border-t border-aven-border pt-4 min-h-[160px]">
-        {nextQuestion && !isLoading && nextQuestion.options && nextQuestion.options.length > 0 && (
+        {currentQ && !isLoading && currentQ.options && currentQ.options.length > 0 && (
           <div>
             <div className="text-[11px] font-bold text-aven-text-muted uppercase tracking-wider mb-2.5">
               Select your experience level:
             </div>
             <div className="grid grid-cols-1 gap-2">
-              {nextQuestion.options.map((opt, idx) => (
+              {currentQ.options.map((opt: any, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => handleOptionSelect(opt)}
