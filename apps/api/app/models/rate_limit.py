@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float
-from app.core.db import Base
+from app.models.base import Base
 
 class RateLimit(Base):
     __tablename__ = "rate_limits"

@@ -16,16 +16,18 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
             client_ip = request.client.host if request.client else "unknown"
             
             try:
-                # Use Postgres as a distributed rate limiter cache via the `rate_limits` table
-                # We do this asynchronously with the provided engine/sessionmaker
+                # Use database as a distributed rate limiter cache via the `rate_limits` table
                 async with async_session() as session:
+                    now_ts = time.time()
+                    cutoff_ts = now_ts - 60.0
+
                     # Clean up old limits for this IP
-                    cleanup_sql = text("DELETE FROM rate_limits WHERE client_ip = :ip AND timestamp < extract(epoch from now()) - 60")
-                    await session.execute(cleanup_sql, {"ip": client_ip})
+                    cleanup_sql = text("DELETE FROM rate_limits WHERE client_ip = :ip AND timestamp < :cutoff")
+                    await session.execute(cleanup_sql, {"ip": client_ip, "cutoff": cutoff_ts})
                     
                     # Insert new request
-                    insert_sql = text("INSERT INTO rate_limits (client_ip, timestamp) VALUES (:ip, extract(epoch from now()))")
-                    await session.execute(insert_sql, {"ip": client_ip})
+                    insert_sql = text("INSERT INTO rate_limits (client_ip, timestamp) VALUES (:ip, :now_ts)")
+                    await session.execute(insert_sql, {"ip": client_ip, "now_ts": now_ts})
                     
                     # Count requests in last minute
                     count_sql = text("SELECT COUNT(*) FROM rate_limits WHERE client_ip = :ip")

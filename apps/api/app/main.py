@@ -36,22 +36,36 @@ async def lifespan(app: FastAPI):
     
     async def safe_seed():
         async with async_session() as session:
+            is_postgres = engine.dialect.name == "postgresql"
+            
             # Create rate limit table if not exists
-            await session.execute(text("CREATE TABLE IF NOT EXISTS rate_limits (id SERIAL PRIMARY KEY, client_ip TEXT, timestamp FLOAT)"))
+            if is_postgres:
+                await session.execute(text("CREATE TABLE IF NOT EXISTS rate_limits (id SERIAL PRIMARY KEY, client_ip TEXT, timestamp FLOAT)"))
+            else:
+                await session.execute(text("CREATE TABLE IF NOT EXISTS rate_limits (id INTEGER PRIMARY KEY AUTOINCREMENT, client_ip TEXT, timestamp REAL)"))
             await session.commit()
             
-            # Use advisory lock to prevent multiple workers from seeding at the same time
-            # 123456789 is just a unique arbitrary lock ID
-            lock_res = await session.execute(text("SELECT pg_try_advisory_lock(123456789)"))
-            locked = lock_res.scalar()
+            # Use advisory lock on PostgreSQL to prevent multiple workers from seeding simultaneously
+            locked = True
+            if is_postgres:
+                try:
+                    lock_res = await session.execute(text("SELECT pg_try_advisory_lock(123456789)"))
+                    locked = lock_res.scalar()
+                except Exception as lock_err:
+                    logger.warning(f"[Startup] Advisory lock query failed: {lock_err}")
+                    locked = True
             
             if locked:
-                logger.info("[Startup] Acquired advisory lock. Proceeding with seeding...")
+                logger.info("[Startup] Acquired lock/permission. Proceeding with seeding...")
                 try:
                     await run_startup_seeding(engine, async_session, neo4j_client)
                 finally:
-                    await session.execute(text("SELECT pg_advisory_unlock(123456789)"))
-                    await session.commit()
+                    if is_postgres:
+                        try:
+                            await session.execute(text("SELECT pg_advisory_unlock(123456789)"))
+                            await session.commit()
+                        except Exception:
+                            pass
             else:
                 logger.info("[Startup] Another worker is seeding. Skipping.")
 
