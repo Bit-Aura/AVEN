@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     
     # DB (PostgreSQL / SQLite for local development)
     DATABASE_URL: str = "sqlite+aiosqlite:///./pathfinder.db"
+    DATABASE_URL_UNPOOLED: str | None = None
+
     
     # Neo4j Graph DB
     NEO4J_URI: str = "bolt://localhost:7687"

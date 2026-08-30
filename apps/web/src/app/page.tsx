@@ -80,7 +80,7 @@ export default function LandingPage() {
 
       <div className="bg-background text-slate-100 font-sans selection:bg-brand-500/30 overflow-x-clip">
         {/* CINEMATIC HERO SECTION */}
-        <div className="cinematic-hero h-screen max-h-screen relative overflow-hidden flex flex-col">
+        <div className="cinematic-hero h-screen max-h-screen relative z-10 overflow-hidden flex flex-col">
           {/* VIDEO BACKGROUND */}
           <video 
             src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4"

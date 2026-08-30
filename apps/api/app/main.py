@@ -69,6 +69,18 @@ async def lifespan(app: FastAPI):
             else:
                 logger.info("[Startup] Another worker is seeding. Skipping.")
 
+    # Synchronously ensure tables are created before accepting traffic to prevent "relation does not exist" errors
+    async def init_tables():
+        async with engine.begin() as conn:
+            from app.models.base import Base
+            await conn.run_sync(Base.metadata.create_all)
+            
+    try:
+        await init_tables()
+        logger.info("[Startup] Tables created successfully.")
+    except Exception as e:
+        logger.error(f"[Startup] Error creating tables: {e}")
+
     asyncio.create_task(safe_seed())
     logger.info("[Startup] Offloaded safe database seeding to background task.")
     yield
@@ -107,6 +119,19 @@ app.add_middleware(
 
 # Include Authentication Router
 from app.routers.auth import router as auth_router
+from fastapi import APIRouter
+admin_router = APIRouter()
+
+@admin_router.get("/migrate")
+async def run_migrations():
+    import subprocess
+    try:
+        result = subprocess.run(["alembic", "upgrade", "head"], capture_output=True, text=True, check=False)
+        return {"stdout": result.stdout, "stderr": result.stderr, "returncode": result.returncode}
+    except Exception as e:
+        return {"error": str(e)}
+
+app.include_router(admin_router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(auth_router)
 
 # Include Platform Admin & Resource Router
