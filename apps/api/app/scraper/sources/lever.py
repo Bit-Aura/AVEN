@@ -81,7 +81,7 @@ class LeverSource(BaseJobSource):
 
         # Handle HTTP status codes
         if response.status_code == 404:
-            logger.warning(f"Lever site '{token}' not found (HTTP 404).")
+            logger.info(f"Lever site '{token}' not found (HTTP 404).")
             raise BoardNotFoundError(f"Lever site '{token}' was not found.")
         elif response.status_code == 429:
             logger.warning(f"Lever rate limit reached (HTTP 429) for site '{token}'.")

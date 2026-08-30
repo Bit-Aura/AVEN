@@ -277,8 +277,8 @@ async def test_mentor_intervention_api_lifecycle(test_client):
     learner_email = f"int_learner_{u_suffix}@pathfinder.dev"
 
     async with async_session() as session:
-        m = User(clerk_id=f"clerk_{mentor_email}", email=mentor_email, name="Lead Mentor", role="mentor", is_active=True)
-        l = User(clerk_id=f"clerk_{learner_email}", email=learner_email, name="Int Learner", role="learner", is_active=True)
+        m = User(clerk_id=f"clerk_{mentor_email}", email=mentor_email, name="Lead Mentor", role="MENTOR", is_active=True)
+        l = User(clerk_id=f"clerk_{learner_email}", email=learner_email, name="Int Learner", role="LEARNER", is_active=True)
         session.add_all([m, l])
         await session.flush()
 
@@ -287,7 +287,8 @@ async def test_mentor_intervention_api_lifecycle(test_client):
         await session.commit()
         profile_id = prof.id
 
-    headers = {"X-User-Email": mentor_email}
+    from tests.conftest import make_test_auth_headers
+    headers = make_test_auth_headers(mentor_email, "MENTOR")
 
     # 1. Create Intervention
     res_create = test_client.post(
@@ -407,13 +408,14 @@ async def test_mentor_endpoint_authorization(test_client):
     mentor_email = f"strictly_mentor_{u_suffix}@pathfinder.dev"
 
     async with async_session() as session:
-        l = User(clerk_id=f"clerk_{learner_email}", email=learner_email, role="learner", is_active=True)
-        m = User(clerk_id=f"clerk_{mentor_email}", email=mentor_email, role="mentor", is_active=True)
+        l = User(clerk_id=f"clerk_{learner_email}", email=learner_email, role="LEARNER", is_active=True)
+        m = User(clerk_id=f"clerk_{mentor_email}", email=mentor_email, role="MENTOR", is_active=True)
         session.add_all([l, m])
         await session.commit()
 
-    learner_headers = {"X-User-Email": learner_email}
-    mentor_headers = {"X-User-Email": mentor_email}
+    from tests.conftest import make_test_auth_headers
+    learner_headers = make_test_auth_headers(learner_email, "LEARNER")
+    mentor_headers = make_test_auth_headers(mentor_email, "MENTOR")
 
     # Learner should be denied
     res_unauth = test_client.get("/api/v1/mentor/cohorts", headers=learner_headers)

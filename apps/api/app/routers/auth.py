@@ -20,7 +20,6 @@ from app.core.auth import (
     UserRole,
     get_current_user,
     require_active_user,
-    DEFAULT_ADMIN_PASSWORD,
 )
 from app.models.domain import User, LearnerProfile
 
@@ -156,30 +155,6 @@ async def login_user(
 
     stmt = select(User).where(User.email == clean_email)
     user = (await db.execute(stmt)).scalars().first()
-
-    # If demo user does not exist yet, create them with canonical role
-    if not user and clean_email in ("demo@pathfinder.dev", "mentor@pathfinder.dev", "admin@aven.com"):
-        role = UserRole.MENTOR.value if "mentor" in clean_email else (UserRole.ADMIN.value if "admin" in clean_email else UserRole.LEARNER.value)
-        user = User(
-            clerk_id=f"clerk_{clean_email.replace('@', '_').replace('.', '_')}",
-            email=clean_email,
-            password_hash=hash_password("Aven@123"),
-            name=clean_email.split("@")[0].replace("_", " ").title(),
-            role=role,
-            is_active=True,
-            created_at=datetime.now(timezone.utc),
-        )
-        db.add(user)
-        await db.flush()
-        db.add(LearnerProfile(user_id=user.id, current_context="General Track"))
-        await db.commit()
-        await db.refresh(user)
-
-    # If user exists but has no password_hash, populate with default dev password
-    if user and not user.password_hash:
-        user.password_hash = hash_password(DEFAULT_ADMIN_PASSWORD if "admin" in clean_email else "Aven@123")
-        await db.commit()
-        await db.refresh(user)
 
     if not user or not user.password_hash or not verify_password(payload.password, user.password_hash):
         raise HTTPException(

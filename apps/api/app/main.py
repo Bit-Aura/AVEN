@@ -36,22 +36,36 @@ async def lifespan(app: FastAPI):
     
     async def safe_seed():
         async with async_session() as session:
+            is_postgres = engine.dialect.name == "postgresql"
+            
             # Create rate limit table if not exists
-            await session.execute(text("CREATE TABLE IF NOT EXISTS rate_limits (id SERIAL PRIMARY KEY, client_ip TEXT, timestamp FLOAT)"))
+            if is_postgres:
+                await session.execute(text("CREATE TABLE IF NOT EXISTS rate_limits (id SERIAL PRIMARY KEY, client_ip TEXT, timestamp FLOAT)"))
+            else:
+                await session.execute(text("CREATE TABLE IF NOT EXISTS rate_limits (id INTEGER PRIMARY KEY AUTOINCREMENT, client_ip TEXT, timestamp REAL)"))
             await session.commit()
             
-            # Use advisory lock to prevent multiple workers from seeding at the same time
-            # 123456789 is just a unique arbitrary lock ID
-            lock_res = await session.execute(text("SELECT pg_try_advisory_lock(123456789)"))
-            locked = lock_res.scalar()
+            # Use advisory lock on PostgreSQL to prevent multiple workers from seeding simultaneously
+            locked = True
+            if is_postgres:
+                try:
+                    lock_res = await session.execute(text("SELECT pg_try_advisory_lock(123456789)"))
+                    locked = lock_res.scalar()
+                except Exception as lock_err:
+                    logger.warning(f"[Startup] Advisory lock query failed: {lock_err}")
+                    locked = True
             
             if locked:
-                logger.info("[Startup] Acquired advisory lock. Proceeding with seeding...")
+                logger.info("[Startup] Acquired lock/permission. Proceeding with seeding...")
                 try:
                     await run_startup_seeding(engine, async_session, neo4j_client)
                 finally:
-                    await session.execute(text("SELECT pg_advisory_unlock(123456789)"))
-                    await session.commit()
+                    if is_postgres:
+                        try:
+                            await session.execute(text("SELECT pg_advisory_unlock(123456789)"))
+                            await session.commit()
+                        except Exception:
+                            pass
             else:
                 logger.info("[Startup] Another worker is seeding. Skipping.")
 
@@ -95,7 +109,7 @@ app.add_middleware(
         "http://localhost:8000",
         "http://127.0.0.1:8000",
     ],
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_origin_regex=r"https://.*\.vercel\.app|http://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -277,12 +291,17 @@ async def parse_and_initiate_goal(
             "target_skill": "http_fundamentals"
         }
     else:
-        content = json.loads(items[0].content)
+        try:
+            content = json.loads(items[0].content) if isinstance(items[0].content, str) else (items[0].content or {})
+        except Exception:
+            content = {}
+        if not isinstance(content, dict):
+            content = {"question": str(items[0].content)}
         first_turn_data = {
             "question_id": f"q_{items[0].id}",
-            "question_text": content.get("question"),
-            "options": content.get("options", []),
-            "target_skill": content.get("target_skill")
+            "question_text": content.get("question") or "Explain your experience with this topic.",
+            "options": content.get("options", ["Yes", "No"]),
+            "target_skill": content.get("target_skill") or "fundamentals"
         }
     
     turn = DiagnosticTurn(
@@ -340,10 +359,13 @@ async def submit_diagnostic_answer(
             prompt_data = json.loads(t.prompt)
             target_skill = prompt_data.get("target_skill")
             if target_skill and t.response:
-                # find correct answer
-                is_correct = False
                 for item in items:
-                    content = json.loads(item.content)
+                    try:
+                        content = json.loads(item.content) if isinstance(item.content, str) else (item.content or {})
+                    except Exception:
+                        continue
+                    if not isinstance(content, dict):
+                        continue
                     if content.get("target_skill") == target_skill:
                         is_correct = (content.get("correct_answer") == t.response)
                         break
@@ -383,12 +405,17 @@ async def submit_diagnostic_answer(
             "target_skill": "http_fundamentals"
         }
         for item in items:
-            content = json.loads(item.content)
+            try:
+                content = json.loads(item.content) if isinstance(item.content, str) else (item.content or {})
+            except Exception:
+                continue
+            if not isinstance(content, dict):
+                continue
             target = content.get("target_skill")
             if target and target not in asked_skills:
                 next_turn_data = {
                     "question_id": f"q_{item.id}",
-                    "question_text": content.get("question"),
+                    "question_text": content.get("question") or "Explain your experience with this topic.",
                     "options": content.get("options", []),
                     "target_skill": target
                 }

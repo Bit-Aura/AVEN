@@ -39,3 +39,14 @@ def setup_test_database():
         loop.run_until_complete(_init_tables())
     finally:
         loop.close()
+
+def make_test_auth_headers(email: str, role: str = "LEARNER", clerk_id: str = None) -> dict:
+    """
+    Generates cryptographically valid Authorization: Bearer <token> headers for test suites.
+    """
+    from app.core.auth import create_access_token
+    payload = {"sub": email, "role": role}
+    if clerk_id:
+        payload["clerk_id"] = clerk_id
+    token = create_access_token(payload)
+    return {"Authorization": f"Bearer {token}"}

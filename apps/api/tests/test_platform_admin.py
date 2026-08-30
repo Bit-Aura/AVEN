@@ -32,14 +32,14 @@ def setup_module_data():
                     clerk_id="clerk_test_admin",
                     email="test_admin@pathfinder.dev",
                     name="Test Admin",
-                    role="admin",
+                    role="ADMIN",
                     is_active=True
                 )
                 session.add(admin)
                 await session.flush()
                 session.add(LearnerProfile(user_id=admin.id, current_context="Administrator"))
             else:
-                admin.role = "admin"
+                admin.role = "ADMIN"
                 admin.is_active = True
 
             # Create test learner
@@ -50,14 +50,14 @@ def setup_module_data():
                     clerk_id="clerk_test_learner",
                     email="test_learner@pathfinder.dev",
                     name="Test Learner",
-                    role="learner",
+                    role="LEARNER",
                     is_active=True
                 )
                 session.add(learner)
                 await session.flush()
                 session.add(LearnerProfile(user_id=learner.id, current_context="Learner"))
             else:
-                learner.role = "learner"
+                learner.role = "LEARNER"
                 learner.is_active = True
 
             # Create test mentor
@@ -68,14 +68,14 @@ def setup_module_data():
                     clerk_id="clerk_test_mentor",
                     email="test_mentor@pathfinder.dev",
                     name="Test Mentor",
-                    role="mentor",
+                    role="MENTOR",
                     is_active=True
                 )
                 session.add(mentor)
                 await session.flush()
                 session.add(LearnerProfile(user_id=mentor.id, current_context="Mentor"))
             else:
-                mentor.role = "mentor"
+                mentor.role = "MENTOR"
                 mentor.is_active = True
 
             await session.commit()
@@ -91,7 +91,8 @@ def test_admin_overview_security_non_admin_rejected():
     """
     Non-admin user cannot access admin overview endpoint (403 Forbidden).
     """
-    headers = {"X-User-Email": "test_learner@pathfinder.dev"}
+    from tests.conftest import make_test_auth_headers
+    headers = make_test_auth_headers("test_learner@pathfinder.dev", "LEARNER")
     response = client.get("/api/v1/admin/overview", headers=headers)
     assert response.status_code == 403
     assert "Admin access required" in response.json()["detail"]
@@ -101,7 +102,8 @@ def test_admin_overview_metrics_success():
     """
     Admin can access admin overview endpoint and receive real database counts.
     """
-    headers = {"X-User-Email": "test_admin@pathfinder.dev"}
+    from tests.conftest import make_test_auth_headers
+    headers = make_test_auth_headers("test_admin@pathfinder.dev", "ADMIN")
     response = client.get("/api/v1/admin/overview", headers=headers)
     assert response.status_code == 200
     data = response.json()
@@ -119,7 +121,8 @@ def test_admin_system_status():
     """
     Admin can query platform system health.
     """
-    headers = {"X-User-Email": "test_admin@pathfinder.dev"}
+    from tests.conftest import make_test_auth_headers
+    headers = make_test_auth_headers("test_admin@pathfinder.dev", "ADMIN")
     response = client.get("/api/v1/admin/system", headers=headers)
     assert response.status_code == 200
     data = response.json()
@@ -136,7 +139,8 @@ def test_admin_user_management():
     """
     Admin can list users, search, and toggle active status.
     """
-    admin_headers = {"X-User-Email": "test_admin@pathfinder.dev"}
+    from tests.conftest import make_test_auth_headers
+    admin_headers = make_test_auth_headers("test_admin@pathfinder.dev", "ADMIN")
     
     # 1. List users
     res = client.get("/api/v1/admin/users?q=test_learner", headers=admin_headers)
@@ -152,7 +156,7 @@ def test_admin_user_management():
     assert res_suspend.json()["is_active"] is False
     
     # 3. Suspended user cannot take actions
-    suspended_headers = {"X-User-Email": "test_learner@pathfinder.dev"}
+    suspended_headers = make_test_auth_headers("test_learner@pathfinder.dev", "LEARNER")
     res_action = client.post("/api/v1/mentor/apply", json={"name": "Suspended", "expertise": "Dev"}, headers=suspended_headers)
     assert res_action.status_code == 403
     assert "deactivated or suspended" in res_action.json()["detail"]
@@ -167,7 +171,8 @@ def test_admin_user_management():
 # MENTOR APPROVAL WORKFLOW TESTS
 # =============================================================================
 
-def test_mentor_application_and_approval_lifecycle():
+@pytest.mark.asyncio
+async def test_mentor_application_and_approval_lifecycle():
     """
     Full lifecycle:
     1. Learner applies -> PENDING
@@ -175,9 +180,17 @@ def test_mentor_application_and_approval_lifecycle():
     3. Admin approves -> APPROVED -> user role becomes mentor
     4. User can now submit mentor resources
     """
+    from tests.conftest import make_test_auth_headers
     unique_email = f"applicant_{uuid.uuid4().hex[:8]}@pathfinder.dev"
-    learner_headers = {"X-User-Email": unique_email}
-    admin_headers = {"X-User-Email": "test_admin@pathfinder.dev"}
+    async with async_session() as session:
+        u = User(clerk_id=f"clerk_{unique_email}", email=unique_email, name="Jane Applicant", role="LEARNER", is_active=True)
+        session.add(u)
+        await session.flush()
+        session.add(LearnerProfile(user_id=u.id))
+        await session.commit()
+
+    learner_headers = make_test_auth_headers(unique_email, "LEARNER")
+    admin_headers = make_test_auth_headers("test_admin@pathfinder.dev", "ADMIN")
     
     # 1. Learner submits application
     res_apply = client.post(
@@ -224,6 +237,7 @@ def test_mentor_application_and_approval_lifecycle():
     assert res_approve.json()["status"] == "APPROVED"
     
     # 6. User now has mentor role and can submit resources
+    mentor_headers = make_test_auth_headers(unique_email, "MENTOR")
     res_mentor_submit = client.post(
         "/api/v1/resources/submit",
         json={
@@ -233,19 +247,28 @@ def test_mentor_application_and_approval_lifecycle():
             "resource_type": "tutorial",
             "skill_id": "api_design"
         },
-        headers=learner_headers
+        headers=mentor_headers
     )
     assert res_mentor_submit.status_code == 200
     assert res_mentor_submit.json()["status"] == "PENDING"
 
 
-def test_mentor_rejection_lifecycle():
+@pytest.mark.asyncio
+async def test_mentor_rejection_lifecycle():
     """
     Learner applies -> Admin rejects -> status is REJECTED, user remains learner.
     """
+    from tests.conftest import make_test_auth_headers
     unique_email = f"rejected_{uuid.uuid4().hex[:8]}@pathfinder.dev"
-    learner_headers = {"X-User-Email": unique_email}
-    admin_headers = {"X-User-Email": "test_admin@pathfinder.dev"}
+    async with async_session() as session:
+        u = User(clerk_id=f"clerk_{unique_email}", email=unique_email, name="Novice Developer", role="LEARNER", is_active=True)
+        session.add(u)
+        await session.flush()
+        session.add(LearnerProfile(user_id=u.id))
+        await session.commit()
+
+    learner_headers = make_test_auth_headers(unique_email, "LEARNER")
+    admin_headers = make_test_auth_headers("test_admin@pathfinder.dev", "ADMIN")
     
     # 1. Apply
     res_apply = client.post(
@@ -278,9 +301,10 @@ def test_resource_submission_and_approval_lifecycle():
     3. Admin approves -> APPROVED
     4. Now visible in public resources
     """
-    mentor_headers = {"X-User-Email": "test_mentor@pathfinder.dev"}
-    admin_headers = {"X-User-Email": "test_admin@pathfinder.dev"}
-    learner_headers = {"X-User-Email": "test_learner@pathfinder.dev"}
+    from tests.conftest import make_test_auth_headers
+    mentor_headers = make_test_auth_headers("test_mentor@pathfinder.dev", "MENTOR")
+    admin_headers = make_test_auth_headers("test_admin@pathfinder.dev", "ADMIN")
+    learner_headers = make_test_auth_headers("test_learner@pathfinder.dev", "LEARNER")
     
     # 1. Mentor submits resource
     unique_title = f"Advanced PostgreSQL Indexing & Query Tuning {uuid.uuid4().hex[:6]}"

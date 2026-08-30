@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: aven-api
+    env: python
+    region: oregon # or frankfurt, ohio, singapore
+    rootDir: apps/api
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0 # Standardize Python version
+      - key: DATABASE_URL
+        sync: false # Set this to your Neon or Supabase connection string in the Render Dashboard
+      - key: NEO4J_URI
+        sync: false # Set this to your Neo4j AuraDB URI
+      - key: NEO4J_USERNAME
+        sync: false
+      - key: NEO4J_PASSWORD
+        sync: false
+      - key: LLM_PROVIDER
+        sync: false
+      - key: CLAUDE_BASE_URL
+        sync: false
+      - key: CLAUDE_MODEL
+        sync: false
+      - key: CLAUDE_API_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: ROADMAP_SH_API_KEY
+        sync: false

@@ -236,12 +236,37 @@ def _generate_fixture_from_topics(prefix, topic_specs):
 
     return nodes, dedup_edges
 
+def _generate_docker_fixtures():
+    topics = [
+        ('Docker Fundamentals', ['Virtual Machines vs Containers', 'Docker Engine & Architecture', 'Container Lifecycle', 'Docker CLI Basics', 'Images vs Containers', 'Docker Desktop & Linux Engine']),
+        ('Dockerfiles & Images', ['Writing Production Dockerfiles', 'FROM, RUN, CMD, ENTRYPOINT', 'Layer Caching Optimization', 'Multi-Stage Builds', 'Distroless & Alpine Bases', '.dockerignore Rules']),
+        ('Storage & Volumes', ['Bind Mounts vs Volumes', 'Named Volumes Management', 'tmpfs Mounts', 'Volume Drivers & Persistence', 'Data Sharing Between Containers']),
+        ('Docker Networking', ['Bridge Networks & Host Driver', 'Overlay Networks', 'Port Mapping & Exposure', 'Custom DNS in Docker', 'Container-to-Container Communication']),
+        ('Docker Compose', ['docker-compose.yml Syntax', 'Multi-Container Orchestration', 'Environment Variables & .env', 'Depends_on & Healthchecks', 'Compose Profiles & Scaling', 'Volume & Network Bindings']),
+        ('Container Security', ['Non-root User Execution', 'Image Vulnerability Scanning (Trivy)', 'Secrets Management', 'Docker Daemon Hardening', 'Resource Constraints (CPU/RAM)']),
+        ('Registry & CI/CD', ['Docker Hub & GHCR Registries', 'Building & Tagging in CI/CD', 'Automated Image Scanning', 'Image Signing & Verification', 'Container Deployment to VPS & Cloud'])
+    ]
+    return _generate_fixture_from_topics('docker', topics)
+
+def _generate_kubernetes_fixtures():
+    topics = [
+        ('Kubernetes Architecture', ['Control Plane & Worker Nodes', 'API Server, etcd, Scheduler', 'Kubelet & Kube-proxy', 'kubectl CLI & Contexts', 'Namespaces & Cluster Scopes']),
+        ('Workloads & Pods', ['Pod Lifecycle & Containers', 'ReplicaSets & Deployments', 'Rolling Updates & Rollbacks', 'StatefulSets & DaemonSets', 'Jobs & CronJobs']),
+        ('Networking & Services', ['ClusterIP & NodePort', 'LoadBalancer Services', 'Ingress Controllers (Nginx/Traefik)', 'CoreDNS & Service Discovery', 'Network Policies & CNI']),
+        ('Config & Storage Management', ['ConfigMaps & Secrets', 'PersistentVolumes & PVCs', 'StorageClasses & Dynamic Provisioning', 'Volume Mounts in Pods', 'Environment Injection']),
+        ('Scaling & Scheduling', ['Horizontal Pod Autoscaler (HPA)', 'Vertical Pod Autoscaler (VPA)', 'Cluster Autoscaler', 'Node Selectors & Affinity', 'Taints and Tolerations']),
+        ('Helm & Package Management', ['Helm Chart Anatomy', 'Chart Values & Templates', 'Helm Release Lifecycle', 'Public Chart Repositories', 'Kustomize Declarative Management']),
+        ('Monitoring & Operations', ['Metrics Server & kube-state-metrics', 'Prometheus Operator', 'Grafana for Kubernetes', 'Liveness & Readiness Probes', 'Logging with EFK/Loki'])
+    ]
+    return _generate_fixture_from_topics('k8s', topics)
+
 PY_NODES, PY_EDGES = _generate_python_fixtures()
 SQL_NODES, SQL_EDGES = _generate_sql_fixtures()
 SYS_NODES, SYS_EDGES = _generate_system_design_fixtures()
 FE_NODES, FE_EDGES = _generate_frontend_fixtures()
 DEVOPS_NODES, DEVOPS_EDGES = _generate_devops_fixtures()
-
+DOCKER_NODES, DOCKER_EDGES = _generate_docker_fixtures()
+K8S_NODES, K8S_EDGES = _generate_kubernetes_fixtures()
 
 FIXTURE_CLEAN_NODES: Dict[str, List[Dict[str, Any]]] = {
     "backend": BACKEND_CLEAN_NODES_178,
@@ -252,8 +277,8 @@ FIXTURE_CLEAN_NODES: Dict[str, List[Dict[str, Any]]] = {
     "javascript": FE_NODES,
     "react": FE_NODES,
     "devops": DEVOPS_NODES,
-    "docker": DEVOPS_NODES,
-    "kubernetes": DEVOPS_NODES,
+    "docker": DOCKER_NODES,
+    "kubernetes": K8S_NODES,
     "mlops": PY_NODES,
     "ai-engineer": PY_NODES,
     "data-engineer": SQL_NODES
@@ -268,8 +293,8 @@ FIXTURE_EDGES: Dict[str, List[Dict[str, str]]] = {
     "javascript": FE_EDGES,
     "react": FE_EDGES,
     "devops": DEVOPS_EDGES,
-    "docker": DEVOPS_EDGES,
-    "kubernetes": DEVOPS_EDGES,
+    "docker": DOCKER_EDGES,
+    "kubernetes": K8S_EDGES,
     "mlops": PY_EDGES,
     "ai-engineer": PY_EDGES,
     "data-engineer": SQL_EDGES

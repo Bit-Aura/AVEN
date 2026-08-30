@@ -42,18 +42,47 @@ JobSchema = Annotated[
     Field(discriminator="type")
 ]
 
+from pydantic import BaseModel, Field, ConfigDict, model_validator
+
 class ScrapedJob(BaseModel):
     """
     Standardized, source-agnostic normalized job record.
     Represents the output contract of the scraping pipeline.
     """
-    job_data: JobSchema
+    external_id: str = Field(..., description="Unique job identifier from the source board")
+    source: str = Field(..., description="Source name/adapter (e.g. 'greenhouse')")
+    title: str = Field(..., description="Job title")
+    company: Optional[str] = None
+    location: Optional[str] = None
+    job_type: Optional[str] = "unknown"
+    description: Optional[str] = None
+    url: Optional[str] = None
+    posted_date: Optional[str] = None
+    department: Optional[str] = None
+    raw_payload: Optional[Dict[str, Any]] = None
     scraped_at: str = Field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat(),
         description="ISO-8601 timestamp when the record was extracted"
     )
 
     model_config = ConfigDict(extra="ignore")
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_input(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "job_data" in data:
+            jd = data["job_data"]
+            if isinstance(jd, dict):
+                merged = {**jd, **{k: v for k, v in data.items() if k != "job_data"}}
+                return merged
+            elif hasattr(jd, "__dict__"):
+                merged = {**jd.__dict__, **{k: v for k, v in data.items() if k != "job_data"}}
+                return merged
+        return data
+
+    @property
+    def job_data(self) -> Any:
+        return self
 
 
 class ScrapeResult(BaseModel):

@@ -105,9 +105,11 @@ class RoadmapIngestionService:
         cached = (await db.execute(stmt)).scalar_one_or_none()
 
         if cached and not force:
+            # Verify cached clean_nodes has rich data (> 5 categories)
+            has_rich_data = bool(cached.clean_nodes_json and len(cached.clean_nodes_json) >= 6)
             c_dt = cached.source_updated_at.replace(tzinfo=None) if cached.source_updated_at else None
             s_dt = source_updated_at.replace(tzinfo=None) if source_updated_at else None
-            if c_dt and s_dt and c_dt >= s_dt:
+            if has_rich_data and c_dt and s_dt and c_dt >= s_dt:
                 logger.info(f"[RoadmapIngestion] Cache hit for '{slug}'. Skipping remote fetch to preserve credits.")
                 return cached
 

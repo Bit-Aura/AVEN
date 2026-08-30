@@ -110,7 +110,7 @@ class ScrapeEventsInput(BaseModel):
 async def scrape_hackathons_endpoint(
     data: ScrapeEventsInput,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_active_user)
+    current_user: User = Depends(require_admin)
 ):
     """
     Executes the standalone event scraping pipeline to fetch, clean, normalize,

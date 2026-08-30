@@ -89,11 +89,12 @@ def verify_proof_card_signature(
         
     payload = {
         "credential_id": card_data.get("credential_id"),
-        "profile_id": card_data.get("profile_id"),
+        "profile_id": int(card_data.get("profile_id")) if card_data.get("profile_id") is not None else None,
         "role": card_data.get("role"),
-        "mastered_count": card_data.get("skills_mastered_count") or card_data.get("mastered_count", 0),
+        "mastered_count": int(card_data.get("skills_mastered_count") or card_data.get("mastered_count", 0)),
         "readiness_score": round(float(card_data.get("readiness_score", 0.0)), 4),
-        "issue_date": card_data.get("issue_date")
+        "issue_date": card_data.get("issue_date"),
+        "narrative_summary": card_data.get("narrative_summary")
     }
     
     canonical_string = json.dumps(payload, sort_keys=True)

@@ -33,8 +33,42 @@ DEFAULT_WEEKLY_HOURS = 10.0
 DEFAULT_SKILL_HOURS = 5.0
 READINESS_THRESHOLD = 0.70
 
-# In-memory cache for dynamically synthesized company intelligence
+# In-memory caches for dynamically synthesized company intelligence and market signals
 DYNAMIC_COMPANY_CACHE: Dict[str, Dict[str, Any]] = {}
+MARKET_SIGNALS_CACHE: Dict[str, List[Any]] = {}
+
+# Known Company to ATS Platform Resolver Mapping
+COMPANY_ATS_MAP: Dict[str, tuple] = {
+    "openai": ("ashby", "openai"),
+    "linear": ("ashby", "linear"),
+    "ramp": ("ashby", "ramp"),
+    "sentry": ("ashby", "sentry"),
+    "replit": ("ashby", "replit"),
+    "notion": ("ashby", "notion"),
+    "anthropic": ("greenhouse", "anthropic"),
+    "stripe": ("greenhouse", "stripe"),
+    "figma": ("greenhouse", "figma"),
+    "airbnb": ("greenhouse", "airbnb"),
+    "uber": ("greenhouse", "uber"),
+    "databricks": ("greenhouse", "databricks"),
+    "scale": ("greenhouse", "scaleai"),
+    "scaleai": ("greenhouse", "scaleai"),
+    "discord": ("greenhouse", "discord"),
+    "robinhood": ("greenhouse", "robinhood"),
+    "coinbase": ("greenhouse", "coinbase"),
+    "pinterest": ("greenhouse", "pinterest"),
+    "instacart": ("greenhouse", "instacart"),
+    "door_dash": ("greenhouse", "doordash"),
+    "doordash": ("greenhouse", "doordash"),
+    "netflix": ("lever", "netflix"),
+    "spotify": ("lever", "spotify"),
+    "palantir": ("lever", "palantir"),
+    "atlassian": ("lever", "atlassian"),
+    "google": ("google", "software"),
+    "alphabet": ("google", "software"),
+    "amazon": ("amazon", "software-development"),
+    "aws": ("amazon", "software-development"),
+}
 
 
 # ---------------------------------------------------------------------------
@@ -188,7 +222,7 @@ Known Core Role Skills:
 Determine:
 1. The proper capitalized company name.
 2. Top 5-8 priority technical skill IDs needed for this company and role. Select strictly from the Available System Skill Graph IDs above wherever possible.
-3. 4-6 specific real-world interview round focus areas / themes for {company_name} (e.g. 'Distributed Systems & Scalability', 'Low-Latency Async Concurrency', 'Database Optimization', 'System Architecture', 'Behavioral & Culture').
+3. 4-6 specific real-world interview round focus areas / themes for {company_name}.
 4. Typical number of interview rounds (usually 4 to 6).
 
 Output STRICTLY valid JSON conforming to this schema:
@@ -199,13 +233,13 @@ Output STRICTLY valid JSON conforming to this schema:
   "typical_rounds": 5
 }}
 
-Do not include any explanation or markdown fences outside the JSON. Return only raw JSON.
+Return only raw JSON.
 """
     try:
         response_text = await ai._chat(
             system="You are an expert technical curriculum and hiring intelligence architect. You output only valid schema JSON.",
             user_prompt=prompt,
-            max_tokens=1000
+            max_tokens=300
         )
         data = ai._parse_json_robust(response_text)
         
@@ -244,6 +278,95 @@ Do not include any explanation or markdown fences outside the JSON. Return only 
         }
         DYNAMIC_COMPANY_CACHE[cache_key] = fallback_profile
         return fallback_profile
+
+
+async def fetch_company_market_jobs(
+    pipeline: Any,
+    company_id: str,
+    company_name: str,
+    target_role: str
+) -> List[Any]:
+    """
+    Intelligently routes to the correct ATS provider (Ashby, Google, Amazon, Greenhouse, Lever)
+    or falls back to market inference without logging spurious 404 errors.
+    """
+    company_key = company_id.lower().strip()
+    cache_key = f"{company_key}_{target_role.lower().strip()}"
+    if cache_key in MARKET_SIGNALS_CACHE:
+        return MARKET_SIGNALS_CACHE[cache_key]
+
+    extracted_jobs = []
+
+    # 1. Check known company mapping
+    if company_key in COMPANY_ATS_MAP:
+        source_type, board_token = COMPANY_ATS_MAP[company_key]
+        try:
+            if source_type == "ashby":
+                raw_jobs = await pipeline.ashby_source.fetch_raw_jobs(board_identifier=board_token)
+                for raw_job in raw_jobs[:5]:
+                    job = pipeline.ashby_source.extract_job(raw_job, company_name=company_name)
+                    if job and job.description:
+                        extracted_jobs.append(job)
+            elif source_type == "greenhouse":
+                raw_jobs = await pipeline.greenhouse_source.fetch_raw_jobs(board_identifier=board_token)
+                for raw_job in raw_jobs[:5]:
+                    job = pipeline.greenhouse_source.extract_job(raw_job, company_name=company_name)
+                    if job and job.description:
+                        extracted_jobs.append(job)
+            elif source_type == "lever":
+                raw_jobs = await pipeline.lever_source.fetch_raw_jobs(board_identifier=board_token)
+                for raw_job in raw_jobs[:5]:
+                    job = pipeline.lever_source.extract_job(raw_job, company_name=company_name)
+                    if job and job.description:
+                        extracted_jobs.append(job)
+            elif source_type == "google":
+                raw_jobs = await pipeline.google_source.fetch_raw_jobs(query=target_role)
+                for raw_job in raw_jobs[:5]:
+                    job = pipeline.google_source.extract_job(raw_job, company_name=company_name)
+                    if job and job.description:
+                        extracted_jobs.append(job)
+            elif source_type == "amazon":
+                raw_jobs = await pipeline.amazon_source.fetch_raw_jobs(query=target_role)
+                for raw_job in raw_jobs[:5]:
+                    job = pipeline.amazon_source.extract_job(raw_job, company_name=company_name)
+                    if job and job.description:
+                        extracted_jobs.append(job)
+        except Exception as e:
+            logger.debug(f"[PlacementEngine] Known ATS fetch error for '{company_id}' ({source_type}): {e}")
+
+    # 2. If no jobs found via known mapping, attempt gentle probing across standard boards
+    if not extracted_jobs:
+        for source_adapter, extract_fn in [
+            (pipeline.ashby_source, pipeline.ashby_source.extract_job),
+            (pipeline.greenhouse_source, pipeline.greenhouse_source.extract_job),
+            (pipeline.lever_source, pipeline.lever_source.extract_job),
+        ]:
+            try:
+                raw_jobs = await source_adapter.fetch_raw_jobs(board_identifier=company_key)
+                for raw_job in raw_jobs[:3]:
+                    job = extract_fn(raw_job, company_name=company_name)
+                    if job and job.description:
+                        extracted_jobs.append(job)
+                if extracted_jobs:
+                    break
+            except Exception:
+                continue
+
+    # 3. High-fidelity Market Inference Fallback
+    if not extracted_jobs:
+        from app.scraper.models import ScrapedJob
+        job1 = ScrapedJob(
+            external_id=f"dyn-job-{company_key}-1",
+            source="market-inference",
+            title=f"{target_role}",
+            company=company_name,
+            description=f"Hiring {target_role} proficient in scalable architecture, system design, and production engineering at {company_name}.",
+            url=f"https://www.linkedin.com/jobs/search/?keywords={company_key}+{target_role.replace(' ', '+')}"
+        )
+        extracted_jobs.append(job1)
+
+    MARKET_SIGNALS_CACHE[cache_key] = extracted_jobs
+    return extracted_jobs
 
 
 # ---------------------------------------------------------------------------
@@ -395,42 +518,15 @@ async def generate_placement_plan(
     from app.scraper.pipeline import JobScrapingPipeline
     pipeline = JobScrapingPipeline()
     market_signals = []
-    company_id_lower = payload.company_id.lower().strip()
 
     try:
         logger.info(f"[PlacementEngine] Fetching real-time market signals for '{payload.company_id}'...")
-        extracted_jobs = []
-        
-        try:
-            scrape_result = await pipeline.lever_source.fetch_raw_jobs(board_identifier=company_id_lower)
-            for raw_job in scrape_result[:3]:
-                job = pipeline.lever_source.extract_job(raw_job, company_name=payload.company_id)
-                if job and job.description:
-                    extracted_jobs.append(job)
-        except Exception:
-            pass
-
-        if not extracted_jobs:
-            try:
-                scrape_result = await pipeline.greenhouse_source.fetch_raw_jobs(board_identifier=company_id_lower)
-                for raw_job in scrape_result[:3]:
-                    job = pipeline.greenhouse_source.extract_job(raw_job, company_name=payload.company_id)
-                    if job and job.description:
-                        extracted_jobs.append(job)
-            except Exception:
-                pass
-
-        if not extracted_jobs:
-            from app.scraper.models import ScrapedJob
-            job1 = ScrapedJob(
-                external_id=f"dyn-job-{company_id_lower}-1",
-                source="market-inference",
-                title=f"{target_role}",
-                company=company_profile["name"],
-                description=f"Hiring {target_role} proficient in scalable architecture, system design, and production engineering at {company_profile['name']}.",
-                url=f"https://www.linkedin.com/jobs/search/?keywords={company_id_lower}+{target_role.replace(' ', '+')}"
-            )
-            extracted_jobs.append(job1)
+        extracted_jobs = await fetch_company_market_jobs(
+            pipeline=pipeline,
+            company_id=payload.company_id,
+            company_name=company_profile["name"],
+            target_role=target_role
+        )
 
         keyword_mapping = {
             "python": "python_advanced",
