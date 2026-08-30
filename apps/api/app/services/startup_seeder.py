@@ -126,6 +126,15 @@ async def run_startup_seeding(engine, async_session_maker, neo4j_client=None):
                     if seed_attempt == 2:
                         logger.error("[Startup Seeding] Skill seeding failed completely.")
                     await asyncio.sleep(2)
+
+            # 6. Seed / Warm Roadmap.sh canonical roadmaps cache
+            try:
+                from app.services.roadmap_ingestion import roadmap_ingestion_service
+                for r_slug in ["backend", "python", "sql", "system-design", "frontend", "devops", "docker", "kubernetes"]:
+                    await roadmap_ingestion_service.fetch_and_cache_roadmap(r_slug, session, force=False)
+                logger.info("[Startup Seeding] Successfully pre-cached canonical roadmap topologies.")
+            except Exception as rm_err:
+                logger.warning(f"[Startup Seeding] Roadmap cache warming warning: {rm_err}")
                 
             # 6. Background event scraping
             event_count = (await session.execute(select(func.count(HackathonEvent.id)))).scalar_one()
