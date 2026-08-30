@@ -6,43 +6,43 @@ import { motion, AnimatePresence } from 'framer-motion';
 const faqs = [
   {
     id: 1,
-    question: "Why wouldn't I just hire a full-time designer?",
-    answer: "To replace our services, you will need to hire a full-time designer and a full-time developer. A senior-level one for each will easily cost you $130k+ annually, benefits, vacation days, training, etc.\n\nBy working with us, not only will you save thousands of dollars, you will get back countless hours as well."
+    question: "How does the RAG-Enriched AI Coach work?",
+    answer: "Our AI coach uses Retrieval-Augmented Generation (RAG) to pull your exact learning context - including your current readiness scores, mastered skills, and position in the curriculum. This allows it to provide highly specific, personalized guidance rather than generic answers."
   },
   {
     id: 2,
-    question: "How do I get started with AVEN?",
-    answer: "Simply reach out through our contact form to schedule an initial discovery call. We'll discuss your goals, scope the project, and determine if we're a good fit before moving forward with a formal proposal."
+    question: "What is Bayesian Knowledge Tracing (BKT)?",
+    answer: "BKT is a mathematical model we use to estimate your actual probability of mastering a skill. Instead of just marking a video as 'watched', we analyze your performance on micro-assessments over time to calculate true posterior mastery."
   },
   {
     id: 3,
-    question: "How do we communicate or share feedback?",
-    answer: "We set up a dedicated Slack or Discord channel for direct, asynchronous communication. For design feedback, we use Figma comments, and for development progress, we provide regular staging links."
+    question: "What happens if I skip a fundamental concept?",
+    answer: "Our Date-Delta Engine simulates the downstream effects. If you skip a prerequisite, our Neo4j knowledge graph calculates the exact friction days and blocked dependent nodes you'll face later, so you understand the cost of skipping."
   },
   {
     id: 4,
-    question: "What size budgets do you typically work with?",
-    answer: "Most of our projects range between $15,000 and $50,000. Our minimum engagement fee is $10,000."
+    question: "Are the Proof Cards recognized by employers?",
+    answer: "Yes. Once you reach the required mastery threshold, we issue cryptographically signed Proof Cards. These are tamper-evident credentials that prove verified technical competence, making them far more valuable to ATS systems than standard completion certificates."
   },
   {
     id: 5,
-    question: "How long does a typical project take?",
-    answer: "Depending on the complexity and scope, a standard project typically takes between 4 to 8 weeks from kickoff to final launch."
+    question: "How is my personalized learning path generated?",
+    answer: "When you set a career goal, our LLM parses your intent and cross-references it with our topological DAG planner. It creates a custom roadmap that eliminates redundancies and maps the most efficient sequence of skills needed for your specific target."
   },
   {
     id: 6,
-    question: "What happens after our new product is launched?",
-    answer: "We include a 30-day post-launch warranty period to fix any bugs and ensure a smooth transition. After that, we offer monthly retainers for ongoing support and feature development."
+    question: "What happens when I fail a checkpoint?",
+    answer: "Our system runs a root-cause backtrace. If you fail, we recursively check your prerequisites to find the foundational gap. We then decay that specific skill score and dynamically replan your path to include necessary refreshers."
   },
   {
     id: 7,
-    question: "What are the payment terms for a project?",
-    answer: "We typically structure payments in three milestones: 40% upfront to secure your spot, 30% at the midpoint deliverable, and the final 30% right before launch."
+    question: "How does the platform handle memory decay?",
+    answer: "We model the Ebbinghaus forgetting curve. Over time, your mastery probability for inactive skills slowly decays. If a score drops below the threshold, our active decay worker will automatically queue a quick refresher assessment into your path."
   },
   {
     id: 8,
-    question: "Does AVEN take on small hourly work?",
-    answer: "No, we only take on fixed-fee projects. However, we do offer retainers to our clients after their project is finished for ongoing iterative work."
+    question: "Can I adjust the speed or depth of my learning?",
+    answer: "Absolutely. We use a steerable weights system where you can adjust sliders for Speed, Depth, and Cost. Our Path Planner will instantly re-rank the resources and regenerate a path tailored to your precise preferences."
   }
 ];
 

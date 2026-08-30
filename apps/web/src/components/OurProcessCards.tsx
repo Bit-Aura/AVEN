@@ -21,32 +21,32 @@ const scatterData = [
 const cards = [
   {
     id: 1,
-    title: "Project request",
-    description: "We begin by carefully reviewing your project requirements. This initial assessment helps us determine if AVEN is the ideal partner to bring your vision to life. Successful projects start with a clear understanding of your goals.",
+    title: "Goal Definition",
+    description: "We begin by capturing your specific career or technical goals. Instead of asking you to choose a generic course, our AI engine parses your intent to generate a personalized target profile, setting the true north for your learning journey.",
     color: "bg-[#f2fbf5]", // light green
   },
   {
     id: 2,
-    title: "First meeting",
-    description: "We believe strong relationships lead to exceptional results. During our initial meeting, we'll take the time to understand your business goals, target audience, and desired outcomes. This helps us create a tailored strategy.",
+    title: "Cold-Start Diagnostic",
+    description: "We respect what you already know. Through a multi-turn adaptive diagnostic, we assess your baseline mastery across foundational concepts. This allows us to map your current knowledge state directly onto our dependency graph.",
     color: "bg-[#fdf9f1]", // light orange/yellow
   },
   {
     id: 3,
-    title: "Proposal",
-    description: "Based on our in-depth understanding of your project, we create a custom proposal outlining the scope of work, project timeline, and transparent pricing structure. Our fixed-fee approach eliminates the uncertainty often associated with hourly billing.",
+    title: "Dynamic Path Generation",
+    description: "Based on your diagnostic, our DAG planner creates a customized learning roadmap. We calculate the exact sequence of skills you need, eliminating redundancies and outlining the fastest, most effective route to your goal.",
     color: "bg-[#fcf5f5]", // light rose/pink
   },
   {
     id: 4,
-    title: "Design and development",
-    description: "Once we have everything we need, we'll kick-off your project. We maintain open communication throughout the process by providing regular updates through communications channels like Slack, Discord, or email.",
+    title: "Active Learning & Verification",
+    description: "You learn by doing, and we verify every step. As you progress, you complete micro-assessments. Our Bayesian Knowledge Tracing engine updates your mastery scores in real-time, dynamically adjusting the path if you stumble.",
     color: "bg-[#f0fbf9]", // light teal
   },
   {
     id: 5,
-    title: "Launch and Beyond",
-    description: "Upon completion, your website undergoes rigorous quality assurance testing to guarantee optimal performance and user experience before launching. We'll also stay on for 30-days post launch - no strings (or bills) attached to ensure everything runs smoothly.",
+    title: "Readiness Proof & Job Market",
+    description: "Once you reach the mastery threshold, you don't just get a certificate. You earn a cryptographically verifiable Proof Card. Our system matches your verified skills directly to current job openings, ensuring you're ready for the market.",
     color: "bg-[#f4f7fe]", // light blue
   }
 ];

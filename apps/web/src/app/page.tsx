@@ -191,17 +191,17 @@ export default function LandingPage() {
 
             <div className="relative z-10 flex flex-col items-center">
               <h2 className="text-4xl md:text-6xl font-display font-normal tracking-tight text-white max-w-3xl leading-[1.1]">
-                Ready to Build Your Verified Career Path?
+                Stop Guessing. Start Mastering.
               </h2>
               <p className="text-[#cccccc] text-base md:text-lg max-w-2xl mt-6 leading-relaxed">
-                Takes under 2 minutes. Enter your target career goal and let the Neo4j topological planner generate your shortest path.
+                Don't waste months on generic courses. Tell our AI your exact career goal, take a 2-minute diagnostic, and let our topological planner map your fastest, verified route to job-readiness.
               </p>
               
               <Link
                 href="/diagnostic"
                 className="mt-10 flex items-center gap-2 px-10 py-4 rounded-full liquid-glass text-white font-bold text-base shadow-[0_0_30px_rgba(59,130,246,0.3)] transition-transform hover:scale-[1.03] active:scale-95"
               >
-                <span>Get Started Free</span>
+                <span>Launch Cold-Start Diagnostic</span>
                 <ArrowRight size={18} />
               </Link>
             </div>
