@@ -25,7 +25,7 @@ export function Footer() {
       {/* The actual footer sits fixed at the bottom behind the page */}
       <footer 
         ref={footerRef}
-        className="fixed bottom-0 left-0 w-full bg-[#0f0f0f] pt-10 md:pt-16 pb-5 md:pb-0 flex flex-col justify-between overflow-hidden z-[-1]"
+        className="fixed bottom-0 left-0 w-full bg-[#0f0f0f] pt-10 md:pt-16 pb-5 md:pb-0 flex flex-col justify-between overflow-hidden z-0"
       >
         {/* Background radial gradient */}
         <div 
