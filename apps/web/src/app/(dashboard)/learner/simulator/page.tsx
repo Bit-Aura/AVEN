@@ -216,7 +216,7 @@ export default function DayOneSimulatorPage() {
   const fetchTickets = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/simulator/tickets/${profileId}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/simulator/tickets/${profileId}`);
       if (res.ok) {
         const data = await res.json();
         setTickets(data);
@@ -282,7 +282,7 @@ export default function DayOneSimulatorPage() {
     setIsSendingChat(true);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/simulator/ticket/${selectedTicket.id}/chat`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/simulator/ticket/${selectedTicket.id}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -336,7 +336,7 @@ export default function DayOneSimulatorPage() {
     }, 1500);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/simulator/ticket/${selectedTicket.id}/submit-pr`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/simulator/ticket/${selectedTicket.id}/submit-pr`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
