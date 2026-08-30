@@ -95,15 +95,7 @@ export function FAQSection() {
   const rightFaqs = faqs.filter((_, i) => i % 2 !== 0);
 
   return (
-    <section className="relative w-full bg-white z-20 py-32">
-      {/* Exact dot grid background from the reference */}
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.15]" 
-        style={{ 
-          backgroundImage: 'radial-gradient(#000 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
-      />
+    <section className="relative w-full z-20 py-32">
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">

@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { OurProcessCards } from '../components/OurProcessCards';
+import { TechStack } from '../components/TechStack';
 import { FAQSection } from '../components/FAQSection';
+import { Footer } from '../components/Footer';
+import { AnimatedFeaturesGrid } from '../components/AnimatedFeaturesGrid';
 import { SafeUserButton, useSafeUser } from '../lib/clerkSafe';
 import { 
   ArrowRight, 
@@ -160,109 +163,24 @@ export default function LandingPage() {
           </main>
         </div>
 
-        {/* REST OF PAGE */}
-        <main className="max-w-7xl mx-auto px-6 py-24 space-y-32 relative z-10">
-          {/* Feature Grid (Tensorik UI Style) */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Card 1: DAG vs Video Progress */}
-            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-default select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
-              {/* Ambient White Glow (Resting State) */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.06] rounded-full blur-[70px] pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500"></div>
+        {/* REST OF PAGE - UNIFIED LIGHT BACKGROUND */}
+        <div className="relative w-full bg-white z-10">
+          {/* Global Dot Grid for all sections below hero */}
+          <div 
+            className="absolute inset-0 pointer-events-none opacity-[0.15]" 
+            style={{ 
+              backgroundImage: 'radial-gradient(#000 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
+            }}
+          />
 
-              {/* Layer 1 (Static) */}
-              <div className="relative z-10 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-0 group-hover:scale-95 group-hover:translate-y-6 pointer-events-auto group-hover:pointer-events-none">
-                <h3 className="text-2xl font-bold text-white tracking-tight">
-                  Bayesian Readiness
-                </h3>
-                <p className="mt-3 text-[15px] text-[#aaaaaa] font-normal leading-relaxed">
-                  Standard MOOCs give 100% progress for passive video completion. PathFinder estimates actual posterior mastery through verified micro-assessments and sandbox telemetry.
-                </p>
-              </div>
-              
-              {/* Layer 2 (Curtain Hover Effect - Slides up from bottom) */}
-              <div className="absolute inset-0 z-20 flex flex-col justify-end p-7 sm:p-8 bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] rounded-[28px] opacity-0 translate-y-[100%] group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none group-hover:pointer-events-auto overflow-hidden">
-                <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-90" />
-                <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white/[0.09] to-transparent pointer-events-none" />
-                <div className="absolute -top-20 -left-20 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl pointer-events-none" />
-                
-                <div className="relative z-30 flex flex-col translate-y-6 group-hover:translate-y-0 transition-transform duration-500 delay-[50ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
-                  <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                    Bayesian Readiness
-                  </h3>
-                  <p className="mt-3 text-sm sm:text-[15px] text-[#cccccc] font-normal leading-relaxed">
-                    Standard MOOCs give 100% progress for passive video completion. PathFinder estimates actual posterior mastery through verified micro-assessments and sandbox telemetry.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 2: Date-Delta Engine */}
-            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-default select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
-              {/* Ambient White Glow (Resting State) */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.06] rounded-full blur-[70px] pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500"></div>
-
-              {/* Layer 1 (Static) */}
-              <div className="relative z-10 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-0 group-hover:scale-95 group-hover:translate-y-6 pointer-events-auto group-hover:pointer-events-none">
-                <h3 className="text-2xl font-bold text-white tracking-tight">
-                  Date-Delta Engine
-                </h3>
-                <p className="mt-3 text-[15px] text-[#aaaaaa] font-normal leading-relaxed">
-                  Wondering what happens if you skip a fundamental concept? Our NetworkX DAG simulator calculates downstream friction days and blocked dependent nodes in real-time.
-                </p>
-              </div>
-              
-              {/* Layer 2 (Curtain Hover Effect - Slides down from top) */}
-              <div className="absolute inset-0 z-20 flex flex-col justify-end p-7 sm:p-8 bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] rounded-[28px] opacity-0 translate-y-[-100%] group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none group-hover:pointer-events-auto overflow-hidden">
-                <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-90" />
-                <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white/[0.09] to-transparent pointer-events-none" />
-                <div className="absolute -top-20 -left-20 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl pointer-events-none" />
-                
-                <div className="relative z-30 flex flex-col translate-y-6 group-hover:translate-y-0 transition-transform duration-500 delay-[50ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
-                  <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                    Date-Delta Engine
-                  </h3>
-                  <p className="mt-3 text-sm sm:text-[15px] text-[#cccccc] font-normal leading-relaxed">
-                    Wondering what happens if you skip a fundamental concept? Our NetworkX DAG simulator calculates downstream friction days and blocked dependent nodes in real-time.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 3: ATS Market Radar & HMAC Proofs */}
-            <div className="group relative w-full rounded-[28px] bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] border border-white/10 overflow-hidden cursor-default select-none transition-all duration-500 hover:border-white/25 hover:shadow-[0_20px_60px_rgba(0,0,0,0.85)] hover:-translate-y-1 min-h-[300px] flex flex-col p-7 sm:p-8 justify-end">
-              {/* Ambient White Glow (Resting State) */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.06] rounded-full blur-[70px] pointer-events-none opacity-100 group-hover:opacity-0 transition-opacity duration-500"></div>
-
-              {/* Layer 1 (Static) */}
-              <div className="relative z-10 flex flex-col transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-0 group-hover:scale-95 group-hover:translate-y-6 pointer-events-auto group-hover:pointer-events-none">
-                <h3 className="text-2xl font-bold text-white tracking-tight">
-                  Market Radar
-                </h3>
-                <p className="mt-3 text-[15px] text-[#aaaaaa] font-normal leading-relaxed">
-                  Live ATS scraper pulling verified openings from Canonical, Stripe, and Linear paired with HMAC-SHA256 tamper-evident proof credentials.
-                </p>
-              </div>
-              
-              {/* Layer 2 (Curtain Hover Effect - Slides up from bottom) */}
-              <div className="absolute inset-0 z-20 flex flex-col justify-end p-7 sm:p-8 bg-[radial-gradient(circle_at_center,_#333_0%,_#18181b_100%)] rounded-[28px] opacity-0 translate-y-[100%] group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none group-hover:pointer-events-auto overflow-hidden">
-                <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-90" />
-                <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white/[0.09] to-transparent pointer-events-none" />
-                <div className="absolute -top-20 -left-20 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl pointer-events-none" />
-                
-                <div className="relative z-30 flex flex-col translate-y-6 group-hover:translate-y-0 transition-transform duration-500 delay-[50ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
-                  <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                    Market Radar
-                  </h3>
-                  <p className="mt-3 text-sm sm:text-[15px] text-[#cccccc] font-normal leading-relaxed">
-                    Live ATS scraper pulling verified openings from Canonical, Stripe, and Linear paired with HMAC-SHA256 tamper-evident proof credentials.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+          <main className="max-w-7xl mx-auto px-6 py-24 space-y-32 relative z-10">
+            {/* Feature Grid (Tensorik UI Style) */}
+          <AnimatedFeaturesGrid />
         </main>
 
         <OurProcessCards />
+        <TechStack />
         <FAQSection />
 
         <main className="max-w-7xl mx-auto px-6 py-24 space-y-32 relative z-10">
@@ -291,25 +209,9 @@ export default function LandingPage() {
         </main>
 
         {/* FOOTER */}
-        <footer className="relative bg-[#061417] pt-24 pb-24 overflow-hidden w-full border-t border-white/5 mt-32">
-          {/* Grid Background */}
-          <div 
-            className="absolute inset-0 pointer-events-none opacity-[0.07]" 
-            style={{ 
-              backgroundImage: 'linear-gradient(rgba(255, 255, 255, 1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 1) 1px, transparent 1px)', 
-              backgroundSize: '80px 80px',
-              backgroundPosition: 'center top'
-            }}
-          ></div>
-          <div className="max-w-[1400px] mx-auto px-6 md:px-12 relative z-10 flex flex-col items-center justify-center h-full min-h-[60vh] md:min-h-[80vh]">
-            {/* Massive Logo */}
-            <div className="w-full flex justify-center items-center select-none pointer-events-none">
-               <span className="font-display text-[35vw] md:text-[28vw] lg:text-[25vw] leading-none tracking-[-0.04em] text-white/95 whitespace-nowrap">
-                 AVEN
-               </span>
-            </div>
-          </div>
-        </footer>
+        <Footer />
+        
+        </div> {/* END OF UNIFIED LIGHT BACKGROUND */}
       </div>
     </>
   );

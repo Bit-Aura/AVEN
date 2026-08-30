@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   title: "AVEN",
   description: "Advanced Peer-to-Peer Mock Interviews & AI-powered personalized learning",
   icons: {
-    icon: "/Logo.png",
-    shortcut: "/Logo.png",
-    apple: "/Logo.png",
+    icon: "/Logo_circle.png",
+    shortcut: "/Logo_circle.png",
+    apple: "/Logo_circle.png",
   }
 };
 

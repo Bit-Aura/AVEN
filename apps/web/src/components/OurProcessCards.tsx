@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 const text = "Our Process";
 const scatterData = [
@@ -23,7 +23,7 @@ const cards = [
     id: 1,
     title: "Project request",
     description: "We begin by carefully reviewing your project requirements. This initial assessment helps us determine if AVEN is the ideal partner to bring your vision to life. Successful projects start with a clear understanding of your goals.",
-    color: "bg-[#f5fbfa]", // slightly cooler white/teal
+    color: "bg-[#f2fbf5]", // light green
   },
   {
     id: 2,
@@ -95,25 +95,11 @@ export function OurProcessCards() {
     offset: ["start start", "end end"]
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 70,
-    damping: 18,
-    mass: 0.8
-  });
-
   return (
-    <div ref={containerRef} className="relative w-full bg-white z-20 pb-[10vh]">
-      {/* Background Grid */}
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.15]" 
-        style={{ 
-          backgroundImage: 'radial-gradient(#000 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
-      />
+    <div ref={containerRef} className="relative w-full z-20 pb-[10vh]">
       
-      {/* The Sticky Title locked to the top */}
-      <div className="sticky top-12 md:top-20 w-full flex flex-col items-center justify-center z-30 pointer-events-none mb-12">
+      {/* The Sticky Title locked to the top. h-screen ensures it gets pushed up perfectly with the last card. */}
+      <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-start z-30 pointer-events-none pt-12 md:pt-20">
         <div className="flex items-center justify-center space-x-1 sm:space-x-3 w-full">
           {text.split('').map((char, i) => {
             if (char === ' ') return <div key={i} className="w-4 sm:w-6 md:w-10" />;
@@ -121,13 +107,13 @@ export function OurProcessCards() {
             const data = scatterData[i];
             
             // Converges very quickly (0 to 0.05) since the whole container is 500vh+
-            const x = useTransform(smoothProgress, [0, 0.05], [data.x, 0]);
-            const y = useTransform(smoothProgress, [0, 0.05], [data.y, 0]);
-            const rotate = useTransform(smoothProgress, [0, 0.05], [data.rot, 0]);
-            const blurVal = useTransform(smoothProgress, [0, 0.04], [24, 0]);
+            const x = useTransform(scrollYProgress, [0, 0.05], [data.x, 0]);
+            const y = useTransform(scrollYProgress, [0, 0.05], [data.y, 0]);
+            const rotate = useTransform(scrollYProgress, [0, 0.05], [data.rot, 0]);
+            const blurVal = useTransform(scrollYProgress, [0, 0.04], [24, 0]);
             const filter = useTransform(blurVal, (v) => `blur(${v}px)`);
-            const opacity = useTransform(smoothProgress, [0, 0.03], [0, 1]);
-            const scale = useTransform(smoothProgress, [0, 0.05], [1.8, 1]);
+            const opacity = useTransform(scrollYProgress, [0, 0.03], [0, 1]);
+            const scale = useTransform(scrollYProgress, [0, 0.05], [1.8, 1]);
 
             return (
               <motion.span
@@ -142,14 +128,14 @@ export function OurProcessCards() {
         </div>
       </div>
 
-      {/* Cards track scrolling. Total height allows multiple cards to stick sequentially. */}
-      <div className="relative mt-[-10vh]" style={{ height: `${cards.length * 100}vh` }}>
+      {/* Cards track scrolling. mt-[-100vh] aligns them precisely with the title's h-screen block. */}
+      <div className="relative mt-[-100vh]" style={{ height: `${cards.length * 100}vh` }}>
         {cards.map((card, index) => (
           <ProcessCard 
             key={card.id} 
             card={card} 
             index={index} 
-            progress={smoothProgress} 
+            progress={scrollYProgress} 
             totalCards={cards.length} 
           />
         ))}
