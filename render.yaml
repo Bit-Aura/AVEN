@@ -18,11 +18,15 @@ services:
         sync: false
       - key: NEO4J_PASSWORD
         sync: false
-      - key: ANTHROPIC_API_KEY
+      - key: LLM_PROVIDER
+        sync: false
+      - key: CLAUDE_BASE_URL
+        sync: false
+      - key: CLAUDE_MODEL
+        sync: false
+      - key: CLAUDE_API_KEY
         sync: false
       - key: CLERK_SECRET_KEY
         sync: false
       - key: ROADMAP_SH_API_KEY
-        sync: false
-      - key: LLM_PROVIDER
         sync: false
