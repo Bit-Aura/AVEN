@@ -291,12 +291,17 @@ async def parse_and_initiate_goal(
             "target_skill": "http_fundamentals"
         }
     else:
-        content = json.loads(items[0].content)
+        try:
+            content = json.loads(items[0].content) if isinstance(items[0].content, str) else (items[0].content or {})
+        except Exception:
+            content = {}
+        if not isinstance(content, dict):
+            content = {"question": str(items[0].content)}
         first_turn_data = {
             "question_id": f"q_{items[0].id}",
-            "question_text": content.get("question"),
-            "options": content.get("options", []),
-            "target_skill": content.get("target_skill")
+            "question_text": content.get("question") or "Explain your experience with this topic.",
+            "options": content.get("options", ["Yes", "No"]),
+            "target_skill": content.get("target_skill") or "fundamentals"
         }
     
     turn = DiagnosticTurn(
@@ -354,10 +359,13 @@ async def submit_diagnostic_answer(
             prompt_data = json.loads(t.prompt)
             target_skill = prompt_data.get("target_skill")
             if target_skill and t.response:
-                # find correct answer
-                is_correct = False
                 for item in items:
-                    content = json.loads(item.content)
+                    try:
+                        content = json.loads(item.content) if isinstance(item.content, str) else (item.content or {})
+                    except Exception:
+                        continue
+                    if not isinstance(content, dict):
+                        continue
                     if content.get("target_skill") == target_skill:
                         is_correct = (content.get("correct_answer") == t.response)
                         break
@@ -397,12 +405,17 @@ async def submit_diagnostic_answer(
             "target_skill": "http_fundamentals"
         }
         for item in items:
-            content = json.loads(item.content)
+            try:
+                content = json.loads(item.content) if isinstance(item.content, str) else (item.content or {})
+            except Exception:
+                continue
+            if not isinstance(content, dict):
+                continue
             target = content.get("target_skill")
             if target and target not in asked_skills:
                 next_turn_data = {
                     "question_id": f"q_{item.id}",
-                    "question_text": content.get("question"),
+                    "question_text": content.get("question") or "Explain your experience with this topic.",
                     "options": content.get("options", []),
                     "target_skill": target
                 }

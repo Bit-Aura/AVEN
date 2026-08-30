@@ -29,6 +29,8 @@ from app.models.domain import (
     MentorSessionRequest,
 )
 
+from tests.conftest import make_test_auth_headers
+
 @pytest.fixture
 def test_client():
     return TestClient(app)
@@ -38,20 +40,20 @@ def uid() -> str:
 
 
 # ---------------------------------------------------------------------------
-# 1. LEARNER REQUEST CREATION & DUPLICATE PROTECTION
+# 1. REQUEST CREATION & CONFLICT PREVENTION
 # ---------------------------------------------------------------------------
 
 @pytest.mark.asyncio
-async def test_learner_create_session_request_and_duplicate_protection(test_client):
+async def test_create_mentor_request_success_and_duplicate_prevention(test_client):
     """
-    Ensures a learner can create a session request derived from auth context,
-    and server-side duplicate OPEN request protection returns 409 Conflict.
+    Ensures a learner can create a valid mentor request, and duplicate OPEN requests
+    for the same skill are rejected with HTTP 409 Conflict.
     """
     u_suffix = uid()
     learner_email = f"learner_{u_suffix}@pathfinder.dev"
 
     async with async_session() as session:
-        user = User(clerk_id=f"clerk_{learner_email}", email=learner_email, name="Test Learner", role="learner", is_active=True)
+        user = User(clerk_id=f"clerk_{learner_email}", email=learner_email, name="Test Learner", role="LEARNER", is_active=True)
         session.add(user)
         await session.flush()
         prof = LearnerProfile(user_id=user.id, current_context="Backend Dev")
@@ -60,7 +62,7 @@ async def test_learner_create_session_request_and_duplicate_protection(test_clie
         session.add(ReadinessSnapshot(profile_id=prof.id, skill_id="async_python", readiness_score=0.45))
         await session.commit()
 
-    headers = {"X-User-Email": learner_email}
+    headers = make_test_auth_headers(learner_email, "LEARNER")
 
     # 1. Successful request creation
     res = test_client.post(
@@ -111,8 +113,8 @@ async def test_learner_request_isolation_and_idor(test_client):
     learner_b_email = f"learner_b_{u_suffix}@pathfinder.dev"
 
     async with async_session() as session:
-        u_a = User(clerk_id=f"clerk_{learner_a_email}", email=learner_a_email, name="Learner A", role="learner", is_active=True)
-        u_b = User(clerk_id=f"clerk_{learner_b_email}", email=learner_b_email, name="Learner B", role="learner", is_active=True)
+        u_a = User(clerk_id=f"clerk_{learner_a_email}", email=learner_a_email, name="Learner A", role="LEARNER", is_active=True)
+        u_b = User(clerk_id=f"clerk_{learner_b_email}", email=learner_b_email, name="Learner B", role="LEARNER", is_active=True)
         session.add_all([u_a, u_b])
         await session.flush()
 
@@ -134,13 +136,15 @@ async def test_learner_request_isolation_and_idor(test_client):
         await session.commit()
         req_b_id = req_b.id
 
+    ha = make_test_auth_headers(learner_a_email, "LEARNER")
+
     # Learner A fetches my-requests: must not see Learner B's request
-    res_a = test_client.get("/api/v1/mentor-connect/my-requests", headers={"X-User-Email": learner_a_email})
+    res_a = test_client.get("/api/v1/mentor-connect/my-requests", headers=ha)
     assert res_a.status_code == 200
     assert len(res_a.json()["requests"]) == 0
 
     # Learner A tries to access Learner B's request by ID: 403 Forbidden
-    res_idor = test_client.get(f"/api/v1/mentor-connect/requests/{req_b_id}", headers={"X-User-Email": learner_a_email})
+    res_idor = test_client.get(f"/api/v1/mentor-connect/requests/{req_b_id}", headers=ha)
     assert res_idor.status_code == 403
     assert "Access denied" in res_idor.json()["detail"]
 
@@ -161,9 +165,9 @@ async def test_atomic_fcfs_acceptance_and_409_conflict(test_client):
     mentor_2_email = f"mentor_beta_{u_suffix}@pathfinder.dev"
 
     async with async_session() as session:
-        u_l = User(clerk_id=f"clerk_{learner_email}", email=learner_email, name="Learner FCFS", role="learner", is_active=True)
-        u_m1 = User(clerk_id=f"clerk_{mentor_1_email}", email=mentor_1_email, name="Mentor 1", role="mentor", is_active=True)
-        u_m2 = User(clerk_id=f"clerk_{mentor_2_email}", email=mentor_2_email, name="Mentor 2", role="mentor", is_active=True)
+        u_l = User(clerk_id=f"clerk_{learner_email}", email=learner_email, name="Learner FCFS", role="LEARNER", is_active=True)
+        u_m1 = User(clerk_id=f"clerk_{mentor_1_email}", email=mentor_1_email, name="Mentor 1", role="MENTOR", is_active=True)
+        u_m2 = User(clerk_id=f"clerk_{mentor_2_email}", email=mentor_2_email, name="Mentor 2", role="MENTOR", is_active=True)
         session.add_all([u_l, u_m1, u_m2])
         await session.flush()
 
@@ -183,10 +187,13 @@ async def test_atomic_fcfs_acceptance_and_409_conflict(test_client):
         await session.commit()
         request_id = req.id
 
+    hm1 = make_test_auth_headers(mentor_1_email, "MENTOR")
+    hm2 = make_test_auth_headers(mentor_2_email, "MENTOR")
+
     # Mentor 1 accepts first -> 200 OK
     res_m1 = test_client.post(
         f"/api/v1/mentor-connect/requests/{request_id}/accept",
-        headers={"X-User-Email": mentor_1_email},
+        headers=hm1,
     )
     assert res_m1.status_code == 200
     data_m1 = res_m1.json()
@@ -196,13 +203,13 @@ async def test_atomic_fcfs_acceptance_and_409_conflict(test_client):
     # Mentor 2 attempts to accept -> 409 Conflict
     res_m2 = test_client.post(
         f"/api/v1/mentor-connect/requests/{request_id}/accept",
-        headers={"X-User-Email": mentor_2_email},
+        headers=hm2,
     )
     assert res_m2.status_code == 409
     assert "accepted by another mentor" in res_m2.json()["detail"]
 
     # Verify request no longer appears in OPEN feed
-    res_open = test_client.get("/api/v1/mentor-connect/open-requests", headers={"X-User-Email": mentor_2_email})
+    res_open = test_client.get("/api/v1/mentor-connect/open-requests", headers=hm2)
     open_ids = [r["id"] for r in res_open.json()["requests"]]
     assert request_id not in open_ids
 
@@ -223,9 +230,9 @@ async def test_session_scheduling_and_mentor_ownership(test_client):
     mentor_intruder_email = f"mentor_intruder_{u_suffix}@pathfinder.dev"
 
     async with async_session() as session:
-        u_l = User(clerk_id=f"clerk_{learner_email}", email=learner_email, name="Learner Sched", role="learner", is_active=True)
-        u_mo = User(clerk_id=f"clerk_{mentor_owner_email}", email=mentor_owner_email, name="Assigned Mentor", role="mentor", is_active=True)
-        u_mi = User(clerk_id=f"clerk_{mentor_intruder_email}", email=mentor_intruder_email, name="Intruder Mentor", role="mentor", is_active=True)
+        u_l = User(clerk_id=f"clerk_{learner_email}", email=learner_email, name="Learner Sched", role="LEARNER", is_active=True)
+        u_mo = User(clerk_id=f"clerk_{mentor_owner_email}", email=mentor_owner_email, name="Assigned Mentor", role="MENTOR", is_active=True)
+        u_mi = User(clerk_id=f"clerk_{mentor_intruder_email}", email=mentor_intruder_email, name="Intruder Mentor", role="MENTOR", is_active=True)
         session.add_all([u_l, u_mo, u_mi])
         await session.flush()
 
@@ -248,11 +255,14 @@ async def test_session_scheduling_and_mentor_ownership(test_client):
 
     sched_time = (datetime.now(timezone.utc) + timedelta(days=2)).isoformat()
 
+    h_intruder = make_test_auth_headers(mentor_intruder_email, "MENTOR")
+    h_owner = make_test_auth_headers(mentor_owner_email, "MENTOR")
+
     # 1. Intruder mentor attempts to schedule -> 403 Forbidden
     res_intruder = test_client.post(
         f"/api/v1/mentor-connect/requests/{request_id}/schedule",
         json={"scheduled_at": sched_time, "duration_minutes": 45},
-        headers={"X-User-Email": mentor_intruder_email},
+        headers=h_intruder,
     )
     assert res_intruder.status_code == 403
     assert "not authorized to schedule" in res_intruder.json()["detail"]
@@ -261,7 +271,7 @@ async def test_session_scheduling_and_mentor_ownership(test_client):
     res_owner = test_client.post(
         f"/api/v1/mentor-connect/requests/{request_id}/schedule",
         json={"scheduled_at": sched_time, "duration_minutes": 45},
-        headers={"X-User-Email": mentor_owner_email},
+        headers=h_owner,
     )
     assert res_owner.status_code == 200
     data = res_owner.json()
@@ -287,13 +297,16 @@ async def test_full_session_lifecycle_and_completion_notes(test_client):
     mentor_email = f"mentor_life_{u_suffix}@pathfinder.dev"
 
     async with async_session() as session:
-        u_l = User(clerk_id=f"clerk_{learner_email}", email=learner_email, name="Life Learner", role="learner", is_active=True)
-        u_m = User(clerk_id=f"clerk_{mentor_email}", email=mentor_email, name="Life Mentor", role="mentor", is_active=True)
+        u_l = User(clerk_id=f"clerk_{learner_email}", email=learner_email, name="Life Learner", role="LEARNER", is_active=True)
+        u_m = User(clerk_id=f"clerk_{mentor_email}", email=mentor_email, name="Life Mentor", role="MENTOR", is_active=True)
         session.add_all([u_l, u_m])
         await session.flush()
         p_l = LearnerProfile(user_id=u_l.id)
         session.add(p_l)
         await session.commit()
+
+    hl = make_test_auth_headers(learner_email, "LEARNER")
+    hm = make_test_auth_headers(mentor_email, "MENTOR")
 
     # 1. Learner creates request (OPEN)
     res_create = test_client.post(
@@ -305,7 +318,7 @@ async def test_full_session_lifecycle_and_completion_notes(test_client):
             "description": "Need advice on composite index ordering and EXPLAIN ANALYZE interpretation.",
             "requested_duration_minutes": 30,
         },
-        headers={"X-User-Email": learner_email},
+        headers=hl,
     )
     assert res_create.status_code == 200
     req_id = res_create.json()["id"]
@@ -313,7 +326,7 @@ async def test_full_session_lifecycle_and_completion_notes(test_client):
     # 2. Mentor accepts (ACCEPTED)
     res_accept = test_client.post(
         f"/api/v1/mentor-connect/requests/{req_id}/accept",
-        headers={"X-User-Email": mentor_email},
+        headers=hm,
     )
     assert res_accept.status_code == 200
     assert res_accept.json()["status"] == "ACCEPTED"
@@ -323,7 +336,7 @@ async def test_full_session_lifecycle_and_completion_notes(test_client):
     res_sched = test_client.post(
         f"/api/v1/mentor-connect/requests/{req_id}/schedule",
         json={"scheduled_at": sched_dt, "duration_minutes": 30},
-        headers={"X-User-Email": mentor_email},
+        headers=hm,
     )
     assert res_sched.status_code == 200
     assert res_sched.json()["status"] == "SCHEDULED"
@@ -331,7 +344,7 @@ async def test_full_session_lifecycle_and_completion_notes(test_client):
     # 4. Mentor joins / starts session (IN_PROGRESS)
     res_start = test_client.post(
         f"/api/v1/mentor-connect/requests/{req_id}/start",
-        headers={"X-User-Email": mentor_email},
+        headers=hm,
     )
     assert res_start.status_code == 200
     assert res_start.json()["status"] == "IN_PROGRESS"
@@ -345,7 +358,7 @@ async def test_full_session_lifecycle_and_completion_notes(test_client):
             "mentor_notes": notes_text,
             "recommendations": recs_text,
         },
-        headers={"X-User-Email": mentor_email},
+        headers=hm,
     )
     assert res_comp.status_code == 200
     data_comp = res_comp.json()
@@ -357,7 +370,7 @@ async def test_full_session_lifecycle_and_completion_notes(test_client):
     # 6. Learner inspects completed session in my-requests: notes & recommendations are visible
     res_learner_view = test_client.get(
         "/api/v1/mentor-connect/my-requests",
-        headers={"X-User-Email": learner_email},
+        headers=hl,
     )
     assert res_learner_view.status_code == 200
     learner_reqs = res_learner_view.json()["requests"]

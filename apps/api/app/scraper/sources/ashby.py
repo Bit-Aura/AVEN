@@ -79,7 +79,7 @@ class AshbySource(BaseJobSource):
             raise SourceHTTPError(f"Network error connecting to Ashby board '{token}': {e}") from e
 
         if response.status_code == 404:
-            logger.warning(f"Ashby board '{token}' not found (HTTP 404).")
+            logger.info(f"Ashby board '{token}' not found (HTTP 404).")
             raise BoardNotFoundError(f"Ashby job board '{token}' was not found.")
         elif response.status_code == 429:
             logger.warning(f"Ashby API rate limit exceeded (HTTP 429) for board '{token}'.")

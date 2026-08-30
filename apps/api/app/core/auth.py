@@ -23,12 +23,12 @@ from sqlalchemy import select
 from app.core.db import get_db
 from app.models.domain import User, LearnerProfile
 
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "aven-secure-jwt-secret-key-32-chars-long-min!!")
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "aven-production-secure-jwt-key-2026-strict-auth")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
 
 DEFAULT_ADMIN_EMAIL = os.getenv("DEFAULT_ADMIN_EMAIL", "admin@aven.com")
-DEFAULT_ADMIN_PASSWORD = os.getenv("DEFAULT_ADMIN_PASSWORD", "Aven@123")
+DEFAULT_ADMIN_PASSWORD = os.getenv("DEFAULT_ADMIN_PASSWORD", "Aven@Admin2026!Secure")
 
 
 # ---------------------------------------------------------------------------
@@ -118,9 +118,9 @@ def decode_access_token(token: str) -> Optional[Dict[str, Any]]:
 
 async def ensure_default_admin(db: AsyncSession) -> User:
     """
-    Idempotently ensures the canonical development/demo admin account exists with a securely hashed password.
-    Email: admin@aven.com
-    Password: Aven@123 (hashed in database)
+    Idempotently ensures the canonical admin account exists with a securely hashed password.
+    Email: DEFAULT_ADMIN_EMAIL
+    Password: DEFAULT_ADMIN_PASSWORD
     Role: ADMIN
     """
     normalized_email = DEFAULT_ADMIN_EMAIL.strip().lower()
@@ -148,7 +148,6 @@ async def ensure_default_admin(db: AsyncSession) -> User:
             db.add(LearnerProfile(user_id=admin_user.id, current_context="Platform Administration"))
             await db.commit()
     else:
-        # If admin exists but has no password_hash or lowercase role, normalize
         changed = False
         if not admin_user.password_hash:
             admin_user.password_hash = hash_password(DEFAULT_ADMIN_PASSWORD)
@@ -169,44 +168,33 @@ async def ensure_default_admin(db: AsyncSession) -> User:
 
 async def get_current_user(
     authorization: Optional[str] = Header(None),
-    x_user_email: Optional[str] = Header(None, alias="X-User-Email"),
-    x_clerk_user_id: Optional[str] = Header(None, alias="X-Clerk-User-Id"),
     db: AsyncSession = Depends(get_db)
 ) -> User:
     """
-    Resolves the authenticated User entity from either:
-    1. Bearer JWT token in Authorization header
-    2. X-Clerk-User-Id header
-    3. X-User-Email header (for test suite and backward compatibility)
+    Resolves and strictly authenticates the User entity from a cryptographically
+    signed JWT Bearer token in the Authorization header.
+
+    Rejects missing or invalid tokens with HTTP 401 Unauthorized.
+    Header-based impersonation (e.g. X-User-Email) is strictly disallowed.
     """
-    target_email: Optional[str] = None
-    target_clerk_id: Optional[str] = None
-
-    invalid_bearer = False
-    # 1. Try JWT Authorization Header
-    if authorization and authorization.startswith("Bearer "):
-        token = authorization.split(" ")[1].strip()
-        payload = decode_access_token(token)
-        if payload and "sub" in payload:
-            target_email = str(payload["sub"]).strip().lower()
-            if "clerk_id" in payload and payload["clerk_id"]:
-                target_clerk_id = str(payload["clerk_id"]).strip()
-        else:
-            invalid_bearer = True
-
-    # 2. Try X-Clerk-User-Id header
-    if not target_email and x_clerk_user_id and x_clerk_user_id.strip():
-        target_clerk_id = x_clerk_user_id.strip()
-
-    # 3. Fallback to X-User-Email header
-    if not target_email and x_user_email and x_user_email.strip():
-        target_email = x_user_email.strip().lower()
-
-    if invalid_bearer and not target_email and not target_clerk_id:
+    if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired authentication token."
+            detail="Authentication credentials were not provided. Expected 'Authorization: Bearer <token>'.",
+            headers={"WWW-Authenticate": "Bearer"},
         )
+
+    token = authorization.split(" ", 1)[1].strip()
+    payload = decode_access_token(token)
+    if not payload or "sub" not in payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid, expired, or corrupted authentication token.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    target_email = str(payload["sub"]).strip().lower()
+    target_clerk_id = str(payload.get("clerk_id", "")).strip() if payload.get("clerk_id") else None
 
     user = None
     if target_clerk_id:
@@ -217,37 +205,12 @@ async def get_current_user(
         stmt = select(User).where(User.email == target_email)
         user = (await db.execute(stmt)).scalars().first()
 
-    # Default demo fallback for local development if neither matched
-    if not user and not target_email and not target_clerk_id:
-        target_email = "demo@pathfinder.dev"
-        stmt = select(User).where(User.email == target_email)
-        user = (await db.execute(stmt)).scalars().first()
-
     if not user:
-        # Determine canonical role based on known conventions for test/dev auto-creation
-        if target_email in ("admin@aven.com", "admin@pathfinder.dev", "test_admin@pathfinder.dev"):
-            role = UserRole.ADMIN.value
-        elif "mentor" in target_email:
-            role = UserRole.MENTOR.value
-        else:
-            role = UserRole.LEARNER.value
-
-        user = User(
-            clerk_id=f"clerk_{target_email.replace('@', '_').replace('.', '_')}",
-            email=target_email,
-            password_hash=hash_password("Aven@123"),
-            name=target_email.split("@")[0].replace("_", " ").title(),
-            role=role,
-            is_active=True,
-            created_at=datetime.now(timezone.utc),
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authenticated user account does not exist or has been removed.",
+            headers={"WWW-Authenticate": "Bearer"},
         )
-        db.add(user)
-        await db.flush()
-
-        profile = LearnerProfile(user_id=user.id, current_context="Software Engineering Track")
-        db.add(profile)
-        await db.commit()
-        await db.refresh(user)
 
     return user
 

@@ -37,6 +37,8 @@ from app.models.domain import (
     MockInterviewTurn,
 )
 
+from tests.conftest import make_test_auth_headers
+
 @pytest.fixture
 def test_client():
     return TestClient(app)
@@ -74,10 +76,12 @@ async def test_resume_upload_and_extraction(test_client):
     Education: B.S. in Computer Science 2025.
     """
 
+    headers = make_test_auth_headers(learner_email, "LEARNER")
+
     # Upload TXT resume
     response = test_client.post(
         "/api/v1/interview/resume/upload",
-        headers={"X-User-Email": learner_email},
+        headers=headers,
         files={"file": ("resume.txt", io.BytesIO(resume_text.encode("utf-8")), "text/plain")}
     )
 
@@ -88,7 +92,7 @@ async def test_resume_upload_and_extraction(test_client):
     assert "FastAPI" in data["parsed_data"]["technical_skills"] or "Python" in data["parsed_data"]["technical_skills"]
 
     # Verify GET /resume
-    get_res = test_client.get("/api/v1/interview/resume", headers={"X-User-Email": learner_email})
+    get_res = test_client.get("/api/v1/interview/resume", headers=headers)
     assert get_res.status_code == 200
     assert get_res.json()["id"] == data["id"]
 
@@ -108,10 +112,12 @@ async def test_resume_upload_rejections(test_client):
         session.add(LearnerProfile(user_id=user.id, current_context="General Track"))
         await session.commit()
 
+    headers = make_test_auth_headers(learner_email, "LEARNER")
+
     # 1. Invalid extension (.exe)
     res_exe = test_client.post(
         "/api/v1/interview/resume/upload",
-        headers={"X-User-Email": learner_email},
+        headers=headers,
         files={"file": ("malicious.exe", io.BytesIO(b"binary content"), "application/octet-stream")}
     )
     assert res_exe.status_code == 400
@@ -120,7 +126,7 @@ async def test_resume_upload_rejections(test_client):
     big_data = b"A" * (6 * 1024 * 1024)
     res_big = test_client.post(
         "/api/v1/interview/resume/upload",
-        headers={"X-User-Email": learner_email},
+        headers=headers,
         files={"file": ("huge_resume.txt", io.BytesIO(big_data), "text/plain")}
     )
     assert res_big.status_code == 413
@@ -145,23 +151,26 @@ async def test_resume_isolation_and_deletion(test_client):
         ])
         await session.commit()
 
+    h1 = make_test_auth_headers(e1, "LEARNER")
+    h2 = make_test_auth_headers(e2, "LEARNER")
+
     # Upload for User 1
     test_client.post(
         "/api/v1/interview/resume/upload",
-        headers={"X-User-Email": e1},
+        headers=h1,
         files={"file": ("u1_resume.txt", io.BytesIO(b"User 1 content with Python"), "text/plain")}
     )
 
     # User 2 should NOT have a resume
-    res2 = test_client.get("/api/v1/interview/resume", headers={"X-User-Email": e2})
+    res2 = test_client.get("/api/v1/interview/resume", headers=h2)
     assert res2.status_code == 404
 
     # Delete User 1 resume
-    del_res = test_client.delete("/api/v1/interview/resume", headers={"X-User-Email": e1})
+    del_res = test_client.delete("/api/v1/interview/resume", headers=h1)
     assert del_res.status_code == 204
 
     # Verify User 1 now has 404
-    assert test_client.get("/api/v1/interview/resume", headers={"X-User-Email": e1}).status_code == 404
+    assert test_client.get("/api/v1/interview/resume", headers=h1).status_code == 404
 
 
 # ---------------------------------------------------------------------------
@@ -188,10 +197,12 @@ async def test_interview_session_start_and_turn_progression(test_client):
         session.add(ReadinessSnapshot(profile_id=prof.id, skill_id="sql_basics", readiness_score=0.85))
         await session.commit()
 
+    headers = make_test_auth_headers(learner_email, "LEARNER")
+
     # 1. Start Session
     start_res = test_client.post(
         "/api/v1/interview/sessions",
-        headers={"X-User-Email": learner_email},
+        headers=headers,
         json={"target_role": "Backend Software Engineer", "interview_type": "COMPREHENSIVE"}
     )
     assert start_res.status_code == 200, start_res.text
@@ -205,7 +216,7 @@ async def test_interview_session_start_and_turn_progression(test_client):
     # 2. Answer Turn 0 with detailed answer
     answer_res = test_client.post(
         f"/api/v1/interview/sessions/{session_id}/answer",
-        headers={"X-User-Email": learner_email},
+        headers=headers,
         json={
             "learner_answer": "I have 3 years of experience building asynchronous backend microservices with Python, FastAPI, and PostgreSQL. I recently architected an e-commerce checkout API using connection pooling and async event loops.",
             "input_mode": "VOICE"
@@ -236,10 +247,12 @@ async def test_dynamic_follow_up_probing_on_struggling_answer(test_client):
         session.add(prof)
         await session.commit()
 
+    headers = make_test_auth_headers(learner_email, "LEARNER")
+
     # Start Session
     start_res = test_client.post(
         "/api/v1/interview/sessions",
-        headers={"X-User-Email": learner_email},
+        headers=headers,
         json={"target_role": "Backend Software Engineer", "interview_type": "TECHNICAL"}
     )
     session_id = start_res.json()["session_id"]
@@ -247,7 +260,7 @@ async def test_dynamic_follow_up_probing_on_struggling_answer(test_client):
     # Submit struggling answer
     answer_res = test_client.post(
         f"/api/v1/interview/sessions/{session_id}/answer",
-        headers={"X-User-Email": learner_email},
+        headers=headers,
         json={
             "learner_answer": "I used async because async makes everything run at the same time and I don't know much about database sessions.",
             "input_mode": "VOICE"
@@ -282,22 +295,25 @@ async def test_idor_protection_for_interview_sessions(test_client):
         ])
         await session.commit()
 
+    h1 = make_test_auth_headers(e1, "LEARNER")
+    h2 = make_test_auth_headers(e2, "LEARNER")
+
     # Owner creates session
     start_res = test_client.post(
         "/api/v1/interview/sessions",
-        headers={"X-User-Email": e1},
+        headers=h1,
         json={"target_role": "Backend Engineer"}
     )
     session_id = start_res.json()["session_id"]
 
     # Attacker tries to GET session detail -> 403
-    get_res = test_client.get(f"/api/v1/interview/sessions/{session_id}", headers={"X-User-Email": e2})
+    get_res = test_client.get(f"/api/v1/interview/sessions/{session_id}", headers=h2)
     assert get_res.status_code == 403
 
     # Attacker tries to submit answer -> 404 / 403
     ans_res = test_client.post(
         f"/api/v1/interview/sessions/{session_id}/answer",
-        headers={"X-User-Email": e2},
+        headers=h2,
         json={"learner_answer": "Attacker answer"}
     )
     assert ans_res.status_code in (403, 404)
@@ -305,7 +321,7 @@ async def test_idor_protection_for_interview_sessions(test_client):
     # Attacker tries to complete session -> 403 / 404
     comp_res = test_client.post(
         f"/api/v1/interview/sessions/{session_id}/complete",
-        headers={"X-User-Email": e2}
+        headers=h2
     )
     assert comp_res.status_code in (403, 404)
 
@@ -342,10 +358,12 @@ async def test_interview_completion_report_and_path_replanning(test_client):
         session.add(ReadinessSnapshot(profile_id=prof.id, skill_id="sql_basics", readiness_score=0.90))
         await session.commit()
 
+    headers = make_test_auth_headers(learner_email, "LEARNER")
+
     # 1. Start Interview
     start_res = test_client.post(
         "/api/v1/interview/sessions",
-        headers={"X-User-Email": learner_email},
+        headers=headers,
         json={"target_role": "Backend Software Engineer"}
     )
     session_id = start_res.json()["session_id"]
@@ -353,7 +371,7 @@ async def test_interview_completion_report_and_path_replanning(test_client):
     # 2. Answer turn with weakness in SQL / concurrency
     test_client.post(
         f"/api/v1/interview/sessions/{session_id}/answer",
-        headers={"X-User-Email": learner_email},
+        headers=headers,
         json={
             "learner_answer": "I struggle with SQL joins and I don't know how database transactions or concurrency work.",
             "input_mode": "VOICE"
@@ -363,7 +381,7 @@ async def test_interview_completion_report_and_path_replanning(test_client):
     # 3. Complete Session Early to trigger final report
     comp_res = test_client.post(
         f"/api/v1/interview/sessions/{session_id}/complete",
-        headers={"X-User-Email": learner_email}
+        headers=headers
     )
     assert comp_res.status_code == 200
     report = comp_res.json()["report"]
@@ -389,6 +407,6 @@ async def test_interview_completion_report_and_path_replanning(test_client):
             assert snap.readiness_score > 0.40, f"Readiness score catastrophically dropped to {snap.readiness_score}"
 
     # 6. Verify GET /report endpoint
-    get_rep = test_client.get(f"/api/v1/interview/sessions/{session_id}/report", headers={"X-User-Email": learner_email})
+    get_rep = test_client.get(f"/api/v1/interview/sessions/{session_id}/report", headers=headers)
     assert get_rep.status_code == 200
     assert get_rep.json()["overall_score"] == report["overall_score"]

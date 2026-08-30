@@ -82,7 +82,7 @@ class GreenhouseSource(BaseJobSource):
 
         # Handle specific HTTP status codes
         if response.status_code == 404:
-            logger.warning(f"Greenhouse board '{token}' not found (HTTP 404).")
+            logger.info(f"Greenhouse board '{token}' not found (HTTP 404).")
             raise BoardNotFoundError(f"Greenhouse board token '{token}' was not found.")
         elif response.status_code == 429:
             logger.warning(f"Greenhouse rate limit reached (HTTP 429) for board '{token}'.")

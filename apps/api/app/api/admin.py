@@ -66,7 +66,7 @@ async def get_admin_overview(
     active_users = (await db.execute(select(func.count(User.id)).where(User.is_active == True))).scalar_one()
     
     # 3. Total approved mentors
-    total_mentors = (await db.execute(select(func.count(User.id)).where(User.role == "mentor"))).scalar_one()
+    total_mentors = (await db.execute(select(func.count(User.id)).where(User.role.in_(["MENTOR", "mentor", "APPROVED_MENTOR"])))).scalar_one()
     
     # 4. Pending mentor applications
     pending_mentors = (await db.execute(

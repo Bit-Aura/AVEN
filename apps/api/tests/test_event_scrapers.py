@@ -26,7 +26,7 @@ async def test_devfolio_source():
         "uuid": "test-uuid-123",
         "name": "Devfolio AI Hackathon",
         "desc": "A great AI hackathon on Devfolio.",
-        "subdomain": "ai-Targeted Fix",
+        "subdomain": "ai-hack",
         "is_online": True,
         "starts_at": "2026-09-01T00:00:00Z",
         "ends_at": "2026-09-03T00:00:00Z",
@@ -104,9 +104,9 @@ async def test_hackerearth_source():
 async def test_hackquest_source():
     source = HackQuestSource()
     raw_item = {
-        "slug": "web3-summit-Targeted Fix",
+        "slug": "web3-summit-hack",
         "title": "Web3 Summit Hackathon",
-        "url": "https://www.hackquest.io/en/hackathons/web3-summit-Targeted Fix",
+        "url": "https://www.hackquest.io/en/hackathons/web3-summit-hack",
         "description": "Building decentralized applications",
         "prize": "$25,000"
     }
@@ -141,7 +141,7 @@ async def test_lablab_source():
 async def test_mlh_source():
     source = MLHSource()
     raw_item = {
-        "id": "mlh-Targeted Fix-2026",
+        "id": "mlh-hack-2026",
         "name": "HackMIT 2026",
         "url": "https://hackmit.org",
         "location": "Cambridge, MA",
@@ -324,14 +324,9 @@ def test_deduplicate_events_fuzzy_and_exact():
 @pytest.mark.asyncio
 async def test_load_events_database_upsert():
     """Gap 1/Load: Asserts Postgres atomic ON CONFLICT DO UPDATE returning xmax for insertion and update counts."""
-    import os
-    pg_url = os.environ.get("TEST_POSTGRES_URL", "postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/postgres")
-    
-    engine = create_async_engine(pg_url, future=True)
+    from app.core.db import engine, async_session as TestingSession
     async with engine.begin() as conn:
         await conn.run_sync(HackathonEvent.__table__.create, checkfirst=True)
-
-    TestingSession = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     ev1 = ScrapedEvent(
         external_id="pg-001",
@@ -357,7 +352,7 @@ async def test_load_events_database_upsert():
         assert inserted == 2
         assert updated == 0
 
-    # Verify rows in Postgres DB
+    # Verify rows in DB
     async with TestingSession() as db:
         res = await db.execute(select(HackathonEvent).where(HackathonEvent.source.in_(["devpost", "devfolio"])))
         db_records = res.scalars().all()
@@ -395,21 +390,14 @@ async def test_load_events_database_upsert():
         await db.execute(text("DELETE FROM hackathon_events WHERE external_id IN ('pg-001', 'pg-002')"))
         await db.commit()
 
-    await engine.dispose()
-
 
 @pytest.mark.asyncio
 async def test_load_events_postgres_concurrency():
     """Requirement 2/Concurrency: Asserts concurrent load_events calls with overlapping records do not cause unique constraint failures or duplicate rows."""
-    import os
     import asyncio
-    pg_url = os.environ.get("TEST_POSTGRES_URL", "postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/postgres")
-    
-    engine = create_async_engine(pg_url, future=True)
+    from app.core.db import engine, async_session as TestingSession
     async with engine.begin() as conn:
         await conn.run_sync(HackathonEvent.__table__.create, checkfirst=True)
-
-    TestingSession = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     ev_concurrent = ScrapedEvent(
         external_id="pg-concurrency-1",
@@ -427,7 +415,7 @@ async def test_load_events_postgres_concurrency():
     results = await asyncio.gather(_run_load(), _run_load())
     assert len(results) == 2
 
-    # Assert exactly 1 row exists in Postgres table
+    # Assert exactly 1 row exists in table
     async with TestingSession() as db:
         res = await db.execute(select(HackathonEvent).where(
             HackathonEvent.source == "unstop",
@@ -441,20 +429,13 @@ async def test_load_events_postgres_concurrency():
         await db.execute(text("DELETE FROM hackathon_events WHERE external_id = 'pg-concurrency-1'"))
         await db.commit()
 
-    await engine.dispose()
-
 
 @pytest.mark.asyncio
 async def test_load_events_postgres_field_update_preserves_created_at():
     """Requirement 2/Field Update: Asserts updating fields modifies mutable fields and updates scraped_at timestamp."""
-    import os
-    pg_url = os.environ.get("TEST_POSTGRES_URL", "postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/postgres")
-    
-    engine = create_async_engine(pg_url, future=True)
+    from app.core.db import engine, async_session as TestingSession
     async with engine.begin() as conn:
         await conn.run_sync(HackathonEvent.__table__.create, checkfirst=True)
-
-    TestingSession = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     ev = ScrapedEvent(
         external_id="pg-created-at-1",
@@ -502,7 +483,3 @@ async def test_load_events_postgres_field_update_preserves_created_at():
         from sqlalchemy import text
         await db.execute(text("DELETE FROM hackathon_events WHERE external_id = 'pg-created-at-1'"))
         await db.commit()
-
-    await engine.dispose()
-
-    await engine.dispose()

@@ -6,15 +6,16 @@ from sqlalchemy import text
 
 from app.main import app
 from app.core.db import get_db, async_session
-from app.models.domain import HackathonEvent
+from app.models.domain import HackathonEvent, User, LearnerProfile
 from app.scraper.models_events import ScrapedEvent
 from app.scraper.event_pipeline import load_events
+from tests.conftest import make_test_auth_headers
 
 client = TestClient(app)
 
 # Helper headers
-LEARNER_HEADERS = {"X-User-Email": "test_learner@pathfinder.dev"}
-ADMIN_HEADERS = {"X-User-Email": "admin@aven.com"}
+LEARNER_HEADERS = make_test_auth_headers("test_learner@pathfinder.dev", "LEARNER")
+ADMIN_HEADERS = make_test_auth_headers("admin@aven.com", "ADMIN")
 
 # Helper timestamps
 NOW = datetime.now(timezone.utc)
@@ -31,7 +32,30 @@ def setup_hackathon_test_data():
     async def _seed():
         async with async_session() as session:
             # Clean up existing test records
-            await session.execute(text("DELETE FROM hackathon_events WHERE source IN ('api_devpost', 'api_devfolio', 'api_unstop')"))
+            await session.execute(text("DELETE FROM hackathon_events"))
+            
+            # Ensure test users exist
+            from sqlalchemy import select
+            l_user = (await session.execute(select(User).where(User.email == "test_learner@pathfinder.dev"))).scalars().first()
+            if not l_user:
+                l_user = User(clerk_id="clerk_test_learner_hackathon", email="test_learner@pathfinder.dev", name="Hackathon Learner", role="LEARNER", is_active=True)
+                session.add(l_user)
+                await session.flush()
+                session.add(LearnerProfile(user_id=l_user.id))
+            else:
+                l_user.role = "LEARNER"
+                l_user.is_active = True
+
+            a_user = (await session.execute(select(User).where(User.email == "admin@aven.com"))).scalars().first()
+            if not a_user:
+                a_user = User(clerk_id="clerk_test_admin_hackathon", email="admin@aven.com", name="Hackathon Admin", role="ADMIN", is_active=True)
+                session.add(a_user)
+                await session.flush()
+                session.add(LearnerProfile(user_id=a_user.id))
+            else:
+                a_user.role = "ADMIN"
+                a_user.is_active = True
+
             await session.commit()
 
             ev1 = ScrapedEvent(
@@ -318,7 +342,7 @@ def test_read_endpoint_unauthenticated_returns_401():
     """Requesting read route with malformed Bearer token returns 401 Unauthorized."""
     response = client.get("/api/v1/hackathons", headers={"Authorization": "Bearer invalid.token.payload"})
     assert response.status_code == 401
-    assert "Invalid or expired" in response.json()["detail"]
+    assert "Invalid, expired, or corrupted" in response.json()["detail"]
 
 
 def test_scrape_endpoint_non_admin_returns_403():
