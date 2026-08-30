@@ -1,6 +1,6 @@
 import React from 'react';
 import { Lightbulb, BookOpen, Layers, CheckCircle } from 'lucide-react';
-import { CodingQuestionResponse } from '../../../api/client';
+import { CodingQuestionResponse } from '../../api/client';
 
 interface IdeChallengePanelProps {
   challenge: CodingQuestionResponse | null;
