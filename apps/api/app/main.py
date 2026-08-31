@@ -45,15 +45,24 @@ async def lifespan(app: FastAPI):
                 await session.execute(text("CREATE TABLE IF NOT EXISTS rate_limits (id INTEGER PRIMARY KEY AUTOINCREMENT, client_ip TEXT, timestamp REAL)"))
             await session.commit()
             
-            # We bypass the advisory lock because session-level locks are unsafe over PgBouncer
-            locked = True
+            # Only run heavy seeding if the database is actually empty
+            # This prevents Out-Of-Memory (OOM) crashes on Render free tier during restart
+            try:
+                count_res = await session.execute(text("SELECT count(id) FROM skill_records"))
+                skill_count = count_res.scalar() or 0
+            except Exception:
+                skill_count = 0
+                
+            locked = (skill_count == 0)
             
             if locked:
-                logger.info("[Startup] Proceeding with seeding...")
+                logger.info("[Startup] Database is empty. Proceeding with seeding...")
                 try:
                     await run_startup_seeding(engine, async_session, neo4j_client)
                 except Exception as e:
                     logger.error(f"[Startup] Seeding failed: {e}")
+            else:
+                logger.info(f"[Startup] Found {skill_count} skills in database. Skipping heavy seeder to save memory.")
 
     # Synchronously ensure tables are created before accepting traffic to prevent "relation does not exist" errors
     async def init_tables():
@@ -66,6 +75,11 @@ async def lifespan(app: FastAPI):
         logger.info("[Startup] Tables created successfully.")
     except Exception as e:
         logger.error(f"[Startup] Error creating tables: {e}")
+
+    try:
+        await neo4j_client.connect()
+    except Exception as e:
+        logger.error(f"[Startup] Failed to connect to Neo4j: {e}")
 
     asyncio.create_task(safe_seed())
     logger.info("[Startup] Offloaded safe database seeding to background task.")

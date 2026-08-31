@@ -363,6 +363,10 @@ export const usePathStore = create<PathState>()((set, get) => ({
       const res = await getPath(targetId);
       
       const allSkills: string[] = res.plan?.all_ordered_skills || res.plan?.remaining_path || [];
+      if (!allSkills || allSkills.length === 0) {
+        throw new Error("No active path plan found");
+      }
+
       const remainingSkills: string[] = res.plan?.remaining_path || allSkills;
       const activeId = remainingSkills[0] || allSkills[0] || '';
       

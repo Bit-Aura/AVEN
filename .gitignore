@@ -7,8 +7,6 @@
 *.sqlite3
 
 # Local Environment files
-.env
-.env.local
 .env.*.local
 *.local
 
@@ -47,7 +45,6 @@ __pycache__/
 htmlcov/
 
 # IDEs, Editors & Agents
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -61,3 +58,7 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+config.bat
