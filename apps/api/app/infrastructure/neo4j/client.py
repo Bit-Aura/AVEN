@@ -25,6 +25,16 @@ class Neo4jClient:
             )
         return self._sync_driver
 
+    @property
+    def async_driver(self) -> AsyncDriver:
+        """
+        Returns the asynchronous Neo4j Driver.
+        Requires connect() to have been called.
+        """
+        if not self._driver:
+            raise RuntimeError("Async Neo4j driver is not initialized. Ensure connect() was called.")
+        return self._driver
+
     async def connect(self) -> None:
         import asyncio
         if not self._driver:

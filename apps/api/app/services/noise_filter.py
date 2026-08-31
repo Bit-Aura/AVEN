@@ -107,9 +107,15 @@ async def analyze_roadmap_noise(
     # 1. Fetch valid Neo4j graph nodes to provide as context to the LLM
     graph_nodes: Dict[str, str] = {}
     try:
-        with neo4j_client.driver.session() as session:
-            for r in session.run("MATCH (s:Skill) RETURN s.id AS id, s.name AS name"):
-                graph_nodes[r["id"]] = r["name"]
+        def fetch_nodes_sync():
+            local_nodes = {}
+            with neo4j_client.driver.session() as session:
+                for r in session.run("MATCH (s:Skill) RETURN s.id AS id, s.name AS name"):
+                    local_nodes[r["id"]] = r["name"]
+            return local_nodes
+            
+        import asyncio
+        graph_nodes = await asyncio.to_thread(fetch_nodes_sync)
     except Exception as e:
         logger.warning(f"[NoiseFilter] Could not load graph nodes: {e}. Using fallback.")
         # Fallback if DB fails

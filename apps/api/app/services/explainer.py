@@ -34,11 +34,15 @@ async def explain_recommendation(
     RETURN s.description AS description, collect(pre.name) AS prerequisites
     """
     try:
-        with neo4j_client.driver.session() as session:
-            result = session.run(query, {"skill_name": skill_name}).single()
-            if result:
-                trace["skill_description"] = result["description"] or ""
-                trace["skill_prerequisites"] = list(result["prerequisites"])
+        def fetch_trace_sync():
+            with neo4j_client.driver.session() as session:
+                return session.run(query, {"skill_name": skill_name}).single()
+        
+        import asyncio
+        result = await asyncio.to_thread(fetch_trace_sync)
+        if result:
+            trace["skill_description"] = result["description"] or ""
+            trace["skill_prerequisites"] = list(result["prerequisites"])
     except Exception as e:
         # Fallback if Neo4j query fails
         trace["skill_description"] = f"Skill: {skill_name}"
