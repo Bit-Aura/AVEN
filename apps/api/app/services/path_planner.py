@@ -314,13 +314,20 @@ async def calculate_readiness_bar(
     # 1. Build complete skill graph from Neo4j for centrality calculation
     G = nx.DiGraph()
     try:
-        with neo4j_client.driver.session() as session:
-            nodes_res = session.run("MATCH (s:Skill) RETURN s.id AS id, s.name AS name")
-            for r in nodes_res:
-                G.add_node(r["id"])
-            edges_res = session.run("MATCH (pre:Skill)-[:PREREQUISITE_OF]->(s:Skill) RETURN pre.id AS pre_id, s.id AS s_id")
-            for r in edges_res:
-                G.add_edge(r["pre_id"], r["s_id"])
+        def fetch_graph_sync():
+            import networkx as nx
+            local_G = nx.DiGraph()
+            with neo4j_client.driver.session() as session:
+                nodes_res = session.run("MATCH (s:Skill) RETURN s.id AS id, s.name AS name")
+                for r in nodes_res:
+                    local_G.add_node(r["id"])
+                edges_res = session.run("MATCH (pre:Skill)-[:PREREQUISITE_OF]->(s:Skill) RETURN pre.id AS pre_id, s.id AS s_id")
+                for r in edges_res:
+                    local_G.add_edge(r["pre_id"], r["s_id"])
+            return local_G
+            
+        import asyncio
+        G = await asyncio.to_thread(fetch_graph_sync)
     except Exception as e:
         logger.error(f"Error loading graph for readiness bar: {e}")
 

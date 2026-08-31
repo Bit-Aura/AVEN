@@ -38,6 +38,13 @@ def get_embedding_model():
     """
     global _model
     if _model is None:
+        import os
+        # Render free tier (512MB RAM) will OOM crash if we load PyTorch
+        if os.getenv("RENDER") or os.getenv("DISABLE_PYTORCH"):
+            logger.info("[Semantic Mapper] Render environment detected; using FallbackEmbeddingModel to prevent OOM crash")
+            _model = FallbackEmbeddingModel()
+            return _model
+            
         try:
             from sentence_transformers import SentenceTransformer
             _model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -118,17 +125,22 @@ async def find_relevant_skills(
 
     # 3. Fallback: Query Neo4j if database query encounters an issue
     query = "MATCH (s:Skill) RETURN s.id AS id, s.name AS name, s.description AS description"
-    skills = []
     try:
-        with neo4j_client.driver.session() as session:
-            result = session.run(query)
-            for record in result:
-                skills.append({
-                    "id": record["id"],
-                    "name": record["name"],
-                    "description": record["description"] or "",
-                    "similarity": 0.50
-                })
+        def fetch_skills_sync():
+            local_skills = []
+            with neo4j_client.driver.session() as session:
+                result = session.run(query)
+                for record in result:
+                    local_skills.append({
+                        "id": record["id"],
+                        "name": record["name"],
+                        "description": record["description"] or "",
+                        "similarity": 0.50
+                    })
+            return local_skills
+            
+        import asyncio
+        skills = await asyncio.to_thread(fetch_skills_sync)
     except Exception:
         return []
 

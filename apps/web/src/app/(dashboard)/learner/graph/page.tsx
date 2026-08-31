@@ -395,12 +395,44 @@ function layoutLabeledContainer(
 // ── MAIN LAYOUT ENGINE ────────────────────────────────────────────────────────
 function generateRoadmapLayout(
   skills: any[], edges: any[],
-  _completedIds: Set<string>, _activeId: string | null
+  completedIds: Set<string> = new Set(), activeId: string | null = null
 ) {
   const layoutNodes: any[] = [];
   const flowEdges: any[] = [];
 
   if (!skills || skills.length === 0) return { nodes: [], edges: [] };
+
+  // Enrich skill status if activeId or completedIds are provided
+  skills.forEach((s) => {
+    if (!s.status) {
+      const sid = (s.id || '').toLowerCase();
+      const sname = (s.name || s.label || '').toLowerCase();
+      const normActive = activeId ? activeId.toLowerCase().replace(/_/g, ' ') : '';
+      const normSid = sid.replace(/_/g, ' ');
+      const normSname = sname.replace(/_/g, ' ');
+
+      if (
+        activeId &&
+        (sid === activeId.toLowerCase() ||
+          sname === activeId.toLowerCase() ||
+          (normActive && normSid.includes(normActive)) ||
+          (normActive && normSname.includes(normActive)) ||
+          (normActive && normActive.includes(normSid)) ||
+          (normActive && normActive.includes(normSname)))
+      ) {
+        s.status = 'active';
+      } else if (
+        completedIds.has(s.id) ||
+        completedIds.has(s.name) ||
+        completedIds.has(sid) ||
+        completedIds.has(sname)
+      ) {
+        s.status = 'completed';
+      } else if (activeId || completedIds.size > 0) {
+        s.status = 'locked';
+      }
+    }
+  });
 
   const hasCatHierarchy = skills.some(s => s.id && s.id.includes('_cat_'));
 
@@ -730,14 +762,97 @@ function TopicDrawer({ node, slug, onClose, onAssess, onIde, onCoach }: any) {
   );
 }
 
+// ── USER GOAL PATH LAYOUT ENGINE ─────────────────────────────────────────────
+function generateUserGoalLayout(userNodes: any[], userEdges: any[], activeMilestone: any, activePathPlan: any) {
+  if (!userNodes || userNodes.length === 0) return { nodes: [], edges: [] };
+
+  const completedSet = new Set<string>();
+  if (activePathPlan?.completed_skills) {
+    activePathPlan.completed_skills.forEach((cs: string) => completedSet.add(cs.toLowerCase()));
+  }
+  const activeId = activeMilestone?.id || activePathPlan?.active_skill || userNodes[0]?.id;
+
+  const layoutNodes: any[] = [];
+  const layoutEdges: any[] = [];
+
+  userNodes.forEach((n: any, idx: number) => {
+    const rawId = n.id || `node-${idx}`;
+    const cleanLabel = n.data?.label || rawId.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+    
+    let status = n.data?.status;
+    if (!status) {
+      if (rawId === activeId || rawId.toLowerCase() === (activeId || '').toLowerCase()) {
+        status = 'active';
+      } else if (completedSet.has(rawId.toLowerCase())) {
+        status = 'completed';
+      } else {
+        status = idx === 0 ? 'active' : 'locked';
+      }
+    }
+
+    const skillObj = {
+      id: rawId,
+      name: cleanLabel,
+      status: status,
+      description: n.data?.description || `Core prerequisite milestone in your personalized path for ${cleanLabel}.`
+    };
+
+    layoutNodes.push({
+      id: rawId,
+      type: 'spineNode',
+      position: { x: CENTER_X - SPINE_NODE_W / 2, y: 80 + idx * 170 },
+      data: {
+        label: cleanLabel,
+        skill: skillObj
+      }
+    });
+  });
+
+  if (userEdges && userEdges.length > 0) {
+    userEdges.forEach((e: any) => {
+      const src = e.source || e.source_id;
+      const tgt = e.target || e.target_id;
+      const isAnimated = e.animated || false;
+      layoutEdges.push({
+        id: e.id || `e-${src}-${tgt}`,
+        source: src,
+        target: tgt,
+        type: 'smoothstep',
+        animated: isAnimated,
+        sourceHandle: 'bottom',
+        targetHandle: 'top',
+        style: { stroke: isAnimated ? '#d97706' : '#141413', strokeWidth: 3 }
+      });
+    });
+  } else {
+    for (let i = 0; i < layoutNodes.length - 1; i++) {
+      const src = layoutNodes[i].id;
+      const tgt = layoutNodes[i + 1].id;
+      const isActive = layoutNodes[i].data?.skill?.status === 'active';
+      layoutEdges.push({
+        id: `e-user-${src}-${tgt}`,
+        source: src,
+        target: tgt,
+        type: 'smoothstep',
+        animated: isActive,
+        sourceHandle: 'bottom',
+        targetHandle: 'top',
+        style: { stroke: isActive ? '#d97706' : '#141413', strokeWidth: 3 }
+      });
+    }
+  }
+
+  return { nodes: layoutNodes, edges: layoutEdges };
+}
+
 // ── MAIN PAGE WRAPPER & INNER ────────────────────────────────────────────────
 /**
  * Enterprise-grade implementation of GraphInner.
  * Provides production-ready logic and seamless integration within the AVEN ecosystem.
  */
 function GraphInner() {
-  const { setCenter } = useReactFlow();
-  const [viewMode, setViewMode] = useState<'graph' | 'roadmap'>('roadmap');
+  const { setCenter, fitView } = useReactFlow();
+  const [viewMode, setViewMode] = useState<'graph' | 'roadmap'>('graph');
   const [selectedRoadmap, setSelectedRoadmap] = useState('backend');
   const [loading, setLoading] = useState(true);
 
@@ -749,63 +864,94 @@ function GraphInner() {
 
   const learnerNodes = usePathStore((s) => s.nodes);
   const learnerEdges = usePathStore((s) => s.edges);
+  const activeMilestone = usePathStore((s) => s.activeMilestone);
+  const activePathPlan = usePathStore((s) => s.activePathPlan);
+  const targetRole = usePathStore((s) => s.targetRole);
   const fetchActivePath = usePathStore((s) => s.fetchActivePath);
   const openIde = usePathStore((s) => s.openIde);
   const openCoach = usePathStore((s) => s.openCoach);
 
   useEffect(() => { fetchActivePath(); }, [fetchActivePath]);
 
-  useEffect(() => {
-    if (viewMode === 'roadmap') loadRoadmap(selectedRoadmap);
-    else if (learnerNodes && learnerNodes.length > 0) {
-      const mapped = learnerNodes.map((n: any) => ({ ...n.data, id: n.id, name: n.data.label }));
-      buildAndSetLayout(mapped, learnerEdges);
+  const loadPersonalGraph = useCallback(async () => {
+    setLoading(true);
+    try {
+      let currentNodes = learnerNodes;
+      let currentEdges = learnerEdges;
+
+      if (!currentNodes || currentNodes.length === 0) {
+        await fetchActivePath();
+        currentNodes = usePathStore.getState().nodes;
+        currentEdges = usePathStore.getState().edges;
+      }
+
+      if (currentNodes && currentNodes.length > 0) {
+        const { nodes, edges: newEdges } = generateUserGoalLayout(
+          currentNodes,
+          currentEdges,
+          activeMilestone,
+          activePathPlan
+        );
+        setRfNodes(nodes);
+        setRfEdges(newEdges);
+      } else {
+        const fallbackSkills = [
+          { id: 'python_basics', data: { label: 'Python Basics & Data Structures', status: 'completed' } },
+          { id: 'sql_relational_design', data: { label: 'SQL & Relational Database Design', status: 'completed' } },
+          { id: 'http_methods_rest', data: { label: 'Design RESTful APIs', status: 'active' } },
+          { id: 'fastapi_microservices', data: { label: 'FastAPI & Microservices Architecture', status: 'locked' } },
+        ];
+        const { nodes, edges: newEdges } = generateUserGoalLayout(
+          fallbackSkills,
+          [],
+          activeMilestone,
+          activePathPlan
+        );
+        setRfNodes(nodes);
+        setRfEdges(newEdges);
+      }
+    } catch (e) {
+      console.error('loadPersonalGraph failed', e);
+    } finally {
+      setLoading(false);
     }
-  }, [selectedRoadmap, viewMode, learnerNodes]);
-
-  const buildAndSetLayout = (skills: any[], edges: any[]) => {
-    const { nodes, edges: newEdges } = generateRoadmapLayout(skills, edges, new Set(), null);
-    setRfNodes(nodes);
-    setRfEdges(newEdges);
-  };
-
-  // Smart Initial Panning
-  useEffect(() => {
-    if (rfNodes.length > 0 && !loading) {
-      // Use requestAnimationFrame or a small timeout to ensure ReactFlow has mounted the nodes
-      setTimeout(() => {
-        let targetNode = null;
-        if (viewMode === 'graph') {
-          // 1. guarantee to find the active milestone
-          targetNode = rfNodes.find(n => n.data?.skill?.status === 'active');
-        }
-        
-        // 2. Fallback to the first spine node (top of the roadmap)
-        if (!targetNode) {
-          targetNode = rfNodes.find(n => n.type === 'spineNode');
-        }
-
-        if (targetNode) {
-          // Zoom out to 0.55 so the wide horizontal leaf clusters aren't cut off on the sides.
-          // Increase Y offset to +350 to ensure the first node still sits comfortably in the upper half.
-          setCenter(targetNode.position.x, targetNode.position.y + 350, { duration: 1200, zoom: 0.55 });
-        }
-      }, 100);
-    }
-  }, [rfNodes, viewMode, loading, setCenter]);
+  }, [activePathPlan, activeMilestone, learnerNodes, learnerEdges, fetchActivePath, setRfNodes, setRfEdges]);
 
   const loadRoadmap = async (slug: string) => {
     setLoading(true);
     try {
       const data = await learnerRoadmapGraph(slug);
-      buildAndSetLayout(data.skills || [], data.edges || []);
+      const { nodes, edges: newEdges } = generateRoadmapLayout(data.skills || [], data.edges || []);
+      setRfNodes(nodes);
+      setRfEdges(newEdges);
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
+
+  useEffect(() => {
+    if (viewMode === 'roadmap') {
+      loadRoadmap(selectedRoadmap);
+    } else {
+      loadPersonalGraph();
+    }
+  }, [selectedRoadmap, viewMode, loadPersonalGraph]);
+
+  // Smart Initial Panning & Auto Fit View
+  useEffect(() => {
+    if (rfNodes.length > 0 && !loading) {
+      const timer = setTimeout(() => {
+        try {
+          fitView({ duration: 800, padding: 0.35 });
+        } catch (err) {
+          console.warn('fitView warning', err);
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [rfNodes, viewMode, loading, fitView]);
 
   const onNodeClick = useCallback((_: any, node: any) => {
     if (node.data?.skill) {
       setSelectedNode(node.data.skill);
-      // Fluid Motion: Smoothly pan to the node instead of jarring the user
       setCenter(node.position.x + 100, node.position.y, { duration: 800, zoom: 0.8 });
     }
   }, [setCenter]);
@@ -817,14 +963,23 @@ function GraphInner() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Compass size={16} className="text-aven-text" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-aven-text-muted">Skill Graph Explorer</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-aven-text-muted">
+              {viewMode === 'graph' ? 'Personal Skill Topology' : 'Skill Graph Explorer'}
+            </span>
           </div>
         </div>
         
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl md:text-4xl font-medium text-aven-text tracking-tight">
-            Curriculum Topology
-          </h1>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-medium text-aven-text tracking-tight">
+              {viewMode === 'graph' ? 'My Skill Graph' : 'Curriculum Topology'}
+            </h1>
+            <p className="text-xs text-aven-text-subtle mt-1 font-medium">
+              {viewMode === 'graph' 
+                ? `Personalized milestone path & skill readiness for ${targetRole || 'Backend Software Engineer'}`
+                : 'Canonical skill topologies & interactive learning roadmaps'}
+            </p>
+          </div>
           
           <div className="flex items-center bg-aven-surface p-1 rounded-lg border border-aven-border">
             <button onClick={() => setViewMode('graph')}

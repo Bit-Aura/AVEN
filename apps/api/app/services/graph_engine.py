@@ -31,7 +31,7 @@ async def build_skill_subgraph(
     query_nodes = "MATCH (s:Skill) RETURN s.id AS id, s.name AS name, s.description AS description"
     node_map = {}
     try:
-        async with neo4j_client.driver.session() as session:
+        async with neo4j_client.async_driver.session() as session:
             result = await session.run(query_nodes)
             async for record in result:
                 name = record["name"]
@@ -47,7 +47,7 @@ async def build_skill_subgraph(
     # 2. Fetch all prerequisite relationships to build edges (pre -> target)
     query_edges = "MATCH (pre:Skill)-[:PREREQUISITE_OF]->(s:Skill) RETURN pre.name AS pre_name, s.name AS skill_name"
     try:
-        async with neo4j_client.driver.session() as session:
+        async with neo4j_client.async_driver.session() as session:
             result = await session.run(query_edges)
             async for record in result:
                 pre_name = record["pre_name"]

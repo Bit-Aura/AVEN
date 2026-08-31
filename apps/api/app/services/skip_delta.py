@@ -95,12 +95,16 @@ class SkipDeltaReport(BaseModel):
 async def _get_skill_name(skill_id: str, neo4j_client: Neo4jClient) -> str:
     """Fetch human-readable skill name from Neo4j. Falls back to formatted ID."""
     try:
-        with neo4j_client.driver.session() as session:
-            res = session.run(
-                "MATCH (s:Skill {id: $id}) RETURN s.name AS name", {"id": skill_id}
-            ).single()
-            if res and res["name"]:
-                return res["name"]
+        def fetch_skill_name_sync():
+            with neo4j_client.driver.session() as session:
+                return session.run(
+                    "MATCH (s:Skill {id: $id}) RETURN s.name AS name", {"id": skill_id}
+                ).single()
+        
+        import asyncio
+        res = await asyncio.to_thread(fetch_skill_name_sync)
+        if res and res["name"]:
+            return res["name"]
     except Exception as e:
         logger.warning(f"Could not fetch skill name for {skill_id}: {e}")
     return skill_id.replace("_", " ").title()
@@ -140,24 +144,22 @@ async def _fetch_all_skill_hours(
     return hours_map
 
 
-def _build_full_graph(neo4j_client: Neo4jClient) -> nx.DiGraph:
-    """
-    Builds the complete skill DAG from Neo4j using skill IDs as node keys.
-    Edges go from prerequisite → dependent (same direction as learning order).
-    """
+def _build_full_graph(neo4j_client: Neo4jClient):
+    import networkx as nx
     G = nx.DiGraph()
     try:
         with neo4j_client.driver.session() as session:
             # Nodes
             for r in session.run("MATCH (s:Skill) RETURN s.id AS id, s.name AS name"):
                 G.add_node(r["id"], name=r["name"])
-            # Edges: PREREQUISITE_OF means pre → skill (pre must come before skill)
+            # Edges
             for r in session.run(
                 "MATCH (pre:Skill)-[:PREREQUISITE_OF]->(s:Skill) RETURN pre.id AS pre, s.id AS s"
             ):
                 G.add_edge(r["pre"], r["s"])
     except Exception as e:
-        logger.error(f"[SkipDelta] Failed to build graph from Neo4j: {e}")
+        import logging
+        logging.getLogger(__name__).error(f"[SkipDelta] Failed to build graph from Neo4j: {e}")
     return G
 
 
@@ -189,7 +191,8 @@ async def compute_skip_delta(
     5. Compute original vs. new projected target dates.
     6. Build the human-readable verdict.
     """
-    G = _build_full_graph(neo4j_client)
+    import asyncio
+    G = await asyncio.to_thread(_build_full_graph, neo4j_client)
     skipped_id = payload.skipped_skill_id
 
     # --- Verify skill exists in graph ---
