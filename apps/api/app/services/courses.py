@@ -19,7 +19,28 @@ async def fetch_dynamic_courses(target_role: str, active_milestone: str = None, 
             videos_search = VideosSearch(query, limit=limit)
             return videos_search.result()
 
-        results = await asyncio.to_thread(search)
+        try:
+            results = await asyncio.wait_for(asyncio.to_thread(search), timeout=5.0)
+        except asyncio.TimeoutError:
+            logger.warning(f"YouTube search timed out for query: {query}. Returning fallback data.")
+            return [
+                {
+                    "title": f"Complete {targetRole} Bootcamp 2026",
+                    "description": "Master the fundamentals and advanced concepts with this comprehensive guide.",
+                    "provider": "Tech Mastery",
+                    "duration": "10:30:00",
+                    "videoId": "jBzwzrDvZ18", 
+                    "link": "https://www.youtube.com/watch?v=jBzwzrDvZ18"
+                },
+                {
+                    "title": f"{activeMilestone or 'Advanced'} Concepts in 2 Hours",
+                    "description": "A deep dive into essential skills required for modern industry standards.",
+                    "provider": "Code Academy",
+                    "duration": "2:15:00",
+                    "videoId": "bJzb-RuUcMU",
+                    "link": "https://www.youtube.com/watch?v=bJzb-RuUcMU"
+                }
+            ]
         
         courses = []
         if results and "result" in results:
@@ -46,4 +67,13 @@ async def fetch_dynamic_courses(target_role: str, active_milestone: str = None, 
         return courses
     except Exception as e:
         logger.error(f"Failed to fetch YouTube courses: {str(e)}")
-        raise e
+        return [
+            {
+                "title": f"Complete {targetRole} Bootcamp 2026",
+                "description": "Master the fundamentals and advanced concepts with this comprehensive guide.",
+                "provider": "Tech Mastery",
+                "duration": "10:30:00",
+                "videoId": "jBzwzrDvZ18", 
+                "link": "https://www.youtube.com/watch?v=jBzwzrDvZ18"
+            }
+        ]

@@ -45,29 +45,15 @@ async def lifespan(app: FastAPI):
                 await session.execute(text("CREATE TABLE IF NOT EXISTS rate_limits (id INTEGER PRIMARY KEY AUTOINCREMENT, client_ip TEXT, timestamp REAL)"))
             await session.commit()
             
-            # Use advisory lock on PostgreSQL to prevent multiple workers from seeding simultaneously
+            # We bypass the advisory lock because session-level locks are unsafe over PgBouncer
             locked = True
-            if is_postgres:
-                try:
-                    lock_res = await session.execute(text("SELECT pg_try_advisory_lock(123456789)"))
-                    locked = lock_res.scalar()
-                except Exception as lock_err:
-                    logger.warning(f"[Startup] Advisory lock query failed: {lock_err}")
-                    locked = True
             
             if locked:
-                logger.info("[Startup] Acquired lock/permission. Proceeding with seeding...")
+                logger.info("[Startup] Proceeding with seeding...")
                 try:
                     await run_startup_seeding(engine, async_session, neo4j_client)
-                finally:
-                    if is_postgres:
-                        try:
-                            await session.execute(text("SELECT pg_advisory_unlock(123456789)"))
-                            await session.commit()
-                        except Exception:
-                            pass
-            else:
-                logger.info("[Startup] Another worker is seeding. Skipping.")
+                except Exception as e:
+                    logger.error(f"[Startup] Seeding failed: {e}")
 
     # Synchronously ensure tables are created before accepting traffic to prevent "relation does not exist" errors
     async def init_tables():

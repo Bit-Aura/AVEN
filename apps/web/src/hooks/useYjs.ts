@@ -21,8 +21,9 @@ export function useYjs(sessionId: string | number | undefined, editorRef: any, u
       ydoc = new Y.Doc();
       
       // Connect to dedicated local y-websocket server (run via `npm run yjs-server`)
+      const wsUrl = process.env.NEXT_PUBLIC_YJS_URL || 'ws://localhost:1234';
       provider = new WebsocketProvider(
-        'ws://localhost:1234',
+        wsUrl,
         `aven-p2p-session-${sessionId}`,
         ydoc
       );

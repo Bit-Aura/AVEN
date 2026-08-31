@@ -67,7 +67,10 @@ export function useWebRTC(sessionId: string | number | undefined, userId: string
     };
 
     // 3. Connect WebSocket for signaling
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+    const defaultWs = process.env.NEXT_PUBLIC_API_URL 
+      ? process.env.NEXT_PUBLIC_API_URL.replace('http', 'ws').replace('/api/v1', '')
+      : 'ws://localhost:8000';
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || defaultWs;
     const ws = new WebSocket(`${wsUrl}/api/v1/p2p/${sessionId}/ws/${userId}`);
     wsRef.current = ws;
 

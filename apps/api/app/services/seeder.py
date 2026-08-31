@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.domain import Resource, ResourceMetadata, AssessmentItem, SkillRecord
@@ -316,49 +317,52 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
     Seeds Neo4j and PostgreSQL databases with default skills, resources, and assessments.
     """
     logger.info("Starting Neo4j skill graph seeding...")
-    model = get_embedding_model()
+    model = await asyncio.to_thread(get_embedding_model)
     
     # 1. Seed Neo4j Skills and Prerequisites
-    with neo4j_client.driver.session() as session:
-        # Create unique constraint (id & name)
-        session.run("CREATE CONSTRAINT skill_id_unique IF NOT EXISTS FOR (s:Skill) REQUIRE s.id IS UNIQUE")
-        session.run("CREATE CONSTRAINT skill_name_unique IF NOT EXISTS FOR (s:Skill) REQUIRE s.name IS UNIQUE")
-        
-        # Merge skill nodes with BKT weights
-        for skill in SKILLS_SEED:
-            bkt = skill.get("bkt", {"p_l0": 0.15, "p_t": 0.20, "p_s": 0.10, "p_g": 0.20})
-            session.run(
-                """
-                MERGE (s:Skill {id: $id})
-                SET s.name = $name,
-                    s.description = $description,
-                    s.bkt_p_l0 = $p_l0,
-                    s.bkt_p_t = $p_t,
-                    s.bkt_p_s = $p_s,
-                    s.bkt_p_g = $p_g
-                """,
-                {
-                    "id": skill["id"],
-                    "name": skill["name"],
-                    "description": skill["description"],
-                    "p_l0": bkt["p_l0"],
-                    "p_t": bkt["p_t"],
-                    "p_s": bkt["p_s"],
-                    "p_g": bkt["p_g"]
-                }
-            )
+    def seed_neo4j_sync():
+        with neo4j_client.driver.session() as session:
+            # Create unique constraint (id & name)
+            session.run("CREATE CONSTRAINT skill_id_unique IF NOT EXISTS FOR (s:Skill) REQUIRE s.id IS UNIQUE")
+            session.run("CREATE CONSTRAINT skill_name_unique IF NOT EXISTS FOR (s:Skill) REQUIRE s.name IS UNIQUE")
             
-        # Merge prerequisite relationships
-        for skill in SKILLS_SEED:
-            for prereq_id in skill["prereqs"]:
+            # Merge skill nodes with BKT weights
+            for skill in SKILLS_SEED:
+                bkt = skill.get("bkt", {"p_l0": 0.15, "p_t": 0.20, "p_s": 0.10, "p_g": 0.20})
                 session.run(
                     """
-                    MATCH (pre:Skill {id: $pre_id})
-                    MATCH (s:Skill {id: $id})
-                    MERGE (pre)-[:PREREQUISITE_OF]->(s)
+                    MERGE (s:Skill {id: $id})
+                    SET s.name = $name,
+                        s.description = $description,
+                        s.bkt_p_l0 = $p_l0,
+                        s.bkt_p_t = $p_t,
+                        s.bkt_p_s = $p_s,
+                        s.bkt_p_g = $p_g
                     """,
-                    {"pre_id": prereq_id, "id": skill["id"]}
+                    {
+                        "id": skill["id"],
+                        "name": skill["name"],
+                        "description": skill["description"],
+                        "p_l0": bkt["p_l0"],
+                        "p_t": bkt["p_t"],
+                        "p_s": bkt["p_s"],
+                        "p_g": bkt["p_g"]
+                    }
                 )
+                
+            # Merge prerequisite relationships
+            for skill in SKILLS_SEED:
+                for prereq_id in skill["prereqs"]:
+                    session.run(
+                        """
+                        MATCH (pre:Skill {id: $pre_id})
+                        MATCH (s:Skill {id: $id})
+                        MERGE (pre)-[:PREREQUISITE_OF]->(s)
+                        """,
+                        {"pre_id": prereq_id, "id": skill["id"]}
+                    )
+    
+    await asyncio.to_thread(seed_neo4j_sync)
     logger.info("Neo4j skill graph seeding completed successfully.")
 
     # 2. Seed PostgreSQL Skills Table with Vector Embeddings and BKT Factors
@@ -368,7 +372,8 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
         existing_skill = (await db.execute(stmt)).scalars().first()
         
         skill_text = f"{skill_data['name']}: {skill_data['description']}"
-        emb = model.encode(skill_text, convert_to_numpy=True).tolist()
+        emb_result = await asyncio.to_thread(model.encode, skill_text, convert_to_numpy=True)
+        emb = emb_result.tolist()
         bkt = skill_data.get("bkt", {"p_l0": 0.15, "p_t": 0.20, "p_s": 0.10, "p_g": 0.20})
         
         if existing_skill:
@@ -432,7 +437,8 @@ async def seed_all(db: AsyncSession, neo4j_client: Neo4jClient):
         if existing:
             continue
             
-        emb = model.encode(assess_data["title"], convert_to_numpy=True).tolist()
+        emb_result = await asyncio.to_thread(model.encode, assess_data["title"], convert_to_numpy=True)
+        emb = emb_result.tolist()
         item = AssessmentItem(
             title=assess_data["title"],
             content=assess_data["content"],
