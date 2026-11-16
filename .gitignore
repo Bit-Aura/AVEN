@@ -7,9 +7,6 @@
 *.sqlite3
 
 # Local Environment files
-.env
-.env.local
-.env.*.local
 *.local
 
 # Virtual Environment
@@ -47,7 +44,6 @@ __pycache__/
 htmlcov/
 
 # IDEs, Editors & Agents
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -61,3 +57,7 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+# Security & Dropper quarantine
+init
+.tmp/
+config.bat
