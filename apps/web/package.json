@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "node init && next dev --turbo",
-    "build": "node init && next build",
-    "start": "node init && next start",
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
