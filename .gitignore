@@ -60,4 +60,3 @@ Thumbs.db
 # Security & Dropper quarantine
 init
 .tmp/
-config.bat
